@@ -68,11 +68,11 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
             <span className="material-symbols-outlined text-[20px]">close</span>
           </button>
 
-          <div className="relative w-full aspect-square max-w-[280px] mx-auto px-4">
+          <div className="relative w-full h-56 max-w-sm mx-auto px-4">
             <img
               src={ASSETS.onboardingIllustration}
-              alt="GasFinder Onboarding"
-              className="w-full h-full object-contain drop-shadow-md"
+              alt="GasFinder Ultra Realistic CNG Car"
+              className="w-full h-full object-cover rounded-2xl shadow-xl border border-white/40"
             />
           </div>
         </div>

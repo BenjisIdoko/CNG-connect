@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { GasStation, StationStatus, DriverReport } from '../types';
 import { ASSETS } from '../data/mockData';
+import { verifyImageMetadata } from '../utils/imageMetadataVerifier';
+import { LiveCameraCaptureModal } from './LiveCameraCaptureModal';
 
 interface ReportStatusModalProps {
   station: GasStation;
@@ -17,14 +19,33 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
   const [waitTime, setWaitTime] = useState<number>(15);
   const [comment, setComment] = useState<string>('');
   const [attachedPhoto, setAttachedPhoto] = useState<string | null>(null);
+  const [photoError, setPhotoError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showLiveCamera, setShowLiveCamera] = useState(false);
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      // Run anti-misinformation metadata verification
+      const verification = verifyImageMetadata(file, undefined, 30);
+      if (!verification.isValid) {
+        setPhotoError(verification.reason || 'Gallery photo rejected. Live camera capture required.');
+        setAttachedPhoto(null);
+        return;
+      }
+
       const reader = new FileReader();
       reader.onload = (event) => {
-        setAttachedPhoto(event.target?.result as string);
+        const dataUrl = event.target?.result as string;
+        const urlVerification = verifyImageMetadata(undefined, dataUrl);
+        if (!urlVerification.isValid) {
+          setPhotoError(urlVerification.reason || 'Duplicate old photo detected.');
+          setAttachedPhoto(null);
+          return;
+        }
+
+        setPhotoError(null);
+        setAttachedPhoto(dataUrl);
       };
       reader.readAsDataURL(file);
     }
@@ -81,10 +102,16 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
 
         {/* Content */}
         <div className="px-5 pb-6 pt-1">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-[20px] font-extrabold text-[#141d19] leading-snug">
-              How's {station.name} right now?
-            </h2>
+          <div className="flex justify-between items-start mb-2">
+            <div>
+              <div className="flex items-center gap-1.5 text-[11px] font-extrabold text-[#006c50] uppercase tracking-wider mb-0.5">
+                <span className="material-symbols-outlined text-[15px]">groups</span>
+                <span>{station.name} Group Feed</span>
+              </div>
+              <h2 className="text-[19px] font-extrabold text-[#141d19] leading-snug">
+                Update Gas Availability
+              </h2>
+            </div>
             <button
               onClick={onClose}
               className="w-8 h-8 rounded-full flex items-center justify-center text-[#6a7b72] hover:bg-[#e6f0e9]"
@@ -92,6 +119,9 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
               <span className="material-symbols-outlined text-[22px]">close</span>
             </button>
           </div>
+          <p className="text-[12px] text-[#6a7b72] mb-4">
+            Submitting this report updates live CNG status and posts directly into the <strong>{station.name} Group</strong> discussion.
+          </p>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             {/* 4 Status Selector Cards */}
@@ -219,45 +249,66 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
               </div>
             </div>
 
-            {/* Photo of Pump Meter */}
+            {/* Live Camera Snapshot of Pump Meter */}
             <div>
-              <label className="block text-[13px] font-bold text-[#3a4a43] mb-1.5">
-                Photo of Pump Meter (Optional)
-              </label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-[13px] font-bold text-[#3a4a43]">
+                  Live Photo of Pump Meter (Camera Only)
+                </label>
+                <span className="text-[10px] font-extrabold text-[#006c50] bg-emerald-100 px-2 py-0.5 rounded-full flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#00c853] animate-pulse" />
+                  Gallery Blocked
+                </span>
+              </div>
+
+              {photoError && (
+                <div className="mb-2 p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-[12px] font-bold flex items-start gap-2">
+                  <span className="material-symbols-outlined text-[18px] shrink-0 text-rose-600">
+                    gpp_bad
+                  </span>
+                  <span>{photoError}</span>
+                </div>
+              )}
+
               {attachedPhoto ? (
-                <div className="relative rounded-2xl overflow-hidden border border-[#006c50] max-h-40 bg-black/10">
+                <div className="relative rounded-2xl overflow-hidden border-2 border-[#006c50] max-h-40 bg-black/10">
                   <img
                     src={attachedPhoto}
-                    alt="Uploaded meter"
+                    alt="Verified meter snapshot"
                     className="w-full h-36 object-cover"
                   />
+                  <div className="absolute bottom-2 left-2 bg-[#004D40]/90 text-[#00E676] text-[10px] font-black px-2.5 py-1 rounded-full backdrop-blur-md flex items-center gap-1 border border-emerald-400/40">
+                    <span className="material-symbols-outlined text-[13px]">verified</span>
+                    Live Camera Verified
+                  </div>
                   <button
                     type="button"
-                    onClick={() => setAttachedPhoto(null)}
+                    onClick={() => {
+                      setAttachedPhoto(null);
+                      setPhotoError(null);
+                    }}
                     className="absolute top-2 right-2 bg-black/70 text-white p-1.5 rounded-full hover:bg-black"
                   >
                     <span className="material-symbols-outlined text-[18px]">delete</span>
                   </button>
                 </div>
               ) : (
-                <label className="w-full flex flex-col items-center justify-center p-4 border-2 border-dashed border-[#b9cbc1] rounded-2xl bg-[#f2fcf5] hover:bg-[#ecf6ef] transition-colors cursor-pointer group">
-                  <span className="material-symbols-outlined text-[#6a7b72] mb-1 group-hover:text-[#006c50] transition-colors text-[28px]">
-                    photo_camera
-                  </span>
-                  <span className="text-[13px] font-bold text-[#3a4a43] text-center leading-tight">
-                    Add a photo of the pump meter
-                    <br />
-                    <span className="text-[11px] font-medium text-[#6a7b72]">
-                      (Validates dispenser pressure & price)
+                <div className="flex flex-col gap-2">
+                  {/* Live HTML5 Viewfinder Camera Trigger - 100% Gallery Blocked */}
+                  <button
+                    type="button"
+                    onClick={() => setShowLiveCamera(true)}
+                    className="w-full py-3.5 px-4 bg-[#004D40] hover:bg-[#006c50] text-white rounded-2xl font-extrabold text-[14px] shadow-md flex items-center justify-center gap-2.5 active:scale-95 transition-all"
+                  >
+                    <span className="material-symbols-outlined text-[24px] text-[#00E676]">
+                      photo_camera
                     </span>
-                  </span>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handlePhotoUpload}
-                    className="hidden"
-                  />
-                </label>
+                    <span>Take Live Camera Photo (Gallery Blocked)</span>
+                  </button>
+                  <p className="text-[11px] font-semibold text-[#6a7b72] text-center">
+                    🔒 Photo gallery access is disabled to prevent old/fake queue reports.
+                  </p>
+                </div>
               )}
             </div>
 
@@ -293,6 +344,18 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
           </form>
         </div>
       </div>
+
+      {showLiveCamera && (
+        <LiveCameraCaptureModal
+          title={`Live Photo of ${station.name}`}
+          onCapture={(dataUrl) => {
+            setAttachedPhoto(dataUrl);
+            setPhotoError(null);
+            setShowLiveCamera(false);
+          }}
+          onClose={() => setShowLiveCamera(false)}
+        />
+      )}
     </div>
   );
 };

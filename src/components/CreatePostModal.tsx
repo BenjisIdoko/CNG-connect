@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { CommunityPost } from '../types';
 import { ASSETS } from '../data/mockData';
+import { verifyImageMetadata, registerSharedImageHash } from '../utils/imageMetadataVerifier';
+import { LiveCameraCaptureModal } from './LiveCameraCaptureModal';
 
 interface CreatePostModalProps {
   isOpen: boolean;
@@ -18,15 +20,33 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
   const [content, setContent] = useState('');
   const [price, setPrice] = useState('');
   const [attachedImage, setAttachedImage] = useState<string | null>(null);
+  const [imageError, setImageError] = useState<string | null>(null);
+  const [showLiveCamera, setShowLiveCamera] = useState(false);
 
   if (!isOpen) return null;
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      const verification = verifyImageMetadata(file, undefined, 30);
+      if (!verification.isValid) {
+        setImageError(verification.reason || 'Old gallery photo rejected. Anti-misinformation rules require a live camera capture.');
+        setAttachedImage(null);
+        return;
+      }
+
       const reader = new FileReader();
       reader.onload = (event) => {
-        setAttachedImage(event.target?.result as string);
+        const dataUrl = event.target?.result as string;
+        const urlVerification = verifyImageMetadata(undefined, dataUrl);
+        if (!urlVerification.isValid) {
+          setImageError(urlVerification.reason || 'Duplicate old photo detected.');
+          setAttachedImage(null);
+          return;
+        }
+
+        setImageError(null);
+        setAttachedImage(dataUrl);
       };
       reader.readAsDataURL(file);
     }
@@ -35,6 +55,10 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim() || !content.trim()) return;
+
+    if (attachedImage) {
+      registerSharedImageHash(attachedImage);
+    }
 
     const categoryLabels = {
       maintenance: 'Maintenance',
@@ -69,7 +93,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
       <div className="w-full max-w-lg bg-[#f2fcf5] rounded-t-3xl sm:rounded-3xl shadow-2xl p-5 border border-[#dbe5de] max-h-[90vh] overflow-y-auto pb-safe animate-slide-up">
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex justify-between items-center mb-3">
           <h2 className="text-[20px] font-extrabold text-[#141d19]">
             Create Community Post
           </h2>
@@ -79,6 +103,16 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
           >
             <span className="material-symbols-outlined text-[22px]">close</span>
           </button>
+        </div>
+
+        {/* Station Group Scoping Banner */}
+        <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-3 mb-4 flex items-start gap-2.5">
+          <span className="material-symbols-outlined text-[#006c50] text-[20px] shrink-0 mt-0.5">
+            groups
+          </span>
+          <p className="text-[12px] text-[#004D40] leading-snug">
+            <strong>Posting about Gas Availability or Station Status?</strong> Updates on CNG availability must be posted inside the station's dedicated <strong>Station Group</strong>.
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -164,21 +198,44 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
             />
           </div>
 
-          {/* Image Upload */}
+          {/* Image Upload (Live Camera Enforcement & Freshness Verified) */}
           <div>
-            <label className="block text-[13px] font-bold text-[#3a4a43] mb-1">
-              Attach Image (Optional)
-            </label>
+            <div className="flex items-center justify-between mb-1">
+              <label className="block text-[13px] font-bold text-[#3a4a43]">
+                Attach Photo (Live Camera Only)
+              </label>
+              <span className="text-[10px] font-extrabold text-[#006c50] bg-emerald-100 px-2 py-0.5 rounded-full flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#00c853] animate-pulse" />
+                Anti-Misinformation Verified
+              </span>
+            </div>
+
+            {imageError && (
+              <div className="mb-2 p-2.5 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-[11.5px] font-bold flex items-start gap-2">
+                <span className="material-symbols-outlined text-[16px] shrink-0 text-rose-600">
+                  gpp_bad
+                </span>
+                <span>{imageError}</span>
+              </div>
+            )}
+
             {attachedImage ? (
-              <div className="relative rounded-2xl overflow-hidden border border-[#006c50] max-h-36">
+              <div className="relative rounded-2xl overflow-hidden border-2 border-[#006c50] max-h-36">
                 <img
                   src={attachedImage}
-                  alt="Uploaded preview"
+                  alt="Verified live snapshot"
                   className="w-full h-32 object-cover"
                 />
+                <div className="absolute bottom-2 left-2 bg-[#004D40]/90 text-[#00E676] text-[10px] font-black px-2.5 py-1 rounded-full backdrop-blur-md flex items-center gap-1 border border-emerald-400/40">
+                  <span className="material-symbols-outlined text-[12px]">verified</span>
+                  Fresh Camera Verified
+                </div>
                 <button
                   type="button"
-                  onClick={() => setAttachedImage(null)}
+                  onClick={() => {
+                    setAttachedImage(null);
+                    setImageError(null);
+                  }}
                   className="absolute top-2 right-2 bg-black/70 text-white p-1 rounded-full hover:bg-black"
                 >
                   <span className="material-symbols-outlined text-[16px]">
@@ -187,18 +244,19 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
                 </button>
               </div>
             ) : (
-              <label className="w-full flex items-center justify-center p-3 border-2 border-dashed border-[#b9cbc1] rounded-2xl bg-[#e6f0e9]/50 hover:bg-[#e6f0e9] transition-colors cursor-pointer gap-2 text-[#6a7b72]">
-                <span className="material-symbols-outlined text-[22px]">
-                  add_photo_alternate
-                </span>
-                <span className="text-[13px] font-bold">Select vehicle or part photo</span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handlePhotoUpload}
-                  className="hidden"
-                />
-              </label>
+              <div className="flex flex-col gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => setShowLiveCamera(true)}
+                  className="w-full py-3 px-3 bg-[#004D40] hover:bg-[#006c50] text-white rounded-xl font-extrabold text-[13px] shadow-xs flex items-center justify-center gap-2 active:scale-95 transition-all"
+                >
+                  <span className="material-symbols-outlined text-[20px] text-[#00E676]">photo_camera</span>
+                  <span>Take Live Camera Photo (Gallery Blocked)</span>
+                </button>
+                <p className="text-[10.5px] font-semibold text-[#6a7b72] text-center">
+                  🔒 Photo gallery access is disabled to prevent old/fake queue posts.
+                </p>
+              </div>
             )}
           </div>
 
@@ -211,6 +269,18 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
           </button>
         </form>
       </div>
+
+      {showLiveCamera && (
+        <LiveCameraCaptureModal
+          title="Live Community Post Snapshot"
+          onCapture={(dataUrl) => {
+            setAttachedImage(dataUrl);
+            setImageError(null);
+            setShowLiveCamera(false);
+          }}
+          onClose={() => setShowLiveCamera(false)}
+        />
+      )}
     </div>
   );
 };

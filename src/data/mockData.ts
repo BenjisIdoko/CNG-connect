@@ -3,7 +3,8 @@ import { GasStation, CommunityPost, ChatMessage, UserProfile } from '../types';
 export const ASSETS = {
   logo: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBXr7CW16AX90XXUC1EdR0947RfRhBmIMe7HGiTWGlNAfGwTjlU7-lTNdNZOFmMx0hT2pos-9hloFXrn6tzhZhIqf5injkLdwnsrzdFuFOpGLExVMmNWBoJOehAzMklKXWRfnUIZBerlJrQZaEbobRnbD1qrprVK0us0AqOtuR6j_eVKDAiNidpATVWDBFDWlfe5xNtN-QwiBp6qL5hm_qWsn0qJSjPsewJfcTmRzpoX1oYPchl_69f5g',
   userAvatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuD7xFFR2C9kpy2vVrPaglu8tSaJ2yPvSNma0VnfEFhkFAoGhw0k7eabmD26I9I8Uit2q_G3FPTA2zP6Fn4xm-c3vwzIGjQKmI8O9bNRyi8izC6LVo_gcmkkd22f6HhmFyuyGEBzpXMBB0BnqqSQ238Js13aC7eer1NGIe4g7LogNDFixISR2Ak95DAeMZuRNFTDDbjfX1Q9vcxp5o0bbCh5ktVaqn-RWIQWcFXhT7wvTjJvm3mvGdDaaA',
-  onboardingIllustration: 'https://lh3.googleusercontent.com/aida-public/AB6AXuC8RQ_VPuW0Y29QgcrA4klNuG6UdTLNtkezcZfWRQR5dHOE7lW8sDJD_P9qjNe10uBhQdsa0ZF0THmynbC9j0y0--Xz8QMUlPlcVww-rp1OPHxEiIA1sqeUvW2aFo_KTrdSHuph-jYQErXUnOoNSE18r0lu2BCalj4aZI5r3QRlZluDc72fUK8l8io-IesSSjY2A3hcvopavs5_p-O9b1rhb1fYlXMuHorFdjFIOszOJfUCoJIJ4P5XrA',
+  onboardingIllustration: 'https://lh3.googleusercontent.com/aida/AP1WRLsJjFzQoG75Jq83Z403b2n8',
+  evSideProfile: 'https://lh3.googleusercontent.com/aida/AP1WRLu_N',
   lagosMap: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDsiVOFvqz971wSOAftqcYFdOkgbTRWuYY70qxsxTqTCdcRUdE6GEGs-viRukOoowE1tCYD_A9KR6kTkBUW1aBZzsKA3o3H7Y62Z0wsrZWOREe_a27XONXQ6gzmkHVKXjkBMo1madFKC9v-beJFdh4GO4fKAB_5BMa0sGjYw85o8RPhkjGU_5EyutOk6h_eMyKzGf7w-gc6UB5xECKlsepu-PCKw-_XWcjiGCxbKKQ2zIykv6VqY5u8pw',
   abujaMap: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAR9KEvDgGDcRWMz3ZBy1F1m-YrxxUJt75EMHU6k9WaWY0DxmA2F024FqprTG-OE3zHaCmM6mY_iRPdwOvm2ty2amwbzQB76EBev5B7F36zYhlwAOLwanFj63hmCMdHnDjqoh75PVXnFKr11P-DcN_HAypcboHQmMZr0bl7bI1GcrkMpj_cBIlGser2-O3re2pat_S2isHvSoa7Xad0AjezB5ZP9gEfnZUcu-4c1hIa_GCAEAmfRZ8Mlw',
   notificationMap: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAOCk3ll_LFFVoMdGMqFtUsm7yx1rUizLGquZwqhthVa9_k7PwZvtyiQa0Ucv5dwNP7dZz7MHSRDQgR-mjDEc1DXR383vtZbpX-jnIfLJYDLbzQOlf-ZYH0akRaVUPntXfu6Z4iHiHSNHBD4sdOb-wiFLwMxfdMWjG3f4luYxQABSc7VwEjH2QnWu6g7rgjvYyhPU3HsjZ0vaixE-7lUozFKjdXv5DXVfUYh9tzjs3WwfVNaY_loRY7Vw',
@@ -65,7 +66,37 @@ export const INITIAL_STATIONS: GasStation[] = [
     operator: 'TotalEnergies / Pi-CNG',
     phone: '+234 9 291 5000',
     coordinates: { x: 48, y: 38 },
+    lat: 9.0765,
+    lng: 7.4853,
     images: [ASSETS.dispenserGreen, ASSETS.totalCanopy, ASSETS.pumpMeter, ASSETS.fuelNozzle],
+    memberCount: 184,
+    isJoined: true,
+    stationNotice: 'Official Pi-CNG Station Group. Update gas availability and report live pump pressures here!',
+    stationComments: [
+      {
+        id: 'st-c-wuse1',
+        author: 'Adeola B.',
+        authorAvatar: ASSETS.ngoziAvatar,
+        timeAgo: '15 min ago',
+        content: 'Dispenser pump #1 is moving very fast. Less than 5 min queue right now!',
+      },
+      {
+        id: 'st-c-wuse2',
+        author: 'Yakubu M.',
+        authorAvatar: ASSETS.babaAvatar,
+        timeAgo: '45 min ago',
+        content: 'Is pump #2 active today?',
+        replies: [
+          {
+            id: 'st-r-wuse1',
+            author: 'Obinna N.',
+            authorAvatar: ASSETS.obinnaAvatar,
+            timeAgo: '30 min ago',
+            content: 'Yes, both pumps are running smoothly at 215 bar!',
+          },
+        ],
+      },
+    ],
     reports: [
       {
         id: 'rep-wuse-1',
@@ -115,7 +146,21 @@ export const INITIAL_STATIONS: GasStation[] = [
     operator: 'NNPC / NIPCO Gas',
     phone: '+234 9 774 2190',
     coordinates: { x: 30, y: 72 },
+    lat: 8.9772,
+    lng: 7.3756,
     images: [ASSETS.pumpMeter, ASSETS.fuelNozzle, ASSETS.stationWide],
+    memberCount: 240,
+    isJoined: true,
+    stationNotice: 'Airport Road Station Group. Please post all live gas availability, queue updates, and pump reports in this group!',
+    stationComments: [
+      {
+        id: 'st-c-nip1',
+        author: 'Baba_Chauffeur',
+        authorAvatar: ASSETS.babaAvatar,
+        timeAgo: '20 min ago',
+        content: 'No waiting time right now at pump 1. Pressure is maxed out at 220 bar.',
+      },
+    ],
     reports: [
       {
         id: 'rep-nip-1',
@@ -151,6 +196,8 @@ export const INITIAL_STATIONS: GasStation[] = [
     operator: 'NNPC Retail',
     phone: '+234 9 270 3000',
     coordinates: { x: 62, y: 55 },
+    lat: 9.0145,
+    lng: 7.4912,
     images: [ASSETS.stationWide, ASSETS.pumpMeter, ASSETS.totalCanopy],
     reports: [
       {
@@ -187,6 +234,8 @@ export const INITIAL_STATIONS: GasStation[] = [
     operator: 'BOVAS Group',
     phone: '+234 9 290 8820',
     coordinates: { x: 50, y: 28 },
+    lat: 9.0621,
+    lng: 7.4682,
     images: [ASSETS.dispenserGreen, ASSETS.totalCanopy],
     reports: [
       {
@@ -223,6 +272,8 @@ export const INITIAL_STATIONS: GasStation[] = [
     operator: 'NNPC / NIPCO Gas',
     phone: '+234 9 883 1000',
     coordinates: { x: 22, y: 25 },
+    lat: 9.1523,
+    lng: 7.3341,
     images: [ASSETS.dispenserGreen, ASSETS.stationWide],
     reports: [
       {
@@ -259,6 +310,8 @@ export const INITIAL_STATIONS: GasStation[] = [
     operator: 'Portland Gas',
     phone: '+234 9 555 9000',
     coordinates: { x: 55, y: 65 },
+    lat: 9.0560,
+    lng: 7.4420,
     images: [ASSETS.stationWide, ASSETS.fuelNozzle],
     reports: [
       {
@@ -295,6 +348,8 @@ export const INITIAL_STATIONS: GasStation[] = [
     operator: 'BOVAS Group',
     phone: '+234 9 290 8821',
     coordinates: { x: 38, y: 78 },
+    lat: 8.9810,
+    lng: 7.4210,
     images: [ASSETS.totalCanopy, ASSETS.pumpMeter],
     reports: [
       {
@@ -331,6 +386,8 @@ export const INITIAL_STATIONS: GasStation[] = [
     operator: 'NNPC / NIPCO Gas',
     phone: '+234 9 881 4400',
     coordinates: { x: 15, y: 20 },
+    lat: 9.1200,
+    lng: 7.2900,
     images: [ASSETS.stationWide, ASSETS.dispenserGreen],
     reports: [
       {
@@ -369,6 +426,8 @@ export const INITIAL_STATIONS: GasStation[] = [
     operator: 'NIPCO Gas / NNPC Ltd',
     phone: '+234 1 774 2190',
     coordinates: { x: 45, y: 40 },
+    lat: 6.6120,
+    lng: 3.3560,
     images: [ASSETS.stationWide, ASSETS.pumpMeter, ASSETS.fuelNozzle],
     reports: [
       {
@@ -405,6 +464,8 @@ export const INITIAL_STATIONS: GasStation[] = [
     operator: 'NIPCO Gas',
     phone: '+234 1 270 2400',
     coordinates: { x: 70, y: 65 },
+    lat: 6.4689,
+    lng: 3.6210,
     images: [ASSETS.totalCanopy, ASSETS.dispenserGreen],
     reports: [
       {
@@ -441,6 +502,8 @@ export const INITIAL_STATIONS: GasStation[] = [
     operator: 'Portland Gas / IBILE',
     phone: '+234 1 342 9000',
     coordinates: { x: 50, y: 48 },
+    lat: 6.5821,
+    lng: 3.3791,
     images: [ASSETS.stationWide, ASSETS.pumpMeter],
     reports: [
       {
@@ -477,6 +540,8 @@ export const INITIAL_STATIONS: GasStation[] = [
     operator: 'BOVAS Group',
     phone: '+234 1 892 1100',
     coordinates: { x: 35, y: 52 },
+    lat: 6.5510,
+    lng: 3.2680,
     images: [ASSETS.dispenserGreen, ASSETS.fuelNozzle],
     reports: [
       {
@@ -515,6 +580,8 @@ export const INITIAL_STATIONS: GasStation[] = [
     operator: 'NIPCO Gas',
     phone: '+234 52 250 880',
     coordinates: { x: 60, y: 70 },
+    lat: 6.3012,
+    lng: 5.6201,
     images: [ASSETS.stationWide, ASSETS.pumpMeter],
     reports: [
       {
@@ -551,6 +618,8 @@ export const INITIAL_STATIONS: GasStation[] = [
     operator: 'BOVAS Group',
     phone: '+234 52 291 002',
     coordinates: { x: 65, y: 75 },
+    lat: 6.3120,
+    lng: 5.6410,
     images: [ASSETS.dispenserGreen, ASSETS.totalCanopy],
     reports: [
       {
@@ -589,6 +658,8 @@ export const INITIAL_STATIONS: GasStation[] = [
     operator: 'NIPCO Gas / NNPC Ltd',
     phone: '+234 2 241 3300',
     coordinates: { x: 30, y: 60 },
+    lat: 7.3512,
+    lng: 3.8901,
     images: [ASSETS.stationWide, ASSETS.pumpMeter, ASSETS.totalCanopy],
     reports: [
       {
@@ -625,6 +696,8 @@ export const INITIAL_STATIONS: GasStation[] = [
     operator: 'BOVAS Group',
     phone: '+234 2 810 5500',
     coordinates: { x: 28, y: 55 },
+    lat: 7.4480,
+    lng: 3.9010,
     images: [ASSETS.dispenserGreen, ASSETS.fuelNozzle],
     reports: [
       {
@@ -643,7 +716,66 @@ export const INITIAL_STATIONS: GasStation[] = [
   },
 ];
 
-export const INITIAL_POSTS: CommunityPost[] = [
+export const INITIAL_COMMUNITY_POSTS: CommunityPost[] = [
+  {
+    id: 'post-picng-centers-ikeja',
+    author: 'Inoventive Tech (Pi-CNG Accredited)',
+    authorAvatar: ASSETS.userAvatar,
+    verified: true,
+    timeAgo: 'Just now',
+    category: 'conversions',
+    categoryLabel: 'CNG Kit Centers',
+    title: 'Inoventive Technology Pi-CNG Conversion Center (Ikeja, Lagos)',
+    content: 'Official Pi-CNG accredited vehicle conversion workshop at Plot A2 Billings Way, Carmax Yard, Ikeja, Lagos. Fast 4-hour sequential kit installation with certified Italian pressure regulator valves & 15kg steel cylinder tanks. Accredited by Presidential CNG Initiative (pci.gov.ng).',
+    image: ASSETS.cngEngineBay,
+    likes: 42,
+    isLiked: true,
+    repliesCount: 18,
+    isListing: true,
+    price: 'Pi-CNG Certified',
+    comments: [
+      {
+        id: 'com-conv-1',
+        author: 'Ade_Driver',
+        authorAvatar: ASSETS.davidAvatar,
+        timeAgo: '30m ago',
+        content: 'Converted my 2012 Corolla here last week under the Pi-CNG program! Engine running smooth, saving ~₦80k monthly.',
+      },
+      {
+        id: 'com-conv-2',
+        author: 'Inoventive Tech',
+        authorAvatar: ASSETS.userAvatar,
+        timeAgo: '15m ago',
+        content: 'Thank you Ade! We test all converted cylinders to 220 bar safety standard before handover.',
+      }
+    ]
+  },
+  {
+    id: 'post-picng-centers-ogba',
+    author: 'Aseba Star Motors',
+    authorAvatar: ASSETS.ngoziAvatar,
+    verified: true,
+    timeAgo: '1h ago',
+    category: 'conversions',
+    categoryLabel: 'CNG Kit Centers',
+    title: 'Aseba Star Motors Certified CNG Kit Installation (Ogba & Ota)',
+    content: 'Aseba Star Motors (Accredited Code LA1575SHB) at 15 Mokuolu Street, Ogba, Lagos & Idiroko Road, Ota. Complete dual-fuel petrol/CNG ECU calibration, safety spark plug tuning & certified cylinder mounting.',
+    image: ASSETS.cngEngineBay,
+    likes: 31,
+    isLiked: false,
+    repliesCount: 9,
+    isListing: true,
+    price: 'Accredited Center',
+    comments: [
+      {
+        id: 'com-aseba-1',
+        author: 'Kabiru_Taxi',
+        authorAvatar: ASSETS.babaAvatar,
+        timeAgo: '40m ago',
+        content: 'Do you install for 1.8L Toyota Sienna vans?',
+      }
+    ]
+  },
   {
     id: 'post-lekki-cng',
     author: 'Tunde_Drives',
@@ -784,6 +916,8 @@ export const INITIAL_POSTS: CommunityPost[] = [
   }
 ];
 
+export const INITIAL_POSTS = INITIAL_COMMUNITY_POSTS;
+
 export const INITIAL_CHAT_MESSAGES: ChatMessage[] = [
   {
     id: 'msg-1',
@@ -812,5 +946,164 @@ export const INITIAL_CHAT_MESSAGES: ChatMessage[] = [
     text: 'Can you send a clearer picture of the CNG tank installation in the trunk?',
     time: '09:48 AM',
     status: 'read'
+  }
+];
+
+export const INITIAL_CONVERSION_CENTERS = [
+  {
+    id: 'cc-inoventive-ikeja',
+    code: 'LA5137YGK',
+    name: 'Inoventive Technology Limited (Ikeja)',
+    address: 'Plot A2 Billings Way, Carmax Yard, Ikeja, Lagos',
+    lga: 'Ikeja',
+    state: 'Lagos',
+    city: 'Lagos',
+    phone: '+234 802 334 5566',
+    status: true,
+    isPiCngAccredited: true,
+    rating: 4.9,
+    reviewsCount: 84,
+    distance: '3.2 km',
+    lat: 6.6018,
+    lng: 3.3515,
+    services: [
+      '4-Hour Sequential Kit Installation',
+      'Italian Valtek / Tomasetto ECU Tuning',
+      '75L (15kg) Lightweight Steel Cylinder',
+      '220 Bar Hydrostatic Pressure Test',
+      'Dual-Fuel Petrol/CNG Switcher'
+    ],
+    conversionPriceRange: '₦750,000 - ₦1,100,000',
+    estimatedHours: '4 - 6 Hours',
+    image: ASSETS.cngEngineBay,
+  },
+  {
+    id: 'cc-aseba-ogba',
+    code: 'LA1575SHB',
+    name: 'Aseba Star Motors Limited (Ogba)',
+    address: '15, Mokuolu Street, Off Ijaiye Road, By Area G Police Command, Ogba, Lagos',
+    lga: 'Ikeja',
+    state: 'Lagos',
+    city: 'Lagos',
+    phone: '+234 803 998 1234',
+    status: true,
+    isPiCngAccredited: true,
+    rating: 4.8,
+    reviewsCount: 62,
+    distance: '5.8 km',
+    lat: 6.6341,
+    lng: 3.3421,
+    services: [
+      'Commercial Taxi / Bolt CNG Kit Conversion',
+      'High-Pressure Cylinder Bracket Mounting',
+      'Spark Plug & Ignition Safety Calibration',
+      'Pi-CNG Certificate of Compliance'
+    ],
+    conversionPriceRange: '₦700,000 - ₦950,000',
+    estimatedHours: '5 Hours',
+    image: ASSETS.cngEngineBay,
+  },
+  {
+    id: 'cc-nipco-ota',
+    code: 'OG3317OAB',
+    name: 'NIPCO CNG Conversion Hub (Ota / Idiroko)',
+    address: 'KM 9, Idiroko Road, Opposite NIPOCO Filling Station, Near Bells University, Ota, Ogun State',
+    lga: 'Ado-Odo/Ota',
+    state: 'Ogun',
+    city: 'Ota',
+    phone: '+234 805 112 3344',
+    status: true,
+    isPiCngAccredited: true,
+    rating: 4.9,
+    reviewsCount: 110,
+    distance: '14.2 km',
+    lat: 6.6912,
+    lng: 3.2384,
+    services: [
+      'Heavy-Duty Bus & Truck CNG Kit Conversion',
+      '220 Bar High Pressure Gas Refueling Test',
+      'OEM Dual Fuel Injection Calibration',
+      'Free 1,000 km Safety Inspection'
+    ],
+    conversionPriceRange: '₦800,000 - ₦1,200,000',
+    estimatedHours: '6 Hours',
+    image: ASSETS.pumpMeter,
+  },
+  {
+    id: 'cc-batcell-maryland',
+    code: 'LA5748NXP',
+    name: 'Batcell Energy Solution (Maryland)',
+    address: 'Ayeni 1010 Close, Behind Sheraton Hotels, Maryland, Lagos',
+    lga: 'Ikeja',
+    state: 'Lagos',
+    city: 'Lagos',
+    phone: '+234 812 445 6677',
+    status: true,
+    isPiCngAccredited: true,
+    rating: 4.7,
+    reviewsCount: 45,
+    distance: '4.1 km',
+    lat: 6.5714,
+    lng: 3.3688,
+    services: [
+      'Sequential CNG Injection Kit',
+      'Composite Type-3 Ultra Light Cylinder',
+      'Diagnostic ECU Remapping',
+      'Safety Cut-off Valve Calibration'
+    ],
+    conversionPriceRange: '₦850,000 - ₦1,350,000',
+    estimatedHours: '4 Hours',
+    image: ASSETS.cngEngineBay,
+  },
+  {
+    id: 'cc-portland-abuja',
+    code: 'AB8920PLD',
+    name: 'Portland Gas Pi-CNG Conversion Center (CBD Abuja)',
+    address: 'Plot 740 Cadastral Zone A00, Central Business District, Abuja FCT',
+    lga: 'Municipal',
+    state: 'Abuja FCT',
+    city: 'Abuja',
+    phone: '+234 9 291 8800',
+    status: true,
+    isPiCngAccredited: true,
+    rating: 5.0,
+    reviewsCount: 142,
+    distance: '2.8 km',
+    lat: 9.0578,
+    lng: 7.4892,
+    services: [
+      'Government Fleet & Private Car Conversion',
+      'Type 1 & Type 2 CNG Cylinder Mounting',
+      'Pi-CNG Government Voucher Redemption Center',
+      '24/7 Mobile Roadside Technician Support'
+    ],
+    conversionPriceRange: '₦780,000 - ₦1,150,000',
+    estimatedHours: '4 Hours',
+    image: ASSETS.stationWide,
+  },
+  {
+    id: 'cc-primevision-kano',
+    code: 'KN9122SOE',
+    name: 'Prime Vision GM Conversion Center (Kano)',
+    address: 'Danlami Petroleum Filling Station, Sabuwar Gandu Road, Kano',
+    lga: 'Kano Municipal',
+    state: 'Kano',
+    city: 'Kano',
+    phone: '+234 64 910 2200',
+    status: true,
+    isPiCngAccredited: true,
+    rating: 4.8,
+    reviewsCount: 56,
+    distance: '18.5 km',
+    lat: 12.0001,
+    lng: 8.5123,
+    services: [
+      'Kano Commercial Tricycle & Taxi CNG Kits',
+      'High-Pressure Cascade Filling Test',
+      'Fast 3-Hour Kit Installation'
+    ],
+    conversionPriceRange: '₦680,000 - ₦900,000',
+    estimatedHours: '3 - 5 Hours',
+    image: ASSETS.dispenserGreen,
   }
 ];

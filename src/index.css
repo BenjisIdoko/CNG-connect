@@ -53,11 +53,13 @@
     font-family: 'Plus Jakarta Sans', sans-serif;
   }
   body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
     -webkit-tap-highlight-color: transparent;
     user-select: none;
     overscroll-behavior-y: none;
   }
   input, textarea {
+    font-family: 'Plus Jakarta Sans', sans-serif;
     user-select: text;
   }
 }

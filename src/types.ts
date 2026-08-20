@@ -37,8 +37,14 @@ export interface GasStation {
   operator?: string; // NIPCO, NNPC, BOVAS, Portland Gas, Axxela, etc.
   phone: string;
   coordinates: { x: number; y: number }; // Percentage 0-100 on map canvas
+  lat?: number; // Real GPS latitude
+  lng?: number; // Real GPS longitude
   images: string[];
   reports: DriverReport[];
+  memberCount?: number;
+  isJoined?: boolean;
+  stationComments?: CommentItem[];
+  stationNotice?: string;
 }
 
 export interface CommentItem {
@@ -58,7 +64,7 @@ export interface CommunityPost {
   authorInitialBg?: string;
   verified: boolean;
   timeAgo: string;
-  category: 'maintenance' | 'parts' | 'reviews' | 'deals';
+  category: 'maintenance' | 'parts' | 'reviews' | 'deals' | 'conversions';
   categoryLabel: string;
   title: string;
   content: string;
@@ -91,4 +97,26 @@ export interface UserProfile {
   monthlySavings: number; // in Naira
   reportsCount: number;
   reputationScore: number;
+}
+
+export interface ConversionCenter {
+  id: string;
+  code: string;
+  name: string;
+  address: string;
+  lga: string;
+  state: string;
+  city: string;
+  phone: string;
+  status: boolean; // Active / Registered
+  isPiCngAccredited: boolean;
+  rating: number;
+  reviewsCount: number;
+  distance?: string;
+  lat?: number;
+  lng?: number;
+  services: string[];
+  conversionPriceRange: string;
+  estimatedHours: string;
+  image?: string;
 }

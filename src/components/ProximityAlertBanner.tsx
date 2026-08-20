@@ -1,68 +1,169 @@
-import React from 'react';
-import { GasStation } from '../types';
+import React, { useState } from 'react';
+import { GasStation, StationStatus, DriverReport } from '../types';
 
 interface ProximityAlertBannerProps {
   station: GasStation;
+  onQuickSubmitReport?: (station: GasStation, newReport: DriverReport, newStatus: StationStatus) => void;
   onShareStatus: (station: GasStation) => void;
   onDismiss: () => void;
 }
 
 export const ProximityAlertBanner: React.FC<ProximityAlertBannerProps> = ({
   station,
+  onQuickSubmitReport,
   onShareStatus,
   onDismiss,
 }) => {
+  const [selectedQuickStatus, setSelectedQuickStatus] = useState<StationStatus | null>(null);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+
+  const handleQuickTap = (status: StationStatus) => {
+    setSelectedQuickStatus(status);
+
+    const statusLabels: Record<StationStatus, string> = {
+      full: 'Full Stock',
+      low: 'Low Pressure',
+      queue: 'Queuing',
+      out: 'Out of Gas',
+    };
+
+    const quickReport: DriverReport = {
+      id: `nudge-rep-${Date.now()}`,
+      author: 'You (Geofence Nudge)',
+      authorAvatar: '',
+      verified: true,
+      timestamp: 'Just now',
+      status: status,
+      statusLabel: statusLabels[status],
+      comment: `1-tap geofence update near ${station.name}`,
+      likes: 1,
+    };
+
+    if (onQuickSubmitReport) {
+      onQuickSubmitReport(station, quickReport, status);
+    }
+
+    setIsSubmitted(true);
+    setTimeout(() => {
+      onDismiss();
+    }, 2200);
+  };
+
   return (
     <div className="fixed top-16 left-0 right-0 z-50 px-3 max-w-xl mx-auto pointer-events-none animate-slide-down">
-      <div className="bg-white rounded-3xl shadow-[0_12px_36px_rgba(0,0,0,0.14)] border border-slate-200/90 p-5 flex flex-col gap-3 pointer-events-auto">
-        {/* Top bar with icon and close button */}
-        <div className="flex items-start justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 shrink-0 rounded-2xl bg-[#006c50] text-white flex items-center justify-center shadow-xs">
-              <span className="material-symbols-outlined text-[22px]">
-                local_gas_station
-              </span>
+      <div className="bg-[#141d19]/95 text-white rounded-3xl shadow-[0_16px_48px_rgba(0,0,0,0.35)] border border-[#00E676]/30 p-4.5 flex flex-col gap-3 pointer-events-auto backdrop-blur-xl relative overflow-hidden">
+        {/* Decorative background glow */}
+        <div className="absolute -top-12 -right-12 w-32 h-32 bg-[#00E676]/15 rounded-full blur-2xl pointer-events-none" />
+
+        {/* Top Header */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            {/* GPS Pulse Dot */}
+            <div className="relative flex items-center justify-center w-8 h-8 rounded-full bg-[#00E676]/20 border border-[#00E676]/40">
+              <div className="w-3 h-3 rounded-full bg-[#00E676] animate-ping absolute" />
+              <div className="w-2.5 h-2.5 rounded-full bg-[#00E676] relative z-10" />
             </div>
+
             <div>
-              <p className="text-[12px] font-semibold text-slate-500 tracking-wide">
-                GasFinder
-              </p>
-              <h2 className="text-[16px] font-bold text-slate-900 leading-tight">
-                You're near {station.name}
+              <div className="flex items-center gap-1.5">
+                <span className="text-[11px] font-black uppercase tracking-wider text-[#00E676]">
+                  Geofence Nudge
+                </span>
+                <span className="text-[10px] bg-[#00E676]/20 text-[#00E676] font-bold px-2 py-0.5 rounded-full border border-[#00E676]/30">
+                  +50 PTS
+                </span>
+              </div>
+              <h2 className="text-[15.5px] font-extrabold text-white leading-tight">
+                Arrived near {station.name}
               </h2>
             </div>
           </div>
+
           <button
             onClick={onDismiss}
             aria-label="Close notification"
-            className="w-7 h-7 -mt-1 -mr-1 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+            className="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 text-slate-300 flex items-center justify-center transition-colors"
           >
             <span className="material-symbols-outlined text-[18px]">close</span>
           </button>
         </div>
 
-        {/* Description body */}
-        <p className="text-[13.5px] text-slate-600 leading-snug pl-0.5">
-          Last update was 42 min ago. Got a second to share the current status?
-        </p>
+        {!isSubmitted ? (
+          <>
+            {/* Subtext */}
+            <p className="text-[12.5px] text-slate-300 leading-snug">
+              Help fellow drivers! What is the current line & pressure status?
+            </p>
 
-        {/* Action Buttons */}
-        <div className="flex items-center gap-3 mt-1">
-          <button
-            onClick={() => onShareStatus(station)}
-            className="px-6 py-2.5 bg-[#005a40] hover:bg-[#004732] text-white font-bold text-[14px] rounded-full transition-all active:scale-95 shadow-xs"
-          >
-            Share status
-          </button>
-          <button
-            onClick={onDismiss}
-            className="px-6 py-2.5 bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold text-[14px] rounded-full transition-all active:scale-95"
-          >
-            Not now
-          </button>
-        </div>
+            {/* Quick 1-Tap Pills Grid */}
+            <div className="grid grid-cols-2 gap-2 mt-0.5">
+              <button
+                onClick={() => handleQuickTap('full')}
+                className="flex items-center gap-2 px-3 py-2.5 rounded-2xl bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/40 text-emerald-200 text-[12px] font-bold transition-all active:scale-95 text-left"
+              >
+                <div className="w-2.5 h-2.5 rounded-full bg-[#00E676] shrink-0" />
+                <span>Full Stock (Fast)</span>
+              </button>
+
+              <button
+                onClick={() => handleQuickTap('queue')}
+                className="flex items-center gap-2 px-3 py-2.5 rounded-2xl bg-amber-950/80 hover:bg-amber-900 border border-amber-500/40 text-amber-200 text-[12px] font-bold transition-all active:scale-95 text-left"
+              >
+                <div className="w-2.5 h-2.5 rounded-full bg-[#f59e0b] shrink-0" />
+                <span>Queuing (&lt;15m)</span>
+              </button>
+
+              <button
+                onClick={() => handleQuickTap('low')}
+                className="flex items-center gap-2 px-3 py-2.5 rounded-2xl bg-orange-950/80 hover:bg-orange-900 border border-orange-500/40 text-orange-200 text-[12px] font-bold transition-all active:scale-95 text-left"
+              >
+                <div className="w-2.5 h-2.5 rounded-full bg-[#fe9400] shrink-0" />
+                <span>Low Pressure</span>
+              </button>
+
+              <button
+                onClick={() => handleQuickTap('out')}
+                className="flex items-center gap-2 px-3 py-2.5 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 text-[12px] font-bold transition-all active:scale-95 text-left"
+              >
+                <div className="w-2.5 h-2.5 rounded-full bg-slate-500 shrink-0" />
+                <span>Out of Gas</span>
+              </button>
+            </div>
+
+            {/* Bottom Actions */}
+            <div className="flex items-center justify-between pt-1 border-t border-white/10 text-[12px]">
+              <button
+                onClick={() => onShareStatus(station)}
+                className="text-[#00E676] font-bold hover:underline flex items-center gap-1"
+              >
+                <span>Add pressure & photo report</span>
+                <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+              </button>
+              <button
+                onClick={onDismiss}
+                className="text-slate-400 font-medium hover:text-white"
+              >
+                Not now
+              </button>
+            </div>
+          </>
+        ) : (
+          /* Confirmation State */
+          <div className="py-3 text-center flex flex-col items-center justify-center gap-1.5 animate-fade-in">
+            <div className="w-10 h-10 rounded-full bg-[#00E676]/20 border border-[#00E676] text-[#00E676] flex items-center justify-center">
+              <span className="material-symbols-outlined text-[24px]">check_circle</span>
+            </div>
+            <p className="font-extrabold text-[15px] text-white">
+              Thanks for the update!
+            </p>
+            <p className="text-[12px] text-[#00E676] font-bold">
+              +50 Community Reputation Points Earned 🏆
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
 };
+
 
