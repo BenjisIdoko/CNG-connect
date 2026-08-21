@@ -310,38 +310,35 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
         <div className="flex bg-[#e6f0e9] p-1 rounded-2xl border border-[#dbe5de]">
           <button
             onClick={() => setActiveTab('feed')}
-            className={`flex-1 py-2 rounded-xl text-[13px] font-bold transition-all flex items-center justify-center gap-1.5 ${
+            className={`flex-1 py-2.5 rounded-xl text-[12.5px] font-bold transition-all text-center ${
               activeTab === 'feed'
-                ? 'bg-white text-[#006c50] shadow-xs'
+                ? 'bg-white text-[#006c50] shadow-xs font-extrabold'
                 : 'text-slate-500 hover:text-slate-900'
             }`}
           >
-            <span className="material-symbols-outlined text-[18px]">forum</span>
-            <span>Group Chat ({comments.length})</span>
+            <span className="whitespace-nowrap">Group Chat ({comments.length})</span>
           </button>
 
           <button
             onClick={() => setActiveTab('reports')}
-            className={`flex-1 py-2 rounded-xl text-[13px] font-bold transition-all flex items-center justify-center gap-1.5 ${
+            className={`flex-1 py-2.5 rounded-xl text-[12.5px] font-bold transition-all text-center ${
               activeTab === 'reports'
-                ? 'bg-white text-[#006c50] shadow-xs'
+                ? 'bg-white text-[#006c50] shadow-xs font-extrabold'
                 : 'text-slate-500 hover:text-slate-900'
             }`}
           >
-            <span className="material-symbols-outlined text-[18px]">verified</span>
-            <span>Reports ({reports.length})</span>
+            <span className="whitespace-nowrap">Driver Reports ({reports.length})</span>
           </button>
 
           <button
             onClick={() => setActiveTab('photos')}
-            className={`flex-1 py-2 rounded-xl text-[13px] font-bold transition-all flex items-center justify-center gap-1.5 ${
+            className={`flex-1 py-2.5 rounded-xl text-[12.5px] font-bold transition-all text-center ${
               activeTab === 'photos'
-                ? 'bg-white text-[#006c50] shadow-xs'
+                ? 'bg-white text-[#006c50] shadow-xs font-extrabold'
                 : 'text-slate-500 hover:text-slate-900'
             }`}
           >
-            <span className="material-symbols-outlined text-[18px]">photo_library</span>
-            <span>Photos ({images.length})</span>
+            <span className="whitespace-nowrap">Photos ({images.length})</span>
           </button>
         </div>
 

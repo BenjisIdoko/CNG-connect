@@ -99,30 +99,28 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
 
       {/* Sticky Top Bar: Main Segment Control + Search */}
       <div className="sticky top-16 z-30 bg-[#f2fcf5]/90 backdrop-blur-md py-2.5 px-4 md:px-6 border-b border-[#dbe5de]/70 max-w-xl mx-auto flex flex-col gap-2">
-        {/* Segmented Switcher: Station Groups vs General Discussions */}
-        <div className="flex bg-[#e0ebe4] p-1 rounded-2xl border border-[#dbe5de]">
+        {/* Main Section Tab Switcher */}
+        <div className="flex bg-[#e6f0e9] p-1 rounded-2xl border border-[#dbe5de]">
           <button
             onClick={() => setActiveMainTab('station_groups')}
-            className={`flex-1 py-2 rounded-xl text-[13px] font-black transition-all flex items-center justify-center gap-1.5 ${
+            className={`flex-1 py-2.5 rounded-xl text-[13px] font-black transition-all text-center ${
               activeMainTab === 'station_groups'
                 ? 'bg-[#006c50] text-white shadow-xs'
                 : 'text-[#3a4a43] hover:text-[#141d19]'
             }`}
           >
-            <span className="material-symbols-outlined text-[18px]">groups</span>
-            <span>Station Groups ({stations.length})</span>
+            <span className="whitespace-nowrap">Station Groups ({stations.length})</span>
           </button>
 
           <button
             onClick={() => setActiveMainTab('general')}
-            className={`flex-1 py-2 rounded-xl text-[13px] font-black transition-all flex items-center justify-center gap-1.5 ${
+            className={`flex-1 py-2.5 rounded-xl text-[13px] font-black transition-all text-center ${
               activeMainTab === 'general'
                 ? 'bg-[#006c50] text-white shadow-xs'
                 : 'text-[#3a4a43] hover:text-[#141d19]'
             }`}
           >
-            <span className="material-symbols-outlined text-[18px]">forum</span>
-            <span>General Hub</span>
+            <span className="whitespace-nowrap">General Hub</span>
           </button>
         </div>
 
