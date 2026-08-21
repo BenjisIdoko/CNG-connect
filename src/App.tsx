@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   GasStation,
   CommunityPost,
@@ -105,6 +105,21 @@ export const App: React.FC = () => {
     }
   });
 
+  // Helper: Strict State Matching
+  const isSameState = useCallback((stState?: string, uState?: string) => {
+    if (!stState || !uState) return true;
+    const a = stState.toLowerCase();
+    const b = uState.toLowerCase();
+    return a === b || a.includes(b) || b.includes(a);
+  }, []);
+
+  // Strict State-Level Scoping: Driver only sees stations in their current/registered state
+  const scopedStations = useMemo(() => {
+    if (!userProfile.state) return stations;
+    const filtered = stations.filter((st) => isSameState(st.state, userProfile.state));
+    return filtered.length > 0 ? filtered : stations;
+  }, [stations, userProfile.state, isSameState]);
+
   // Load backend data from API Service on mount
   useEffect(() => {
     let isMounted = true;
@@ -168,8 +183,9 @@ export const App: React.FC = () => {
           });
         });
 
-        // Find nearby station requiring status update
+        // Find nearby station in user's state requiring status update
         const nearbyStaleStation = stations.find((st) => {
+          if (!isSameState(st.state, userProfile.state)) return false;
           if (st.lat == null || st.lng == null) return false;
 
           const distKm = getDistanceInKm(latitude, longitude, st.lat, st.lng);
@@ -214,9 +230,11 @@ export const App: React.FC = () => {
 
   const handleSimulateProximityNudge = (requestedStation?: GasStation) => {
     const userKey = userProfile.email || userProfile.phone || 'default_driver';
+    const userStateStations = stations.filter((st) => isSameState(st.state, userProfile.state));
     const candidate =
       requestedStation ||
-      stations.find((st) => isStationStale(st.lastUpdated, 30) && !isStationOnCooldown(userKey, st.id, 2)) ||
+      userStateStations.find((st) => isStationStale(st.lastUpdated, 30) && !isStationOnCooldown(userKey, st.id, 2)) ||
+      userStateStations[0] ||
       stations[0];
 
     const stale = isStationStale(candidate.lastUpdated, 30);
@@ -447,7 +465,7 @@ export const App: React.FC = () => {
           />
         ) : activeTab === 'map' ? (
           <MapScreen
-            stations={stations}
+            stations={scopedStations}
             selectedStation={selectedStation}
             onSelectStation={(st) => setSelectedStation(st)}
             onOpenStationDetails={handleOpenStationDetail}
@@ -463,7 +481,7 @@ export const App: React.FC = () => {
         ) : activeTab === 'community' ? (
           <CommunityScreen
             posts={posts}
-            stations={stations}
+            stations={scopedStations}
             onOpenDiscussion={(p) => setActiveDiscussionPost(p)}
             onOpenChat={(p) => setActiveChatPost(p)}
             onOpenCreatePost={() => setIsCreatePostOpen(true)}
@@ -521,18 +539,11 @@ export const App: React.FC = () => {
       {selectedBookingCenter && (
         <BookConversionModal
           center={selectedBookingCenter}
+          user={userProfile}
           onClose={() => setSelectedBookingCenter(null)}
-          onSuccess={(ref) => {
-            let updatedPts = 0;
-            setUserProfile((prev) => {
-              updatedPts = (prev.communityPoints || 0) + 100;
-              return {
-                ...prev,
-                reputationScore: Number((prev.reputationScore + 0.1).toFixed(1)),
-                communityPoints: updatedPts,
-              };
-            });
-            showToast(`Conversion Slot Confirmed! Ref: ${ref} • +100 Points added (${updatedPts} PTS total) 🏆`);
+          onSuccess={(appointmentInfo) => {
+            showToast(`Appointment requested at ${appointmentInfo.centerName} for ${appointmentInfo.preferredDate}!`);
+            setSelectedBookingCenter(null);
           }}
         />
       )}
@@ -580,7 +591,7 @@ export const App: React.FC = () => {
       <AiAssistantModal
         isOpen={isAiModalOpen}
         onClose={() => setIsAiModalOpen(false)}
-        stations={stations}
+        stations={scopedStations}
         onSelectStation={(st) => {
           setSelectedStation(st);
           setActiveDetailStation(st);
