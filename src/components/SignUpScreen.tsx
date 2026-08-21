@@ -416,6 +416,8 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
                   </span>
                   <input
                     type="text"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
                     maxLength={6}
                     required
                     value={userOtpInput}
