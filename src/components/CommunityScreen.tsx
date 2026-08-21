@@ -179,7 +179,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                   <span className="material-symbols-outlined text-[15px]">info</span>
                 </button>
               </div>
-              <span className="text-[11.5px] font-extrabold text-[#006c50] bg-emerald-100 px-2.5 py-0.5 rounded-full">
+              <span className="text-[11.5px] font-extrabold text-[#006c50] bg-emerald-100 px-2.5 py-0.5 rounded-full shrink-0 whitespace-nowrap">
                 Active Discussions
               </span>
             </div>
@@ -202,7 +202,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                       : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
                   }`}
                 >
-                  {st.label}
+                  <span className="whitespace-nowrap">{st.label}</span>
                 </button>
               ))}
             </div>
@@ -235,8 +235,8 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                   onClick={() => onOpenStationGroup && onOpenStationGroup(st)}
                   className="bg-white rounded-3xl p-4 shadow-sm border border-slate-200/80 hover:border-[#006c50]/60 transition-all cursor-pointer flex flex-col gap-2.5 active:scale-[0.99]"
                 >
-                  <div className="flex justify-between items-start">
-                    <div className="flex items-center gap-2.5">
+                  <div className="flex justify-between items-start gap-2">
+                    <div className="flex items-center gap-2.5 min-w-0 flex-1">
                       <div className="w-11 h-11 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-[#006c50] font-black shrink-0 shadow-xs">
                         <span className="material-symbols-outlined text-[22px]">
                           groups
@@ -257,17 +257,28 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                     </div>
 
                     <div
-                      className={`px-2.5 py-1 rounded-full text-[11px] font-extrabold uppercase tracking-wide flex items-center gap-1 shrink-0 ${
+                      className={`px-2.5 py-1 rounded-full text-[10.5px] font-extrabold uppercase tracking-wide flex items-center gap-1.5 shrink-0 shadow-2xs border ${
                         st.status === 'full'
-                          ? 'bg-[#00E676] text-white'
-                          : st.status === 'low'
-                          ? 'bg-[#fe9400] text-white'
+                          ? 'bg-emerald-50 text-[#006c50] border-emerald-200'
                           : st.status === 'queue'
-                          ? 'bg-[#FFB800] text-slate-900'
-                          : 'bg-[#6a7b72] text-white'
+                          ? 'bg-amber-50 text-amber-900 border-amber-200'
+                          : st.status === 'low'
+                          ? 'bg-orange-50 text-orange-900 border-orange-200'
+                          : 'bg-slate-100 text-slate-700 border-slate-200'
                       }`}
                     >
-                      <span>{st.statusLabel}</span>
+                      <span
+                        className={`w-1.5 h-1.5 rounded-full ${
+                          st.status === 'full'
+                            ? 'bg-[#00c853]'
+                            : st.status === 'queue'
+                            ? 'bg-[#f59e0b]'
+                            : st.status === 'low'
+                            ? 'bg-[#fe9400]'
+                            : 'bg-slate-400'
+                        }`}
+                      />
+                      <span className="whitespace-nowrap">{st.statusLabel}</span>
                     </div>
                   </div>
 
