@@ -1,17 +1,19 @@
 import React, { useState } from 'react';
-import { CommunityPost } from '../types';
+import { CommunityPost, UserProfile } from '../types';
 import { ASSETS } from '../data/mockData';
-import { verifyImageMetadata, registerSharedImageHash } from '../utils/imageMetadataVerifier';
 import { LiveCameraCaptureModal } from './LiveCameraCaptureModal';
+import { StationGroupInfoSheet } from './StationGroupInfoSheet';
 
 interface CreatePostModalProps {
   isOpen: boolean;
+  user?: UserProfile;
   onClose: () => void;
   onSubmitPost: (newPost: CommunityPost) => void;
 }
 
 export const CreatePostModal: React.FC<CreatePostModalProps> = ({
   isOpen,
+  user,
   onClose,
   onSubmitPost,
 }) => {
@@ -22,29 +24,16 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
   const [attachedImage, setAttachedImage] = useState<string | null>(null);
   const [imageError, setImageError] = useState<string | null>(null);
   const [showLiveCamera, setShowLiveCamera] = useState(false);
+  const [showInfoSheet, setShowInfoSheet] = useState(false);
 
   if (!isOpen) return null;
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const verification = verifyImageMetadata(file, undefined, 30);
-      if (!verification.isValid) {
-        setImageError(verification.reason || 'Old gallery photo rejected. Anti-misinformation rules require a live camera capture.');
-        setAttachedImage(null);
-        return;
-      }
-
       const reader = new FileReader();
       reader.onload = (event) => {
         const dataUrl = event.target?.result as string;
-        const urlVerification = verifyImageMetadata(undefined, dataUrl);
-        if (!urlVerification.isValid) {
-          setImageError(urlVerification.reason || 'Duplicate old photo detected.');
-          setAttachedImage(null);
-          return;
-        }
-
         setImageError(null);
         setAttachedImage(dataUrl);
       };
@@ -56,10 +45,6 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
     e.preventDefault();
     if (!title.trim() || !content.trim()) return;
 
-    if (attachedImage) {
-      registerSharedImageHash(attachedImage);
-    }
-
     const categoryLabels = {
       maintenance: 'Maintenance',
       parts: 'Parts & Accessories',
@@ -67,11 +52,13 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
       deals: 'Car Deals',
     };
 
+    const hasVerifiedPhoto = Boolean(attachedImage);
+
     const newPost: CommunityPost = {
       id: `post-${Date.now()}`,
-      author: 'Tunde Adebayo',
-      authorAvatar: ASSETS.userAvatar,
-      verified: true,
+      author: user?.name || 'Tunde Adebayo',
+      authorAvatar: user?.avatar || ASSETS.userAvatar,
+      verified: hasVerifiedPhoto,
       timeAgo: 'Just now',
       category,
       categoryLabel: categoryLabels[category],
@@ -105,14 +92,20 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
           </button>
         </div>
 
-        {/* Station Group Scoping Banner */}
-        <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-3 mb-4 flex items-start gap-2.5">
-          <span className="material-symbols-outlined text-[#006c50] text-[20px] shrink-0 mt-0.5">
-            groups
+        {/* Station Group Policy Notice */}
+        <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-2.5 mb-4 flex items-center justify-between">
+          <span className="text-[12px] font-bold text-[#004D40]">
+            Gas availability posts belong in Station Groups
           </span>
-          <p className="text-[12px] text-[#004D40] leading-snug">
-            <strong>Posting about Gas Availability or Station Status?</strong> Updates on CNG availability must be posted inside the station's dedicated <strong>Station Group</strong>.
-          </p>
+          <button
+            type="button"
+            onClick={() => setShowInfoSheet(true)}
+            aria-label="Station Group Policy Info"
+            className="w-6 h-6 rounded-full bg-emerald-200 hover:bg-emerald-300 text-[#006c50] flex items-center justify-center transition-all shrink-0 ml-2"
+            title="Policy Info"
+          >
+            <span className="material-symbols-outlined text-[15px]">info</span>
+          </button>
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -281,6 +274,11 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
           onClose={() => setShowLiveCamera(false)}
         />
       )}
+
+      <StationGroupInfoSheet
+        isOpen={showInfoSheet}
+        onClose={() => setShowInfoSheet(false)}
+      />
     </div>
   );
 };

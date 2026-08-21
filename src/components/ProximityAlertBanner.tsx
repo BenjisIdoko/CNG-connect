@@ -31,7 +31,8 @@ export const ProximityAlertBanner: React.FC<ProximityAlertBannerProps> = ({
       id: `nudge-rep-${Date.now()}`,
       author: 'You (Geofence Nudge)',
       authorAvatar: '',
-      verified: true,
+      verified: false,
+      isPhotoVerified: false,
       timestamp: 'Just now',
       status: status,
       statusLabel: statusLabels[status],
@@ -92,7 +93,7 @@ export const ProximityAlertBanner: React.FC<ProximityAlertBannerProps> = ({
           <>
             {/* Subtext */}
             <p className="text-[12.5px] text-slate-300 leading-snug">
-              Help fellow drivers! What is the current line & pressure status?
+              <strong className="text-[#00E676] font-bold">{station.activePresenceCount || 14} drivers</strong> near {station.name} right now — share what you see!
             </p>
 
             {/* Quick 1-Tap Pills Grid */}

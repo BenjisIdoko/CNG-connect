@@ -1,19 +1,25 @@
 import React, { useState } from 'react';
-import { GasStation, StationStatus, DriverReport } from '../types';
+import { GasStation, StationStatus, DriverReport, UserProfile } from '../types';
 import { ASSETS } from '../data/mockData';
 import { verifyImageMetadata } from '../utils/imageMetadataVerifier';
 import { LiveCameraCaptureModal } from './LiveCameraCaptureModal';
+import { checkLiveUpdatePermission } from '../utils/permissionManager';
+import { StationGroupInfoSheet } from './StationGroupInfoSheet';
 
 interface ReportStatusModalProps {
   station: GasStation;
+  user?: UserProfile;
   onClose: () => void;
   onSubmitReport: (newReport: DriverReport, updatedStationStatus: StationStatus) => void;
+  isPresenceActive?: boolean;
 }
 
 export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
   station,
+  user,
   onClose,
   onSubmitReport,
+  isPresenceActive = true,
 }) => {
   const [selectedStatus, setSelectedStatus] = useState<StationStatus>('full');
   const [waitTime, setWaitTime] = useState<number>(15);
@@ -21,7 +27,9 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
   const [attachedPhoto, setAttachedPhoto] = useState<string | null>(null);
   const [photoError, setPhotoError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [presenceActive, setPresenceActive] = useState<boolean>(isPresenceActive);
   const [showLiveCamera, setShowLiveCamera] = useState(false);
+  const [showInfoSheet, setShowInfoSheet] = useState(false);
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -53,6 +61,14 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    const perm = checkLiveUpdatePermission(presenceActive);
+    if (!perm.allowed) {
+      setPhotoError(perm.reason || 'You need to be at the station to report its status');
+      setIsSubmitting(false);
+      return;
+    }
+
     setIsSubmitting(true);
 
     const statusLabels: Record<StationStatus, string> = {
@@ -62,12 +78,14 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
       out: 'Reported Out of gas',
     };
 
+    const isPhotoVerified = Boolean(attachedPhoto);
+
     const newReport: DriverReport = {
       id: `report-${Date.now()}`,
-      author: 'Tunde Adebayo',
-      authorAvatar: ASSETS.userAvatar,
-      verified: true,
-      isPhotoVerified: Boolean(attachedPhoto),
+      author: user?.name || 'Tunde Adebayo',
+      authorAvatar: user?.avatar || ASSETS.userAvatar,
+      verified: isPhotoVerified,
+      isPhotoVerified: isPhotoVerified,
       timestamp: 'Just now',
       status: selectedStatus,
       statusLabel: statusLabels[selectedStatus],
@@ -102,11 +120,20 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
 
         {/* Content */}
         <div className="px-5 pb-6 pt-1">
-          <div className="flex justify-between items-start mb-2">
+          <div className="flex justify-between items-start mb-3">
             <div>
               <div className="flex items-center gap-1.5 text-[11px] font-extrabold text-[#006c50] uppercase tracking-wider mb-0.5">
                 <span className="material-symbols-outlined text-[15px]">groups</span>
                 <span>{station.name} Group Feed</span>
+                <button
+                  type="button"
+                  onClick={() => setShowInfoSheet(true)}
+                  aria-label="Station Group Policy Info"
+                  className="w-5 h-5 rounded-full bg-emerald-100 hover:bg-emerald-200 text-[#006c50] flex items-center justify-center transition-all ml-1"
+                  title="Policy Info"
+                >
+                  <span className="material-symbols-outlined text-[13px]">info</span>
+                </button>
               </div>
               <h2 className="text-[19px] font-extrabold text-[#141d19] leading-snug">
                 Update Gas Availability
@@ -119,9 +146,6 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
               <span className="material-symbols-outlined text-[22px]">close</span>
             </button>
           </div>
-          <p className="text-[12px] text-[#6a7b72] mb-4">
-            Submitting this report updates live CNG status and posts directly into the <strong>{station.name} Group</strong> discussion.
-          </p>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             {/* 4 Status Selector Cards */}
@@ -326,10 +350,21 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
               />
             </div>
 
+            {/* Presence Gate Warning Banner */}
+            {!presenceActive && (
+              <div className="bg-rose-50 rounded-2xl p-3.5 border border-rose-200 text-rose-900 text-[12.5px] font-bold flex items-center gap-2.5">
+                <span className="material-symbols-outlined text-[24px] text-rose-600 shrink-0">location_off</span>
+                <div className="flex-1">
+                  <strong className="block text-[13px] text-rose-800 font-extrabold mb-0.5">Presence Verification Required</strong>
+                  <span>You need to be at the station to report its status. Live updates require active GPS presence within the station geofence radius.</span>
+                </div>
+              </div>
+            )}
+
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={isSubmitting}
+              disabled={!presenceActive || isSubmitting}
               className="w-full h-13 flex items-center justify-center bg-[#006c50] hover:bg-[#004D40] text-white rounded-full font-extrabold text-[15px] shadow-md active:scale-[0.98] transition-all disabled:opacity-50 mt-1"
             >
               {isSubmitting ? (
@@ -356,6 +391,11 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
           onClose={() => setShowLiveCamera(false)}
         />
       )}
+
+      <StationGroupInfoSheet
+        isOpen={showInfoSheet}
+        onClose={() => setShowInfoSheet(false)}
+      />
     </div>
   );
 };

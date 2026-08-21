@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { GasStation } from '../types';
-import { GoogleGenAI } from '@google/genai';
 
 interface AiAssistantModalProps {
   isOpen: boolean;
@@ -13,7 +12,6 @@ export const AiAssistantModal: React.FC<AiAssistantModalProps> = ({
   isOpen,
   onClose,
   stations,
-  onSelectStation,
 }) => {
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
@@ -33,6 +31,27 @@ export const AiAssistantModal: React.FC<AiAssistantModalProps> = ({
     'Show me Pi-CNG accredited stations in Lagos',
   ];
 
+  const getKnowledgeEngineFallback = (promptText: string): string => {
+    const lower = promptText.toLowerCase();
+
+    if (lower.includes('pressure') || lower.includes('highest')) {
+      const best = [...stations].sort((a, b) => b.pumpPressure - a.pumpPressure)[0];
+      return `⚡ **${best.name}** currently has the highest pressure at **${best.pumpPressure} bar** (${best.statusLabel}). High pressure ensures your tank fills to 100% capacity faster!`;
+    } else if (lower.includes('save') || lower.includes('cost') || lower.includes('converting')) {
+      return `💰 **CNG Savings Estimate:**\n• Petrol price: ~₦1,100/liter\n• CNG price: **₦230/kg** at Pi-CNG stations\n• An average driver using 15kg/week saves approximately **₦78,500 monthly** (over **₦940,000 yearly**)!`;
+    } else if (lower.includes('wuse') || lower.includes('best time')) {
+      return `🕒 **Total CNG - Wuse 2 Tip:** The queue is lightest between **7:00 AM - 8:30 AM** and **2:00 PM - 4:00 PM**. Current wait time is around **4 minutes** with 215 bar pressure.`;
+    } else if (lower.includes('lagos') || lower.includes('pi-cng')) {
+      const lagosStations = stations.filter((s) => s.state.toLowerCase().includes('lagos'));
+      return (
+        `🇳🇬 Found **${lagosStations.length} Pi-CNG accredited stations** in Lagos:\n` +
+        lagosStations.map((s) => `• **${s.name}** (${s.city}) - ${s.statusLabel}, ₦${s.cngPrice}/kg`).join('\n')
+      );
+    } else {
+      return `Based on live driver reports, **${stations[0].name}** (${stations[0].city}) is currently full stock with ${stations[0].pumpPressure} bar pressure and short queue times (${stations[0].busyEstimate}).`;
+    }
+  };
+
   const handleSend = async (textToSend?: string) => {
     const promptText = textToSend || query;
     if (!promptText.trim()) return;
@@ -43,72 +62,37 @@ export const AiAssistantModal: React.FC<AiAssistantModalProps> = ({
     setLoading(true);
 
     try {
-      // Check if Gemini API key exists in env
-      const metaEnv = (import.meta as unknown as { env?: Record<string, string> }).env || {};
-      const apiKey = metaEnv.VITE_GEMINI_API_KEY || metaEnv.GEMINI_API_KEY;
+      // Call serverless API endpoint (Vercel/Netlify function)
+      let response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: promptText, stations }),
+      });
 
-      if (apiKey) {
-        const ai = new GoogleGenAI({ apiKey });
-        const contextPrompt = `You are GasFinder AI, an expert assistant for Nigerian drivers using Compressed Natural Gas (CNG).
-Here is the current live status of CNG stations across Nigeria:
-${JSON.stringify(
-  stations.map((s) => ({
-    name: s.name,
-    city: s.city,
-    state: s.state,
-    status: s.statusLabel,
-    pressure: `${s.pumpPressure} bar`,
-    price: `₦${s.cngPrice}/kg`,
-    wait: s.busyEstimate,
-    piCng: s.isPiCngAccredited ? 'Yes' : 'No',
-  })),
-  null,
-  2
-)}
-
-Driver question: "${promptText}"
-Give a friendly, concise, and helpful response. Mention specific stations, prices in Naira, and practical driving/refuelling tips. Keep answer under 4 paragraphs.`;
-
-        const response = await ai.models.generateContent({
-          model: 'gemini-2.5-flash',
-          contents: contextPrompt,
+      if (!response.ok && response.status === 404) {
+        // Try netlify function route if /api/chat isn't found
+        response = await fetch('/.netlify/functions/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt: promptText, stations }),
         });
-
-        const reply = response.text || 'I analyzed the station reports! All major Pi-CNG stations are operating smoothly today.';
-        setMessages((prev) => [...prev, { role: 'assistant', text: reply }]);
-      } else {
-        // Fallback smart knowledge engine if no API key is set
-        setTimeout(() => {
-          let reply = '';
-          const lower = promptText.toLowerCase();
-
-          if (lower.includes('pressure') || lower.includes('highest')) {
-            const best = [...stations].sort((a, b) => b.pumpPressure - a.pumpPressure)[0];
-            reply = `⚡ **${best.name}** currently has the highest pressure at **${best.pumpPressure} bar** (${best.statusLabel}). High pressure ensures your tank fills to 100% capacity faster!`;
-          } else if (lower.includes('save') || lower.includes('cost') || lower.includes('converting')) {
-            reply = `💰 **CNG Savings Estimate:**\n• Petrol price: ~₦1,100/liter\n• CNG price: **₦230/kg** at Pi-CNG stations\n• An average driver using 15kg/week saves approximately **₦78,500 monthly** (over **₦940,000 yearly**)!`;
-          } else if (lower.includes('wuse') || lower.includes('best time')) {
-            reply = `🕒 **Total CNG - Wuse 2 Tip:** The queue is lightest between **7:00 AM - 8:30 AM** and **2:00 PM - 4:00 PM**. Current wait time is around **4 minutes** with 215 bar pressure.`;
-          } else if (lower.includes('lagos') || lower.includes('pi-cng')) {
-            const lagosStations = stations.filter((s) => s.state.toLowerCase().includes('lagos'));
-            reply = `🇳🇬 Found **${lagosStations.length} Pi-CNG accredited stations** in Lagos:\n` +
-              lagosStations.map((s) => `• **${s.name}** (${s.city}) - ${s.statusLabel}, ₦${s.cngPrice}/kg`).join('\n');
-          } else {
-            reply = `Based on live driver reports, **${stations[0].name}** (${stations[0].city}) is currently full stock with ${stations[0].pumpPressure} bar pressure and short queue times (${stations[0].busyEstimate}).`;
-          }
-
-          setMessages((prev) => [...prev, { role: 'assistant', text: reply }]);
-        }, 600);
       }
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data && data.reply) {
+          setMessages((prev) => [...prev, { role: 'assistant', text: data.reply }]);
+          return;
+        }
+      }
+
+      // If serverless endpoint returned non-OK or was unavailable, use fallback knowledge engine
+      const fallbackReply = getKnowledgeEngineFallback(promptText);
+      setMessages((prev) => [...prev, { role: 'assistant', text: fallbackReply }]);
     } catch (err) {
-      console.error(err);
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: 'assistant',
-          text: 'I recommend checking **Total CNG Wuse 2** or **NIPCO Airport Road**, both are currently full stock with 215+ bar pressure!',
-        },
-      ]);
+      console.warn('Serverless endpoint fetch error, using knowledge engine fallback:', err);
+      const fallbackReply = getKnowledgeEngineFallback(promptText);
+      setMessages((prev) => [...prev, { role: 'assistant', text: fallbackReply }]);
     } finally {
       setLoading(false);
     }
@@ -131,7 +115,7 @@ Give a friendly, concise, and helpful response. Mention specific stations, price
                 </span>
               </h3>
               <p className="text-[11.5px] text-emerald-100/90 font-medium">
-                Station queue advisor & CNG calculator
+                Station queue advisor &amp; CNG calculator
               </p>
             </div>
           </div>
@@ -148,66 +132,70 @@ Give a friendly, concise, and helpful response. Mention specific stations, price
           {messages.map((m, idx) => (
             <div
               key={idx}
-              className={`flex gap-2.5 ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              className={`flex flex-col ${
+                m.role === 'user' ? 'items-end' : 'items-start'
+              }`}
             >
-              {m.role === 'assistant' && (
-                <div className="w-7 h-7 rounded-full bg-[#006c50] text-white flex items-center justify-center shrink-0 mt-0.5">
-                  <span className="material-symbols-outlined text-[15px]">auto_awesome</span>
-                </div>
-              )}
               <div
-                className={`max-w-[82%] px-4 py-2.5 rounded-2xl text-[13.5px] leading-relaxed shadow-2xs ${
+                className={`max-w-[85%] rounded-2xl p-3.5 text-[14px] leading-relaxed shadow-xs ${
                   m.role === 'user'
-                    ? 'bg-[#004D40] text-white font-medium rounded-br-none'
-                    : 'bg-white border border-slate-200 text-slate-800 rounded-bl-none font-normal whitespace-pre-line'
+                    ? 'bg-[#006c50] text-white rounded-br-none font-medium'
+                    : 'bg-white border border-[#dbe5de] text-[#141d19] rounded-bl-none'
                 }`}
               >
-                {m.text}
+                <div className="whitespace-pre-wrap">{m.text}</div>
               </div>
             </div>
           ))}
 
           {loading && (
-            <div className="flex items-center gap-2 text-slate-400 text-[12.5px] font-medium p-2">
-              <span className="material-symbols-outlined text-[18px] animate-spin text-[#006c50]">
-                progress_activity
+            <div className="flex items-center gap-2 text-[#006c50] text-[13px] font-bold p-2 bg-emerald-50 rounded-xl w-fit border border-emerald-200">
+              <span className="material-symbols-outlined text-[18px] animate-spin">
+                sync
               </span>
-              Analyzing station pressure & queue reports...
+              <span>GasFinder AI is analyzing live station data...</span>
             </div>
           )}
         </div>
 
         {/* Quick Prompts */}
-        <div className="px-4 py-2 bg-white border-t border-slate-100 overflow-x-auto hide-scrollbar flex gap-2">
-          {quickPrompts.map((p, i) => (
+        <div className="p-3 bg-white border-t border-[#dbe5de]/70 flex overflow-x-auto gap-2 hide-scrollbar">
+          {quickPrompts.map((prompt, idx) => (
             <button
-              key={i}
-              onClick={() => handleSend(p)}
-              className="shrink-0 px-3 py-1.5 rounded-full bg-emerald-50 hover:bg-emerald-100 text-[#006c50] text-[11.5px] font-bold border border-emerald-200 transition-colors"
+              key={idx}
+              onClick={() => handleSend(prompt)}
+              disabled={loading}
+              className="px-3 py-1.5 bg-[#e6f0e9] hover:bg-[#dbe5de] text-[#004D40] text-[12px] font-bold rounded-full whitespace-nowrap border border-[#dbe5de] active:scale-95 transition-all shrink-0"
             >
-              {p}
+              {prompt}
             </button>
           ))}
         </div>
 
         {/* Input Bar */}
-        <div className="p-3 bg-white border-t border-slate-200 flex items-center gap-2">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSend();
+          }}
+          className="p-3 bg-white border-t border-[#dbe5de] flex items-center gap-2"
+        >
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-            placeholder="Ask AI about CNG stations, pressure, or savings..."
-            className="flex-1 bg-slate-100 border border-slate-200 rounded-2xl px-4 py-2.5 text-[13.5px] outline-none focus:ring-2 focus:ring-[#006c50]/30"
+            placeholder="Ask GasFinder AI..."
+            className="flex-1 bg-[#e6f0e9] border border-[#dbe5de] rounded-full px-4 py-2.5 text-[14px] text-[#141d19] placeholder:text-[#6a7b72] focus:outline-none focus:ring-2 focus:ring-[#006c50]/30"
           />
           <button
-            onClick={() => handleSend()}
+            type="submit"
             disabled={!query.trim() || loading}
-            className="w-10 h-10 rounded-2xl bg-[#004D40] hover:bg-[#006c50] disabled:bg-slate-300 text-white flex items-center justify-center transition-all shadow-md active:scale-95"
+            aria-label="Send query to AI"
+            className="w-10 h-10 rounded-full bg-[#006c50] hover:bg-[#004D40] disabled:opacity-40 text-white flex items-center justify-center shadow-md active:scale-95 transition-all shrink-0"
           >
             <span className="material-symbols-outlined text-[20px]">send</span>
           </button>
-        </div>
+        </form>
       </div>
     </div>
   );

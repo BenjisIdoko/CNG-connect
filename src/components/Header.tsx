@@ -40,7 +40,7 @@ export const Header: React.FC<HeaderProps> = ({
               alt="GasFinder Logo"
               className="h-7 w-auto object-contain"
             />
-            <span className="font-black text-[20px] text-[#006c50] tracking-tight">
+            <span className="font-black text-[19px] sm:text-[20px] text-[#006c50] tracking-tight truncate max-w-[160px] sm:max-w-[240px]">
               {title}
             </span>
           </div>

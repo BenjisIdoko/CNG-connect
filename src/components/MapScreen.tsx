@@ -3,12 +3,16 @@ import L from 'leaflet';
 import { GasStation, StationStatus } from '../types';
 import { ASSETS } from '../data/mockData';
 
+export type GpsStatus = 'active' | 'denied' | 'unavailable';
+
 interface MapScreenProps {
   stations: GasStation[];
   selectedStation: GasStation;
   onSelectStation: (station: GasStation) => void;
   onOpenStationDetails: (station: GasStation) => void;
   onNavigate: (station: GasStation) => void;
+  gpsStatus?: GpsStatus;
+  onGpsStatusChange?: (status: GpsStatus, coords?: { lat: number; lng: number }) => void;
 }
 
 export const MapScreen: React.FC<MapScreenProps> = ({
@@ -17,6 +21,8 @@ export const MapScreen: React.FC<MapScreenProps> = ({
   onSelectStation,
   onOpenStationDetails,
   onNavigate,
+  gpsStatus: propGpsStatus,
+  onGpsStatusChange,
 }) => {
   const [activeFilter, setActiveFilter] = useState<string>('all');
   const [activeCity, setActiveCity] = useState<string>('all');
@@ -28,6 +34,10 @@ export const MapScreen: React.FC<MapScreenProps> = ({
   const [isRecentering, setIsRecentering] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
+  const [userGps, setUserGps] = useState<{ lat: number; lng: number } | null>(null);
+  const [gpsStatus, setGpsStatus] = useState<GpsStatus>(propGpsStatus || 'unavailable');
+  const [gpsStatusText, setGpsStatusText] = useState<string>('GPS Location Unavailable (Abuja Default)');
+
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
   const markersLayerRef = useRef<L.LayerGroup | null>(null);
@@ -36,9 +46,6 @@ export const MapScreen: React.FC<MapScreenProps> = ({
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3000);
   };
-
-  const [userGps, setUserGps] = useState<{ lat: number; lng: number } | null>(null);
-  const [gpsStatusText, setGpsStatusText] = useState<string>('Live GPS Ready');
 
   const calculateHaversineKm = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
     const R = 6371; // Earth radius in km
@@ -187,8 +194,12 @@ export const MapScreen: React.FC<MapScreenProps> = ({
         (pos) => {
           const { latitude, longitude } = pos.coords;
           setUserGps({ lat: latitude, lng: longitude });
+          setGpsStatus('active');
           setGpsStatusText(`GPS Active: ${latitude.toFixed(4)}°N, ${longitude.toFixed(4)}°E`);
           showToast(`Live GPS Acquired: ${latitude.toFixed(4)}° N, ${longitude.toFixed(4)}° E`);
+          if (onGpsStatusChange) {
+            onGpsStatusChange('active', { lat: latitude, lng: longitude });
+          }
           if (mapInstanceRef.current) {
             mapInstanceRef.current.flyTo([latitude, longitude], 14);
           }
@@ -196,8 +207,22 @@ export const MapScreen: React.FC<MapScreenProps> = ({
         },
         (err) => {
           console.warn('Geolocation permission error or unavailable:', err.message);
-          setGpsStatusText('Abuja City Center (Default GPS)');
-          showToast('Centered on your current location (Wuse 2, Abuja)');
+          const isDenied = err.code === err.PERMISSION_DENIED;
+          const status: GpsStatus = isDenied ? 'denied' : 'unavailable';
+          setUserGps(null);
+          setGpsStatus(status);
+          setGpsStatusText(
+            isDenied
+              ? 'GPS Permission Denied (Showing Abuja Default)'
+              : 'GPS Location Unavailable (Showing Abuja Default)'
+          );
+          const failMsg = isDenied
+            ? "Couldn't get your location — permission denied. Showing Abuja as default."
+            : "Couldn't get your location — showing Abuja as default";
+          showToast(failMsg);
+          if (onGpsStatusChange) {
+            onGpsStatusChange(status);
+          }
           if (mapInstanceRef.current) {
             mapInstanceRef.current.flyTo([9.0765, 7.4853], 13);
           }
@@ -206,7 +231,13 @@ export const MapScreen: React.FC<MapScreenProps> = ({
         { enableHighAccuracy: true, timeout: 5000 }
       );
     } else {
-      showToast('Centered on your current location (Wuse 2, Abuja)');
+      setUserGps(null);
+      setGpsStatus('unavailable');
+      setGpsStatusText('GPS Not Supported (Showing Abuja Default)');
+      showToast("Couldn't get your location — showing Abuja as default");
+      if (onGpsStatusChange) {
+        onGpsStatusChange('unavailable');
+      }
       if (mapInstanceRef.current) {
         mapInstanceRef.current.flyTo([9.0765, 7.4853], 13);
       }
@@ -302,9 +333,18 @@ export const MapScreen: React.FC<MapScreenProps> = ({
             <button
               onClick={handleRecenter}
               aria-label="My Location"
-              className="w-9 h-9 bg-[#00c853] hover:bg-emerald-600 text-white rounded-full active:scale-95 transition-all flex items-center justify-center shadow-md shadow-[#00c853]/25"
+              title={gpsStatusText}
+              className={`w-9 h-9 text-white rounded-full active:scale-95 transition-all flex items-center justify-center shadow-md ${
+                gpsStatus === 'active'
+                  ? 'bg-[#00c853] hover:bg-emerald-600 shadow-[#00c853]/25'
+                  : gpsStatus === 'denied'
+                  ? 'bg-rose-600 hover:bg-rose-700 shadow-rose-600/25'
+                  : 'bg-amber-600 hover:bg-amber-700 shadow-amber-600/25'
+              }`}
             >
-              <span className="material-symbols-outlined text-[18px]">near_me</span>
+              <span className="material-symbols-outlined text-[18px]">
+                {gpsStatus === 'active' ? 'near_me' : gpsStatus === 'denied' ? 'location_off' : 'wrong_location'}
+              </span>
             </button>
           </div>
         </div>

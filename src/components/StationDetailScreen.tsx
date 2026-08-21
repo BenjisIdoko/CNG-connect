@@ -1,15 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { GasStation, CommentItem } from '../types';
 import { ASSETS } from '../data/mockData';
+import { openExternalMaps } from '../utils/navigationHelper';
+import { StationGroupInfoSheet } from './StationGroupInfoSheet';
 
 interface StationDetailScreenProps {
   station: GasStation;
   onBack: () => void;
   onOpenReportModal: (station: GasStation) => void;
   onNavigate: (station: GasStation) => void;
-  onToggleJoinGroup?: (stationId: string) => void;
   onAddStationComment?: (stationId: string, commentText: string) => void;
   onAddPhoto?: () => void;
+  isPresenceActive?: boolean;
 }
 
 export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
@@ -17,8 +19,8 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
   onBack,
   onOpenReportModal,
   onNavigate,
-  onToggleJoinGroup,
   onAddStationComment,
+  isPresenceActive = true,
 }) => {
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
   const [reports, setReports] = useState(station.reports || []);
@@ -34,21 +36,24 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
     ]
   );
   const [newCommentText, setNewCommentText] = useState('');
-  const [isJoined, setIsJoined] = useState<boolean>(station.isJoined ?? true);
-  const [memberCount, setMemberCount] = useState<number>(station.memberCount || 148);
   const [copiedNotification, setCopiedNotification] = useState(false);
   const [activeTab, setActiveTab] = useState<'feed' | 'reports' | 'photos'>('feed');
+  const [isPresenceActiveState, setIsPresenceActiveState] = useState<boolean>(isPresenceActive);
+  const [showInfoSheet, setShowInfoSheet] = useState(false);
+
+  useEffect(() => {
+    try {
+      const hasSeen = localStorage.getItem('hasSeenGroupPolicy');
+      if (!hasSeen) {
+        setShowInfoSheet(true);
+      }
+    } catch {
+      // localStorage fallback
+    }
+  }, []);
 
   const images = station.images || [];
-
-  const handleToggleJoin = () => {
-    const nextJoined = !isJoined;
-    setIsJoined(nextJoined);
-    setMemberCount((prev) => (nextJoined ? prev + 1 : prev - 1));
-    if (onToggleJoinGroup) {
-      onToggleJoinGroup(station.id);
-    }
-  };
+  const presenceCount = station.activePresenceCount || 14;
 
   const handleVote = (reportId: string, type: 'up' | 'down') => {
     setReports((prev) =>
@@ -135,19 +140,10 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
         </button>
 
         <div className="flex items-center gap-2">
-          <button
-            onClick={handleToggleJoin}
-            className={`px-3 py-1.5 rounded-full text-[12px] font-extrabold flex items-center gap-1 transition-all active:scale-95 ${
-              isJoined
-                ? 'bg-emerald-100 text-[#006c50] border border-emerald-300'
-                : 'bg-[#006c50] text-white shadow-xs hover:bg-[#004D40]'
-            }`}
-          >
-            <span className="material-symbols-outlined text-[16px]">
-              {isJoined ? 'check_circle' : 'group_add'}
-            </span>
-            <span>{isJoined ? 'Joined Group' : 'Join Station Group'}</span>
-          </button>
+          <div className="bg-emerald-50 text-[#006c50] border border-emerald-200 px-3 py-1 rounded-full text-[12px] font-extrabold flex items-center gap-1.5 shadow-2xs">
+            <span className="w-2 h-2 rounded-full bg-[#00c853] animate-pulse" />
+            <span>{presenceCount} drivers here now</span>
+          </div>
 
           <button
             onClick={handleShareStation}
@@ -170,46 +166,44 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                   <span className="material-symbols-outlined text-[13px]">groups</span>
                   <span>Station Group</span>
                 </span>
-                <span className="text-[12px] font-bold text-[#6a7b72]">
-                  {memberCount} Drivers
+                <button
+                  onClick={() => setShowInfoSheet(true)}
+                  aria-label="Station Group Policy Info"
+                  className="w-6 h-6 rounded-full bg-emerald-100 hover:bg-emerald-200 text-[#006c50] flex items-center justify-center transition-all active:scale-95"
+                  title="Policy Info"
+                >
+                  <span className="material-symbols-outlined text-[15px]">info</span>
+                </button>
+                <span className="text-[12px] font-extrabold text-[#006c50] flex items-center gap-1 ml-auto">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#00c853] animate-pulse" />
+                  {presenceCount} Active Nearby
                 </span>
               </div>
-              <h1 className="text-[22px] sm:text-[26px] font-black text-[#141d19] tracking-tight leading-tight">
+              <h1 className="text-[22px] sm:text-[25px] font-extrabold text-slate-900 tracking-tight leading-snug">
                 {station.name}
               </h1>
             </div>
           </div>
 
-          <p className="text-[14px] font-medium text-[#3a4a43] flex items-center gap-1.5">
-            <span className="material-symbols-outlined text-[#6a7b72] text-[18px]">
+          <p className="text-[13.5px] font-normal text-slate-600 flex items-center gap-1.5">
+            <span className="material-symbols-outlined text-slate-400 text-[18px]">
               location_on
             </span>
             <span>{station.address}</span>
           </p>
 
-          {/* Group Scoping Rules Alert */}
-          <div className="bg-emerald-50 border border-emerald-200/90 rounded-2xl p-3 flex items-start gap-2.5">
-            <span className="material-symbols-outlined text-[#006c50] text-[20px] shrink-0 mt-0.5">
-              verified
-            </span>
-            <div className="text-[12px] text-[#004D40] leading-snug">
-              <strong className="font-extrabold block mb-0.5">Official Station Group Policy</strong>
-              Updates on Gas availability, pump pressures, and queue conditions for this station are discussed exclusively in this group feed.
-            </div>
-          </div>
-
           {/* Live Status & Specs Summary */}
           <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-[#dbe5de]/70">
             {/* Status Badge */}
             <div
-              className={`rounded-full px-3.5 py-1.5 flex items-center gap-1.5 shadow-xs ${
+              className={`rounded-full px-3 py-1 flex items-center gap-1.5 shadow-2xs ${
                 station.status === 'full'
-                  ? 'bg-[#00E676] text-white font-extrabold'
+                  ? 'bg-[#00E676] text-white font-bold'
                   : station.status === 'low'
-                  ? 'bg-[#fe9400] text-white font-extrabold'
+                  ? 'bg-[#fe9400] text-white font-bold'
                   : station.status === 'queue'
-                  ? 'bg-[#FFB800] text-[#141d19] font-extrabold'
-                  : 'bg-[#6a7b72] text-white font-extrabold'
+                  ? 'bg-[#FFB800] text-[#141d19] font-bold'
+                  : 'bg-[#6a7b72] text-white font-bold'
               }`}
             >
               <span
@@ -224,58 +218,47 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                   ? 'battery_3_bar'
                   : 'not_interested'}
               </span>
-              <span className="text-[12px] tracking-wider uppercase font-black">
+              <span className="text-[11.5px] tracking-wider uppercase font-extrabold">
                 {station.statusLabel}
               </span>
             </div>
 
             {/* Busy Status */}
-            <div className="bg-[#ffe149]/30 border border-[#FFB800]/60 rounded-full px-3 py-1.5 flex items-center gap-1.5">
-              <span className="material-symbols-outlined text-[#746300] text-[16px]">
+            <div className="bg-[#ffe149]/30 border border-[#FFB800]/60 rounded-full px-3 py-1 flex items-center gap-1.5">
+              <span className="material-symbols-outlined text-[#746300] text-[15px]">
                 schedule
               </span>
-              <span className="text-[12px] font-bold text-[#746300]">
+              <span className="text-[11.5px] font-semibold text-[#746300]">
                 {station.busyEstimate}
               </span>
             </div>
 
             {/* Time / Distance Info */}
-            <div className="flex items-center gap-2 text-[12.5px] font-medium text-[#3a4a43] ml-auto">
-              <span className="flex items-center gap-1 text-[#006c50] font-bold">
+            <div className="flex items-center gap-2 text-[12px] font-medium text-slate-500 ml-auto">
+              <span className="flex items-center gap-1 text-[#006c50] font-semibold">
                 Updated {station.lastUpdated}
               </span>
             </div>
           </div>
         </div>
 
-        {/* Map / Directions Button Banner */}
+        {/* Station Image Banner with Distance Badge */}
         <div className="relative rounded-2xl overflow-hidden shadow-xs border border-[#dbe5de] h-36 bg-[#e6f0e9]">
           <div
             className="w-full h-full bg-cover bg-center"
             style={{ backgroundImage: `url('${images[1] || images?.[0]}')` }}
           >
-            <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/30 to-transparent flex items-end p-4">
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent flex items-end p-4">
               <div className="flex items-center justify-between w-full">
-                <button
-                  onClick={() => onNavigate(station)}
-                  className="bg-[#006c50] hover:bg-[#004D40] text-white px-4 py-2 rounded-full font-bold text-[13px] flex items-center gap-2 shadow-md active:scale-95 transition-all"
-                >
-                  <span
-                    className="material-symbols-outlined text-[18px]"
-                    style={{ fontVariationSettings: "'FILL' 1" }}
-                  >
-                    directions
+                <span className="bg-black/60 backdrop-blur-md text-white text-[12px] font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm">
+                  <span className="material-symbols-outlined text-[16px] text-[#00E676]">near_me</span>
+                  <span>{station.distance} • {station.driveTime}</span>
+                </span>
+                {station.operator && (
+                  <span className="bg-[#006c50]/90 backdrop-blur-md text-white text-[11px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider shadow-sm">
+                    {station.operator}
                   </span>
-                  <span>Get Directions ({station.distance})</span>
-                </button>
-
-                <button
-                  onClick={() => onOpenReportModal(station)}
-                  className="bg-white/95 hover:bg-white text-[#006c50] px-3.5 py-2 rounded-full font-extrabold text-[12.5px] flex items-center gap-1.5 shadow-md active:scale-95 transition-all"
-                >
-                  <span className="material-symbols-outlined text-[18px]">edit_document</span>
-                  <span>Update Availability</span>
-                </button>
+                )}
               </div>
             </div>
           </div>
@@ -284,30 +267,30 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
         {/* Price & Pump Pressure Bento Cards */}
         <div className="grid grid-cols-2 gap-3">
           <div className="bg-white rounded-2xl p-4 border border-[#dbe5de] shadow-xs flex flex-col justify-between">
-            <span className="text-[11px] font-extrabold text-[#6a7b72] uppercase tracking-wider">
+            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
               CNG Price
             </span>
             <div className="flex items-baseline gap-1 my-1">
-              <span className="text-[30px] font-extrabold text-[#004D40]">
+              <span className="text-[28px] font-bold text-[#004D40]">
                 ₦{station.cngPrice}
               </span>
-              <span className="text-[13px] font-bold text-[#6a7b72]">/kg</span>
+              <span className="text-[13px] font-normal text-slate-400">/kg</span>
             </div>
-            <span className="text-[11px] font-bold text-[#00E676] flex items-center gap-1">
+            <span className="text-[11px] font-semibold text-[#00E676] flex items-center gap-1">
               <span className="material-symbols-outlined text-[14px]">arrow_downward</span>
               <span>{station.priceTrend === 'stable' ? 'Official Rate' : 'Updated'}</span>
             </span>
           </div>
 
           <div className="bg-white rounded-2xl p-4 border border-[#dbe5de] shadow-xs flex flex-col justify-between">
-            <span className="text-[11px] font-extrabold text-[#6a7b72] uppercase tracking-wider">
+            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
               Pump Pressure
             </span>
             <div className="flex items-baseline gap-1 my-1">
-              <span className="text-[26px] font-extrabold text-[#141d19]">
+              <span className="text-[26px] font-bold text-slate-900">
                 {station.pumpPressure}
               </span>
-              <span className="text-[13px] font-bold text-[#6a7b72]">bar</span>
+              <span className="text-[13px] font-normal text-slate-400">bar</span>
             </div>
             <div className="w-full bg-[#e6f0e9] h-2 rounded-full overflow-hidden">
               <div
@@ -327,10 +310,10 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
         <div className="flex bg-[#e6f0e9] p-1 rounded-2xl border border-[#dbe5de]">
           <button
             onClick={() => setActiveTab('feed')}
-            className={`flex-1 py-2 rounded-xl text-[13px] font-extrabold transition-all flex items-center justify-center gap-1.5 ${
+            className={`flex-1 py-2 rounded-xl text-[13px] font-bold transition-all flex items-center justify-center gap-1.5 ${
               activeTab === 'feed'
                 ? 'bg-white text-[#006c50] shadow-xs'
-                : 'text-[#6a7b72] hover:text-[#141d19]'
+                : 'text-slate-500 hover:text-slate-900'
             }`}
           >
             <span className="material-symbols-outlined text-[18px]">forum</span>
@@ -339,22 +322,22 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
 
           <button
             onClick={() => setActiveTab('reports')}
-            className={`flex-1 py-2 rounded-xl text-[13px] font-extrabold transition-all flex items-center justify-center gap-1.5 ${
+            className={`flex-1 py-2 rounded-xl text-[13px] font-bold transition-all flex items-center justify-center gap-1.5 ${
               activeTab === 'reports'
                 ? 'bg-white text-[#006c50] shadow-xs'
-                : 'text-[#6a7b72] hover:text-[#141d19]'
+                : 'text-slate-500 hover:text-slate-900'
             }`}
           >
             <span className="material-symbols-outlined text-[18px]">verified</span>
-            <span>Driver Reports ({reports.length})</span>
+            <span>Reports ({reports.length})</span>
           </button>
 
           <button
             onClick={() => setActiveTab('photos')}
-            className={`flex-1 py-2 rounded-xl text-[13px] font-extrabold transition-all flex items-center justify-center gap-1.5 ${
+            className={`flex-1 py-2 rounded-xl text-[13px] font-bold transition-all flex items-center justify-center gap-1.5 ${
               activeTab === 'photos'
                 ? 'bg-white text-[#006c50] shadow-xs'
-                : 'text-[#6a7b72] hover:text-[#141d19]'
+                : 'text-slate-500 hover:text-slate-900'
             }`}
           >
             <span className="material-symbols-outlined text-[18px]">photo_library</span>
@@ -366,82 +349,82 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
         {activeTab === 'feed' && (
           <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between px-1">
-              <h2 className="text-[17px] font-extrabold text-[#141d19] flex items-center gap-2">
+              <h2 className="text-[16px] font-bold text-slate-900 flex items-center gap-2">
                 <span className="material-symbols-outlined text-[#006c50] text-[20px]">
                   chat_bubble
                 </span>
                 <span>Group Discussion Feed</span>
               </h2>
-              <span className="text-[11.5px] font-bold text-[#006c50] bg-emerald-100 px-2.5 py-0.5 rounded-full">
-                Live Group Chat
+              <span className="text-[11.5px] font-semibold text-[#006c50] bg-emerald-100 px-2.5 py-0.5 rounded-full">
+                Open Group Chat
               </span>
             </div>
 
             {/* Comments List */}
             <div className="flex flex-col gap-3">
               {comments.map((comment) => (
-                <div
-                  key={comment.id}
-                  className="bg-white rounded-2xl p-4 border border-[#dbe5de] shadow-xs flex flex-col gap-2"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2.5">
-                      {comment.authorAvatar ? (
-                        <img
-                          src={comment.authorAvatar}
-                          alt={comment.author}
-                          className="w-9 h-9 rounded-full object-cover border border-[#dbe5de]"
-                        />
-                      ) : (
-                        <div className="w-9 h-9 rounded-full bg-[#006c50]/20 text-[#006c50] font-bold flex items-center justify-center text-[14px]">
-                          {comment.author.charAt(0)}
+                  <div
+                    key={comment.id}
+                    className="bg-white rounded-2xl p-4 border border-[#dbe5de] shadow-xs flex flex-col gap-2"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2.5">
+                        {comment.authorAvatar ? (
+                          <img
+                            src={comment.authorAvatar}
+                            alt={comment.author}
+                            className="w-9 h-9 rounded-full object-cover border border-[#dbe5de]"
+                          />
+                        ) : (
+                          <div className="w-9 h-9 rounded-full bg-[#006c50]/20 text-[#006c50] font-bold flex items-center justify-center text-[14px]">
+                            {comment.author.charAt(0)}
+                          </div>
+                        )}
+                        <div>
+                          <span className="text-[13.5px] font-semibold text-slate-900">
+                            {comment.author}
+                          </span>
+                          <span className="text-[11px] font-normal text-slate-400 ml-2">
+                            {comment.timeAgo}
+                          </span>
                         </div>
-                      )}
-                      <div>
-                        <span className="text-[13.5px] font-extrabold text-[#141d19]">
-                          {comment.author}
-                        </span>
-                        <span className="text-[11px] text-[#6a7b72] ml-2">
-                          {comment.timeAgo}
-                        </span>
                       </div>
                     </div>
-                  </div>
 
-                  <p className="text-[14px] text-[#3a4a43] leading-relaxed pl-1">
-                    {comment.content}
-                  </p>
+                    <p className="text-[13.5px] font-normal text-slate-700 leading-relaxed pl-1">
+                      {comment.content}
+                    </p>
 
-                  {/* Replies if any */}
-                  {comment.replies && comment.replies.length > 0 && (
-                    <div className="mt-2 ml-4 pl-3 border-l-2 border-[#006c50]/30 flex flex-col gap-2">
-                      {comment.replies.map((reply) => (
-                        <div key={reply.id} className="pt-1">
-                          <div className="flex items-center gap-2">
-                            {reply.authorAvatar && (
-                              <img
-                                src={reply.authorAvatar}
-                                alt={reply.author}
-                                className="w-5 h-5 rounded-full object-cover"
-                              />
-                            )}
-                            <span className="text-[12px] font-bold text-[#141d19]">
-                              {reply.author}
-                            </span>
-                            <span className="text-[10px] text-[#6a7b72]">
-                              {reply.timeAgo}
-                            </span>
+                    {/* Replies if any */}
+                    {comment.replies && comment.replies.length > 0 && (
+                      <div className="mt-2 ml-4 pl-3 border-l-2 border-[#006c50]/30 flex flex-col gap-2">
+                        {comment.replies.map((reply) => (
+                          <div key={reply.id} className="pt-1">
+                            <div className="flex items-center gap-2">
+                              {reply.authorAvatar && (
+                                <img
+                                  src={reply.authorAvatar}
+                                  alt={reply.author}
+                                  className="w-5 h-5 rounded-full object-cover"
+                                />
+                              )}
+                              <span className="text-[12px] font-semibold text-slate-900">
+                                {reply.author}
+                              </span>
+                              <span className="text-[10px] font-normal text-slate-400">
+                                {reply.timeAgo}
+                              </span>
+                            </div>
+                            <p className="text-[13px] font-normal text-slate-700 mt-0.5">
+                              {reply.content}
+                            </p>
                           </div>
-                          <p className="text-[13px] text-[#3a4a43] mt-0.5">
-                            {reply.content}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
           </div>
         )}
 
@@ -480,14 +463,6 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                       <div>
                         <div className="text-[14px] font-bold text-[#141d19] flex items-center gap-1">
                           {report.author}
-                          {report.verified && (
-                            <span
-                              className="material-symbols-outlined text-[#006c50] text-[16px]"
-                              style={{ fontVariationSettings: "'FILL' 1" }}
-                            >
-                              verified
-                            </span>
-                          )}
                         </div>
                         <span className="text-[12px] text-[#6a7b72]">
                           {report.timestamp}
@@ -495,17 +470,22 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                       </div>
                     </div>
 
-                    {report.isPhotoVerified && (
-                      <div className="flex flex-col items-end">
+                    {report.verified && report.isPhotoVerified ? (
+                      <div className="bg-emerald-100 border border-emerald-300 text-[#006c50] px-2.5 py-1 rounded-full text-[10.5px] font-extrabold flex items-center gap-1 shadow-2xs">
                         <span
-                          className="material-symbols-outlined text-[#006c50] text-[18px]"
+                          className="material-symbols-outlined text-[14px]"
                           style={{ fontVariationSettings: "'FILL' 1" }}
                         >
                           verified
                         </span>
-                        <span className="text-[9px] font-bold text-[#6a7b72] tracking-wider uppercase">
-                          photo verified
+                        <span>Photo Verified</span>
+                      </div>
+                    ) : (
+                      <div className="bg-amber-100 border border-amber-300/80 text-amber-900 px-2.5 py-1 rounded-full text-[10.5px] font-extrabold flex items-center gap-1 shadow-2xs">
+                        <span className="material-symbols-outlined text-[14px]">
+                          gavel
                         </span>
+                        <span>Unverified</span>
                       </div>
                     )}
                   </div>
@@ -532,6 +512,13 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                     <p className="text-[14px] text-[#3a4a43] leading-relaxed">
                       {report.comment}
                     </p>
+                  )}
+
+                  {!report.verified && (
+                    <div className="bg-amber-50 border border-amber-200 text-amber-800 rounded-xl p-2 text-[11.5px] font-semibold flex items-center gap-1.5 mt-0.5">
+                      <span className="material-symbols-outlined text-[15px] text-amber-700">info</span>
+                      <span>Unverified update: No live photo attached to confirm this report.</span>
+                    </div>
                   )}
 
                   {report.photo && (
@@ -646,7 +633,12 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
             </button>
 
             <button
-              onClick={() => onNavigate(station)}
+              onClick={() => {
+                openExternalMaps(station);
+                if (onNavigate) {
+                  onNavigate(station);
+                }
+              }}
               className="px-5 h-12 bg-white text-[#006c50] border-2 border-[#006c50] hover:bg-[#e6f0e9] font-extrabold text-[14px] rounded-full flex items-center justify-center gap-1.5 shadow-xs active:scale-[0.98] transition-all shrink-0"
             >
               <span
@@ -659,14 +651,14 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
             </button>
           </div>
 
-          {/* Station Group Live Comment Input */}
+          {/* Station Group Comment Input (Open to All Drivers) */}
           <form onSubmit={handlePostGroupComment} className="flex items-center gap-2 pt-1">
             <div className="flex-1 bg-[#e6f0e9] rounded-full h-11 flex items-center px-4 border border-[#dbe5de]">
               <input
                 type="text"
                 value={newCommentText}
                 onChange={(e) => setNewCommentText(e.target.value)}
-                placeholder={`Post to ${station.name} Group...`}
+                placeholder={`Post message to ${station.name} Group...`}
                 className="w-full bg-transparent border-none outline-none text-[13.5px] text-[#141d19] placeholder:text-[#6a7b72]"
               />
             </div>
@@ -708,6 +700,11 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
           </div>
         </div>
       )}
+
+      <StationGroupInfoSheet
+        isOpen={showInfoSheet}
+        onClose={() => setShowInfoSheet(false)}
+      />
     </div>
   );
 };

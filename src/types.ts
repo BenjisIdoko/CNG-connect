@@ -1,4 +1,18 @@
 export type StationStatus = 'full' | 'low' | 'queue' | 'out';
+export type VerificationLevel = 'unverified_text' | 'quick_tap_geofence' | 'verified_live_photo';
+
+export interface StationMedia {
+  id: string;
+  stationId: string;
+  reportId?: string;
+  mediaUrl: string;
+  isVerified: boolean;
+  geoLat?: number;
+  geoLng?: number;
+  geoAccuracyMeters?: number;
+  photoTimestamp?: string;
+  perceptualHash?: string;
+}
 
 export interface DriverReport {
   id: string;
@@ -6,6 +20,8 @@ export interface DriverReport {
   authorAvatar: string;
   verified: boolean;
   isPhotoVerified?: boolean;
+  verificationLevel?: VerificationLevel;
+  verificationWeight?: number; // 0.5 for unverified/quick-tap, 1.0 for photo verified
   timestamp: string;
   status: StationStatus;
   statusLabel: string;
@@ -36,15 +52,18 @@ export interface GasStation {
   isPiCngAccredited?: boolean; // Official Presidential CNG Initiative partner (pci.gov.ng)
   operator?: string; // NIPCO, NNPC, BOVAS, Portland Gas, Axxela, etc.
   phone: string;
-  coordinates: { x: number; y: number }; // Percentage 0-100 on map canvas
-  lat?: number; // Real GPS latitude
-  lng?: number; // Real GPS longitude
+  lat: number; // Real GPS latitude
+  lng: number; // Real GPS longitude
   images: string[];
   reports: DriverReport[];
-  memberCount?: number;
-  isJoined?: boolean;
+  stationMedia?: StationMedia[];
+  activePresenceCount?: number;
   stationComments?: CommentItem[];
   stationNotice?: string;
+  locationPrecision?: 'geocoded' | 'gps_confirmed';
+  dataSource?: string;
+  dataSourceDate?: string;
+  createdBy?: string | null;
 }
 
 export interface CommentItem {
@@ -97,6 +116,8 @@ export interface UserProfile {
   monthlySavings: number; // in Naira
   reportsCount: number;
   reputationScore: number;
+  communityPoints?: number;
+  state?: string; // Registered or detected state (e.g., 'Abuja FCT', 'Lagos', etc.)
 }
 
 export interface ConversionCenter {
@@ -119,4 +140,7 @@ export interface ConversionCenter {
   conversionPriceRange: string;
   estimatedHours: string;
   image?: string;
+  locationPrecision?: 'source_exact' | 'geocoded' | 'gps_confirmed';
+  dataSource?: string;
+  dataSourceDate?: string;
 }

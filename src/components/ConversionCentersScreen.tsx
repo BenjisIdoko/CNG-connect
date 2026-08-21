@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ConversionCenter } from '../types';
 
 interface ConversionCentersScreenProps {
@@ -13,23 +13,57 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedState, setSelectedState] = useState<string>('all');
   const [onlyAccredited, setOnlyAccredited] = useState(true);
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+
+  useEffect(() => {
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+        },
+        () => {},
+        { enableHighAccuracy: true, timeout: 10000 }
+      );
+    }
+  }, []);
+
+  const calculateDistance = (cLat?: number, cLng?: number): string => {
+    if (!userLocation || cLat == null || cLng == null) return '2.5 km';
+    const R = 6371;
+    const dLat = ((cLat - userLocation.lat) * Math.PI) / 180;
+    const dLon = ((cLng - userLocation.lng) * Math.PI) / 180;
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos((userLocation.lat * Math.PI) / 180) *
+        Math.cos((cLat * Math.PI) / 180) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return `${(R * c).toFixed(1)} km`;
+  };
 
   const statesList = ['all', 'Lagos', 'Abuja FCT', 'Ogun', 'Kano', 'Oyo', 'Katsina'];
 
-  const filteredCenters = centers.filter((center) => {
-    const matchesSearch =
-      center.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      center.address.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      center.lga.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      center.code.toLowerCase().includes(searchQuery.toLowerCase());
+  const filteredCenters = centers
+    .filter((center) => {
+      const matchesSearch =
+        center.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        center.address.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        center.lga.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        center.code.toLowerCase().includes(searchQuery.toLowerCase());
 
-    const matchesState =
-      selectedState === 'all' || center.state.toLowerCase() === selectedState.toLowerCase();
+      const matchesState =
+        selectedState === 'all' || center.state.toLowerCase() === selectedState.toLowerCase();
 
-    const matchesAccredited = !onlyAccredited || center.isPiCngAccredited;
+      const matchesAccredited = !onlyAccredited || center.isPiCngAccredited;
 
-    return matchesSearch && matchesState && matchesAccredited;
-  });
+      return matchesSearch && matchesState && matchesAccredited;
+    })
+    .map((c) => ({
+      ...c,
+      computedDistance: calculateDistance(c.lat, c.lng),
+    }))
+    .sort((a, b) => parseFloat(a.computedDistance) - parseFloat(b.computedDistance));
 
   const handleOpenDirections = (center: ConversionCenter) => {
     const daddr = center.lat && center.lng ? `${center.lat},${center.lng}` : encodeURIComponent(center.address);
@@ -136,10 +170,10 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
 
         {/* Centers Count Header */}
         <div className="flex justify-between items-center px-1">
-          <h2 className="text-[16px] font-black text-slate-900 tracking-tight">
+          <h2 className="text-[16px] font-bold text-slate-900 tracking-tight">
             Accredited Centers ({filteredCenters.length})
           </h2>
-          <span className="text-[11.5px] font-bold text-[#006c50]">
+          <span className="text-[11.5px] font-semibold text-[#006c50]">
             Real-time Verification
           </span>
         </div>
@@ -151,10 +185,10 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
               <span className="material-symbols-outlined text-[44px] text-slate-300 mb-2">
                 build_circle
               </span>
-              <p className="font-extrabold text-slate-800 text-[15px]">
+              <p className="font-bold text-slate-800 text-[15px]">
                 No Conversion Centers Found
               </p>
-              <p className="text-[13px] text-slate-500 mt-1">
+              <p className="text-[13px] font-normal text-slate-500 mt-1">
                 Try searching for another state, LGA, or clear your search term.
               </p>
               <button
@@ -163,7 +197,7 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
                   setSelectedState('all');
                   setOnlyAccredited(false);
                 }}
-                className="mt-3 px-4 py-2 bg-[#006c50] text-white text-[12px] font-bold rounded-full"
+                className="mt-3 px-4 py-2 bg-[#006c50] text-white text-[12px] font-semibold rounded-full"
               >
                 Reset All Filters
               </button>
@@ -178,22 +212,22 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap mb-1">
-                      <span className="bg-emerald-100 text-[#006c50] text-[10.5px] font-black px-2.5 py-0.5 rounded-full border border-emerald-200">
+                      <span className="bg-emerald-100 text-[#006c50] text-[10.5px] font-bold px-2.5 py-0.5 rounded-full border border-emerald-200">
                         Code: {center.code}
                       </span>
                       {center.isPiCngAccredited && (
-                        <span className="bg-[#004D40] text-[#00E676] text-[10.5px] font-black px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                        <span className="bg-[#004D40] text-[#00E676] text-[10.5px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1">
                           <span className="material-symbols-outlined text-[12px]">verified</span>
                           Pi-CNG Accredited
                         </span>
                       )}
                     </div>
 
-                    <h3 className="text-[16px] font-black text-slate-900 tracking-tight leading-snug">
+                    <h3 className="text-[15.5px] font-bold text-slate-900 tracking-tight leading-snug">
                       {center.name}
                     </h3>
 
-                    <div className="flex items-center gap-1 text-[12.5px] font-semibold text-slate-500 mt-1">
+                    <div className="flex items-center gap-1 text-[12.5px] font-normal text-slate-500 mt-1">
                       <span className="material-symbols-outlined text-[16px] text-slate-400">
                         location_on
                       </span>
@@ -202,17 +236,24 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
                   </div>
 
                   {/* Rating Badge */}
-                  <div className="bg-emerald-50 rounded-2xl p-2 text-center border border-emerald-100 shrink-0">
-                    <div className="flex items-center gap-0.5 text-[#006c50] font-black text-[13px]">
-                      <span className="material-symbols-outlined text-[15px]" style={{ fontVariationSettings: "'FILL' 1" }}>
-                        star
+                  {center.reviewsCount > 0 && center.rating > 0 ? (
+                    <div className="bg-emerald-50 rounded-2xl p-2 text-center border border-emerald-100 shrink-0">
+                      <div className="flex items-center gap-0.5 text-[#006c50] font-black text-[13px]">
+                        <span className="material-symbols-outlined text-[15px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+                          star
+                        </span>
+                        {center.rating}
+                      </div>
+                      <span className="text-[10px] font-bold text-slate-400 block">
+                        ({center.reviewsCount})
                       </span>
-                      {center.rating}
                     </div>
-                    <span className="text-[10px] font-bold text-slate-400 block">
-                      ({center.reviewsCount})
-                    </span>
-                  </div>
+                  ) : (
+                    <div className="bg-slate-100 rounded-2xl px-2.5 py-1.5 text-center border border-slate-200/80 shrink-0">
+                      <span className="text-[10.5px] font-extrabold text-slate-600 block">Not yet rated</span>
+                      <span className="text-[9.5px] font-bold text-slate-400 block">0 driver reviews</span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Services Tags Grid */}
@@ -237,12 +278,18 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
                 <div className="flex items-center justify-between text-[12.5px] px-1 font-bold">
                   <div>
                     <span className="text-slate-400 text-[11px] block">Est. Cost Range:</span>
-                    <span className="text-slate-900 font-extrabold">{center.conversionPriceRange}</span>
+                    <span className="text-slate-900 font-extrabold">
+                      {center.conversionPriceRange || 'Contact centre for pricing'}
+                    </span>
                   </div>
-                  <div className="text-right">
-                    <span className="text-slate-400 text-[11px] block">Installation Time:</span>
-                    <span className="text-[#006c50] font-extrabold">{center.estimatedHours}</span>
-                  </div>
+                  {Boolean(center.estimatedHours) && (
+                    <div className="text-right">
+                      <span className="text-slate-400 text-[11px] block">Installation Time:</span>
+                      <span className="text-[#006c50] font-extrabold">
+                        {center.estimatedHours}
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Action Buttons Row */}

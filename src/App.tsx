@@ -15,7 +15,7 @@ import {
 import { ConversionCenter } from './types';
 import { Header } from './components/Header';
 import { BottomNav } from './components/BottomNav';
-import { MapScreen } from './components/MapScreen';
+import { MapScreen, GpsStatus } from './components/MapScreen';
 import { StationDetailScreen } from './components/StationDetailScreen';
 import { CommunityScreen } from './components/CommunityScreen';
 import { ConversionCentersScreen } from './components/ConversionCentersScreen';
@@ -25,12 +25,20 @@ import { ChatScreen } from './components/ChatScreen';
 import { ProfileScreen } from './components/ProfileScreen';
 import { ReportStatusModal } from './components/ReportStatusModal';
 import { OnboardingModal } from './components/OnboardingModal';
+import { OnboardingScreen } from './components/OnboardingScreen';
 import { ProximityAlertBanner } from './components/ProximityAlertBanner';
 import { CreatePostModal } from './components/CreatePostModal';
 import { AiAssistantModal } from './components/AiAssistantModal';
 import { SignUpScreen } from './components/SignUpScreen';
 import { LiveNavigationModal } from './components/LiveNavigationModal';
 import { SplashScreen } from './components/SplashScreen';
+import {
+  isStationStale,
+  isStationOnCooldown,
+  setStationCooldown,
+  getDistanceInKm,
+} from './utils/proximityAlertEngine';
+import { apiService } from './services/apiService';
 
 export const App: React.FC = () => {
   // Animated Splash Screen State
@@ -49,33 +57,24 @@ export const App: React.FC = () => {
   // Modals & Overlays
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [reportingStation, setReportingStation] = useState<GasStation | null>(null);
-  const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
-  const [isSignUpOpen, setIsSignUpOpen] = useState(false);
   const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
   const [isAiModalOpen, setIsAiModalOpen] = useState(false);
   const [proximityAlertStation, setProximityAlertStation] = useState<GasStation | null>(null);
   const [globalToast, setGlobalToast] = useState<string | null>(null);
+  const [gpsStatus, setGpsStatus] = useState<GpsStatus>('unavailable');
 
-  // Data Store with LocalStorage Persistence
-  const [stations, setStations] = useState<GasStation[]>(() => {
-    try {
-      const saved = localStorage.getItem('gasfinder_stations');
-      return saved ? JSON.parse(saved) : INITIAL_STATIONS;
-    } catch {
-      return INITIAL_STATIONS;
-    }
+  // Auth-Gated Onboarding & Registration State
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+    return localStorage.getItem('cng_user_authenticated') === 'true';
+  });
+  const [authMode, setAuthMode] = useState<'onboarding' | 'signup' | 'login' | null>(() => {
+    return localStorage.getItem('cng_user_authenticated') === 'true' ? null : 'onboarding';
   });
 
-  const [selectedStation, setSelectedStation] = useState<GasStation>(() => stations[0] || INITIAL_STATIONS[0]);
-
-  const [posts, setPosts] = useState<CommunityPost[]>(() => {
-    try {
-      const saved = localStorage.getItem('gasfinder_posts');
-      return saved ? JSON.parse(saved) : INITIAL_POSTS;
-    } catch {
-      return INITIAL_POSTS;
-    }
-  });
+  // Data Store connected to Supabase API Service (with offline fallback)
+  const [stations, setStations] = useState<GasStation[]>(INITIAL_STATIONS);
+  const [selectedStation, setSelectedStation] = useState<GasStation>(INITIAL_STATIONS[0]);
+  const [posts, setPosts] = useState<CommunityPost[]>(INITIAL_POSTS);
 
   const [userProfile, setUserProfile] = useState<UserProfile>(() => {
     try {
@@ -86,22 +85,26 @@ export const App: React.FC = () => {
     }
   });
 
-  // Auto-sync state changes to LocalStorage
+  // Load backend data from API Service on mount
   useEffect(() => {
-    try {
-      localStorage.setItem('gasfinder_stations', JSON.stringify(stations));
-    } catch (e) {
-      console.error('Failed to save stations to localStorage', e);
-    }
-  }, [stations]);
+    let isMounted = true;
+    apiService.fetchStations().then((data) => {
+      if (isMounted && data.length > 0) {
+        setStations(data);
+        setSelectedStation(data[0]);
+      }
+    });
 
-  useEffect(() => {
-    try {
-      localStorage.setItem('gasfinder_posts', JSON.stringify(posts));
-    } catch (e) {
-      console.error('Failed to save posts to localStorage', e);
-    }
-  }, [posts]);
+    apiService.fetchPosts().then((data) => {
+      if (isMounted && data.length > 0) {
+        setPosts(data);
+      }
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   useEffect(() => {
     try {
@@ -111,14 +114,115 @@ export const App: React.FC = () => {
     }
   }, [userProfile]);
 
+  // Real navigator.geolocation.watchPosition + Haversine distance calculation
+  useEffect(() => {
+    if (!('geolocation' in navigator)) return;
+
+    const userKey = userProfile.email || userProfile.phone || 'default_driver';
+
+    const watchId = navigator.geolocation.watchPosition(
+      (pos) => {
+        const { latitude, longitude } = pos.coords;
+        setGpsStatus('active');
+
+        // Dynamically compute exact distance & drive time for all stations relative to user's real GPS position
+        setStations((prevStations) => {
+          const updated = prevStations.map((st) => {
+            if (st.lat != null && st.lng != null) {
+              const distKm = getDistanceInKm(latitude, longitude, st.lat, st.lng);
+              const driveMins = Math.round(distKm * 2.5 + 2);
+              return {
+                ...st,
+                distance: `${distKm.toFixed(1)} km`,
+                driveTime: `${driveMins} min drive`,
+              };
+            }
+            return st;
+          });
+
+          // Sort by closest distance to driver's live location
+          return updated.sort((a, b) => {
+            const numA = parseFloat(a.distance) || 999;
+            const numB = parseFloat(b.distance) || 999;
+            return numA - numB;
+          });
+        });
+
+        // Find nearby station requiring status update
+        const nearbyStaleStation = stations.find((st) => {
+          if (st.lat == null || st.lng == null) return false;
+
+          const distKm = getDistanceInKm(latitude, longitude, st.lat, st.lng);
+          // Radius threshold: within 0.8 km (800 meters)
+          if (distKm > 0.8) return false;
+
+          // (a) Check staleness (>30 min)
+          if (!isStationStale(st.lastUpdated, 30)) return false;
+
+          // (b) Check per-station per-user 2-hour cooldown
+          if (isStationOnCooldown(userKey, st.id, 2)) return false;
+
+          return true;
+        });
+
+        if (nearbyStaleStation && (!proximityAlertStation || proximityAlertStation.id !== nearbyStaleStation.id)) {
+          setProximityAlertStation(nearbyStaleStation);
+          setStationCooldown(userKey, nearbyStaleStation.id);
+          showToast(`📍 Geofence Nudge: You arrived near ${nearbyStaleStation.name}`);
+        }
+      },
+      (err) => {
+        console.debug('Geolocation watch status:', err.message);
+        setGpsStatus(err.code === err.PERMISSION_DENIED ? 'denied' : 'unavailable');
+      },
+      {
+        enableHighAccuracy: true,
+        maximumAge: 15000,
+        timeout: 20000,
+      }
+    );
+
+    return () => {
+      navigator.geolocation.clearWatch(watchId);
+    };
+  }, [userProfile, proximityAlertStation]);
+
   const showToast = (msg: string) => {
     setGlobalToast(msg);
     setTimeout(() => setGlobalToast(null), 3500);
   };
 
+  const handleSimulateProximityNudge = (requestedStation?: GasStation) => {
+    const userKey = userProfile.email || userProfile.phone || 'default_driver';
+    const candidate =
+      requestedStation ||
+      stations.find((st) => isStationStale(st.lastUpdated, 30) && !isStationOnCooldown(userKey, st.id, 2)) ||
+      stations[0];
+
+    const stale = isStationStale(candidate.lastUpdated, 30);
+    const onCooldown = isStationOnCooldown(userKey, candidate.id, 2);
+
+    if (!stale) {
+      showToast(`⚠️ Nudge skipped for ${candidate.name}: Status is fresh (${candidate.lastUpdated}). Nudges require >30m staleness.`);
+      return;
+    }
+
+    if (onCooldown) {
+      showToast(`⏳ Nudge skipped for ${candidate.name}: 2-hour user cooldown active.`);
+      return;
+    }
+
+    setProximityAlertStation(candidate);
+    setStationCooldown(userKey, candidate.id);
+    showToast(`📍 Geofence Alert: Arrived near ${candidate.name}`);
+  };
+
   // Handlers
-  const handleOpenStationDetail = (station: GasStation) => {
-    setActiveDetailStation(station);
+  const handleOpenStationDetail = async (station: GasStation) => {
+    const userKey = userProfile.email || userProfile.phone || 'default_driver';
+    const activeCount = await apiService.pingStationPresence(station.id, userKey);
+    const updatedStation = { ...station, activePresenceCount: activeCount };
+    setActiveDetailStation(updatedStation);
   };
 
   const handleOpenReportModal = (station: GasStation) => {
@@ -126,59 +230,50 @@ export const App: React.FC = () => {
     setIsReportModalOpen(true);
   };
 
-  const handleSubmitReport = (newReport: DriverReport, newStatus: StationStatus) => {
+  const handleSubmitReport = async (newReport: DriverReport, newStatus: StationStatus) => {
     if (!reportingStation) return;
 
-    const statusLabels: Record<StationStatus, string> = {
-      full: 'Full Stock',
-      low: 'Low Pressure',
-      queue: 'Queuing',
-      out: 'Out of Gas',
-    };
+    const pointsAwarded = newReport.isPhotoVerified ? 100 : 50;
+    let newTotalPoints = 0;
 
-    const updatedStations = stations.map((st) => {
-      if (st.id === reportingStation.id) {
-        const updated = {
-          ...st,
-          status: newStatus,
-          statusLabel: statusLabels[newStatus],
-          lastUpdated: 'Just now',
-          reports: [newReport, ...st.reports],
-        };
-        if (activeDetailStation?.id === st.id) {
-          setActiveDetailStation(updated);
-        }
-        if (selectedStation?.id === st.id) {
-          setSelectedStation(updated);
-        }
-        return updated;
+    const updatedStations = await apiService.submitReport(reportingStation.id, newReport, newStatus);
+    setStations(updatedStations);
+
+    const activeSt = updatedStations.find((s) => s.id === reportingStation.id);
+    if (activeSt) {
+      if (activeDetailStation?.id === activeSt.id) {
+        setActiveDetailStation(activeSt);
       }
-      return st;
+      if (selectedStation?.id === activeSt.id) {
+        setSelectedStation(activeSt);
+      }
+    }
+
+    const broadcast = apiService.broadcastStatusUpdate(
+      reportingStation,
+      newReport,
+      newStatus,
+      userProfile.state || 'Abuja FCT'
+    );
+
+    setUserProfile((prev) => {
+      newTotalPoints = (prev.communityPoints || 0) + pointsAwarded;
+      return {
+        ...prev,
+        reportsCount: prev.reportsCount + 1,
+        communityPoints: newTotalPoints,
+      };
     });
 
-    setStations(updatedStations);
-    setUserProfile((prev) => ({
-      ...prev,
-      reportsCount: prev.reportsCount + 1,
-    }));
-    showToast(`Status updated for ${reportingStation.name}! +50 Community Points`);
-  };
-
-  const handleToggleJoinGroup = (stationId: string) => {
-    setStations((prev) =>
-      prev.map((st) => {
-        if (st.id === stationId) {
-          const isJoined = !st.isJoined;
-          const memberCount = (st.memberCount || 100) + (isJoined ? 1 : -1);
-          const updated = { ...st, isJoined, memberCount };
-          if (activeDetailStation?.id === stationId) {
-            setActiveDetailStation(updated);
-          }
-          return updated;
-        }
-        return st;
-      })
-    );
+    if (broadcast.isDelivered) {
+      showToast(
+        `${broadcast.title}: ${broadcast.message} (+${pointsAwarded} PTS)`
+      );
+    } else {
+      showToast(
+        `Report submitted (+${pointsAwarded} PTS). Push broadcast skipped for driver: Registered state (${userProfile.state || 'Unassigned'}) does not match station state (${reportingStation.state}).`
+      );
+    }
   };
 
   const handleAddStationComment = (stationId: string, commentText: string) => {
@@ -209,21 +304,39 @@ export const App: React.FC = () => {
 
   const handleNavigate = (station: GasStation) => {
     setNavigatingStation(station);
-    showToast(`Starting live navigation to ${station.name} (${station.distance})`);
+    showToast(`Navigation summary for ${station.name} (${station.distance})`);
   };
 
-  const handleCreatePost = (newPost: CommunityPost) => {
-    setPosts([newPost, ...posts]);
+  const handleCreatePost = async (newPost: CommunityPost) => {
+    const updatedPosts = await apiService.createPost(newPost);
+    setPosts(updatedPosts);
     showToast('Post published to GasFinder Community!');
   };
 
+  const handleAuthSuccess = (newUserProfile: UserProfile) => {
+    setUserProfile(newUserProfile);
+    setIsAuthenticated(true);
+    setAuthMode(null);
+    localStorage.setItem('cng_user_authenticated', 'true');
+    localStorage.setItem('cng_user_profile', JSON.stringify(newUserProfile));
+    showToast(`Welcome to GasFinder, ${newUserProfile.name}!`);
+  };
+
   const handleLoginSuccess = (identifier: string) => {
-    setUserProfile((prev) => ({
-      ...prev,
-      phone: identifier.includes('@') ? prev.phone : identifier,
-      email: identifier.includes('@') ? identifier : prev.email,
-    }));
-    showToast(`Welcome to GasFinder, ${userProfile.name}!`);
+    const updatedUser: UserProfile = {
+      ...userProfile,
+      phone: identifier.includes('@') ? userProfile.phone : identifier,
+      email: identifier.includes('@') ? identifier : userProfile.email,
+    };
+    handleAuthSuccess(updatedUser);
+  };
+
+  const handleSignOut = () => {
+    setIsAuthenticated(false);
+    setAuthMode('onboarding');
+    localStorage.removeItem('cng_user_authenticated');
+    localStorage.removeItem('cng_user_profile');
+    showToast('Signed out successfully.');
   };
 
   // Determine current view title and back button
@@ -239,9 +352,8 @@ export const App: React.FC = () => {
     showHeaderBack = true;
     onHeaderBack = () => setActiveDiscussionPost(null);
   } else if (activeDetailStation) {
-    headerTitle = `${activeDetailStation.name} Group`;
-    showHeaderBack = true;
-    onHeaderBack = () => setActiveDetailStation(null);
+    headerTitle = undefined; // handled inside StationDetailScreen sticky header
+    showHeaderBack = false;
   }
 
   return (
@@ -305,7 +417,6 @@ export const App: React.FC = () => {
             onBack={() => setActiveDetailStation(null)}
             onOpenReportModal={handleOpenReportModal}
             onNavigate={handleNavigate}
-            onToggleJoinGroup={handleToggleJoinGroup}
             onAddStationComment={handleAddStationComment}
           />
         ) : activeTab === 'map' ? (
@@ -315,6 +426,8 @@ export const App: React.FC = () => {
             onSelectStation={(st) => setSelectedStation(st)}
             onOpenStationDetails={handleOpenStationDetail}
             onNavigate={handleNavigate}
+            gpsStatus={gpsStatus}
+            onGpsStatusChange={(status) => setGpsStatus(status)}
           />
         ) : activeTab === 'conversions' ? (
           <ConversionCentersScreen
@@ -330,23 +443,53 @@ export const App: React.FC = () => {
             onOpenCreatePost={() => setIsCreatePostOpen(true)}
             onOpenStationGroup={(st) => setActiveDetailStation(st)}
             onOpenNotifications={() => {
-              setProximityAlertStation(stations[1]); // Trigger Total CNG Wuse 2 proximity alert
-              showToast('Received alert: Total CNG Wuse 2 is nearby!');
+              handleSimulateProximityNudge();
             }}
           />
         ) : (
           <ProfileScreen
             user={userProfile}
-            onOpenOnboarding={() => setIsOnboardingOpen(true)}
-            onOpenSignUp={() => setIsSignUpOpen(true)}
+            onOpenOnboarding={() => setAuthMode('onboarding')}
+            onOpenSignUp={() => setAuthMode('signup')}
+            onSignOut={handleSignOut}
+            onUpdateState={(newState) => {
+              setUserProfile((prev) => ({ ...prev, state: newState }));
+            }}
             onTriggerProximityAlert={() => {
-              setProximityAlertStation(stations[1]);
+              handleSimulateProximityNudge();
               setActiveTab('map');
-              showToast('Simulating alert for Total CNG - Wuse 2');
             }}
           />
         )}
       </main>
+
+      {/* Auth-Gated Onboarding & Registration Screen */}
+      {(!isAuthenticated || authMode !== null) && (
+        <div className="fixed inset-0 z-[60] bg-[#f2fcf5] overflow-y-auto">
+          {authMode === 'onboarding' && (
+            <OnboardingScreen
+              onStartSignUp={() => setAuthMode('signup')}
+              onStartLogin={() => setAuthMode('login')}
+            />
+          )}
+
+          {authMode === 'signup' && (
+            <SignUpScreen
+              onSignUpComplete={handleAuthSuccess}
+              onSwitchToLogin={() => setAuthMode('login')}
+              onCancel={() => (isAuthenticated ? setAuthMode(null) : setAuthMode('onboarding'))}
+            />
+          )}
+
+          {authMode === 'login' && (
+            <OnboardingModal
+              isOpen={true}
+              onClose={() => (isAuthenticated ? setAuthMode(null) : setAuthMode('onboarding'))}
+              onLoginSuccess={handleLoginSuccess}
+            />
+          )}
+        </div>
+      )}
 
       {/* Book Conversion Kit Modal */}
       {selectedBookingCenter && (
@@ -354,35 +497,22 @@ export const App: React.FC = () => {
           center={selectedBookingCenter}
           onClose={() => setSelectedBookingCenter(null)}
           onSuccess={(ref) => {
-            showToast(`Conversion Slot Confirmed! Ref: ${ref}`);
-            setUserProfile((prev) => ({
-              ...prev,
-              reputationScore: Number((prev.reputationScore + 0.1).toFixed(1)),
-            }));
+            let updatedPts = 0;
+            setUserProfile((prev) => {
+              updatedPts = (prev.communityPoints || 0) + 100;
+              return {
+                ...prev,
+                reputationScore: Number((prev.reputationScore + 0.1).toFixed(1)),
+                communityPoints: updatedPts,
+              };
+            });
+            showToast(`Conversion Slot Confirmed! Ref: ${ref} • +100 Points added (${updatedPts} PTS total) 🏆`);
           }}
         />
       )}
 
-      {/* Full-Screen Sign Up Overlay */}
-      {isSignUpOpen && (
-        <div className="fixed inset-0 z-50 bg-[#f2fcf5] overflow-y-auto">
-          <SignUpScreen
-            onSignUpComplete={(newUser) => {
-              setUserProfile(newUser);
-              setIsSignUpOpen(false);
-              showToast(`Welcome to GasFinder, ${newUser.name}! +100 Welcome Points awarded 🏆`);
-            }}
-            onSwitchToLogin={() => {
-              setIsSignUpOpen(false);
-              setIsOnboardingOpen(true);
-            }}
-            onCancel={() => setIsSignUpOpen(false)}
-          />
-        </div>
-      )}
-
-      {/* Bottom Navigation Bar (Shown when not in sub-screens) */}
-      {!activeDetailStation && !activeDiscussionPost && !activeChatPost && !isSignUpOpen && (
+      {/* Bottom Navigation Bar (Shown when authenticated & not in sub-screens) */}
+      {isAuthenticated && !activeDetailStation && !activeDiscussionPost && !activeChatPost && !authMode && (
         <BottomNav
           activeTab={activeTab}
           onTabChange={(tab) => {
@@ -398,6 +528,14 @@ export const App: React.FC = () => {
       {isReportModalOpen && reportingStation && (
         <ReportStatusModal
           station={reportingStation}
+          user={userProfile}
+          isPresenceActive={
+            Boolean(
+              gpsStatus === 'active' &&
+              reportingStation.distance &&
+              parseFloat(reportingStation.distance) <= 0.8
+            )
+          }
           onClose={() => {
             setIsReportModalOpen(false);
             setReportingStation(null);
@@ -406,14 +544,9 @@ export const App: React.FC = () => {
         />
       )}
 
-      <OnboardingModal
-        isOpen={isOnboardingOpen}
-        onClose={() => setIsOnboardingOpen(false)}
-        onLoginSuccess={handleLoginSuccess}
-      />
-
       <CreatePostModal
         isOpen={isCreatePostOpen}
+        user={userProfile}
         onClose={() => setIsCreatePostOpen(false)}
         onSubmitPost={handleCreatePost}
       />

@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { UserProfile } from '../types';
 import { ASSETS } from '../data/mockData';
+import { validatePhoneNumber } from '../utils/phoneValidator';
+import { otpService } from '../services/otpService';
 
 interface SignUpScreenProps {
   onSignUpComplete: (newUserProfile: UserProfile) => void;
@@ -13,30 +15,153 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
   onSwitchToLogin,
   onCancel,
 }) => {
-  const [step, setStep] = useState<1 | 2>(1);
+  const [step, setStep] = useState<1 | 2 | 3>(1);
+
+  // Step 1 Form Fields
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
   const [countryCode, setCountryCode] = useState('+234');
   const [email, setEmail] = useState('');
   const [city, setCity] = useState('Abuja FCT');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [phoneError, setPhoneError] = useState<string | null>(null);
+  const [isSendingOtp, setIsSendingOtp] = useState(false);
+
+  // Step 2 OTP Verification State
+  const [devCode, setDevCode] = useState<string | null>(null);
+  const [userOtpInput, setUserOtpInput] = useState<string>('');
+  const [otpError, setOtpError] = useState<string | null>(null);
+  const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState<number>(0);
+  const [expiryCountdown, setExpiryCountdown] = useState<number>(300); // 5 minutes (300s)
+  const [otpNotice, setOtpNotice] = useState<string | null>(null);
+
+  // Step 3 Vehicle Details
   const [vehicleMake, setVehicleMake] = useState('Toyota Camry');
   const [vehicleYear, setVehicleYear] = useState('2018');
   const [vehicleType, setVehicleType] = useState<'private' | 'taxi' | 'keke' | 'truck'>('private');
   const [cngStatus, setCngStatus] = useState<'installed' | 'planning' | 'interested'>('installed');
   const [tankSize, setTankSize] = useState('15kg');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (step === 1) {
-      setStep(2);
+  // Cooldown & Expiry Countdown Timers for OTP Step
+  useEffect(() => {
+    let cooldownTimer: NodeJS.Timeout;
+    if (resendCooldown > 0) {
+      cooldownTimer = setInterval(() => {
+        setResendCooldown((c) => Math.max(0, c - 1));
+      }, 1000);
+    }
+    return () => clearInterval(cooldownTimer);
+  }, [resendCooldown]);
+
+  useEffect(() => {
+    let expiryTimer: NodeJS.Timeout;
+    if (step === 2 && expiryCountdown > 0) {
+      expiryTimer = setInterval(() => {
+        setExpiryCountdown((e) => Math.max(0, e - 1));
+      }, 1000);
+    }
+    return () => clearInterval(expiryTimer);
+  }, [step, expiryCountdown]);
+
+  // Step 1: Validate Phone Format & Call Serverless /api/otp/send
+  const handleStep1Submit = async () => {
+    const phoneValidation = validatePhoneNumber(phone);
+    if (!phoneValidation.isValid) {
+      setPhoneError(phoneValidation.error || 'Please enter a valid Nigerian phone number (0 + 10 digits, e.g. 0803 123 4567)');
       return;
     }
 
+    setPhoneError(null);
+    setIsSendingOtp(true);
+
+    const res = await otpService.sendOtp(phoneValidation.normalized || phone);
+    setIsSendingOtp(false);
+
+    if (!res.success) {
+      setPhoneError(res.error || 'Failed to send SMS verification code.');
+      return;
+    }
+
+    if (res.devCode) {
+      setDevCode(res.devCode);
+    }
+
+    setResendCooldown(res.cooldownSeconds || 60);
+    setExpiryCountdown(300); // 5 minutes
+    setUserOtpInput('');
+    setOtpError(null);
+    setOtpNotice(res.message || 'SMS verification code dispatched!');
+    setStep(2);
+  };
+
+  // Step 2: Call Serverless /api/otp/verify (Server-Side Verification Gate)
+  const handleStep2Submit = async () => {
+    if (userOtpInput.trim().length !== 6) {
+      setOtpError('Please enter a 6-digit verification code.');
+      return;
+    }
+
+    if (expiryCountdown <= 0) {
+      setOtpError('OTP code has expired (5 minute limit). Tap "Resend Code" to get a new code.');
+      return;
+    }
+
+    setIsVerifyingOtp(true);
+    setOtpError(null);
+
+    const phoneValidation = validatePhoneNumber(phone);
+    const targetPhone = phoneValidation.normalized || phone;
+
+    const res = await otpService.verifyOtp(targetPhone, userOtpInput.trim());
+    setIsVerifyingOtp(false);
+
+    if (!res.verified) {
+      setOtpError(res.error || 'Verification failed. Please check your OTP code.');
+      return;
+    }
+
+    // Verified server-side! Proceed to Step 3 (Vehicle details)
+    setStep(3);
+  };
+
+  // Resend OTP Handler (Rate-Limited 60s)
+  const handleResendOtp = async () => {
+    if (resendCooldown > 0) return;
+
+    const phoneValidation = validatePhoneNumber(phone);
+    const targetPhone = phoneValidation.normalized || phone;
+
+    setIsSendingOtp(true);
+    const res = await otpService.sendOtp(targetPhone);
+    setIsSendingOtp(false);
+
+    if (!res.success) {
+      setOtpError(res.error || 'Failed to resend SMS code.');
+      return;
+    }
+
+    if (res.devCode) {
+      setDevCode(res.devCode);
+    }
+
+    setResendCooldown(res.cooldownSeconds || 60);
+    setExpiryCountdown(300); // Reset 5 min timer
+    setUserOtpInput('');
+    setOtpError(null);
+    setOtpNotice(`New SMS code sent! ${res.devCode ? `(Dev Code: ${res.devCode})` : ''}`);
+    setTimeout(() => setOtpNotice(null), 4000);
+  };
+
+  // Step 3: Create Profile & Complete Signup
+  const handleStep3Submit = () => {
+    const phoneValidation = validatePhoneNumber(phone);
+    const formattedPhone = phoneValidation.formatted || `${countryCode} ${phone.trim()}`;
+
     const newUser: UserProfile = {
       name: fullName.trim() || 'CNG Driver',
-      phone: `${countryCode} ${phone.trim()}`,
+      phone: formattedPhone,
       email: email.trim() || 'driver@gasfinder.ng',
       avatar: ASSETS.userAvatar,
       vehicle: `${vehicleYear} ${vehicleMake} (${cngStatus === 'installed' ? `CNG ${tankSize}` : 'Petrol'})`,
@@ -44,9 +169,28 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
       monthlySavings: cngStatus === 'installed' ? 78500 : 0,
       reportsCount: 1,
       reputationScore: 5.0,
+      communityPoints: 100,
+      state: city.includes('Lagos') ? 'Lagos' : city.includes('Edo') ? 'Edo' : city.includes('Oyo') ? 'Oyo' : city.includes('Rivers') ? 'Rivers' : city.includes('Kano') ? 'Kano' : 'Abuja FCT',
     };
 
     onSignUpComplete(newUser);
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (step === 1) {
+      handleStep1Submit();
+    } else if (step === 2) {
+      handleStep2Submit();
+    } else {
+      handleStep3Submit();
+    }
+  };
+
+  const formatExpiryMinutes = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
   };
 
   return (
@@ -74,15 +218,20 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
         <div className="flex items-center justify-between border-b border-slate-100 pb-3">
           <div>
             <span className="text-[11px] font-black uppercase text-[#006c50] tracking-wider">
-              Step {step} of 2
+              Step {step} of 3
             </span>
             <h1 className="text-[20px] font-extrabold text-[#141d19] leading-tight">
-              {step === 1 ? 'Create Driver Account' : 'Vehicle & CNG Details'}
+              {step === 1
+                ? 'Create Driver Account'
+                : step === 2
+                ? 'SMS OTP Verification'
+                : 'Vehicle & CNG Details'}
             </h1>
           </div>
           <div className="flex items-center gap-1.5">
             <div className={`w-3 h-3 rounded-full ${step >= 1 ? 'bg-[#006c50]' : 'bg-slate-200'}`} />
             <div className={`w-3 h-3 rounded-full ${step >= 2 ? 'bg-[#006c50]' : 'bg-slate-200'}`} />
+            <div className={`w-3 h-3 rounded-full ${step >= 3 ? 'bg-[#006c50]' : 'bg-slate-200'}`} />
           </div>
         </div>
 
@@ -100,7 +249,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          {step === 1 ? (
+          {step === 1 && (
             <>
               {/* Full Name */}
               <div>
@@ -122,12 +271,14 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
                 </div>
               </div>
 
-              {/* Phone Number */}
+              {/* Phone Number with Format Validation */}
               <div>
                 <label className="block text-[12.5px] font-bold text-slate-700 mb-1">
-                  Phone Number (WhatsApp)
+                  Phone Number (Nigerian Format: 0 + 10 digits or +234)
                 </label>
-                <div className="flex items-center bg-[#f2fcf5] border border-[#dbe5de] rounded-2xl px-3 h-12 focus-within:ring-2 focus-within:ring-[#006c50]/30 focus-within:border-[#006c50] transition-all gap-2">
+                <div className={`flex items-center bg-[#f2fcf5] border rounded-2xl px-3 h-12 transition-all gap-2 ${
+                  phoneError ? 'border-rose-500 ring-2 ring-rose-500/20' : 'border-[#dbe5de] focus-within:ring-2 focus-within:ring-[#006c50]/30 focus-within:border-[#006c50]'
+                }`}>
                   <span className="text-[14px] font-bold text-[#006c50] shrink-0 border-r border-[#dbe5de] pr-2">
                     🇳🇬 {countryCode}
                   </span>
@@ -135,11 +286,20 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
                     type="tel"
                     required
                     value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
+                    onChange={(e) => {
+                      setPhone(e.target.value);
+                      if (phoneError) setPhoneError(null);
+                    }}
                     placeholder="0803 123 4567"
                     className="flex-1 bg-transparent text-[14.5px] font-medium text-slate-900 outline-none"
                   />
                 </div>
+                {phoneError && (
+                  <p className="text-[11.5px] font-bold text-rose-600 mt-1 flex items-center gap-1">
+                    <span className="material-symbols-outlined text-[14px]">error</span>
+                    <span>{phoneError}</span>
+                  </p>
+                )}
               </div>
 
               {/* Email Address */}
@@ -165,7 +325,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
               {/* Primary Operating City */}
               <div>
                 <label className="block text-[12.5px] font-bold text-slate-700 mb-1">
-                  Primary Location / City
+                  Primary Location / State
                 </label>
                 <select
                   value={city}
@@ -210,7 +370,93 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
                 </div>
               </div>
             </>
-          ) : (
+          )}
+
+          {step === 2 && (
+            <div className="flex flex-col gap-4 py-2">
+              {/* SMS Code Banner Callout */}
+              <div className="bg-emerald-50 border border-emerald-300 rounded-2xl p-4 flex flex-col gap-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-[12px] font-black uppercase text-[#006c50] tracking-wider flex items-center gap-1">
+                    <span className="material-symbols-outlined text-[16px]">sms</span>
+                    Serverless SMS OTP Verification
+                  </span>
+                  {devCode && (
+                    <span className="bg-[#004D40] text-[#00E676] text-[10.5px] font-black px-2.5 py-0.5 rounded-full border border-emerald-400/40">
+                      Dev Code: {devCode}
+                    </span>
+                  )}
+                </div>
+                <p className="text-[13px] text-slate-700 font-medium leading-relaxed">
+                  We triggered a 6-digit verification code to <strong>{phone}</strong> via serverless function.
+                </p>
+                <div className="flex items-center justify-between text-[11.5px] font-bold text-[#004D40] pt-1">
+                  <span>Code expires in: <strong className="text-rose-600">{formatExpiryMinutes(expiryCountdown)}</strong></span>
+                  <span>Server Verified Gate</span>
+                </div>
+              </div>
+
+              {otpNotice && (
+                <div className="p-3 bg-[#004D40] text-white text-[12.5px] font-bold rounded-2xl animate-fade-in flex items-center gap-2">
+                  <span className="material-symbols-outlined text-[18px] text-[#00E676]">mark_email_read</span>
+                  <span>{otpNotice}</span>
+                </div>
+              )}
+
+              {/* 6-Digit OTP Code Input */}
+              <div>
+                <label className="block text-[13px] font-bold text-slate-700 mb-1.5">
+                  Enter 6-Digit Verification Code
+                </label>
+                <div className={`flex items-center bg-[#f2fcf5] border rounded-2xl px-4 h-14 transition-all ${
+                  otpError ? 'border-rose-500 ring-2 ring-rose-500/20' : 'border-[#dbe5de] focus-within:ring-2 focus-within:ring-[#006c50]/30 focus-within:border-[#006c50]'
+                }`}>
+                  <span className="material-symbols-outlined text-[#006c50] text-[24px] mr-3">
+                    verified_user
+                  </span>
+                  <input
+                    type="text"
+                    maxLength={6}
+                    required
+                    value={userOtpInput}
+                    onChange={(e) => {
+                      setUserOtpInput(e.target.value.replace(/\D/g, ''));
+                      if (otpError) setOtpError(null);
+                    }}
+                    placeholder="1 2 3 4 5 6"
+                    className="flex-1 bg-transparent text-[22px] font-extrabold tracking-[0.3em] text-[#004D40] outline-none placeholder:tracking-normal placeholder:text-slate-300 placeholder:text-[15px]"
+                  />
+                </div>
+
+                {otpError && (
+                  <p className="text-[12px] font-bold text-rose-600 mt-1.5 flex items-center gap-1">
+                    <span className="material-symbols-outlined text-[16px]">gpp_bad</span>
+                    <span>{otpError}</span>
+                  </p>
+                )}
+              </div>
+
+              {/* Rate-Limited Resend Action (60s Cooldown) */}
+              <div className="flex items-center justify-between text-[12.5px] pt-1">
+                <span className="text-slate-500 font-medium">Didn't receive SMS?</span>
+                <button
+                  type="button"
+                  onClick={handleResendOtp}
+                  disabled={resendCooldown > 0 || isSendingOtp}
+                  className="text-[#006c50] font-extrabold hover:underline disabled:opacity-50 disabled:no-underline flex items-center gap-1"
+                >
+                  <span className="material-symbols-outlined text-[16px]">refresh</span>
+                  <span>
+                    {resendCooldown > 0
+                      ? `Resend Code in ${resendCooldown}s`
+                      : 'Resend Code'}
+                  </span>
+                </button>
+              </div>
+            </div>
+          )}
+
+          {step === 3 && (
             <>
               {/* Vehicle Type Selector */}
               <div>
@@ -326,10 +572,10 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
 
           {/* Action Buttons */}
           <div className="flex items-center gap-3 mt-2">
-            {step === 2 && (
+            {step > 1 && (
               <button
                 type="button"
-                onClick={() => setStep(1)}
+                onClick={() => setStep((s) => (s - 1) as 1 | 2)}
                 className="py-3.5 px-5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[14px] rounded-full transition-all"
               >
                 Back
@@ -337,12 +583,28 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
             )}
             <button
               type="submit"
-              className="flex-1 py-3.5 bg-[#004D40] hover:bg-[#006c50] text-white font-extrabold text-[15px] rounded-full shadow-md active:scale-95 transition-all flex items-center justify-center gap-2"
+              disabled={isSendingOtp || isVerifyingOtp}
+              className="flex-1 py-3.5 bg-[#004D40] hover:bg-[#006c50] text-white font-extrabold text-[15px] rounded-full shadow-md active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
             >
-              <span>{step === 1 ? 'Next: Vehicle Details' : 'Complete Registration'}</span>
-              <span className="material-symbols-outlined text-[20px]">
-                {step === 1 ? 'arrow_forward' : 'check_circle'}
-              </span>
+              {isSendingOtp || isVerifyingOtp ? (
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <span>{isSendingOtp ? 'Sending SMS OTP...' : 'Verifying Code...'}</span>
+                </div>
+              ) : (
+                <>
+                  <span>
+                    {step === 1
+                      ? 'Next: Verify Phone'
+                      : step === 2
+                      ? 'Verify OTP & Continue'
+                      : 'Complete Registration'}
+                  </span>
+                  <span className="material-symbols-outlined text-[20px]">
+                    {step === 3 ? 'check_circle' : 'arrow_forward'}
+                  </span>
+                </>
+              )}
             </button>
           </div>
         </form>

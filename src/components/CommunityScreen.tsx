@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { CommunityPost, GasStation } from '../types';
+import { StationGroupInfoSheet } from './StationGroupInfoSheet';
 
 interface CommunityScreenProps {
   posts: CommunityPost[];
@@ -25,6 +26,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [postList, setPostList] = useState<CommunityPost[]>(posts);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [showInfoSheet, setShowInfoSheet] = useState(false);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -160,25 +162,20 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
         {/* MAIN TAB 1: Station Groups List & Scoping Notice */}
         {activeMainTab === 'station_groups' ? (
           <div className="flex flex-col gap-3">
-            {/* Scoping Policy Banner */}
-            <div className="bg-emerald-500/10 border border-[#006c50]/30 rounded-2xl p-3.5 flex items-start gap-3 shadow-2xs">
-              <div className="w-9 h-9 rounded-xl bg-[#006c50] text-white flex items-center justify-center shrink-0">
-                <span className="material-symbols-outlined text-[20px]">local_gas_station</span>
-              </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="text-[13.5px] font-black text-[#004D40] leading-tight">
-                  Gas Availability Scoping Policy
-                </h3>
-                <p className="text-[12px] text-[#3a4a43] leading-relaxed mt-0.5">
-                  Every CNG station has its own group. <strong>Updates on Gas availability, queues, and pump pressures can only be discussed inside their respective Station Groups.</strong>
-                </p>
-              </div>
-            </div>
-
             <div className="flex items-center justify-between pt-1">
-              <h2 className="text-[18px] font-black text-[#141d19] tracking-tight">
-                All Station Groups ({filteredStations.length})
-              </h2>
+              <div className="flex items-center gap-2">
+                <h2 className="text-[18px] font-black text-[#141d19] tracking-tight">
+                  All Station Groups ({filteredStations.length})
+                </h2>
+                <button
+                  onClick={() => setShowInfoSheet(true)}
+                  aria-label="Station Group Policy Info"
+                  className="w-6 h-6 rounded-full bg-emerald-100 hover:bg-emerald-200 text-[#006c50] flex items-center justify-center transition-all active:scale-95"
+                  title="Policy Info"
+                >
+                  <span className="material-symbols-outlined text-[15px]">info</span>
+                </button>
+              </div>
               <span className="text-[11.5px] font-extrabold text-[#006c50] bg-emerald-100 px-2.5 py-0.5 rounded-full">
                 Active Discussions
               </span>
@@ -244,10 +241,10 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                         e.stopPropagation();
                         if (onOpenStationGroup) onOpenStationGroup(st);
                       }}
-                      className="px-3.5 py-1.5 bg-[#006c50] hover:bg-[#004D40] text-white rounded-full font-bold text-[12px] flex items-center gap-1 shadow-2xs transition-colors"
+                      aria-label="Open Station Group"
+                      className="w-8 h-8 rounded-full bg-[#006c50] hover:bg-[#004D40] text-white flex items-center justify-center shadow-2xs transition-colors"
                     >
-                      <span>Enter Group Room</span>
-                      <span className="material-symbols-outlined text-[14px]">chevron_right</span>
+                      <span className="material-symbols-outlined text-[18px]">chevron_right</span>
                     </button>
                   </div>
                 </div>
@@ -542,6 +539,11 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
       >
         <span className="material-symbols-outlined text-[30px]">add</span>
       </button>
+
+      <StationGroupInfoSheet
+        isOpen={showInfoSheet}
+        onClose={() => setShowInfoSheet(false)}
+      />
     </div>
   );
 };
