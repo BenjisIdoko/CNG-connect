@@ -108,13 +108,13 @@ export const AiAssistantModal: React.FC<AiAssistantModalProps> = ({
               <span className="material-symbols-outlined text-[20px] text-[#00E676]">auto_awesome</span>
             </div>
             <div>
-              <h3 className="font-extrabold text-[16px] text-white flex items-center gap-1.5">
+              <h3 className="font-bold text-[16px] text-white flex items-center gap-1.5">
                 GasFinder AI Assistant
-                <span className="bg-[#00E676] text-[#004D40] text-[9.5px] font-black uppercase px-2 py-0.5 rounded-full">
+                <span className="bg-[#00E676] text-[#004D40] text-[9.5px] font-semibold uppercase px-2 py-0.5 rounded-full">
                   Live
                 </span>
               </h3>
-              <p className="text-[11.5px] text-emerald-100/90 font-medium">
+              <p className="text-[11.5px] text-emerald-100/90 font-normal">
                 Station queue advisor &amp; CNG calculator
               </p>
             </div>
@@ -140,7 +140,7 @@ export const AiAssistantModal: React.FC<AiAssistantModalProps> = ({
                 className={`max-w-[85%] rounded-2xl p-3.5 text-[14px] leading-relaxed shadow-xs ${
                   m.role === 'user'
                     ? 'bg-[#006c50] text-white rounded-br-none font-medium'
-                    : 'bg-white border border-[#dbe5de] text-[#141d19] rounded-bl-none'
+                    : 'bg-white border border-[#dbe5de] text-[#141d19] rounded-bl-none font-normal'
                 }`}
               >
                 <div className="whitespace-pre-wrap">{m.text}</div>
@@ -149,7 +149,7 @@ export const AiAssistantModal: React.FC<AiAssistantModalProps> = ({
           ))}
 
           {loading && (
-            <div className="flex items-center gap-2 text-[#006c50] text-[13px] font-bold p-2 bg-emerald-50 rounded-xl w-fit border border-emerald-200">
+            <div className="flex items-center gap-2 text-[#006c50] text-[13px] font-semibold p-2 bg-emerald-50 rounded-xl w-fit border border-emerald-200">
               <span className="material-symbols-outlined text-[18px] animate-spin">
                 sync
               </span>
@@ -165,7 +165,7 @@ export const AiAssistantModal: React.FC<AiAssistantModalProps> = ({
               key={idx}
               onClick={() => handleSend(prompt)}
               disabled={loading}
-              className="px-3 py-1.5 bg-[#e6f0e9] hover:bg-[#dbe5de] text-[#004D40] text-[12px] font-bold rounded-full whitespace-nowrap border border-[#dbe5de] active:scale-95 transition-all shrink-0"
+              className="px-3 py-1.5 bg-[#e6f0e9] hover:bg-[#dbe5de] text-[#004D40] text-[12px] font-semibold rounded-full whitespace-nowrap border border-[#dbe5de] active:scale-95 transition-all shrink-0"
             >
               {prompt}
             </button>
@@ -185,7 +185,7 @@ export const AiAssistantModal: React.FC<AiAssistantModalProps> = ({
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Ask GasFinder AI..."
-            className="flex-1 bg-[#e6f0e9] border border-[#dbe5de] rounded-full px-4 py-2.5 text-[14px] text-[#141d19] placeholder:text-[#6a7b72] focus:outline-none focus:ring-2 focus:ring-[#006c50]/30"
+            className="flex-1 bg-[#e6f0e9] border border-[#dbe5de] rounded-full px-4 py-2.5 text-[14px] font-normal text-[#141d19] placeholder:text-[#6a7b72] focus:outline-none focus:ring-2 focus:ring-[#006c50]/30"
           />
           <button
             type="submit"

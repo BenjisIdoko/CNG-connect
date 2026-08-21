@@ -77,32 +77,32 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
         <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-400/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="max-w-2xl mx-auto text-center relative z-10">
-          <div className="inline-flex items-center gap-1.5 bg-[#00E676]/20 border border-[#00E676]/40 text-[#00E676] text-[11px] font-black px-3 py-1 rounded-full uppercase tracking-wider mb-3 shadow-xs">
+          <div className="inline-flex items-center gap-1.5 bg-[#00E676]/20 border border-[#00E676]/40 text-[#00E676] text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-3 shadow-xs">
             <span className="material-symbols-outlined text-[14px]">verified</span>
             Official Pi-CNG Network (pci.gov.ng)
           </div>
 
-          <h1 className="text-[24px] sm:text-[28px] font-black tracking-tight leading-tight">
+          <h1 className="text-[24px] sm:text-[28px] font-extrabold tracking-tight leading-tight">
             Find CNG Vehicle <br />
             <span className="text-[#00E676]">Conversion Kit Centers</span>
           </h1>
-          <p className="text-[13px] text-emerald-100/80 font-medium mt-1.5 max-w-md mx-auto">
-            Search certified workshops for dual-fuel CNG kit installation, Italian ECU tuning & 220 bar cylinder safety testing.
+          <p className="text-[13px] text-emerald-100/80 font-normal mt-1.5 max-w-md mx-auto">
+            Search certified workshops for dual-fuel CNG kit installation, Italian ECU tuning &amp; 220 bar cylinder safety testing.
           </p>
 
           {/* Quick Stats Grid */}
           <div className="grid grid-cols-3 gap-2 mt-5 bg-white/10 backdrop-blur-md p-3 rounded-2xl border border-white/15">
             <div className="text-center">
-              <span className="text-[18px] font-black text-white block">337+</span>
-              <span className="text-[10px] font-bold text-emerald-200 uppercase tracking-wider">Certified Centers</span>
+              <span className="text-[18px] font-bold text-white block">337+</span>
+              <span className="text-[10px] font-semibold text-emerald-200 uppercase tracking-wider">Certified Centers</span>
             </div>
             <div className="text-center border-x border-white/15">
-              <span className="text-[18px] font-black text-[#00E676] block">28</span>
-              <span className="text-[10px] font-bold text-emerald-200 uppercase tracking-wider">States Covered</span>
+              <span className="text-[18px] font-bold text-[#00E676] block">28</span>
+              <span className="text-[10px] font-semibold text-emerald-200 uppercase tracking-wider">States Covered</span>
             </div>
             <div className="text-center">
-              <span className="text-[18px] font-black text-white block">4 - 6 hrs</span>
-              <span className="text-[10px] font-bold text-emerald-200 uppercase tracking-wider">Conversion Time</span>
+              <span className="text-[18px] font-bold text-white block">4 - 6 hrs</span>
+              <span className="text-[10px] font-semibold text-emerald-200 uppercase tracking-wider">Conversion Time</span>
             </div>
           </div>
         </div>
@@ -121,7 +121,7 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search center by name, LGA, state or code (e.g. LA5137YGK)..."
-              className="flex-1 bg-transparent border-none outline-none text-[13.5px] font-semibold text-slate-900 placeholder:text-slate-400"
+              className="flex-1 bg-transparent border-none outline-none text-[13.5px] font-normal text-slate-900 placeholder:text-slate-400"
             />
             {searchQuery && (
               <button onClick={() => setSearchQuery('')} className="text-slate-400 hover:text-slate-600">
@@ -136,7 +136,7 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
               <button
                 key={st}
                 onClick={() => setSelectedState(st)}
-                className={`shrink-0 px-3.5 py-1.5 rounded-full text-[12px] font-extrabold transition-all active:scale-95 ${
+                className={`shrink-0 px-3.5 py-1.5 rounded-full text-[12px] font-semibold transition-all active:scale-95 ${
                   selectedState.toLowerCase() === st.toLowerCase()
                     ? 'bg-[#004D40] text-white shadow-sm'
                     : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200/60'
@@ -148,7 +148,7 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
           </div>
 
           {/* Toggle Pi-CNG Accredited Only */}
-          <div className="flex items-center justify-between pt-1 border-t border-slate-100 text-[12px] font-bold text-slate-700">
+          <div className="flex items-center justify-between pt-1 border-t border-slate-100 text-[12px] font-semibold text-slate-700">
             <div className="flex items-center gap-1.5">
               <span className="material-symbols-outlined text-[#006c50] text-[18px]">workspace_premium</span>
               <span>Pi-CNG Accredited Only</span>
@@ -173,7 +173,7 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
           <h2 className="text-[16px] font-bold text-slate-900 tracking-tight">
             Accredited Centers ({filteredCenters.length})
           </h2>
-          <span className="text-[11.5px] font-semibold text-[#006c50]">
+          <span className="text-[11.5px] font-normal text-[#006c50]">
             Real-time Verification
           </span>
         </div>
@@ -212,11 +212,11 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap mb-1">
-                      <span className="bg-emerald-100 text-[#006c50] text-[10.5px] font-bold px-2.5 py-0.5 rounded-full border border-emerald-200">
+                      <span className="bg-emerald-100 text-[#006c50] text-[10.5px] font-semibold px-2.5 py-0.5 rounded-full border border-emerald-200">
                         Code: {center.code}
                       </span>
                       {center.isPiCngAccredited && (
-                        <span className="bg-[#004D40] text-[#00E676] text-[10.5px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                        <span className="bg-[#004D40] text-[#00E676] text-[10.5px] font-semibold px-2.5 py-0.5 rounded-full flex items-center gap-1">
                           <span className="material-symbols-outlined text-[12px]">verified</span>
                           Pi-CNG Accredited
                         </span>
@@ -238,34 +238,34 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
                   {/* Rating Badge */}
                   {center.reviewsCount > 0 && center.rating > 0 ? (
                     <div className="bg-emerald-50 rounded-2xl p-2 text-center border border-emerald-100 shrink-0">
-                      <div className="flex items-center gap-0.5 text-[#006c50] font-black text-[13px]">
+                      <div className="flex items-center gap-0.5 text-[#006c50] font-bold text-[13px]">
                         <span className="material-symbols-outlined text-[15px]" style={{ fontVariationSettings: "'FILL' 1" }}>
                           star
                         </span>
                         {center.rating}
                       </div>
-                      <span className="text-[10px] font-bold text-slate-400 block">
+                      <span className="text-[10px] font-normal text-slate-400 block">
                         ({center.reviewsCount})
                       </span>
                     </div>
                   ) : (
                     <div className="bg-slate-100 rounded-2xl px-2.5 py-1.5 text-center border border-slate-200/80 shrink-0">
-                      <span className="text-[10.5px] font-extrabold text-slate-600 block">Not yet rated</span>
-                      <span className="text-[9.5px] font-bold text-slate-400 block">0 driver reviews</span>
+                      <span className="text-[10.5px] font-semibold text-slate-600 block">Not yet rated</span>
+                      <span className="text-[9.5px] font-normal text-slate-400 block">0 driver reviews</span>
                     </div>
                   )}
                 </div>
 
                 {/* Services Tags Grid */}
                 <div className="bg-slate-50 rounded-2xl p-3 border border-slate-100 space-y-1.5">
-                  <span className="text-[11px] font-extrabold text-slate-500 uppercase tracking-wider block">
+                  <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">
                     Certified Installation Services:
                   </span>
                   <div className="flex flex-wrap gap-1.5">
                     {center.services.map((srv, idx) => (
                       <span
                         key={idx}
-                        className="bg-white border border-slate-200 text-slate-700 text-[11px] font-bold px-2.5 py-1 rounded-lg shadow-2xs flex items-center gap-1"
+                        className="bg-white border border-slate-200 text-slate-700 text-[11px] font-medium px-2.5 py-1 rounded-lg shadow-2xs flex items-center gap-1"
                       >
                         <span className="w-1.5 h-1.5 rounded-full bg-[#00c853]" />
                         {srv}
@@ -275,17 +275,17 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
                 </div>
 
                 {/* Price & Duration Bar */}
-                <div className="flex items-center justify-between text-[12.5px] px-1 font-bold">
+                <div className="flex items-center justify-between text-[12.5px] px-1 font-semibold">
                   <div>
                     <span className="text-slate-400 text-[11px] block">Est. Cost Range:</span>
-                    <span className="text-slate-900 font-extrabold">
+                    <span className="text-slate-900 font-bold">
                       {center.conversionPriceRange || 'Contact centre for pricing'}
                     </span>
                   </div>
                   {Boolean(center.estimatedHours) && (
                     <div className="text-right">
                       <span className="text-slate-400 text-[11px] block">Installation Time:</span>
-                      <span className="text-[#006c50] font-extrabold">
+                      <span className="text-[#006c50] font-bold">
                         {center.estimatedHours}
                       </span>
                     </div>
@@ -296,7 +296,7 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
                 <div className="grid grid-cols-3 gap-2 pt-1 border-t border-slate-100">
                   <a
                     href={`tel:${center.phone}`}
-                    className="py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl font-bold text-[12px] flex items-center justify-center gap-1 transition-colors"
+                    className="py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl font-semibold text-[12px] flex items-center justify-center gap-1 transition-colors"
                   >
                     <span className="material-symbols-outlined text-[16px] text-slate-600">call</span>
                     Call
@@ -304,7 +304,7 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
 
                   <button
                     onClick={() => handleOpenDirections(center)}
-                    className="py-2.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-200 rounded-xl font-bold text-[12px] flex items-center justify-center gap-1 transition-colors"
+                    className="py-2.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-200 rounded-xl font-semibold text-[12px] flex items-center justify-center gap-1 transition-colors"
                   >
                     <span className="material-symbols-outlined text-[16px] text-[#006c50]" style={{ fontVariationSettings: "'FILL' 1" }}>
                       near_me

@@ -104,7 +104,7 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
 
         <button
           onClick={onStartLogin}
-          className="text-[13px] font-bold text-white/90 hover:text-white bg-white/10 hover:bg-white/20 px-3.5 py-1.5 rounded-full backdrop-blur-md transition-all active:scale-95 border border-white/15 flex items-center gap-1"
+          className="text-[13px] font-semibold text-white/90 hover:text-white bg-white/10 hover:bg-white/20 px-3.5 py-1.5 rounded-full backdrop-blur-md transition-all active:scale-95 border border-white/15 flex items-center gap-1"
         >
           <span>Log In</span>
           <span className="material-symbols-outlined text-[16px]">login</span>
@@ -115,17 +115,17 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
       <div className="relative z-10 max-w-xl mx-auto w-full px-6 flex-1 flex flex-col justify-end pb-8">
         <div className="animate-fade-in space-y-4">
           {/* Badge */}
-          <div className="inline-flex items-center gap-1.5 bg-status-green/20 border border-status-green/40 px-3 py-1 rounded-full text-status-green text-[11px] font-extrabold uppercase tracking-wider backdrop-blur-md">
+          <div className="inline-flex items-center gap-1.5 bg-status-green/20 border border-status-green/40 px-3 py-1 rounded-full text-status-green text-[11px] font-bold uppercase tracking-wider backdrop-blur-md">
             <span className="material-symbols-outlined text-[15px]">{activeSlide.icon}</span>
             <span>{activeSlide.badge}</span>
           </div>
 
           {/* Title & Subtitle */}
           <div>
-            <span className="text-status-green text-[13px] font-bold block mb-1">
+            <span className="text-status-green text-[13px] font-semibold block mb-1">
               {activeSlide.subtitle}
             </span>
-            <h1 className="text-[26px] sm:text-[30px] font-extrabold text-white leading-tight tracking-tight">
+            <h1 className="text-[26px] sm:text-[30px] font-bold text-white leading-tight tracking-tight">
               {activeSlide.title}
             </h1>
           </div>

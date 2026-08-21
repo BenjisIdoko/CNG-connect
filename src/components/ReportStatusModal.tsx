@@ -122,7 +122,7 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
         <div className="px-5 pb-6 pt-1">
           <div className="flex justify-between items-start mb-3">
             <div>
-              <div className="flex items-center gap-1.5 text-[11px] font-extrabold text-[#006c50] uppercase tracking-wider mb-0.5">
+              <div className="flex items-center gap-1.5 text-[11px] font-semibold text-[#006c50] uppercase tracking-wider mb-0.5">
                 <span className="material-symbols-outlined text-[15px]">groups</span>
                 <span>{station.name} Group Feed</span>
                 <button
@@ -135,7 +135,7 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
                   <span className="material-symbols-outlined text-[13px]">info</span>
                 </button>
               </div>
-              <h2 className="text-[19px] font-extrabold text-[#141d19] leading-snug">
+              <h2 className="text-[19px] font-bold text-[#141d19] leading-snug">
                 Update Gas Availability
               </h2>
             </div>
@@ -166,7 +166,7 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
                 >
                   local_gas_station
                 </span>
-                <span className="text-[14px] font-extrabold text-[#141d19]">
+                <span className="text-[14px] font-bold text-[#141d19]">
                   Full stock
                 </span>
                 {selectedStatus === 'full' && (
@@ -190,7 +190,7 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
                 >
                   battery_3_bar
                 </span>
-                <span className="text-[14px] font-extrabold text-[#141d19]">
+                <span className="text-[14px] font-bold text-[#141d19]">
                   Low pressure
                 </span>
                 {selectedStatus === 'low' && (
@@ -214,7 +214,7 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
                 >
                   schedule
                 </span>
-                <span className="text-[14px] font-extrabold text-[#141d19]">
+                <span className="text-[14px] font-bold text-[#141d19]">
                   Queuing
                 </span>
                 {selectedStatus === 'queue' && (
@@ -238,7 +238,7 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
                 >
                   not_interested
                 </span>
-                <span className="text-[14px] font-extrabold text-[#141d19]">
+                <span className="text-[14px] font-bold text-[#141d19]">
                   Out of gas
                 </span>
                 {selectedStatus === 'out' && (
@@ -249,7 +249,7 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
 
             {/* Wait Time Stepper */}
             <div>
-              <label className="block text-[13px] font-bold text-[#3a4a43] mb-1.5">
+              <label className="block text-[13px] font-semibold text-[#3a4a43] mb-1.5">
                 Wait time estimate
               </label>
               <div className="flex items-center justify-between bg-[#e6f0e9] rounded-2xl p-2 px-3 border border-[#dbe5de]">
@@ -276,17 +276,17 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
             {/* Live Camera Snapshot of Pump Meter */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="block text-[13px] font-bold text-[#3a4a43]">
+                <label className="block text-[13px] font-semibold text-[#3a4a43]">
                   Live Photo of Pump Meter (Camera Only)
                 </label>
-                <span className="text-[10px] font-extrabold text-[#006c50] bg-emerald-100 px-2 py-0.5 rounded-full flex items-center gap-1">
+                <span className="text-[10px] font-semibold text-[#006c50] bg-emerald-100 px-2 py-0.5 rounded-full flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#00c853] animate-pulse" />
                   Gallery Blocked
                 </span>
               </div>
 
               {photoError && (
-                <div className="mb-2 p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-[12px] font-bold flex items-start gap-2">
+                <div className="mb-2 p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-[12px] font-medium flex items-start gap-2">
                   <span className="material-symbols-outlined text-[18px] shrink-0 text-rose-600">
                     gpp_bad
                   </span>
@@ -301,7 +301,7 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
                     alt="Verified meter snapshot"
                     className="w-full h-36 object-cover"
                   />
-                  <div className="absolute bottom-2 left-2 bg-[#004D40]/90 text-[#00E676] text-[10px] font-black px-2.5 py-1 rounded-full backdrop-blur-md flex items-center gap-1 border border-emerald-400/40">
+                  <div className="absolute bottom-2 left-2 bg-[#004D40]/90 text-[#00E676] text-[10px] font-bold px-2.5 py-1 rounded-full backdrop-blur-md flex items-center gap-1 border border-emerald-400/40">
                     <span className="material-symbols-outlined text-[13px]">verified</span>
                     Live Camera Verified
                   </div>
@@ -322,14 +322,14 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
                   <button
                     type="button"
                     onClick={() => setShowLiveCamera(true)}
-                    className="w-full py-3.5 px-4 bg-[#004D40] hover:bg-[#006c50] text-white rounded-2xl font-extrabold text-[14px] shadow-md flex items-center justify-center gap-2.5 active:scale-95 transition-all"
+                    className="w-full py-3.5 px-4 bg-[#004D40] hover:bg-[#006c50] text-white rounded-2xl font-bold text-[14px] shadow-md flex items-center justify-center gap-2.5 active:scale-95 transition-all"
                   >
                     <span className="material-symbols-outlined text-[24px] text-[#00E676]">
                       photo_camera
                     </span>
                     <span>Take Live Camera Photo (Gallery Blocked)</span>
                   </button>
-                  <p className="text-[11px] font-semibold text-[#6a7b72] text-center">
+                  <p className="text-[11px] font-normal text-[#6a7b72] text-center">
                     🔒 Photo gallery access is disabled to prevent old/fake queue reports.
                   </p>
                 </div>
@@ -338,7 +338,7 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
 
             {/* Notes / Comment Input */}
             <div>
-              <label className="block text-[13px] font-bold text-[#3a4a43] mb-1.5">
+              <label className="block text-[13px] font-semibold text-[#3a4a43] mb-1.5">
                 Driver Note / Observation
               </label>
               <textarea
@@ -346,7 +346,7 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
                 onChange={(e) => setComment(e.target.value)}
                 placeholder="e.g. Pump 2 working fast, POS terminal active, line moving smoothly..."
                 rows={2}
-                className="w-full bg-[#e6f0e9] border border-[#dbe5de] rounded-2xl p-3 text-[14px] font-medium text-[#141d19] placeholder:text-[#6a7b72] focus:outline-none focus:ring-2 focus:ring-[#006c50]/30"
+                className="w-full bg-[#e6f0e9] border border-[#dbe5de] rounded-2xl p-3 text-[14px] font-normal text-[#141d19] placeholder:text-[#6a7b72] focus:outline-none focus:ring-2 focus:ring-[#006c50]/30"
               />
             </div>
 

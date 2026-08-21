@@ -40,7 +40,7 @@ export const Header: React.FC<HeaderProps> = ({
               alt="GasFinder Logo"
               className="h-7 w-auto object-contain"
             />
-            <span className="font-black text-[19px] sm:text-[20px] text-primary tracking-tight truncate max-w-[160px] sm:max-w-[240px]">
+            <span className="font-extrabold text-[19px] sm:text-[20px] text-primary tracking-tight truncate max-w-[160px] sm:max-w-[240px]">
               {title}
             </span>
           </div>
@@ -54,7 +54,7 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 onClick={onOpenAiAssistant}
                 aria-label="Open AI Assistant"
-                className="flex items-center gap-1.5 bg-primary hover:opacity-95 text-on-primary text-[12px] font-extrabold px-3.5 py-1.5 rounded-full shadow-xs active:scale-95 transition-all"
+                className="flex items-center gap-1.5 bg-primary hover:opacity-95 text-on-primary text-[12px] font-bold px-3.5 py-1.5 rounded-full shadow-xs active:scale-95 transition-all"
               >
                 <span className="material-symbols-outlined text-[16px] text-status-green">
                   auto_awesome

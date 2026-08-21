@@ -571,10 +571,10 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                   {sheetMode === 'expanded' && (
                     <div className="pt-2 border-t border-outline-variant/40">
                       <div className="flex items-center justify-between mb-2.5 px-1">
-                        <h3 className="font-black text-[15px] text-on-surface">
+                        <h3 className="font-bold text-[15px] text-on-surface">
                           Browse Station Photos
                         </h3>
-                        <span className="text-[11.5px] font-bold text-outline">
+                        <span className="text-[11.5px] font-semibold text-outline">
                           Swipe to view
                         </span>
                       </div>
@@ -596,22 +596,22 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                                   alt={st.name}
                                   className="w-full h-full object-cover"
                                 />
-                                <span className="absolute top-2 left-2 bg-primary/90 backdrop-blur-md text-status-green text-[10px] font-black px-2 py-0.5 rounded-full border border-status-green/30">
+                                <span className="absolute top-2 left-2 bg-primary/90 backdrop-blur-md text-status-green text-[10px] font-semibold px-2 py-0.5 rounded-full border border-status-green/30">
                                   {st.statusLabel}
                                 </span>
                               </div>
 
-                              <h4 className="font-extrabold text-[14px] text-on-surface truncate leading-snug">
+                              <h4 className="font-bold text-[14px] text-on-surface truncate leading-snug">
                                 {st.name}
                               </h4>
-                              <p className="text-[11.5px] font-medium text-on-surface-variant truncate mt-0.5">
+                              <p className="text-[11.5px] font-normal text-on-surface-variant truncate mt-0.5">
                                 {st.address}
                               </p>
                             </div>
 
                             <div className="mt-2.5 pt-2 border-t border-outline-variant/30 flex items-center justify-between">
-                              <div className="flex items-center gap-1.5 text-[11px] font-bold text-on-surface-variant">
-                                <span className="text-status-orange">★ {st.rating || '4.8'}</span>
+                              <div className="flex items-center gap-1.5 text-[11px] font-medium text-on-surface-variant">
+                                <span className="text-status-orange font-semibold">★ {st.rating || '4.8'}</span>
                                 <span>•</span>
                                 <span>{st.distance}</span>
                               </div>
@@ -621,7 +621,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                                   e.stopPropagation();
                                   onNavigate(st);
                                 }}
-                                className="px-2.5 py-1 bg-status-green text-on-surface rounded-full text-[11px] font-black shadow-xs active:scale-95 transition-all flex items-center gap-1"
+                                className="px-2.5 py-1 bg-status-green text-on-surface rounded-full text-[11px] font-bold shadow-xs active:scale-95 transition-all flex items-center gap-1"
                               >
                                 <span className="material-symbols-outlined text-[13px]">navigation</span>
                                 <span>Nav</span>
@@ -644,7 +644,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-end sm:items-center justify-center p-4 font-['Plus_Jakarta_Sans',sans-serif]">
           <div className="bg-white w-full max-w-md rounded-3xl p-6 shadow-2xl animate-fade-in border border-slate-200">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="font-extrabold text-[20px] text-slate-900">
+              <h3 className="font-bold text-[20px] text-slate-900">
                 Filter Stations
               </h3>
               <button

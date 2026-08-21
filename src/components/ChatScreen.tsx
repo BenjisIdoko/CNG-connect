@@ -122,10 +122,10 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ post, onBack }) => {
               <span className="absolute bottom-0 right-0 w-3 h-3 bg-[#00E676] border-2 border-white rounded-full shadow-xs" />
             </div>
             <div className="min-w-0">
-              <h2 className="text-[15px] font-extrabold text-[#141d19] leading-tight truncate max-w-[180px] sm:max-w-[240px]">
+              <h2 className="text-[15px] font-bold text-[#141d19] leading-tight truncate max-w-[180px] sm:max-w-[240px]">
                 {sellerName}
               </h2>
-              <span className="text-[12px] text-[#006c50] font-bold block truncate">
+              <span className="text-[12px] text-[#006c50] font-semibold block truncate">
                 Active now
               </span>
             </div>
@@ -147,10 +147,10 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ post, onBack }) => {
             style={{ backgroundImage: `url('${listingImage}')` }}
           />
           <div className="flex-1 min-w-0">
-            <h3 className="text-[14px] font-extrabold text-[#141d19] truncate">
+            <h3 className="text-[14px] font-bold text-[#141d19] truncate">
               {listingTitle}
             </h3>
-            <p className="text-[15px] font-extrabold text-[#006c50] mt-0.5">
+            <p className="text-[15px] font-bold text-[#006c50] mt-0.5">
               {listingPrice}
             </p>
           </div>
@@ -166,7 +166,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ post, onBack }) => {
       <div className="flex-1 max-w-xl w-full mx-auto px-4 py-4 flex flex-col gap-3">
         {/* Date Divider */}
         <div className="flex items-center justify-center my-1">
-          <span className="text-[11px] font-bold bg-[#e6f0e9] text-[#6a7b72] px-3.5 py-1 rounded-full uppercase tracking-wider">
+          <span className="text-[11px] font-semibold bg-[#e6f0e9] text-[#6a7b72] px-3.5 py-1 rounded-full uppercase tracking-wider">
             Today
           </span>
         </div>
@@ -183,7 +183,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ post, onBack }) => {
               <div className="flex flex-col gap-1">
                 {/* Bubble */}
                 <div
-                  className={`rounded-2xl p-3.5 shadow-xs text-[14.5px] leading-relaxed relative ${
+                  className={`rounded-2xl p-3.5 shadow-xs text-[14.5px] font-normal leading-relaxed relative ${
                     isMe
                       ? 'bg-[#006c50] text-white rounded-br-xs'
                       : 'bg-white text-[#141d19] border border-[#dbe5de] rounded-bl-xs'
@@ -236,7 +236,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ post, onBack }) => {
                 style={{ animationDelay: '0.4s' }}
               />
             </div>
-            <span className="text-[12px] font-bold text-[#6a7b72] ml-1">
+            <span className="text-[12px] font-medium text-[#6a7b72] ml-1">
               {sellerName} is typing...
             </span>
           </div>

@@ -67,14 +67,14 @@ export const ProximityAlertBanner: React.FC<ProximityAlertBannerProps> = ({
 
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-1.5">
-                <span className="text-[11px] font-black uppercase tracking-wider text-status-green shrink-0">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-status-green shrink-0">
                   Geofence Nudge
                 </span>
-                <span className="text-[10px] bg-status-green/20 text-status-green font-bold px-2 py-0.5 rounded-full border border-status-green/30 shrink-0">
+                <span className="text-[10px] bg-status-green/20 text-status-green font-medium px-2 py-0.5 rounded-full border border-status-green/30 shrink-0">
                   +50 PTS
                 </span>
               </div>
-              <h2 className="text-[15.5px] font-extrabold text-white leading-tight truncate">
+              <h2 className="text-[15.5px] font-bold text-white leading-tight truncate">
                 Arrived near {station.name}
               </h2>
             </div>
@@ -93,14 +93,14 @@ export const ProximityAlertBanner: React.FC<ProximityAlertBannerProps> = ({
           <>
             {/* Subtext */}
             <p className="text-[12.5px] text-slate-300 leading-snug">
-              <strong className="text-status-green font-bold">{station.activePresenceCount || 14} drivers</strong> near {station.name} right now — share what you see!
+              <strong className="text-status-green font-semibold">{station.activePresenceCount || 14} drivers</strong> near {station.name} right now — share what you see!
             </p>
 
             {/* Quick 1-Tap Pills Grid */}
             <div className="grid grid-cols-2 gap-2 mt-0.5">
               <button
                 onClick={() => handleQuickTap('full')}
-                className="flex items-center gap-2 px-3 py-2.5 rounded-2xl bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/40 text-emerald-200 text-[12px] font-bold transition-all active:scale-95 text-left"
+                className="flex items-center gap-2 px-3 py-2.5 rounded-2xl bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/40 text-emerald-200 text-[12px] font-medium transition-all active:scale-95 text-left"
               >
                 <div className="w-2.5 h-2.5 rounded-full bg-status-green shrink-0" />
                 <span>Full Stock (Fast)</span>
@@ -108,7 +108,7 @@ export const ProximityAlertBanner: React.FC<ProximityAlertBannerProps> = ({
 
               <button
                 onClick={() => handleQuickTap('queue')}
-                className="flex items-center gap-2 px-3 py-2.5 rounded-2xl bg-amber-950/80 hover:bg-amber-900 border border-amber-500/40 text-amber-200 text-[12px] font-bold transition-all active:scale-95 text-left"
+                className="flex items-center gap-2 px-3 py-2.5 rounded-2xl bg-amber-950/80 hover:bg-amber-900 border border-amber-500/40 text-amber-200 text-[12px] font-medium transition-all active:scale-95 text-left"
               >
                 <div className="w-2.5 h-2.5 rounded-full bg-status-orange shrink-0" />
                 <span>Queuing (&lt;15m)</span>
@@ -116,7 +116,7 @@ export const ProximityAlertBanner: React.FC<ProximityAlertBannerProps> = ({
 
               <button
                 onClick={() => handleQuickTap('low')}
-                className="flex items-center gap-2 px-3 py-2.5 rounded-2xl bg-orange-950/80 hover:bg-orange-900 border border-orange-500/40 text-orange-200 text-[12px] font-bold transition-all active:scale-95 text-left"
+                className="flex items-center gap-2 px-3 py-2.5 rounded-2xl bg-orange-950/80 hover:bg-orange-900 border border-orange-500/40 text-orange-200 text-[12px] font-medium transition-all active:scale-95 text-left"
               >
                 <div className="w-2.5 h-2.5 rounded-full bg-status-orange shrink-0" />
                 <span>Low Pressure</span>
@@ -124,7 +124,7 @@ export const ProximityAlertBanner: React.FC<ProximityAlertBannerProps> = ({
 
               <button
                 onClick={() => handleQuickTap('out')}
-                className="flex items-center gap-2 px-3 py-2.5 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 text-[12px] font-bold transition-all active:scale-95 text-left"
+                className="flex items-center gap-2 px-3 py-2.5 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 text-[12px] font-medium transition-all active:scale-95 text-left"
               >
                 <div className="w-2.5 h-2.5 rounded-full bg-outline shrink-0" />
                 <span>Out of Gas</span>
@@ -135,7 +135,7 @@ export const ProximityAlertBanner: React.FC<ProximityAlertBannerProps> = ({
             <div className="flex items-center justify-between pt-1 border-t border-white/10 text-[12px]">
               <button
                 onClick={() => onShareStatus(station)}
-                className="text-status-green font-bold hover:underline flex items-center gap-1"
+                className="text-status-green font-semibold hover:underline flex items-center gap-1"
               >
                 <span>Add pressure & photo report</span>
                 <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
@@ -154,7 +154,7 @@ export const ProximityAlertBanner: React.FC<ProximityAlertBannerProps> = ({
             <div className="w-10 h-10 rounded-full bg-status-green/20 border border-status-green text-status-green flex items-center justify-center">
               <span className="material-symbols-outlined text-[24px]">check_circle</span>
             </div>
-            <p className="font-extrabold text-[15px] text-white">
+            <p className="font-bold text-[15px] text-white">
               Thanks for the update!
             </p>
             <p className="text-[12px] text-status-green font-bold">

@@ -112,7 +112,7 @@ export const LiveCameraCaptureModal: React.FC<LiveCameraCaptureModalProps> = ({
       <div className="flex items-center justify-between text-white z-10 pt-2 pb-2">
         <div className="flex items-center gap-2">
           <span className="w-2.5 h-2.5 rounded-full bg-status-green animate-pulse" />
-          <span className="font-extrabold text-[16px] text-status-green">{title}</span>
+          <span className="font-bold text-[16px] text-status-green">{title}</span>
         </div>
         <div className="flex items-center gap-2">
           {stream && (
@@ -140,14 +140,14 @@ export const LiveCameraCaptureModal: React.FC<LiveCameraCaptureModalProps> = ({
             <div className="w-16 h-16 rounded-full bg-status-red/20 text-status-red flex items-center justify-center mb-3">
               <span className="material-symbols-outlined text-[36px]">videocam_off</span>
             </div>
-            <h3 className="font-extrabold text-[18px] text-white">Enable Camera Access</h3>
-            <p className="text-[13px] mt-1 text-slate-300 leading-relaxed mb-5">
+            <h3 className="font-bold text-[18px] text-white">Enable Camera Access</h3>
+            <p className="text-[13px] mt-1 text-slate-300 font-normal leading-relaxed mb-5">
               {cameraError}
             </p>
 
             <button
               onClick={() => startCamera(facingMode)}
-              className="px-6 py-3.5 bg-status-green hover:opacity-95 text-on-surface font-extrabold text-[14.5px] rounded-full shadow-lg flex items-center gap-2 active:scale-95 transition-all"
+              className="px-6 py-3.5 bg-status-green hover:opacity-95 text-on-surface font-bold text-[14.5px] rounded-full shadow-lg flex items-center gap-2 active:scale-95 transition-all"
             >
               <span className="material-symbols-outlined text-[20px]">photo_camera</span>
               <span>Allow &amp; Enable Camera</span>
@@ -175,7 +175,7 @@ export const LiveCameraCaptureModal: React.FC<LiveCameraCaptureModalProps> = ({
             </div>
 
             {/* Live Watermark Preview Pill */}
-            <div className="absolute bottom-4 left-4 bg-black/70 backdrop-blur-md text-white text-[11px] font-bold px-3 py-1.5 rounded-full border border-status-green/40 flex items-center gap-2">
+            <div className="absolute bottom-4 left-4 bg-black/70 backdrop-blur-md text-white text-[11px] font-medium px-3 py-1.5 rounded-full border border-status-green/40 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-status-green animate-ping" />
               <span>LIVE CAMERA ACTIVE • Gallery Uploads Blocked</span>
             </div>

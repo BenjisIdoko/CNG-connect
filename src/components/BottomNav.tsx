@@ -72,7 +72,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
             groups
           </span>
           {unreadNotifications > 0 && (
-            <span className="absolute -top-1 -right-1.5 w-4 h-4 bg-status-red text-white text-[9px] font-black rounded-full flex items-center justify-center border-2 border-white">
+            <span className="absolute -top-1 -right-1.5 w-4 h-4 bg-status-red text-white text-[9px] font-bold rounded-full flex items-center justify-center border-2 border-white">
               {unreadNotifications}
             </span>
           )}

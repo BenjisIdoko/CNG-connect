@@ -325,7 +325,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                 Pump Pressure
               </span>
               <span
-                className={`text-[9.5px] font-extrabold px-2 py-0.5 rounded-full border ${
+                className={`text-[9.5px] font-semibold px-2 py-0.5 rounded-full border ${
                   station.pumpPressure >= 180
                     ? 'bg-emerald-50 text-[#006c50] border-emerald-200'
                     : station.pumpPressure >= 130
@@ -368,10 +368,10 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
               </svg>
 
               <div className="absolute bottom-0 flex flex-col items-center text-center -mb-1">
-                <span className="text-[20px] font-black leading-none text-slate-900">
+                <span className="text-[20px] font-extrabold leading-none text-slate-900">
                   {station.pumpPressure}
                 </span>
-                <span className="text-[9.5px] font-extrabold text-slate-400 uppercase tracking-widest -mt-0.5">
+                <span className="text-[9.5px] font-semibold text-slate-400 uppercase tracking-widest -mt-0.5">
                   bar
                 </span>
               </div>
@@ -379,7 +379,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
 
             <div className="flex items-center justify-between text-[10px] font-bold text-slate-400 pt-1 border-t border-slate-100">
               <span>0 bar</span>
-              <span className="text-[#006c50] font-extrabold">{Math.round((station.pumpPressure / 220) * 100)}% Max</span>
+              <span className="text-[#006c50] font-semibold">{Math.round((station.pumpPressure / 220) * 100)}% Max</span>
               <span>220 bar</span>
             </div>
           </div>
@@ -391,7 +391,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
             onClick={() => setActiveTab('feed')}
             className={`flex-1 py-2.5 rounded-xl text-[12.5px] font-bold transition-all text-center ${
               activeTab === 'feed'
-                ? 'bg-white text-[#006c50] shadow-xs font-extrabold'
+                ? 'bg-white text-[#006c50] shadow-xs font-bold'
                 : 'text-slate-500 hover:text-slate-900'
             }`}
           >
@@ -402,7 +402,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
             onClick={() => setActiveTab('reports')}
             className={`flex-1 py-2.5 rounded-xl text-[12.5px] font-bold transition-all text-center ${
               activeTab === 'reports'
-                ? 'bg-white text-[#006c50] shadow-xs font-extrabold'
+                ? 'bg-white text-[#006c50] shadow-xs font-bold'
                 : 'text-slate-500 hover:text-slate-900'
             }`}
           >
@@ -413,7 +413,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
             onClick={() => setActiveTab('photos')}
             className={`flex-1 py-2.5 rounded-xl text-[12.5px] font-bold transition-all text-center ${
               activeTab === 'photos'
-                ? 'bg-white text-[#006c50] shadow-xs font-extrabold'
+                ? 'bg-white text-[#006c50] shadow-xs font-bold'
                 : 'text-slate-500 hover:text-slate-900'
             }`}
           >
@@ -508,7 +508,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
         {activeTab === 'reports' && (
           <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between px-1">
-              <h2 className="text-[17px] font-extrabold text-[#141d19] flex items-center gap-2">
+              <h2 className="text-[17px] font-bold text-[#141d19] flex items-center gap-2">
                 <span className="material-symbols-outlined text-[#006c50] text-[20px]">
                   verified_user
                 </span>
@@ -533,7 +533,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                             className="w-10 h-10 rounded-full object-cover border border-[#dbe5de] shrink-0"
                           />
                         ) : (
-                          <div className="w-10 h-10 rounded-full bg-[#fe9400]/20 text-[#8c5000] font-extrabold flex items-center justify-center text-[16px] shrink-0">
+                          <div className="w-10 h-10 rounded-full bg-[#fe9400]/20 text-[#8c5000] font-bold flex items-center justify-center text-[16px] shrink-0">
                             {report.author.charAt(0)}
                           </div>
                         )}
@@ -543,7 +543,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                             {report.author}
                           </div>
                           <div className="flex items-center gap-1.5 mt-0.5">
-                            <span className="inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-surface-container text-on-surface-variant border border-outline-variant whitespace-nowrap">
+                            <span className="inline-flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-surface-container text-on-surface-variant border border-outline-variant whitespace-nowrap">
                               <span className={`w-1.5 h-1.5 rounded-full ${freshness.dotColor}`} />
                               <span>{freshness.label}</span>
                             </span>
@@ -552,7 +552,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                       </div>
 
                       {report.verified && report.isPhotoVerified ? (
-                        <div className="bg-emerald-100 border border-emerald-300 text-[#006c50] px-2.5 py-1 rounded-full text-[10.5px] font-extrabold flex items-center gap-1 shadow-2xs shrink-0 whitespace-nowrap">
+                        <div className="bg-emerald-100 border border-emerald-300 text-[#006c50] px-2.5 py-1 rounded-full text-[10.5px] font-semibold flex items-center gap-1 shadow-2xs shrink-0 whitespace-nowrap">
                           <span
                             className="material-symbols-outlined text-[14px]"
                             style={{ fontVariationSettings: "'FILL' 1" }}
@@ -562,7 +562,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                           <span>Photo Verified</span>
                         </div>
                       ) : (
-                        <div className="bg-amber-100 border border-amber-300/80 text-amber-900 px-2.5 py-1 rounded-full text-[10.5px] font-extrabold flex items-center gap-1 shadow-2xs shrink-0 whitespace-nowrap">
+                        <div className="bg-amber-100 border border-amber-300/80 text-amber-900 px-2.5 py-1 rounded-full text-[10.5px] font-semibold flex items-center gap-1 shadow-2xs shrink-0 whitespace-nowrap">
                           <span className="material-symbols-outlined text-[14px]">
                             gavel
                           </span>
@@ -590,13 +590,13 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                   </div>
 
                   {report.comment && (
-                    <p className="text-[14px] text-[#3a4a43] leading-relaxed">
+                    <p className="text-[14px] font-normal text-[#3a4a43] leading-relaxed">
                       {report.comment}
                     </p>
                   )}
 
                   {!report.verified && (
-                    <div className="bg-amber-50 border border-amber-200 text-amber-800 rounded-xl p-2 text-[11.5px] font-semibold flex items-center gap-1.5 mt-0.5">
+                    <div className="bg-amber-50 border border-amber-200 text-amber-800 rounded-xl p-2 text-[11.5px] font-normal flex items-center gap-1.5 mt-0.5">
                       <span className="material-symbols-outlined text-[15px] text-amber-700">info</span>
                       <span>Unverified update: No live photo attached to confirm this report.</span>
                     </div>
@@ -619,7 +619,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                   <div className="flex items-center gap-3 pt-2 border-t border-[#dbe5de]/50 mt-1">
                     <button
                       onClick={() => handleVote(report.id, 'up')}
-                      className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[13px] font-bold transition-all ${
+                      className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[13px] font-semibold transition-all ${
                         report.userVoted === 'up'
                           ? 'bg-[#006c50] text-white'
                           : 'bg-[#f2fcf5] text-[#3a4a43] hover:bg-[#e6f0e9]'
@@ -639,7 +639,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
 
                     <button
                       onClick={() => handleVote(report.id, 'down')}
-                      className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[13px] font-bold transition-all ${
+                      className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[13px] font-semibold transition-all ${
                         report.userVoted === 'down'
                           ? 'bg-[#ba1a1a] text-white'
                           : 'bg-[#f2fcf5] text-[#3a4a43] hover:bg-[#e6f0e9]'
@@ -667,12 +667,12 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
         {activeTab === 'photos' && (
           <div className="flex flex-col gap-3">
             <div className="flex justify-between items-center px-1">
-              <h2 className="text-[17px] font-extrabold text-[#141d19]">
-                Station & Pump Photos ({images.length})
+              <h2 className="text-[17px] font-bold text-[#141d19]">
+                Station &amp; Pump Photos ({images.length})
               </h2>
               <button
                 onClick={() => onOpenReportModal(station)}
-                className="text-[12.5px] font-bold text-[#006c50] flex items-center gap-1 hover:underline"
+                className="text-[12.5px] font-semibold text-[#006c50] flex items-center gap-1 hover:underline"
               >
                 <span className="material-symbols-outlined text-[16px]">add_a_photo</span>
                 <span>Add Photo</span>
@@ -705,7 +705,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
           <div className="flex items-center gap-2">
             <button
               onClick={() => onOpenReportModal(station)}
-              className="flex-1 h-12 bg-[#006c50] hover:bg-[#004D40] text-white font-extrabold text-[13.5px] rounded-full flex items-center justify-center gap-1.5 shadow-md active:scale-[0.98] transition-all px-3 min-w-0"
+              className="flex-1 h-12 bg-[#006c50] hover:bg-[#004D40] text-white font-bold text-[13.5px] rounded-full flex items-center justify-center gap-1.5 shadow-md active:scale-[0.98] transition-all px-3 min-w-0"
             >
               <span className="material-symbols-outlined text-[18px] shrink-0">
                 edit_document
@@ -720,7 +720,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                   onNavigate(station);
                 }
               }}
-              className="px-3.5 h-12 bg-white text-[#006c50] border-2 border-[#006c50] hover:bg-[#e6f0e9] font-extrabold text-[13px] rounded-full flex items-center justify-center gap-1.5 shadow-xs active:scale-[0.98] transition-all shrink-0"
+              className="px-3.5 h-12 bg-white text-[#006c50] border-2 border-[#006c50] hover:bg-[#e6f0e9] font-bold text-[13px] rounded-full flex items-center justify-center gap-1.5 shadow-xs active:scale-[0.98] transition-all shrink-0"
             >
               <span
                 className="material-symbols-outlined text-[18px] shrink-0"
@@ -729,7 +729,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                 navigation
               </span>
               <span className="whitespace-nowrap">Get Directions</span>
-              <span className="bg-emerald-100 text-[#006c50] text-[10.5px] font-black px-2 py-0.5 rounded-full ml-0.5 shrink-0">
+              <span className="bg-emerald-100 text-[#006c50] text-[10.5px] font-bold px-2 py-0.5 rounded-full ml-0.5 shrink-0">
                 {station.distance}
               </span>
             </button>

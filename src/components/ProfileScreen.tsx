@@ -44,10 +44,10 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
               className="w-14 h-14 rounded-full object-cover border-2 border-primary shadow-xs"
             />
             <div>
-              <h2 className="font-extrabold text-[18px] text-on-surface leading-tight">
+              <h2 className="font-bold text-[18px] text-on-surface leading-tight">
                 {user.name}
               </h2>
-              <p className="text-[12.5px] text-on-surface-variant font-medium mt-0.5">
+              <p className="text-[12.5px] text-on-surface-variant font-normal mt-0.5">
                 {user.email || user.phone || 'driver@gasfinder.ng'}
               </p>
             </div>
@@ -76,7 +76,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
               <span className="text-[20px] font-black text-status-green leading-none block">
                 {user.communityPoints ?? 450}
               </span>
-              <span className="text-[10px] font-bold text-white/90 uppercase tracking-wider">
+              <span className="text-[10px] font-semibold text-white/90 uppercase tracking-wider">
                 Points
               </span>
             </div>
@@ -91,7 +91,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
               <span className="text-[20px] font-black text-on-surface leading-none block">
                 {user.reportsCount}
               </span>
-              <span className="text-[10px] font-bold text-outline uppercase tracking-wider">
+              <span className="text-[10px] font-semibold text-outline uppercase tracking-wider">
                 Reports
               </span>
             </div>
@@ -106,7 +106,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
               <span className="text-[20px] font-black text-on-surface leading-none block">
                 {user.reputationScore}
               </span>
-              <span className="text-[10px] font-bold text-outline uppercase tracking-wider">
+              <span className="text-[10px] font-semibold text-outline uppercase tracking-wider">
                 Rating
               </span>
             </div>
@@ -115,7 +115,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
 
         {/* General Settings Group */}
         <div className="flex flex-col gap-2">
-          <span className="text-[13px] font-extrabold text-on-surface-variant px-1">
+          <span className="text-[13px] font-semibold text-on-surface-variant px-1">
             General
           </span>
 
@@ -129,7 +129,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                 <span className="material-symbols-outlined text-on-surface-variant text-[20px]">
                   account_balance_wallet
                 </span>
-                <span className="text-[14px] font-bold text-on-surface">
+                <span className="text-[14px] font-medium text-on-surface">
                   Payment Method
                 </span>
               </div>
@@ -145,10 +145,10 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                   location_on
                 </span>
                 <div>
-                  <span className="text-[14px] font-bold text-on-surface block leading-tight">
+                  <span className="text-[14px] font-medium text-on-surface block leading-tight">
                     Registered State
                   </span>
-                  <span className="text-[11px] text-outline font-medium">
+                  <span className="text-[11px] text-outline font-normal">
                     Push notifications are scoped to this state
                   </span>
                 </div>
@@ -162,7 +162,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                   }
                   showToast(`Registered state updated to ${newState}`);
                 }}
-                className="bg-surface-container text-primary border border-outline-variant font-extrabold text-[12.5px] rounded-xl px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary"
+                className="bg-surface-container text-primary border border-outline-variant font-semibold text-[12.5px] rounded-xl px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary"
               >
                 <option value="Abuja FCT">Abuja FCT</option>
                 <option value="Lagos">Lagos</option>
@@ -185,7 +185,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                 <span className="material-symbols-outlined text-on-surface-variant text-[20px]">
                   translate
                 </span>
-                <span className="text-[14px] font-bold text-on-surface">
+                <span className="text-[14px] font-medium text-on-surface">
                   Language
                 </span>
               </div>
@@ -200,7 +200,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                 <span className="material-symbols-outlined text-on-surface-variant text-[20px]">
                   notifications
                 </span>
-                <span className="text-[14px] font-bold text-on-surface">
+                <span className="text-[14px] font-medium text-on-surface">
                   Proximity Alert Notifications
                 </span>
               </div>
@@ -224,7 +224,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
 
         {/* Support & Actions Group */}
         <div className="flex flex-col gap-2">
-          <span className="text-[13px] font-extrabold text-on-surface-variant px-1">
+          <span className="text-[13px] font-semibold text-on-surface-variant px-1">
             Support &amp; Community
           </span>
 
@@ -238,7 +238,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                 <span className="material-symbols-outlined text-on-surface-variant text-[20px]">
                   chat_bubble
                 </span>
-                <span className="text-[14px] font-bold text-on-surface">
+                <span className="text-[14px] font-medium text-on-surface">
                   Feedback &amp; Suggestions
                 </span>
               </div>
@@ -266,7 +266,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                 <span className="material-symbols-outlined text-on-surface-variant text-[20px]">
                   share
                 </span>
-                <span className="text-[14px] font-bold text-on-surface">
+                <span className="text-[14px] font-medium text-on-surface">
                   Share App with Drivers
                 </span>
               </div>
@@ -284,7 +284,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                 <span className="material-symbols-outlined text-on-surface-variant text-[20px]">
                   help
                 </span>
-                <span className="text-[14px] font-bold text-on-surface">
+                <span className="text-[14px] font-medium text-on-surface">
                   Help &amp; FAQ
                 </span>
               </div>
@@ -300,7 +300,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
           {onOpenSignUp && (
             <button
               onClick={onOpenSignUp}
-              className="w-full py-3.5 px-4 bg-primary hover:opacity-95 text-on-primary font-extrabold text-[14px] rounded-2xl shadow-xs flex items-center justify-center gap-2 active:scale-98 transition-all"
+              className="w-full py-3.5 px-4 bg-primary hover:opacity-95 text-on-primary font-bold text-[14px] rounded-2xl shadow-xs flex items-center justify-center gap-2 active:scale-98 transition-all"
             >
               <span className="material-symbols-outlined text-status-green text-[20px] shrink-0">
                 person_add
@@ -311,7 +311,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
 
           <button
             onClick={onOpenOnboarding}
-            className="w-full py-3.5 px-4 bg-white hover:bg-surface text-on-surface font-bold text-[14px] rounded-2xl shadow-xs border border-outline-variant flex items-center justify-center gap-2 active:scale-98 transition-all"
+            className="w-full py-3.5 px-4 bg-white hover:bg-surface text-on-surface font-semibold text-[14px] rounded-2xl shadow-xs border border-outline-variant flex items-center justify-center gap-2 active:scale-98 transition-all"
           >
             <span className="material-symbols-outlined text-primary text-[20px] shrink-0">
               slideshow
@@ -321,7 +321,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
 
           <button
             onClick={onSignOut || onOpenOnboarding}
-            className="w-full py-3.5 px-4 bg-status-orange-container hover:opacity-90 text-status-orange font-bold text-[14px] rounded-2xl border border-status-orange/30 flex items-center justify-center gap-2 active:scale-98 transition-all"
+            className="w-full py-3.5 px-4 bg-status-orange-container hover:opacity-90 text-status-orange font-semibold text-[14px] rounded-2xl border border-status-orange/30 flex items-center justify-center gap-2 active:scale-98 transition-all"
           >
             <span className="material-symbols-outlined text-status-orange text-[20px] shrink-0">
               logout

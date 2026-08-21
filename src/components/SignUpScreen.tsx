@@ -217,10 +217,10 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
         {/* Step Indicator */}
         <div className="flex items-center justify-between border-b border-outline-variant/40 pb-3">
           <div>
-            <span className="text-[11px] font-black uppercase text-primary tracking-wider">
+            <span className="text-[11px] font-semibold uppercase text-primary tracking-wider">
               Step {step} of 3
             </span>
-            <h1 className="text-[20px] font-extrabold text-on-surface leading-tight">
+            <h1 className="text-[20px] font-bold text-on-surface leading-tight">
               {step === 1
                 ? 'Create Driver Account'
                 : step === 2
@@ -237,12 +237,12 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
 
         {/* Welcome Bonus Callout */}
         <div className="bg-surface-container border border-outline-variant rounded-2xl p-3 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-primary text-on-primary flex items-center justify-center shrink-0 font-extrabold text-[14px]">
+          <div className="w-9 h-9 rounded-xl bg-primary text-on-primary flex items-center justify-center shrink-0 font-bold text-[14px]">
             🎁
           </div>
           <div>
-            <p className="text-[13px] font-extrabold text-primary">100 Welcome Points</p>
-            <p className="text-[11.5px] text-on-surface-variant font-medium leading-tight">
+            <p className="text-[13px] font-semibold text-primary">100 Welcome Points</p>
+            <p className="text-[11.5px] text-on-surface-variant font-normal leading-tight">
               Earn community reputation points instantly upon registration!
             </p>
           </div>
@@ -253,7 +253,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
             <>
               {/* Full Name */}
               <div>
-                <label className="block text-[12.5px] font-bold text-on-surface-variant mb-1">
+                <label className="block text-[12.5px] font-semibold text-on-surface-variant mb-1">
                   Full Name
                 </label>
                 <div className="flex items-center bg-surface border border-outline-variant rounded-2xl px-3.5 h-12 focus-within:ring-2 focus-within:ring-primary/30 focus-within:border-primary transition-all">
@@ -273,13 +273,13 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
 
               {/* Phone Number with Format Validation */}
               <div>
-                <label className="block text-[12.5px] font-bold text-on-surface-variant mb-1">
+                <label className="block text-[12.5px] font-semibold text-on-surface-variant mb-1">
                   Phone Number (Nigerian Format: 0 + 10 digits or +234)
                 </label>
                 <div className={`flex items-center bg-surface border rounded-2xl px-3 h-12 transition-all gap-2 ${
                   phoneError ? 'border-status-red ring-2 ring-status-red/20' : 'border-outline-variant focus-within:ring-2 focus-within:ring-primary/30 focus-within:border-primary'
                 }`}>
-                  <span className="text-[14px] font-bold text-primary shrink-0 border-r border-outline-variant pr-2">
+                  <span className="text-[14px] font-semibold text-primary shrink-0 border-r border-outline-variant pr-2">
                     🇳🇬 {countryCode}
                   </span>
                   <input
@@ -295,7 +295,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
                   />
                 </div>
                 {phoneError && (
-                  <p className="text-[11.5px] font-bold text-status-red mt-1 flex items-center gap-1">
+                  <p className="text-[11.5px] font-medium text-status-red mt-1 flex items-center gap-1">
                     <span className="material-symbols-outlined text-[14px]">error</span>
                     <span>{phoneError}</span>
                   </p>
@@ -304,7 +304,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
 
               {/* Email Address */}
               <div>
-                <label className="block text-[12.5px] font-bold text-on-surface-variant mb-1">
+                <label className="block text-[12.5px] font-semibold text-on-surface-variant mb-1">
                   Email Address
                 </label>
                 <div className="flex items-center bg-surface border border-outline-variant rounded-2xl px-3.5 h-12 focus-within:ring-2 focus-within:ring-primary/30 focus-within:border-primary transition-all">
@@ -324,13 +324,13 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
 
               {/* Primary Operating City */}
               <div>
-                <label className="block text-[12.5px] font-bold text-on-surface-variant mb-1">
+                <label className="block text-[12.5px] font-semibold text-on-surface-variant mb-1">
                   Primary Location / State
                 </label>
                 <select
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
-                  className="w-full bg-surface border border-outline-variant rounded-2xl px-3.5 h-12 text-[14px] font-bold text-on-surface outline-none focus:ring-2 focus:ring-primary/30"
+                  className="w-full bg-surface border border-outline-variant rounded-2xl px-3.5 h-12 text-[14px] font-medium text-on-surface outline-none focus:ring-2 focus:ring-primary/30"
                 >
                   <option value="Abuja FCT">Abuja FCT</option>
                   <option value="Lagos State">Lagos State</option>
@@ -343,7 +343,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
 
               {/* Password */}
               <div>
-                <label className="block text-[12.5px] font-bold text-on-surface-variant mb-1">
+                <label className="block text-[12.5px] font-semibold text-on-surface-variant mb-1">
                   Password
                 </label>
                 <div className="flex items-center bg-surface border border-outline-variant rounded-2xl px-3.5 h-12 focus-within:ring-2 focus-within:ring-primary/30 focus-within:border-primary transition-all">

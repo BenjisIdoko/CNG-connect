@@ -26,7 +26,7 @@ export const LiveNavigationModal: React.FC<LiveNavigationModalProps> = ({
             <span className="material-symbols-outlined text-status-green text-[22px]">
               navigation
             </span>
-            <span className="font-extrabold text-[16px] text-white">
+            <span className="font-bold text-[16px] text-white">
               Station Navigation Summary
             </span>
           </div>
@@ -42,7 +42,7 @@ export const LiveNavigationModal: React.FC<LiveNavigationModalProps> = ({
         {/* Station Overview Card */}
         <div className="bg-[#1c2923] rounded-2xl p-4 border border-status-green/20 flex flex-col gap-2.5">
           <div>
-            <h2 className="font-extrabold text-[19px] text-white leading-snug truncate">
+            <h2 className="font-bold text-[19px] text-white leading-snug truncate">
               {station.name}
             </h2>
             <p className="text-[13px] text-slate-300 font-normal mt-0.5 flex items-center gap-1">
@@ -54,10 +54,10 @@ export const LiveNavigationModal: React.FC<LiveNavigationModalProps> = ({
           </div>
 
           <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-white/10">
-            <span className="bg-status-green/20 text-status-green text-[11.5px] font-extrabold px-3 py-1 rounded-full border border-status-green/30">
+            <span className="bg-status-green/20 text-status-green text-[11.5px] font-semibold px-3 py-1 rounded-full border border-status-green/30">
               {station.statusLabel} • {station.pumpPressure} bar
             </span>
-            <span className="bg-white/10 text-white text-[11.5px] font-bold px-3 py-1 rounded-full">
+            <span className="bg-white/10 text-white text-[11.5px] font-medium px-3 py-1 rounded-full">
               ₦{station.cngPrice}/kg
             </span>
           </div>
@@ -66,19 +66,19 @@ export const LiveNavigationModal: React.FC<LiveNavigationModalProps> = ({
         {/* Real Distance & Drive Time Summary Grid */}
         <div className="grid grid-cols-2 gap-3">
           <div className="bg-white/5 rounded-2xl p-3.5 border border-white/10 text-center">
-            <span className="text-[10.5px] font-extrabold uppercase text-slate-400 block mb-0.5">
+            <span className="text-[10.5px] font-semibold uppercase text-slate-400 block mb-0.5">
               Estimated Distance
             </span>
-            <span className="text-[20px] font-black text-white">
+            <span className="text-[20px] font-bold text-white">
               {station.distance}
             </span>
           </div>
 
           <div className="bg-white/5 rounded-2xl p-3.5 border border-white/10 text-center">
-            <span className="text-[10.5px] font-extrabold uppercase text-slate-400 block mb-0.5">
+            <span className="text-[10.5px] font-semibold uppercase text-slate-400 block mb-0.5">
               Drive Time ETA
             </span>
-            <span className="text-[20px] font-black text-status-green">
+            <span className="text-[20px] font-bold text-status-green">
               {station.driveTime}
             </span>
           </div>
@@ -88,7 +88,7 @@ export const LiveNavigationModal: React.FC<LiveNavigationModalProps> = ({
         <div className="flex flex-col gap-2.5 pt-1">
           <button
             onClick={handleLaunchMaps}
-            className="w-full py-4 bg-status-green hover:opacity-95 text-on-surface font-black text-[15px] rounded-full shadow-lg flex items-center justify-center gap-2.5 active:scale-[0.98] transition-all"
+            className="w-full py-4 bg-status-green hover:opacity-95 text-on-surface font-bold text-[15px] rounded-full shadow-lg flex items-center justify-center gap-2.5 active:scale-[0.98] transition-all"
           >
             <span className="material-symbols-outlined text-[22px] shrink-0">map</span>
             <span className="whitespace-nowrap">Open in Maps</span>

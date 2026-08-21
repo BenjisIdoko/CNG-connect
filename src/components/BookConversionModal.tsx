@@ -40,37 +40,37 @@ export const BookConversionModal: React.FC<BookConversionModalProps> = ({
             </div>
 
             <div>
-              <span className="bg-surface-container text-primary text-[11px] font-black px-3 py-1 rounded-full uppercase tracking-wider">
+              <span className="bg-surface-container text-primary text-[11px] font-semibold px-3 py-1 rounded-full uppercase tracking-wider">
                 Pi-CNG Booking Confirmed
               </span>
-              <h3 className="text-[20px] font-black text-on-surface mt-2">
+              <h3 className="text-[20px] font-bold text-on-surface mt-2">
                 Conversion Appointment Booked!
               </h3>
-              <p className="text-[13px] text-on-surface-variant font-medium mt-1">
-                Your kit inspection slot at <strong className="text-on-surface">{center.name}</strong> is reserved.
+              <p className="text-[13px] text-on-surface-variant font-normal mt-1">
+                Your kit inspection slot at <strong className="text-on-surface font-semibold">{center.name}</strong> is reserved.
               </p>
             </div>
 
             <div className="bg-surface-container rounded-2xl p-4 border border-outline-variant text-left space-y-2 text-[13px]">
               <div className="flex justify-between">
-                <span className="text-on-surface-variant font-bold">Booking Reference:</span>
-                <span className="font-extrabold text-primary">{bookingSuccessRef}</span>
+                <span className="text-on-surface-variant font-medium">Booking Reference:</span>
+                <span className="font-bold text-primary">{bookingSuccessRef}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-on-surface-variant font-bold">Center Code:</span>
-                <span className="font-extrabold text-on-surface">{center.code}</span>
+                <span className="text-on-surface-variant font-medium">Center Code:</span>
+                <span className="font-bold text-on-surface">{center.code}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-on-surface-variant font-bold">Date:</span>
-                <span className="font-extrabold text-on-surface">{selectedDate}</span>
+                <span className="text-on-surface-variant font-medium">Date:</span>
+                <span className="font-bold text-on-surface">{selectedDate}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-on-surface-variant font-bold">Kit Spec:</span>
-                <span className="font-extrabold text-on-surface truncate max-w-[200px]">{tankSize}</span>
+                <span className="text-on-surface-variant font-medium">Kit Spec:</span>
+                <span className="font-bold text-on-surface truncate max-w-[200px]">{tankSize}</span>
               </div>
             </div>
 
-            <div className="bg-surface border border-outline-variant rounded-2xl p-3 text-primary text-[12px] font-bold flex items-center gap-2">
+            <div className="bg-surface border border-outline-variant rounded-2xl p-3 text-primary text-[12px] font-semibold flex items-center gap-2">
               <span className="material-symbols-outlined text-[18px]">stars</span>
               <span>+100 Driver Reward Points added to your profile!</span>
             </div>
@@ -80,7 +80,7 @@ export const BookConversionModal: React.FC<BookConversionModalProps> = ({
                 onSuccess(bookingSuccessRef);
                 onClose();
               }}
-              className="w-full py-3.5 bg-primary text-on-primary font-extrabold text-[14px] rounded-full shadow-md hover:opacity-95 transition-all"
+              className="w-full py-3.5 bg-primary text-on-primary font-bold text-[14px] rounded-full shadow-md hover:opacity-95 transition-all"
             >
               Done & Return
             </button>
@@ -89,10 +89,10 @@ export const BookConversionModal: React.FC<BookConversionModalProps> = ({
           <div>
             <div className="flex justify-between items-center mb-4 pb-3 border-b border-outline-variant/40">
               <div>
-                <span className="text-[11px] font-black text-primary bg-surface-container px-2.5 py-0.5 rounded-full uppercase">
+                <span className="text-[11px] font-semibold text-primary bg-surface-container px-2.5 py-0.5 rounded-full uppercase">
                   Accredited Workshop
                 </span>
-                <h3 className="font-black text-[18px] text-on-surface mt-1">
+                <h3 className="font-bold text-[18px] text-on-surface mt-1">
                   Book CNG Kit Conversion
                 </h3>
               </div>
@@ -106,20 +106,20 @@ export const BookConversionModal: React.FC<BookConversionModalProps> = ({
 
             {/* Selected Center Summary Card */}
             <div className="bg-surface-container rounded-2xl p-3.5 border border-outline-variant mb-4 space-y-1">
-              <span className="text-[10.5px] font-black text-primary uppercase tracking-wider block">
+              <span className="text-[10.5px] font-semibold text-primary uppercase tracking-wider block">
                 Selected Workshop ({center.code})
               </span>
-              <p className="font-black text-[14px] text-on-surface leading-snug">
+              <p className="font-bold text-[14px] text-on-surface leading-snug">
                 {center.name}
               </p>
-              <p className="text-[12px] font-medium text-on-surface-variant truncate">
+              <p className="text-[12px] font-normal text-on-surface-variant truncate">
                 {center.address}
               </p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-3.5 text-[13px]">
               <div>
-                <label className="block font-extrabold text-on-surface-variant mb-1">
+                <label className="block font-semibold text-on-surface-variant mb-1">
                   Vehicle Make &amp; Year
                 </label>
                 <input
@@ -128,18 +128,18 @@ export const BookConversionModal: React.FC<BookConversionModalProps> = ({
                   value={carModel}
                   onChange={(e) => setCarModel(e.target.value)}
                   placeholder="e.g. 2018 Toyota Camry, 2014 Honda Accord"
-                  className="w-full bg-surface-container/90 rounded-2xl px-4 py-2.5 outline-none font-semibold text-on-surface focus:ring-2 focus:ring-primary/30"
+                  className="w-full bg-surface-container/90 rounded-2xl px-4 py-2.5 outline-none font-medium text-on-surface focus:ring-2 focus:ring-primary/30"
                 />
               </div>
 
               <div>
-                <label className="block font-extrabold text-on-surface-variant mb-1">
+                <label className="block font-semibold text-on-surface-variant mb-1">
                   CNG Kit Tank Capacity
                 </label>
                 <select
                   value={tankSize}
                   onChange={(e) => setTankSize(e.target.value)}
-                  className="w-full bg-surface-container/90 rounded-2xl px-4 py-2.5 outline-none font-semibold text-on-surface focus:ring-2 focus:ring-primary/30"
+                  className="w-full bg-surface-container/90 rounded-2xl px-4 py-2.5 outline-none font-medium text-on-surface focus:ring-2 focus:ring-primary/30"
                 >
                   <option value="15kg / 75L Steel Cylinder (Recommended)">
                     15kg / 75L Steel Cylinder (Recommended for Sedans)
@@ -158,7 +158,7 @@ export const BookConversionModal: React.FC<BookConversionModalProps> = ({
 
               <div className="grid grid-cols-2 gap-2.5">
                 <div>
-                  <label className="block font-extrabold text-on-surface-variant mb-1">
+                  <label className="block font-semibold text-on-surface-variant mb-1">
                     Preferred Date
                   </label>
                   <input
@@ -166,12 +166,12 @@ export const BookConversionModal: React.FC<BookConversionModalProps> = ({
                     required
                     value={selectedDate}
                     onChange={(e) => setSelectedDate(e.target.value)}
-                    className="w-full bg-surface-container/90 rounded-2xl px-3.5 py-2.5 outline-none font-semibold text-on-surface focus:ring-2 focus:ring-primary/30"
+                    className="w-full bg-surface-container/90 rounded-2xl px-3.5 py-2.5 outline-none font-medium text-on-surface focus:ring-2 focus:ring-primary/30"
                   />
                 </div>
 
                 <div>
-                  <label className="block font-extrabold text-on-surface-variant mb-1">
+                  <label className="block font-semibold text-on-surface-variant mb-1">
                     Phone Number
                   </label>
                   <input
@@ -179,13 +179,13 @@ export const BookConversionModal: React.FC<BookConversionModalProps> = ({
                     required
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    className="w-full bg-surface-container/90 rounded-2xl px-3 py-2.5 outline-none font-semibold text-on-surface focus:ring-2 focus:ring-primary/30"
+                    className="w-full bg-surface-container/90 rounded-2xl px-3 py-2.5 outline-none font-medium text-on-surface focus:ring-2 focus:ring-primary/30"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block font-extrabold text-on-surface-variant mb-1">
+                <label className="block font-semibold text-on-surface-variant mb-1">
                   Additional Notes (Optional)
                 </label>
                 <textarea
@@ -193,7 +193,7 @@ export const BookConversionModal: React.FC<BookConversionModalProps> = ({
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder="Mention any existing vehicle issues or special instructions..."
-                  className="w-full bg-surface-container/90 rounded-2xl px-4 py-2 outline-none font-medium text-on-surface focus:ring-2 focus:ring-primary/30"
+                  className="w-full bg-surface-container/90 rounded-2xl px-4 py-2 outline-none font-normal text-on-surface focus:ring-2 focus:ring-primary/30"
                 />
               </div>
 
@@ -201,7 +201,7 @@ export const BookConversionModal: React.FC<BookConversionModalProps> = ({
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full py-3.5 bg-primary text-on-primary font-extrabold text-[14px] rounded-full shadow-lg hover:opacity-95 active:scale-98 transition-all flex items-center justify-center gap-2"
+                  className="w-full py-3.5 bg-primary text-on-primary font-bold text-[14px] rounded-full shadow-lg hover:opacity-95 active:scale-98 transition-all flex items-center justify-center gap-2"
                 >
                   {isSubmitting ? (
                     <>

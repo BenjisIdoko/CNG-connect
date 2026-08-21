@@ -71,7 +71,7 @@ export const DiscussionScreen: React.FC<DiscussionScreenProps> = ({
 
             <div className="flex-1">
               <div className="flex items-center gap-1.5">
-                <span className="font-extrabold text-[16px] text-[#141d19]">
+                <span className="font-bold text-[16px] text-[#141d19]">
                   {post.author}
                 </span>
                 {post.verified && (
@@ -87,17 +87,17 @@ export const DiscussionScreen: React.FC<DiscussionScreenProps> = ({
             </div>
 
             {/* Category Tag */}
-            <div className="bg-[#00ffc2]/20 text-[#007255] px-3 py-1 rounded-full text-[11px] font-extrabold uppercase tracking-wide">
+            <div className="bg-[#00ffc2]/20 text-[#007255] px-3 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wide">
               {post.categoryLabel}
             </div>
           </div>
 
           {/* Post Title and Body */}
           <div>
-            <h1 className="text-[22px] font-extrabold text-[#141d19] leading-tight mb-2">
+            <h1 className="text-[22px] font-bold text-[#141d19] leading-tight mb-2">
               {post.title}
             </h1>
-            <p className="text-[15px] text-[#3a4a43] leading-relaxed">
+            <p className="text-[15px] text-[#3a4a43] font-normal leading-relaxed">
               {post.content}
             </p>
           </div>
@@ -111,7 +111,7 @@ export const DiscussionScreen: React.FC<DiscussionScreenProps> = ({
                 className="w-full h-full object-cover"
               />
               {post.price && (
-                <div className="absolute bottom-3 right-3 bg-[#006c50] text-white text-[14px] font-extrabold px-3.5 py-1.5 rounded-xl shadow-md">
+                <div className="absolute bottom-3 right-3 bg-[#006c50] text-white text-[14px] font-bold px-3.5 py-1.5 rounded-xl shadow-md">
                   {post.price}
                 </div>
               )}
@@ -123,7 +123,7 @@ export const DiscussionScreen: React.FC<DiscussionScreenProps> = ({
             <div className="flex gap-4">
               <button
                 onClick={handleToggleLike}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[14px] font-bold transition-all active:scale-95 ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[14px] font-medium transition-all active:scale-95 ${
                   isLiked
                     ? 'bg-[#006c50] text-white'
                     : 'bg-[#f2fcf5] text-[#3a4a43] hover:bg-[#e6f0e9]'
@@ -140,7 +140,7 @@ export const DiscussionScreen: React.FC<DiscussionScreenProps> = ({
                 <span>{likesCount}</span>
               </button>
 
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#f2fcf5] text-[#3a4a43] text-[14px] font-bold">
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#f2fcf5] text-[#3a4a43] text-[14px] font-medium">
                 <span className="material-symbols-outlined text-[20px]">
                   chat_bubble_outline
                 </span>
@@ -173,7 +173,7 @@ export const DiscussionScreen: React.FC<DiscussionScreenProps> = ({
             <span className="material-symbols-outlined text-[#006c50] text-[22px]">
               forum
             </span>
-            <h2 className="text-[18px] font-extrabold text-[#141d19]">
+            <h2 className="text-[18px] font-bold text-[#141d19]">
               {comments.length} Comments
             </h2>
           </div>
@@ -198,7 +198,7 @@ export const DiscussionScreen: React.FC<DiscussionScreenProps> = ({
                       </div>
                     )}
                     <div>
-                      <span className="text-[14px] font-extrabold text-[#141d19]">
+                      <span className="text-[14px] font-bold text-[#141d19]">
                         {comment.author}
                       </span>
                       <span className="text-[11px] text-[#6a7b72] ml-2">
@@ -209,13 +209,13 @@ export const DiscussionScreen: React.FC<DiscussionScreenProps> = ({
 
                   <button
                     onClick={() => setReplyingTo(comment.author)}
-                    className="text-[12px] font-bold text-[#006c50] hover:underline"
+                    className="text-[12px] font-semibold text-[#006c50] hover:underline"
                   >
                     Reply
                   </button>
                 </div>
 
-                <p className="text-[14px] text-[#3a4a43] leading-relaxed pl-1">
+                <p className="text-[14px] text-[#3a4a43] font-normal leading-relaxed pl-1">
                   {comment.content}
                 </p>
 
@@ -230,14 +230,14 @@ export const DiscussionScreen: React.FC<DiscussionScreenProps> = ({
                             alt={reply.author}
                             className="w-6 h-6 rounded-full object-cover"
                           />
-                          <span className="text-[12px] font-bold text-[#141d19]">
+                          <span className="text-[12px] font-semibold text-[#141d19]">
                             {reply.author}
                           </span>
                           <span className="text-[10px] text-[#6a7b72]">
                             {reply.timeAgo}
                           </span>
                         </div>
-                        <p className="text-[13px] text-[#3a4a43] mt-0.5">
+                        <p className="text-[13px] text-[#3a4a43] font-normal mt-0.5">
                           {reply.content}
                         </p>
                       </div>
@@ -254,7 +254,7 @@ export const DiscussionScreen: React.FC<DiscussionScreenProps> = ({
       <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md p-3 px-4 border-t border-[#dbe5de] shadow-lg z-40 pb-safe">
         <div className="max-w-xl mx-auto">
           {replyingTo && (
-            <div className="flex items-center justify-between text-[12px] text-[#006c50] font-bold mb-1.5 px-2">
+            <div className="flex items-center justify-between text-[12px] text-[#006c50] font-semibold mb-1.5 px-2">
               <span>Replying to @{replyingTo}</span>
               <button
                 onClick={() => setReplyingTo(null)}

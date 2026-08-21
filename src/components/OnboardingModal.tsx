@@ -80,10 +80,10 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
         {/* Form Body */}
         <div className="flex-1 flex flex-col px-6 pt-6 pb-8">
           <div className="text-center mb-6">
-            <h1 className="text-[28px] font-extrabold text-on-surface tracking-tight leading-tight mb-2">
+            <h1 className="text-[28px] font-bold text-on-surface tracking-tight leading-tight mb-2">
               Never guess where the gas is.
             </h1>
-            <p className="text-[16px] font-semibold text-on-surface-variant max-w-[280px] mx-auto leading-snug">
+            <p className="text-[16px] font-normal text-on-surface-variant max-w-[280px] mx-auto leading-snug">
               Live station status from drivers near you.
             </p>
           </div>
@@ -95,7 +95,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                   <button
                     type="button"
                     onClick={() => setShowCountryPicker(!showCountryPicker)}
-                    className="flex items-center gap-1.5 px-3.5 h-full border-r border-outline-variant/50 text-on-surface font-bold text-[15px] hover:bg-surface-container-high transition-colors"
+                    className="flex items-center gap-1.5 px-3.5 h-full border-r border-outline-variant/50 text-on-surface font-semibold text-[15px] hover:bg-surface-container-high transition-colors"
                   >
                     <span className="text-xl">{countryFlag}</span>
                     <span>{countryCode}</span>
@@ -109,7 +109,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                     value={phoneNumber}
                     onChange={handlePhoneChange}
                     placeholder="0800 000 0000"
-                    className="flex-1 h-full bg-transparent px-4 text-[16px] font-bold text-on-surface placeholder:text-outline focus:outline-none w-full"
+                    className="flex-1 h-full bg-transparent px-4 text-[16px] font-medium text-on-surface placeholder:text-outline focus:outline-none w-full"
                   />
                 </div>
 
@@ -125,13 +125,13 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                           setCountryFlag(c.flag);
                           setShowCountryPicker(false);
                         }}
-                        className="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-surface text-[14px] font-bold text-on-surface"
+                        className="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-surface text-[14px] font-medium text-on-surface"
                       >
                         <span className="flex items-center gap-2">
                           <span className="text-lg">{c.flag}</span>
                           <span>{c.name}</span>
                         </span>
-                        <span className="text-primary">{c.code}</span>
+                        <span className="text-primary font-bold">{c.code}</span>
                       </button>
                     ))}
                   </div>
@@ -144,7 +144,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="driver@example.com"
-                  className="w-full h-[56px] bg-surface-container rounded-2xl px-4 text-[16px] font-bold text-on-surface placeholder:text-outline border border-outline-variant focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
+                  className="w-full h-[56px] bg-surface-container rounded-2xl px-4 text-[16px] font-medium text-on-surface placeholder:text-outline border border-outline-variant focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
                 />
               </div>
             )}
@@ -152,7 +152,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
             {/* Continue Button */}
             <button
               type="submit"
-              className="w-full h-[56px] rounded-full bg-primary text-on-primary font-extrabold text-[16px] shadow-md hover:opacity-95 active:scale-[0.98] transition-all flex items-center justify-center gap-2 group relative overflow-hidden"
+              className="w-full h-[56px] rounded-full bg-primary text-on-primary font-bold text-[16px] shadow-md hover:opacity-95 active:scale-[0.98] transition-all flex items-center justify-center gap-2 group relative overflow-hidden"
             >
               <span>Continue</span>
               <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">
@@ -164,7 +164,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
             <button
               type="button"
               onClick={() => setIsEmailMode(!isEmailMode)}
-              className="w-full py-2 text-primary font-bold text-[14px] hover:underline underline-offset-4 rounded-lg"
+              className="w-full py-2 text-primary font-semibold text-[14px] hover:underline underline-offset-4 rounded-lg"
             >
               {isEmailMode ? 'Continue with phone number' : 'Continue with email'}
             </button>
@@ -174,11 +174,11 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
           <div className="mt-auto pt-6 text-center">
             <p className="text-[12px] text-outline leading-relaxed max-w-[280px] mx-auto">
               By continuing, you agree to GasFinder{' '}
-              <a href="#" className="text-primary underline font-bold">
+              <a href="#" className="text-primary underline font-medium">
                 Terms of Service
               </a>{' '}
               and{' '}
-              <a href="#" className="text-primary underline font-bold">
+              <a href="#" className="text-primary underline font-medium">
                 Privacy Policy
               </a>
               .
