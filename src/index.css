@@ -21,8 +21,11 @@
   --color-electric-amber: #FFB800;
   
   --color-status-green: #00E676;
+  --color-status-green-container: #ecfdf5;
   --color-status-orange: #FF6D00;
+  --color-status-orange-container: #fff7ed;
   --color-status-red: #FF3D00;
+  --color-status-red-container: #fef2f2;
   
   --color-surface: #f2fcf5;
   --color-background: #f2fcf5;

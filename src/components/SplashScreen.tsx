@@ -57,14 +57,14 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
             <img src={ASSETS.logo} alt="GasFinder Logo" className="w-full h-full object-contain" />
           </div>
           <span className="text-[22px] font-black text-white tracking-tight">
-            Gas<span className="text-[#9be15d]">Finder</span>
+            Gas<span className="text-status-green">Finder</span>
           </span>
         </div>
 
         {/* Minimal Progress Line */}
         <div className="w-24 bg-white/20 h-1 rounded-full overflow-hidden backdrop-blur-md">
           <div
-            className="bg-[#9be15d] h-full rounded-full transition-all duration-500 ease-out shadow-[0_0_10px_#9be15d]"
+            className="bg-status-green h-full rounded-full transition-all duration-500 ease-out shadow-[0_0_10px_var(--color-status-green)]"
             style={{ width: `${progress}%` }}
           />
         </div>
@@ -73,13 +73,13 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
       {/* Bottom Hero Typography & AutoGo-Style CTA Pill */}
       <div className="relative z-10 p-6 pb-12 max-w-md mx-auto w-full space-y-6 animate-fade-in">
         <div className="space-y-2 text-left">
-          <span className="text-[11px] font-black text-[#9be15d] bg-[#9be15d]/20 px-3 py-1 rounded-full uppercase tracking-widest backdrop-blur-md border border-[#9be15d]/30 inline-block">
+          <span className="text-[11px] font-black text-status-green bg-status-green/20 px-3 py-1 rounded-full uppercase tracking-widest backdrop-blur-md border border-status-green/30 inline-block">
             Official Pi-CNG Network
           </span>
 
           <h1 className="text-[38px] sm:text-[42px] font-black tracking-tight leading-[1.08] text-white">
             Your ride, <br />
-            <span className="text-[#9be15d]">ready to go.</span>
+            <span className="text-status-green">ready to go.</span>
           </h1>
 
           <p className="text-[14.5px] text-slate-300 font-medium leading-relaxed max-w-xs">
@@ -87,13 +87,13 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
           </p>
         </div>
 
-        {/* Lime Green Button Pill matching AutoGo mockup */}
+        {/* Brand Primary Button Pill */}
         <button
           onClick={() => {
             setIsFadingOut(true);
             setTimeout(onFinish, 400);
           }}
-          className="w-full h-14 bg-[#9be15d] hover:bg-[#8bd24e] text-[#0d2204] font-black text-[16px] rounded-full shadow-[0_10px_30px_rgba(155,225,93,0.35)] flex items-center justify-center gap-2 active:scale-98 transition-all cursor-pointer"
+          className="w-full h-14 bg-status-green hover:opacity-95 text-on-surface font-black text-[16px] rounded-full shadow-[0_10px_30px_rgba(0,230,118,0.35)] flex items-center justify-center gap-2 active:scale-98 transition-all cursor-pointer"
         >
           <span>Let's Go!</span>
           <span className="material-symbols-outlined text-[20px] font-bold">arrow_forward</span>

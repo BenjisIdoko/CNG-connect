@@ -52,25 +52,25 @@ export const ProximityAlertBanner: React.FC<ProximityAlertBannerProps> = ({
 
   return (
     <div className="fixed top-16 left-0 right-0 z-50 px-3 max-w-xl mx-auto pointer-events-none animate-slide-down">
-      <div className="bg-[#141d19]/95 text-white rounded-3xl shadow-[0_16px_48px_rgba(0,0,0,0.35)] border border-[#00E676]/30 p-4.5 flex flex-col gap-3 pointer-events-auto backdrop-blur-xl relative overflow-hidden">
+      <div className="bg-[#141d19]/95 text-white rounded-3xl shadow-[0_16px_48px_rgba(0,0,0,0.35)] border border-status-green/30 p-4.5 flex flex-col gap-3 pointer-events-auto backdrop-blur-xl relative overflow-hidden">
         {/* Decorative background glow */}
-        <div className="absolute -top-12 -right-12 w-32 h-32 bg-[#00E676]/15 rounded-full blur-2xl pointer-events-none" />
+        <div className="absolute -top-12 -right-12 w-32 h-32 bg-status-green/15 rounded-full blur-2xl pointer-events-none" />
 
         {/* Top Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             {/* GPS Pulse Dot */}
-            <div className="relative flex items-center justify-center w-8 h-8 rounded-full bg-[#00E676]/20 border border-[#00E676]/40">
-              <div className="w-3 h-3 rounded-full bg-[#00E676] animate-ping absolute" />
-              <div className="w-2.5 h-2.5 rounded-full bg-[#00E676] relative z-10" />
+            <div className="relative flex items-center justify-center w-8 h-8 rounded-full bg-status-green/20 border border-status-green/40">
+              <div className="w-3 h-3 rounded-full bg-status-green animate-ping absolute" />
+              <div className="w-2.5 h-2.5 rounded-full bg-status-green relative z-10" />
             </div>
 
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-1.5">
-                <span className="text-[11px] font-black uppercase tracking-wider text-[#00E676] shrink-0">
+                <span className="text-[11px] font-black uppercase tracking-wider text-status-green shrink-0">
                   Geofence Nudge
                 </span>
-                <span className="text-[10px] bg-[#00E676]/20 text-[#00E676] font-bold px-2 py-0.5 rounded-full border border-[#00E676]/30 shrink-0">
+                <span className="text-[10px] bg-status-green/20 text-status-green font-bold px-2 py-0.5 rounded-full border border-status-green/30 shrink-0">
                   +50 PTS
                 </span>
               </div>
@@ -93,7 +93,7 @@ export const ProximityAlertBanner: React.FC<ProximityAlertBannerProps> = ({
           <>
             {/* Subtext */}
             <p className="text-[12.5px] text-slate-300 leading-snug">
-              <strong className="text-[#00E676] font-bold">{station.activePresenceCount || 14} drivers</strong> near {station.name} right now — share what you see!
+              <strong className="text-status-green font-bold">{station.activePresenceCount || 14} drivers</strong> near {station.name} right now — share what you see!
             </p>
 
             {/* Quick 1-Tap Pills Grid */}
@@ -102,7 +102,7 @@ export const ProximityAlertBanner: React.FC<ProximityAlertBannerProps> = ({
                 onClick={() => handleQuickTap('full')}
                 className="flex items-center gap-2 px-3 py-2.5 rounded-2xl bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/40 text-emerald-200 text-[12px] font-bold transition-all active:scale-95 text-left"
               >
-                <div className="w-2.5 h-2.5 rounded-full bg-[#00E676] shrink-0" />
+                <div className="w-2.5 h-2.5 rounded-full bg-status-green shrink-0" />
                 <span>Full Stock (Fast)</span>
               </button>
 
@@ -110,7 +110,7 @@ export const ProximityAlertBanner: React.FC<ProximityAlertBannerProps> = ({
                 onClick={() => handleQuickTap('queue')}
                 className="flex items-center gap-2 px-3 py-2.5 rounded-2xl bg-amber-950/80 hover:bg-amber-900 border border-amber-500/40 text-amber-200 text-[12px] font-bold transition-all active:scale-95 text-left"
               >
-                <div className="w-2.5 h-2.5 rounded-full bg-[#f59e0b] shrink-0" />
+                <div className="w-2.5 h-2.5 rounded-full bg-status-orange shrink-0" />
                 <span>Queuing (&lt;15m)</span>
               </button>
 
@@ -118,7 +118,7 @@ export const ProximityAlertBanner: React.FC<ProximityAlertBannerProps> = ({
                 onClick={() => handleQuickTap('low')}
                 className="flex items-center gap-2 px-3 py-2.5 rounded-2xl bg-orange-950/80 hover:bg-orange-900 border border-orange-500/40 text-orange-200 text-[12px] font-bold transition-all active:scale-95 text-left"
               >
-                <div className="w-2.5 h-2.5 rounded-full bg-[#fe9400] shrink-0" />
+                <div className="w-2.5 h-2.5 rounded-full bg-status-orange shrink-0" />
                 <span>Low Pressure</span>
               </button>
 
@@ -126,7 +126,7 @@ export const ProximityAlertBanner: React.FC<ProximityAlertBannerProps> = ({
                 onClick={() => handleQuickTap('out')}
                 className="flex items-center gap-2 px-3 py-2.5 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 text-[12px] font-bold transition-all active:scale-95 text-left"
               >
-                <div className="w-2.5 h-2.5 rounded-full bg-slate-500 shrink-0" />
+                <div className="w-2.5 h-2.5 rounded-full bg-outline shrink-0" />
                 <span>Out of Gas</span>
               </button>
             </div>
@@ -135,7 +135,7 @@ export const ProximityAlertBanner: React.FC<ProximityAlertBannerProps> = ({
             <div className="flex items-center justify-between pt-1 border-t border-white/10 text-[12px]">
               <button
                 onClick={() => onShareStatus(station)}
-                className="text-[#00E676] font-bold hover:underline flex items-center gap-1"
+                className="text-status-green font-bold hover:underline flex items-center gap-1"
               >
                 <span>Add pressure & photo report</span>
                 <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
@@ -151,13 +151,13 @@ export const ProximityAlertBanner: React.FC<ProximityAlertBannerProps> = ({
         ) : (
           /* Confirmation State */
           <div className="py-3 text-center flex flex-col items-center justify-center gap-1.5 animate-fade-in">
-            <div className="w-10 h-10 rounded-full bg-[#00E676]/20 border border-[#00E676] text-[#00E676] flex items-center justify-center">
+            <div className="w-10 h-10 rounded-full bg-status-green/20 border border-status-green text-status-green flex items-center justify-center">
               <span className="material-symbols-outlined text-[24px]">check_circle</span>
             </div>
             <p className="font-extrabold text-[15px] text-white">
               Thanks for the update!
             </p>
-            <p className="text-[12px] text-[#00E676] font-bold">
+            <p className="text-[12px] text-status-green font-bold">
               +50 Community Reputation Points Earned 🏆
             </p>
           </div>

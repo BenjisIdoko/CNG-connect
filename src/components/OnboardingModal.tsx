@@ -57,13 +57,13 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-0 sm:p-4 overflow-y-auto">
-      <div className="w-full max-w-md min-h-screen sm:min-h-0 bg-[#f2fcf5] sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col justify-between border border-[#dbe5de] animate-fade-in">
+      <div className="w-full max-w-md min-h-screen sm:min-h-0 bg-surface sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col justify-between border border-outline-variant animate-fade-in">
         {/* Top Graphic Illustration Header */}
-        <div className="w-full flex-shrink-0 relative overflow-hidden bg-[#ecf6ef] rounded-b-[36px] pt-8 pb-6 border-b border-[#dbe5de]/60">
+        <div className="w-full flex-shrink-0 relative overflow-hidden bg-surface-container rounded-b-[36px] pt-8 pb-6 border-b border-outline-variant/60">
           <button
             onClick={onClose}
             aria-label="Close"
-            className="absolute top-4 right-4 z-20 w-9 h-9 rounded-full bg-white/80 backdrop-blur-md flex items-center justify-center text-[#141d19] hover:bg-white active:scale-95 transition-all shadow-xs"
+            className="absolute top-4 right-4 z-20 w-9 h-9 rounded-full bg-white/80 backdrop-blur-md flex items-center justify-center text-on-surface hover:bg-white active:scale-95 transition-all shadow-xs"
           >
             <span className="material-symbols-outlined text-[20px]">close</span>
           </button>
@@ -80,10 +80,10 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
         {/* Form Body */}
         <div className="flex-1 flex flex-col px-6 pt-6 pb-8">
           <div className="text-center mb-6">
-            <h1 className="text-[28px] font-extrabold text-[#141d19] tracking-tight leading-tight mb-2">
+            <h1 className="text-[28px] font-extrabold text-on-surface tracking-tight leading-tight mb-2">
               Never guess where the gas is.
             </h1>
-            <p className="text-[16px] font-semibold text-[#3a4a43] max-w-[280px] mx-auto leading-snug">
+            <p className="text-[16px] font-semibold text-on-surface-variant max-w-[280px] mx-auto leading-snug">
               Live station status from drivers near you.
             </p>
           </div>
@@ -91,15 +91,15 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
           <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full">
             {!isEmailMode ? (
               <div className="relative w-full">
-                <div className="flex items-center h-[56px] bg-[#e6f0e9] rounded-2xl overflow-hidden shadow-xs border border-[#dbe5de] focus-within:ring-2 focus-within:ring-[#006c50]/30 focus-within:border-[#006c50] transition-all">
+                <div className="flex items-center h-[56px] bg-surface-container rounded-2xl overflow-hidden shadow-xs border border-outline-variant focus-within:ring-2 focus-within:ring-primary/30 focus-within:border-primary transition-all">
                   <button
                     type="button"
                     onClick={() => setShowCountryPicker(!showCountryPicker)}
-                    className="flex items-center gap-1.5 px-3.5 h-full border-r border-[#b9cbc1]/50 text-[#141d19] font-bold text-[15px] hover:bg-[#dbe5de] transition-colors"
+                    className="flex items-center gap-1.5 px-3.5 h-full border-r border-outline-variant/50 text-on-surface font-bold text-[15px] hover:bg-surface-container-high transition-colors"
                   >
                     <span className="text-xl">{countryFlag}</span>
                     <span>{countryCode}</span>
-                    <span className="material-symbols-outlined text-[#6a7b72] text-[18px]">
+                    <span className="material-symbols-outlined text-outline text-[18px]">
                       expand_more
                     </span>
                   </button>
@@ -109,13 +109,13 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                     value={phoneNumber}
                     onChange={handlePhoneChange}
                     placeholder="0800 000 0000"
-                    className="flex-1 h-full bg-transparent px-4 text-[16px] font-bold text-[#141d19] placeholder:text-[#6a7b72] focus:outline-none w-full"
+                    className="flex-1 h-full bg-transparent px-4 text-[16px] font-bold text-on-surface placeholder:text-outline focus:outline-none w-full"
                   />
                 </div>
 
                 {/* Country Picker Dropdown */}
                 {showCountryPicker && (
-                  <div className="absolute top-16 left-0 w-64 bg-white rounded-2xl shadow-xl border border-[#dbe5de] z-30 p-2 max-h-52 overflow-y-auto">
+                  <div className="absolute top-16 left-0 w-64 bg-white rounded-2xl shadow-xl border border-outline-variant z-30 p-2 max-h-52 overflow-y-auto">
                     {countries.map((c) => (
                       <button
                         key={c.code}
@@ -125,13 +125,13 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                           setCountryFlag(c.flag);
                           setShowCountryPicker(false);
                         }}
-                        className="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-[#f2fcf5] text-[14px] font-bold text-[#141d19]"
+                        className="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-surface text-[14px] font-bold text-on-surface"
                       >
                         <span className="flex items-center gap-2">
                           <span className="text-lg">{c.flag}</span>
                           <span>{c.name}</span>
                         </span>
-                        <span className="text-[#006c50]">{c.code}</span>
+                        <span className="text-primary">{c.code}</span>
                       </button>
                     ))}
                   </div>
@@ -144,7 +144,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="driver@example.com"
-                  className="w-full h-[56px] bg-[#e6f0e9] rounded-2xl px-4 text-[16px] font-bold text-[#141d19] placeholder:text-[#6a7b72] border border-[#dbe5de] focus:outline-none focus:ring-2 focus:ring-[#006c50]/30 focus:border-[#006c50]"
+                  className="w-full h-[56px] bg-surface-container rounded-2xl px-4 text-[16px] font-bold text-on-surface placeholder:text-outline border border-outline-variant focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
                 />
               </div>
             )}
@@ -152,7 +152,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
             {/* Continue Button */}
             <button
               type="submit"
-              className="w-full h-[56px] rounded-full bg-[#006c50] text-white font-extrabold text-[16px] shadow-md hover:bg-[#004D40] active:scale-[0.98] transition-all flex items-center justify-center gap-2 group relative overflow-hidden"
+              className="w-full h-[56px] rounded-full bg-primary text-on-primary font-extrabold text-[16px] shadow-md hover:opacity-95 active:scale-[0.98] transition-all flex items-center justify-center gap-2 group relative overflow-hidden"
             >
               <span>Continue</span>
               <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">
@@ -164,7 +164,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
             <button
               type="button"
               onClick={() => setIsEmailMode(!isEmailMode)}
-              className="w-full py-2 text-[#006c50] font-bold text-[14px] hover:underline underline-offset-4 rounded-lg"
+              className="w-full py-2 text-primary font-bold text-[14px] hover:underline underline-offset-4 rounded-lg"
             >
               {isEmailMode ? 'Continue with phone number' : 'Continue with email'}
             </button>
@@ -172,13 +172,13 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
 
           {/* Legal Disclaimer */}
           <div className="mt-auto pt-6 text-center">
-            <p className="text-[12px] text-[#6a7b72] leading-relaxed max-w-[280px] mx-auto">
+            <p className="text-[12px] text-outline leading-relaxed max-w-[280px] mx-auto">
               By continuing, you agree to GasFinder{' '}
-              <a href="#" className="text-[#006c50] underline font-bold">
+              <a href="#" className="text-primary underline font-bold">
                 Terms of Service
               </a>{' '}
               and{' '}
-              <a href="#" className="text-[#006c50] underline font-bold">
+              <a href="#" className="text-primary underline font-bold">
                 Privacy Policy
               </a>
               .

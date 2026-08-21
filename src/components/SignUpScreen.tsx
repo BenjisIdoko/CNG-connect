@@ -194,18 +194,18 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-[#f2fcf5] text-[#141d19] font-['Plus_Jakarta_Sans',sans-serif] flex flex-col justify-between p-4 max-w-xl mx-auto animate-fade-in">
+    <div className="min-h-screen bg-surface text-on-surface font-['Plus_Jakarta_Sans',sans-serif] flex flex-col justify-between p-4 max-w-xl mx-auto animate-fade-in">
       {/* Top Bar */}
       <div className="flex items-center justify-between pt-3 pb-2">
         <div className="flex items-center gap-2">
           <img src={ASSETS.logo} alt="GasFinder Logo" className="h-7 w-auto object-contain" />
-          <span className="font-extrabold text-[19px] text-[#006c50]">GasFinder</span>
+          <span className="font-extrabold text-[19px] text-primary">GasFinder</span>
         </div>
         {onCancel && (
           <button
             onClick={onCancel}
             aria-label="Close sign up"
-            className="w-9 h-9 rounded-full bg-slate-200/70 hover:bg-slate-200 flex items-center justify-center text-slate-700 transition-colors"
+            className="w-9 h-9 rounded-full bg-surface-container hover:bg-surface-container-high flex items-center justify-center text-on-surface-variant transition-colors"
           >
             <span className="material-symbols-outlined text-[20px]">close</span>
           </button>
@@ -213,14 +213,14 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
       </div>
 
       {/* Main Card Container */}
-      <div className="bg-white rounded-3xl shadow-xl border border-[#dbe5de] p-6 flex flex-col gap-5 my-2">
+      <div className="bg-white rounded-3xl shadow-xl border border-outline-variant p-6 flex flex-col gap-5 my-2">
         {/* Step Indicator */}
-        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div className="flex items-center justify-between border-b border-outline-variant/40 pb-3">
           <div>
-            <span className="text-[11px] font-black uppercase text-[#006c50] tracking-wider">
+            <span className="text-[11px] font-black uppercase text-primary tracking-wider">
               Step {step} of 3
             </span>
-            <h1 className="text-[20px] font-extrabold text-[#141d19] leading-tight">
+            <h1 className="text-[20px] font-extrabold text-on-surface leading-tight">
               {step === 1
                 ? 'Create Driver Account'
                 : step === 2
@@ -229,20 +229,20 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
             </h1>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className={`w-3 h-3 rounded-full ${step >= 1 ? 'bg-[#006c50]' : 'bg-slate-200'}`} />
-            <div className={`w-3 h-3 rounded-full ${step >= 2 ? 'bg-[#006c50]' : 'bg-slate-200'}`} />
-            <div className={`w-3 h-3 rounded-full ${step >= 3 ? 'bg-[#006c50]' : 'bg-slate-200'}`} />
+            <div className={`w-3 h-3 rounded-full ${step >= 1 ? 'bg-primary' : 'bg-surface-container-high'}`} />
+            <div className={`w-3 h-3 rounded-full ${step >= 2 ? 'bg-primary' : 'bg-surface-container-high'}`} />
+            <div className={`w-3 h-3 rounded-full ${step >= 3 ? 'bg-primary' : 'bg-surface-container-high'}`} />
           </div>
         </div>
 
         {/* Welcome Bonus Callout */}
-        <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-3 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-[#006c50] text-white flex items-center justify-center shrink-0 font-extrabold text-[14px]">
+        <div className="bg-surface-container border border-outline-variant rounded-2xl p-3 flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-primary text-on-primary flex items-center justify-center shrink-0 font-extrabold text-[14px]">
             🎁
           </div>
           <div>
-            <p className="text-[13px] font-extrabold text-[#004D40]">100 Welcome Points</p>
-            <p className="text-[11.5px] text-emerald-800 font-medium leading-tight">
+            <p className="text-[13px] font-extrabold text-primary">100 Welcome Points</p>
+            <p className="text-[11.5px] text-on-surface-variant font-medium leading-tight">
               Earn community reputation points instantly upon registration!
             </p>
           </div>
@@ -253,11 +253,11 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
             <>
               {/* Full Name */}
               <div>
-                <label className="block text-[12.5px] font-bold text-slate-700 mb-1">
+                <label className="block text-[12.5px] font-bold text-on-surface-variant mb-1">
                   Full Name
                 </label>
-                <div className="flex items-center bg-[#f2fcf5] border border-[#dbe5de] rounded-2xl px-3.5 h-12 focus-within:ring-2 focus-within:ring-[#006c50]/30 focus-within:border-[#006c50] transition-all">
-                  <span className="material-symbols-outlined text-[#6a7b72] text-[20px] mr-2">
+                <div className="flex items-center bg-surface border border-outline-variant rounded-2xl px-3.5 h-12 focus-within:ring-2 focus-within:ring-primary/30 focus-within:border-primary transition-all">
+                  <span className="material-symbols-outlined text-outline text-[20px] mr-2">
                     person
                   </span>
                   <input
@@ -266,20 +266,20 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     placeholder="e.g. Tunde Adebayo"
-                    className="flex-1 bg-transparent text-[14.5px] font-medium text-slate-900 outline-none"
+                    className="flex-1 bg-transparent text-[14.5px] font-medium text-on-surface outline-none"
                   />
                 </div>
               </div>
 
               {/* Phone Number with Format Validation */}
               <div>
-                <label className="block text-[12.5px] font-bold text-slate-700 mb-1">
+                <label className="block text-[12.5px] font-bold text-on-surface-variant mb-1">
                   Phone Number (Nigerian Format: 0 + 10 digits or +234)
                 </label>
-                <div className={`flex items-center bg-[#f2fcf5] border rounded-2xl px-3 h-12 transition-all gap-2 ${
-                  phoneError ? 'border-rose-500 ring-2 ring-rose-500/20' : 'border-[#dbe5de] focus-within:ring-2 focus-within:ring-[#006c50]/30 focus-within:border-[#006c50]'
+                <div className={`flex items-center bg-surface border rounded-2xl px-3 h-12 transition-all gap-2 ${
+                  phoneError ? 'border-status-red ring-2 ring-status-red/20' : 'border-outline-variant focus-within:ring-2 focus-within:ring-primary/30 focus-within:border-primary'
                 }`}>
-                  <span className="text-[14px] font-bold text-[#006c50] shrink-0 border-r border-[#dbe5de] pr-2">
+                  <span className="text-[14px] font-bold text-primary shrink-0 border-r border-outline-variant pr-2">
                     🇳🇬 {countryCode}
                   </span>
                   <input
@@ -291,11 +291,11 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
                       if (phoneError) setPhoneError(null);
                     }}
                     placeholder="0803 123 4567"
-                    className="flex-1 bg-transparent text-[14.5px] font-medium text-slate-900 outline-none"
+                    className="flex-1 bg-transparent text-[14.5px] font-medium text-on-surface outline-none"
                   />
                 </div>
                 {phoneError && (
-                  <p className="text-[11.5px] font-bold text-rose-600 mt-1 flex items-center gap-1">
+                  <p className="text-[11.5px] font-bold text-status-red mt-1 flex items-center gap-1">
                     <span className="material-symbols-outlined text-[14px]">error</span>
                     <span>{phoneError}</span>
                   </p>
@@ -304,11 +304,11 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
 
               {/* Email Address */}
               <div>
-                <label className="block text-[12.5px] font-bold text-slate-700 mb-1">
+                <label className="block text-[12.5px] font-bold text-on-surface-variant mb-1">
                   Email Address
                 </label>
-                <div className="flex items-center bg-[#f2fcf5] border border-[#dbe5de] rounded-2xl px-3.5 h-12 focus-within:ring-2 focus-within:ring-[#006c50]/30 focus-within:border-[#006c50] transition-all">
-                  <span className="material-symbols-outlined text-[#6a7b72] text-[20px] mr-2">
+                <div className="flex items-center bg-surface border border-outline-variant rounded-2xl px-3.5 h-12 focus-within:ring-2 focus-within:ring-primary/30 focus-within:border-primary transition-all">
+                  <span className="material-symbols-outlined text-outline text-[20px] mr-2">
                     mail
                   </span>
                   <input
@@ -317,20 +317,20 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="tunde.drives@gmail.com"
-                    className="flex-1 bg-transparent text-[14.5px] font-medium text-slate-900 outline-none"
+                    className="flex-1 bg-transparent text-[14.5px] font-medium text-on-surface outline-none"
                   />
                 </div>
               </div>
 
               {/* Primary Operating City */}
               <div>
-                <label className="block text-[12.5px] font-bold text-slate-700 mb-1">
+                <label className="block text-[12.5px] font-bold text-on-surface-variant mb-1">
                   Primary Location / State
                 </label>
                 <select
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
-                  className="w-full bg-[#f2fcf5] border border-[#dbe5de] rounded-2xl px-3.5 h-12 text-[14px] font-bold text-slate-900 outline-none focus:ring-2 focus:ring-[#006c50]/30"
+                  className="w-full bg-surface border border-outline-variant rounded-2xl px-3.5 h-12 text-[14px] font-bold text-on-surface outline-none focus:ring-2 focus:ring-primary/30"
                 >
                   <option value="Abuja FCT">Abuja FCT</option>
                   <option value="Lagos State">Lagos State</option>
@@ -343,11 +343,11 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
 
               {/* Password */}
               <div>
-                <label className="block text-[12.5px] font-bold text-slate-700 mb-1">
+                <label className="block text-[12.5px] font-bold text-on-surface-variant mb-1">
                   Password
                 </label>
-                <div className="flex items-center bg-[#f2fcf5] border border-[#dbe5de] rounded-2xl px-3.5 h-12 focus-within:ring-2 focus-within:ring-[#006c50]/30 focus-within:border-[#006c50] transition-all">
-                  <span className="material-symbols-outlined text-[#6a7b72] text-[20px] mr-2">
+                <div className="flex items-center bg-surface border border-outline-variant rounded-2xl px-3.5 h-12 focus-within:ring-2 focus-within:ring-primary/30 focus-within:border-primary transition-all">
+                  <span className="material-symbols-outlined text-outline text-[20px] mr-2">
                     lock
                   </span>
                   <input
@@ -356,12 +356,12 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="flex-1 bg-transparent text-[14.5px] font-medium text-slate-900 outline-none"
+                    className="flex-1 bg-transparent text-[14.5px] font-medium text-on-surface outline-none"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="text-[#6a7b72] hover:text-slate-900"
+                    className="text-outline hover:text-on-surface"
                   >
                     <span className="material-symbols-outlined text-[20px]">
                       {showPassword ? 'visibility_off' : 'visibility'}
@@ -375,43 +375,43 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
           {step === 2 && (
             <div className="flex flex-col gap-4 py-2">
               {/* SMS Code Banner Callout */}
-              <div className="bg-emerald-50 border border-emerald-300 rounded-2xl p-4 flex flex-col gap-1.5">
+              <div className="bg-surface-container border border-outline-variant rounded-2xl p-4 flex flex-col gap-1.5">
                 <div className="flex items-center justify-between">
-                  <span className="text-[12px] font-black uppercase text-[#006c50] tracking-wider flex items-center gap-1">
+                  <span className="text-[12px] font-black uppercase text-primary tracking-wider flex items-center gap-1">
                     <span className="material-symbols-outlined text-[16px]">sms</span>
                     Serverless SMS OTP Verification
                   </span>
                   {devCode && (
-                    <span className="bg-[#004D40] text-[#00E676] text-[10.5px] font-black px-2.5 py-0.5 rounded-full border border-emerald-400/40">
+                    <span className="bg-primary text-status-green text-[10.5px] font-black px-2.5 py-0.5 rounded-full border border-status-green/40">
                       Dev mode — use code {devCode}
                     </span>
                   )}
                 </div>
-                <p className="text-[13px] text-slate-700 font-medium leading-relaxed">
+                <p className="text-[13px] text-on-surface-variant font-medium leading-relaxed">
                   We triggered a 6-digit verification code to <strong>{phone}</strong> via serverless function.
                 </p>
-                <div className="flex items-center justify-between text-[11.5px] font-bold text-[#004D40] pt-1">
-                  <span>Code expires in: <strong className="text-rose-600">{formatExpiryMinutes(expiryCountdown)}</strong></span>
-                  <span className="text-[#006c50] font-black">⚙️ Dev mode — use code 123456</span>
+                <div className="flex items-center justify-between text-[11.5px] font-bold text-primary pt-1">
+                  <span>Code expires in: <strong className="text-status-red">{formatExpiryMinutes(expiryCountdown)}</strong></span>
+                  <span className="text-primary font-black">⚙️ Dev mode — use code 123456</span>
                 </div>
               </div>
 
               {otpNotice && (
-                <div className="p-3 bg-[#004D40] text-white text-[12.5px] font-bold rounded-2xl animate-fade-in flex items-center gap-2">
-                  <span className="material-symbols-outlined text-[18px] text-[#00E676]">mark_email_read</span>
+                <div className="p-3 bg-primary text-on-primary text-[12.5px] font-bold rounded-2xl animate-fade-in flex items-center gap-2">
+                  <span className="material-symbols-outlined text-[18px] text-status-green">mark_email_read</span>
                   <span>{otpNotice}</span>
                 </div>
               )}
 
               {/* 6-Digit OTP Code Input */}
               <div>
-                <label className="block text-[13px] font-bold text-slate-700 mb-1.5">
+                <label className="block text-[13px] font-bold text-on-surface-variant mb-1.5">
                   Enter 6-Digit Verification Code
                 </label>
-                <div className={`flex items-center bg-[#f2fcf5] border rounded-2xl px-4 h-14 transition-all ${
-                  otpError ? 'border-rose-500 ring-2 ring-rose-500/20' : 'border-[#dbe5de] focus-within:ring-2 focus-within:ring-[#006c50]/30 focus-within:border-[#006c50]'
+                <div className={`flex items-center bg-surface border rounded-2xl px-4 h-14 transition-all ${
+                  otpError ? 'border-status-red ring-2 ring-status-red/20' : 'border-outline-variant focus-within:ring-2 focus-within:ring-primary/30 focus-within:border-primary'
                 }`}>
-                  <span className="material-symbols-outlined text-[#006c50] text-[24px] mr-3">
+                  <span className="material-symbols-outlined text-primary text-[24px] mr-3">
                     verified_user
                   </span>
                   <input
@@ -426,12 +426,12 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
                       if (otpError) setOtpError(null);
                     }}
                     placeholder="1 2 3 4 5 6"
-                    className="flex-1 bg-transparent text-[22px] font-extrabold tracking-[0.3em] text-[#004D40] outline-none placeholder:tracking-normal placeholder:text-slate-300 placeholder:text-[15px]"
+                    className="flex-1 bg-transparent text-[22px] font-extrabold tracking-[0.3em] text-primary outline-none placeholder:tracking-normal placeholder:text-outline placeholder:text-[15px]"
                   />
                 </div>
 
                 {otpError && (
-                  <p className="text-[12px] font-bold text-rose-600 mt-1.5 flex items-center gap-1">
+                  <p className="text-[12px] font-bold text-status-red mt-1.5 flex items-center gap-1">
                     <span className="material-symbols-outlined text-[16px]">gpp_bad</span>
                     <span>{otpError}</span>
                   </p>
@@ -440,12 +440,12 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
 
               {/* Rate-Limited Resend Action (60s Cooldown) */}
               <div className="flex items-center justify-between text-[12.5px] pt-1">
-                <span className="text-slate-500 font-medium">Didn't receive SMS?</span>
+                <span className="text-outline font-medium">Didn't receive SMS?</span>
                 <button
                   type="button"
                   onClick={handleResendOtp}
                   disabled={resendCooldown > 0 || isSendingOtp}
-                  className="text-[#006c50] font-extrabold hover:underline disabled:opacity-50 disabled:no-underline flex items-center gap-1"
+                  className="text-primary font-extrabold hover:underline disabled:opacity-50 disabled:no-underline flex items-center gap-1"
                 >
                   <span className="material-symbols-outlined text-[16px]">refresh</span>
                   <span>
@@ -462,7 +462,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
             <>
               {/* Vehicle Type Selector */}
               <div>
-                <label className="block text-[12.5px] font-bold text-slate-700 mb-2">
+                <label className="block text-[12.5px] font-bold text-on-surface-variant mb-2">
                   Vehicle Category
                 </label>
                 <div className="grid grid-cols-2 gap-2">
@@ -478,12 +478,12 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
                       onClick={() => setVehicleType(v.id as any)}
                       className={`p-3 rounded-2xl border text-left transition-all ${
                         vehicleType === v.id
-                          ? 'bg-[#004D40] text-white border-[#004D40] shadow-sm'
-                          : 'bg-[#f2fcf5] text-slate-800 border-[#dbe5de] hover:bg-emerald-50'
+                          ? 'bg-primary text-on-primary border-primary shadow-sm'
+                          : 'bg-surface text-on-surface border-outline-variant hover:bg-surface-container'
                       }`}
                     >
                       <p className="font-bold text-[13.5px]">{v.label}</p>
-                      <p className={`text-[11px] mt-0.5 ${vehicleType === v.id ? 'text-emerald-200' : 'text-slate-500'}`}>
+                      <p className={`text-[11px] mt-0.5 ${vehicleType === v.id ? 'text-status-green' : 'text-outline'}`}>
                         {v.sub}
                       </p>
                     </button>
@@ -494,7 +494,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
               {/* Vehicle Make & Year */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[12.5px] font-bold text-slate-700 mb-1">
+                  <label className="block text-[12.5px] font-bold text-on-surface-variant mb-1">
                     Car Model
                   </label>
                   <input
@@ -503,11 +503,11 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
                     value={vehicleMake}
                     onChange={(e) => setVehicleMake(e.target.value)}
                     placeholder="e.g. Toyota Camry"
-                    className="w-full bg-[#f2fcf5] border border-[#dbe5de] rounded-2xl px-3.5 h-12 text-[14px] font-bold text-slate-900 outline-none"
+                    className="w-full bg-surface border border-outline-variant rounded-2xl px-3.5 h-12 text-[14px] font-bold text-on-surface outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-[12.5px] font-bold text-slate-700 mb-1">
+                  <label className="block text-[12.5px] font-bold text-on-surface-variant mb-1">
                     Year
                   </label>
                   <input
@@ -516,14 +516,14 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
                     value={vehicleYear}
                     onChange={(e) => setVehicleYear(e.target.value)}
                     placeholder="2018"
-                    className="w-full bg-[#f2fcf5] border border-[#dbe5de] rounded-2xl px-3.5 h-12 text-[14px] font-bold text-slate-900 outline-none"
+                    className="w-full bg-surface border border-outline-variant rounded-2xl px-3.5 h-12 text-[14px] font-bold text-on-surface outline-none"
                   />
                 </div>
               </div>
 
               {/* CNG Kit Status */}
               <div>
-                <label className="block text-[12.5px] font-bold text-slate-700 mb-1.5">
+                <label className="block text-[12.5px] font-bold text-on-surface-variant mb-1.5">
                   CNG Conversion Status
                 </label>
                 <div className="flex flex-col gap-2">
@@ -538,12 +538,12 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
                       onClick={() => setCngStatus(st.id as any)}
                       className={`p-3 rounded-2xl border text-left transition-all ${
                         cngStatus === st.id
-                          ? 'bg-[#006c50] text-white border-[#006c50]'
-                          : 'bg-[#f2fcf5] text-slate-800 border-[#dbe5de] hover:bg-emerald-50'
+                          ? 'bg-primary text-on-primary border-primary'
+                          : 'bg-surface text-on-surface border-outline-variant hover:bg-surface-container'
                       }`}
                     >
                       <p className="font-bold text-[13px]">{st.label}</p>
-                      <p className={`text-[11px] ${cngStatus === st.id ? 'text-emerald-100' : 'text-slate-500'}`}>
+                      <p className={`text-[11px] ${cngStatus === st.id ? 'text-status-green' : 'text-outline'}`}>
                         {st.desc}
                       </p>
                     </button>
@@ -554,13 +554,13 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
               {/* Tank Size (if installed) */}
               {cngStatus === 'installed' && (
                 <div>
-                  <label className="block text-[12.5px] font-bold text-slate-700 mb-1">
+                  <label className="block text-[12.5px] font-bold text-on-surface-variant mb-1">
                     CNG Cylinder Tank Size
                   </label>
                   <select
                     value={tankSize}
                     onChange={(e) => setTankSize(e.target.value)}
-                    className="w-full bg-[#f2fcf5] border border-[#dbe5de] rounded-2xl px-3.5 h-12 text-[14px] font-bold text-slate-900 outline-none"
+                    className="w-full bg-surface border border-outline-variant rounded-2xl px-3.5 h-12 text-[14px] font-bold text-on-surface outline-none"
                   >
                     <option value="12kg">12kg Cylinder</option>
                     <option value="15kg">15kg Cylinder (Standard Sedan)</option>
@@ -578,7 +578,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
               <button
                 type="button"
                 onClick={() => setStep((s) => (s - 1) as 1 | 2)}
-                className="py-3.5 px-5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[14px] rounded-full transition-all"
+                className="py-3.5 px-5 bg-surface-container hover:bg-surface-container-high text-on-surface-variant font-bold text-[14px] rounded-full transition-all"
               >
                 Back
               </button>
@@ -586,7 +586,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
             <button
               type="submit"
               disabled={isSendingOtp || isVerifyingOtp}
-              className="flex-1 py-3.5 bg-[#004D40] hover:bg-[#006c50] text-white font-extrabold text-[15px] rounded-full shadow-md active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+              className="flex-1 py-3.5 bg-primary hover:opacity-95 text-on-primary font-extrabold text-[15px] rounded-full shadow-md active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
             >
               {isSendingOtp || isVerifyingOtp ? (
                 <div className="flex items-center gap-2">
@@ -614,17 +614,17 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
 
       {/* Bottom Switch to Login Link */}
       <div className="text-center py-3">
-        <p className="text-[13px] text-slate-600 font-medium">
+        <p className="text-[13px] text-on-surface-variant font-medium">
           Already have a GasFinder account?{' '}
           {onSwitchToLogin ? (
             <button
               onClick={onSwitchToLogin}
-              className="text-[#006c50] font-extrabold hover:underline"
+              className="text-primary font-extrabold hover:underline"
             >
               Sign In
             </button>
           ) : (
-            <span className="text-[#006c50] font-extrabold">Sign In</span>
+            <span className="text-primary font-extrabold">Sign In</span>
           )}
         </p>
       </div>

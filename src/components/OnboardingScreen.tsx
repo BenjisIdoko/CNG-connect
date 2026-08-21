@@ -98,7 +98,7 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
             <img src={ASSETS.logo} alt="GasFinder Logo" className="w-full h-full object-contain" />
           </div>
           <span className="text-[20px] font-extrabold text-white tracking-tight">
-            Gas<span className="text-[#00E676]">Finder</span>
+            Gas<span className="text-status-green">Finder</span>
           </span>
         </div>
 
@@ -115,14 +115,14 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
       <div className="relative z-10 max-w-xl mx-auto w-full px-6 flex-1 flex flex-col justify-end pb-8">
         <div className="animate-fade-in space-y-4">
           {/* Badge */}
-          <div className="inline-flex items-center gap-1.5 bg-[#00E676]/20 border border-[#00E676]/40 px-3 py-1 rounded-full text-[#00E676] text-[11px] font-extrabold uppercase tracking-wider backdrop-blur-md">
+          <div className="inline-flex items-center gap-1.5 bg-status-green/20 border border-status-green/40 px-3 py-1 rounded-full text-status-green text-[11px] font-extrabold uppercase tracking-wider backdrop-blur-md">
             <span className="material-symbols-outlined text-[15px]">{activeSlide.icon}</span>
             <span>{activeSlide.badge}</span>
           </div>
 
           {/* Title & Subtitle */}
           <div>
-            <span className="text-[#00E676] text-[13px] font-bold block mb-1">
+            <span className="text-status-green text-[13px] font-bold block mb-1">
               {activeSlide.subtitle}
             </span>
             <h1 className="text-[26px] sm:text-[30px] font-extrabold text-white leading-tight tracking-tight">
@@ -143,7 +143,7 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
                 onClick={() => setCurrentSlide(idx)}
                 aria-label={`Go to slide ${idx + 1}`}
                 className={`h-2 rounded-full transition-all duration-300 ${
-                  currentSlide === idx ? 'w-8 bg-[#00E676]' : 'w-2 bg-white/30 hover:bg-white/50'
+                  currentSlide === idx ? 'w-8 bg-status-green' : 'w-2 bg-white/30 hover:bg-white/50'
                 }`}
               />
             ))}
@@ -157,7 +157,7 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
             <div className="flex flex-col gap-2.5">
               <button
                 onClick={onStartSignUp}
-                className="w-full h-13 bg-[#00E676] hover:bg-[#00c853] text-[#09140f] font-extrabold text-[15px] rounded-full flex items-center justify-center gap-2 shadow-xl active:scale-[0.98] transition-all"
+                className="w-full h-13 bg-status-green hover:opacity-95 text-on-surface font-extrabold text-[15px] rounded-full flex items-center justify-center gap-2 shadow-xl active:scale-[0.98] transition-all"
               >
                 <span className="whitespace-nowrap">Sign Up</span>
                 <span className="material-symbols-outlined text-[20px] shrink-0">arrow_forward</span>
@@ -187,7 +187,7 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
 
               <button
                 onClick={handleNext}
-                className="flex-1 h-12 bg-[#006c50] hover:bg-[#004D40] text-white font-extrabold text-[14px] rounded-full flex items-center justify-center gap-2 shadow-lg active:scale-[0.98] transition-all"
+                className="flex-1 h-12 bg-primary hover:opacity-95 text-on-primary font-extrabold text-[14px] rounded-full flex items-center justify-center gap-2 shadow-lg active:scale-[0.98] transition-all"
               >
                 <span>Continue</span>
                 <span className="material-symbols-outlined text-[18px]">chevron_right</span>

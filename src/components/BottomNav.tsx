@@ -21,8 +21,8 @@ export const BottomNav: React.FC<BottomNavProps> = ({
         aria-label="Map"
         className={`w-11 h-11 rounded-full flex items-center justify-center transition-all duration-200 active:scale-90 ${
           activeTab === 'map'
-            ? 'bg-[#00c853] text-white shadow-md shadow-[#00c853]/30 scale-105'
-            : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100/60'
+            ? 'bg-primary text-on-primary shadow-md shadow-primary/30 scale-105'
+            : 'text-outline hover:text-on-surface hover:bg-surface-container/60'
         }`}
       >
         <span
@@ -40,8 +40,8 @@ export const BottomNav: React.FC<BottomNavProps> = ({
         aria-label="CNG Kit Centers"
         className={`w-11 h-11 rounded-full flex items-center justify-center transition-all duration-200 active:scale-90 ${
           activeTab === 'conversions'
-            ? 'bg-[#00c853] text-white shadow-md shadow-[#00c853]/30 scale-105'
-            : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100/60'
+            ? 'bg-primary text-on-primary shadow-md shadow-primary/30 scale-105'
+            : 'text-outline hover:text-on-surface hover:bg-surface-container/60'
         }`}
       >
         <span
@@ -59,8 +59,8 @@ export const BottomNav: React.FC<BottomNavProps> = ({
         aria-label="Community"
         className={`w-11 h-11 rounded-full flex items-center justify-center transition-all duration-200 relative active:scale-90 ${
           activeTab === 'community'
-            ? 'bg-[#00c853] text-white shadow-md shadow-[#00c853]/30 scale-105'
-            : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100/60'
+            ? 'bg-primary text-on-primary shadow-md shadow-primary/30 scale-105'
+            : 'text-outline hover:text-on-surface hover:bg-surface-container/60'
         }`}
       >
         <div className="relative flex items-center justify-center">
@@ -72,7 +72,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
             groups
           </span>
           {unreadNotifications > 0 && (
-            <span className="absolute -top-1 -right-1.5 w-4 h-4 bg-[#ba1a1a] text-white text-[9px] font-black rounded-full flex items-center justify-center border-2 border-white">
+            <span className="absolute -top-1 -right-1.5 w-4 h-4 bg-status-red text-white text-[9px] font-black rounded-full flex items-center justify-center border-2 border-white">
               {unreadNotifications}
             </span>
           )}
@@ -85,8 +85,8 @@ export const BottomNav: React.FC<BottomNavProps> = ({
         aria-label="Profile"
         className={`w-11 h-11 rounded-full flex items-center justify-center transition-all duration-200 active:scale-90 ${
           activeTab === 'profile'
-            ? 'bg-[#00c853] text-white shadow-md shadow-[#00c853]/30 scale-105'
-            : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100/60'
+            ? 'bg-primary text-on-primary shadow-md shadow-primary/30 scale-105'
+            : 'text-outline hover:text-on-surface hover:bg-surface-container/60'
         }`}
       >
         <span
