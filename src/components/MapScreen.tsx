@@ -30,6 +30,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [showPiCngInfo, setShowPiCngInfo] = useState(false);
   const [minPressure, setMinPressure] = useState<number>(0);
+  const [maxDistanceKm, setMaxDistanceKm] = useState<number>(0); // 0 = any distance
   const [sheetMode, setSheetMode] = useState<'standard' | 'expanded' | 'collapsed'>('standard');
   const [isRecentering, setIsRecentering] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -41,6 +42,46 @@ export const MapScreen: React.FC<MapScreenProps> = ({
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
   const markersLayerRef = useRef<L.LayerGroup | null>(null);
+
+  const CITY_COORDINATES: Record<string, { lat: number; lng: number; zoom: number }> = {
+    all: { lat: 9.0765, lng: 7.4853, zoom: 6 },
+    abuja: { lat: 9.0765, lng: 7.4853, zoom: 12 },
+    lagos: { lat: 6.5244, lng: 3.3792, zoom: 12 },
+    rivers: { lat: 4.8156, lng: 7.0498, zoom: 12 },
+    kano: { lat: 12.0022, lng: 8.5919, zoom: 12 },
+    ogun: { lat: 6.9075, lng: 3.5813, zoom: 11 },
+    edo: { lat: 6.3350, lng: 5.6037, zoom: 12 },
+    oyo: { lat: 7.3775, lng: 3.9470, zoom: 12 },
+    delta: { lat: 5.5442, lng: 5.7603, zoom: 11 },
+    kaduna: { lat: 10.5105, lng: 7.4165, zoom: 12 },
+  };
+
+  const handleCitySelect = (cityId: string) => {
+    setActiveCity(cityId);
+    const cityInfo = CITY_COORDINATES[cityId];
+    if (mapInstanceRef.current && cityInfo) {
+      if (cityId === 'all') {
+        const matchCoords = stations.filter((s) => s.lat && s.lng).map((s) => [s.lat, s.lng] as [number, number]);
+        if (matchCoords.length > 0) {
+          mapInstanceRef.current.flyToBounds(L.latLngBounds(matchCoords), { padding: [50, 50], maxZoom: 12, duration: 1.2 });
+        } else {
+          mapInstanceRef.current.flyTo([cityInfo.lat, cityInfo.lng], cityInfo.zoom, { duration: 1.2 });
+        }
+      } else {
+        const cityStations = stations.filter(
+          (s) =>
+            s.state.toLowerCase().includes(cityId.toLowerCase()) ||
+            s.city.toLowerCase().includes(cityId.toLowerCase())
+        );
+        if (cityStations.length > 0) {
+          const bounds = L.latLngBounds(cityStations.map((s) => [s.lat, s.lng] as [number, number]));
+          mapInstanceRef.current.flyToBounds(bounds, { padding: [40, 40], maxZoom: 13, duration: 1.2 });
+        } else {
+          mapInstanceRef.current.flyTo([cityInfo.lat, cityInfo.lng], cityInfo.zoom, { duration: 1.2 });
+        }
+      }
+    }
+  };
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -82,7 +123,8 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       st.state.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (st.operator && st.operator.toLowerCase().includes(searchQuery.toLowerCase()));
     const matchesPressure = st.pumpPressure >= minPressure;
-    return matchesFilter && matchesCity && matchesSearch && matchesPressure;
+    const matchesDistance = maxDistanceKm === 0 || getDistanceKm(st) <= maxDistanceKm;
+    return matchesFilter && matchesCity && matchesSearch && matchesPressure && matchesDistance;
   });
 
   const nearestTop5Stations = [...filteredStations]
@@ -377,7 +419,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
           ].map((city) => (
             <button
               key={city.id}
-              onClick={() => setActiveCity(city.id)}
+              onClick={() => handleCitySelect(city.id)}
               className={`shrink-0 px-3 py-1 rounded-full text-[11px] font-extrabold transition-all shadow-2xs active:scale-95 ${
                 activeCity === city.id
                   ? 'bg-[#004D40] text-white shadow-xs'
@@ -511,6 +553,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                       setActiveFilter('all');
                       setActiveCity('all');
                       setMinPressure(0);
+                      setMaxDistanceKm(0);
                     }}
                     className="mt-1 px-5 py-2.5 bg-[#006c50] hover:bg-[#004D40] text-white text-[12.5px] font-extrabold rounded-full shadow-md active:scale-95 transition-all"
                   >
@@ -716,6 +759,32 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                 </div>
               </div>
 
+              {/* Maximum Distance Radius */}
+              <div>
+                <div className="flex justify-between text-[13px] font-bold text-slate-700 mb-1.5">
+                  <span>Maximum Distance</span>
+                  <span className="text-[#006c50]">
+                    {maxDistanceKm === 0 ? 'Any Distance' : `Within ${maxDistanceKm} km`}
+                  </span>
+                </div>
+                <div className="flex gap-1.5 overflow-x-auto pb-1 hide-scrollbar">
+                  {[0, 5, 10, 25, 50].map((dist) => (
+                    <button
+                      key={dist}
+                      type="button"
+                      onClick={() => setMaxDistanceKm(dist)}
+                      className={`flex-1 py-2 rounded-xl text-[12px] font-bold border transition-all ${
+                        maxDistanceKm === dist
+                          ? 'bg-[#006c50] text-white border-[#006c50]'
+                          : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                      }`}
+                    >
+                      {dist === 0 ? 'Any' : `${dist}km`}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               {/* Status checkboxes */}
               <div>
                 <label className="block text-[13px] font-bold text-slate-700 mb-2">
@@ -751,6 +820,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
               <button
                 onClick={() => {
                   setMinPressure(0);
+                  setMaxDistanceKm(0);
                   setActiveFilter('all');
                   setIsFilterModalOpen(false);
                 }}

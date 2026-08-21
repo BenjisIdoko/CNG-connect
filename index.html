@@ -11,6 +11,7 @@
     <meta name="description" content="Live CNG and fuel station status finder, queue tracker, and driver community for real-time station availability." />
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⛽</text></svg>" />
     <link rel="alternate icon" type="image/png" href="https://lh3.googleusercontent.com/aida-public/AB6AXuBXr7CW16AX90XXUC1EdR0947RfRhBmIMe7HGiTWGlNAfGwTjlU7-lTNdNZOFmMx0hT2pos-9hloFXrn6tzhZhIqf5injkLdwnsrzdFuFOpGLExVMmNWBoJOehAzMklKXWRfnUIZBerlJrQZaEbobRnbD1qrprVK0us0AqOtuR6j_eVKDAiNidpATVWDBFDWlfe5xNtN-QwiBp6qL5hm_qWsn0qJSjPsewJfcTmRzpoX1oYPchl_69f5g" />
+    <link rel="manifest" href="/manifest.json" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -20,6 +21,15 @@
   <body class="bg-[#f2fcf5] text-[#141d19] antialiased selection:bg-[#00ffc2] selection:text-[#004D40]">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch((err) => {
+            console.warn('SW registration skipped:', err);
+          });
+        });
+      }
+    </script>
   </body>
 </html>
 

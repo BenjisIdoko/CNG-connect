@@ -71,6 +71,26 @@ export const App: React.FC = () => {
     return localStorage.getItem('cng_user_authenticated') === 'true' ? null : 'onboarding';
   });
 
+  // Offline / Network Online Status Detector
+  const [isOnline, setIsOnline] = useState<boolean>(navigator.onLine);
+
+  useEffect(() => {
+    const handleOnline = () => {
+      setIsOnline(true);
+      setGlobalToast('Network connection restored. Syncing live stations...');
+    };
+    const handleOffline = () => {
+      setIsOnline(false);
+    };
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
   // Data Store connected to Supabase API Service (with offline fallback)
   const [stations, setStations] = useState<GasStation[]>(INITIAL_STATIONS);
   const [selectedStation, setSelectedStation] = useState<GasStation>(INITIAL_STATIONS[0]);
@@ -401,6 +421,12 @@ export const App: React.FC = () => {
 
       {/* Main Content Area */}
       <main className="flex-1 w-full pt-16 pb-20">
+        {!isOnline && (
+          <div className="fixed top-3 left-1/2 -translate-x-1/2 z-50 bg-[#004D40]/95 text-white text-[11.5px] font-extrabold px-4 py-1.5 rounded-full shadow-lg border border-emerald-400/40 backdrop-blur-md flex items-center gap-1.5 animate-pulse pointer-events-none">
+            <span className="material-symbols-outlined text-[16px] text-amber-400">wifi_off</span>
+            <span>Offline Mode — Showing Cached Stations</span>
+          </div>
+        )}
         {activeChatPost ? (
           <ChatScreen
             post={activeChatPost}
