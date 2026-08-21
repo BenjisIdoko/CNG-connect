@@ -42,7 +42,7 @@ export const LiveNavigationModal: React.FC<LiveNavigationModalProps> = ({
         {/* Station Overview Card */}
         <div className="bg-[#1c2923] rounded-2xl p-4 border border-emerald-500/20 flex flex-col gap-2.5">
           <div>
-            <h2 className="font-extrabold text-[19px] text-white leading-snug">
+            <h2 className="font-extrabold text-[19px] text-white leading-snug truncate">
               {station.name}
             </h2>
             <p className="text-[13px] text-slate-300 font-normal mt-0.5 flex items-center gap-1">

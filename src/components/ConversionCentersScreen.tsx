@@ -223,7 +223,7 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
                       )}
                     </div>
 
-                    <h3 className="text-[15.5px] font-bold text-slate-900 tracking-tight leading-snug">
+                    <h3 className="text-[15.5px] font-bold text-slate-900 tracking-tight leading-snug truncate">
                       {center.name}
                     </h3>
 

@@ -179,7 +179,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                   {presenceCount} Active Nearby
                 </span>
               </div>
-              <h1 className="text-[22px] sm:text-[25px] font-extrabold text-slate-900 tracking-tight leading-snug">
+              <h1 className="text-[22px] sm:text-[25px] font-extrabold text-slate-900 tracking-tight leading-snug line-clamp-2">
                 {station.name}
               </h1>
             </div>

@@ -65,16 +65,16 @@ export const ProximityAlertBanner: React.FC<ProximityAlertBannerProps> = ({
               <div className="w-2.5 h-2.5 rounded-full bg-[#00E676] relative z-10" />
             </div>
 
-            <div>
+            <div className="min-w-0 flex-1">
               <div className="flex items-center gap-1.5">
-                <span className="text-[11px] font-black uppercase tracking-wider text-[#00E676]">
+                <span className="text-[11px] font-black uppercase tracking-wider text-[#00E676] shrink-0">
                   Geofence Nudge
                 </span>
-                <span className="text-[10px] bg-[#00E676]/20 text-[#00E676] font-bold px-2 py-0.5 rounded-full border border-[#00E676]/30">
+                <span className="text-[10px] bg-[#00E676]/20 text-[#00E676] font-bold px-2 py-0.5 rounded-full border border-[#00E676]/30 shrink-0">
                   +50 PTS
                 </span>
               </div>
-              <h2 className="text-[15.5px] font-extrabold text-white leading-tight">
+              <h2 className="text-[15.5px] font-extrabold text-white leading-tight truncate">
                 Arrived near {station.name}
               </h2>
             </div>

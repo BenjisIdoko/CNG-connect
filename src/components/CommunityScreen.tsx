@@ -196,11 +196,11 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                           groups
                         </span>
                       </div>
-                      <div>
-                        <h3 className="text-[15.5px] font-extrabold text-[#141d19] leading-tight">
+                      <div className="min-w-0 flex-1">
+                        <h3 className="text-[15.5px] font-extrabold text-[#141d19] leading-tight truncate">
                           {st.name} Group
                         </h3>
-                        <p className="text-[12px] text-[#6a7b72] font-medium flex items-center gap-1 mt-0.5">
+                        <p className="text-[12px] text-[#6a7b72] font-medium flex items-center gap-1 mt-0.5 truncate">
                           <span>{st.city}, {st.state}</span>
                           <span>•</span>
                           <span className="text-[#006c50] font-bold">

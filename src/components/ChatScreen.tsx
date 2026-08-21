@@ -121,11 +121,11 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ post, onBack }) => {
               />
               <span className="absolute bottom-0 right-0 w-3 h-3 bg-[#00E676] border-2 border-white rounded-full shadow-xs" />
             </div>
-            <div>
-              <h2 className="text-[15px] font-extrabold text-[#141d19] leading-tight">
+            <div className="min-w-0">
+              <h2 className="text-[15px] font-extrabold text-[#141d19] leading-tight truncate max-w-[180px] sm:max-w-[240px]">
                 {sellerName}
               </h2>
-              <span className="text-[12px] text-[#006c50] font-bold">
+              <span className="text-[12px] text-[#006c50] font-bold block truncate">
                 Active now
               </span>
             </div>
