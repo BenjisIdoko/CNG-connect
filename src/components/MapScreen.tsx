@@ -42,6 +42,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
   const markersLayerRef = useRef<L.LayerGroup | null>(null);
+  const initialFitRef = useRef(false);
 
   const CITY_COORDINATES: Record<string, { lat: number; lng: number; zoom: number }> = {
     all: { lat: 9.0765, lng: 7.4853, zoom: 6 },
@@ -126,6 +127,18 @@ export const MapScreen: React.FC<MapScreenProps> = ({
     const matchesDistance = maxDistanceKm === 0 || getDistanceKm(st) <= maxDistanceKm;
     return matchesFilter && matchesCity && matchesSearch && matchesPressure && matchesDistance;
   });
+
+  useEffect(() => {
+    if (!mapInstanceRef.current || initialFitRef.current) return;
+    const validCoords = filteredStations
+      .filter((s) => s.lat != null && s.lng != null)
+      .map((s) => [s.lat!, s.lng!] as [number, number]);
+
+    if (validCoords.length > 0) {
+      initialFitRef.current = true;
+      mapInstanceRef.current.fitBounds(L.latLngBounds(validCoords), { padding: [50, 50], maxZoom: 13 });
+    }
+  }, [filteredStations]);
 
   const nearestTop5Stations = [...filteredStations]
     .sort((a, b) => getDistanceKm(a) - getDistanceKm(b))
