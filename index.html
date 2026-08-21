@@ -24,8 +24,29 @@
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js').catch((err) => {
+          navigator.serviceWorker.register('/sw.js').then((reg) => {
+            reg.update();
+            reg.addEventListener('updatefound', () => {
+              const installingWorker = reg.installing;
+              if (installingWorker) {
+                installingWorker.addEventListener('statechange', () => {
+                  if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                    console.log('[SW] New version detected, updating...');
+                    window.location.reload();
+                  }
+                });
+              }
+            });
+          }).catch((err) => {
             console.warn('SW registration skipped:', err);
+          });
+
+          let refreshing = false;
+          navigator.serviceWorker.addEventListener('controllerchange', () => {
+            if (!refreshing) {
+              refreshing = true;
+              window.location.reload();
+            }
           });
         });
       }

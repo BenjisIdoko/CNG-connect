@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cng-connect-v1';
+const CACHE_NAME = 'cng-connect-v4';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -9,25 +9,28 @@ const STATIC_ASSETS = [
 ];
 
 self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(STATIC_ASSETS).catch(() => {});
     })
   );
-  self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
-        cacheNames
-          .filter((name) => name !== CACHE_NAME && name !== 'cng-map-tiles')
-          .map((name) => caches.delete(name))
+        cacheNames.map((name) => {
+          if (name !== CACHE_NAME && name !== 'cng-map-tiles') {
+            console.log('[SW] Purging stale cache:', name);
+            return caches.delete(name);
+          }
+          return null;
+        })
       );
-    })
+    }).then(() => self.clients.claim())
   );
-  self.clients.claim();
 });
 
 self.addEventListener('fetch', (event) => {

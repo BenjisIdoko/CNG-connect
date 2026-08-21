@@ -29,13 +29,35 @@ export function calculateVerificationMetadata(report: DriverReport): {
 }
 
 // LocalStorage Persistence Fallback Keys
-const STATIONS_STORAGE_KEY = 'gasfinder_stations_v2';
-const POSTS_STORAGE_KEY = 'gasfinder_posts_v2';
+const STATIONS_STORAGE_KEY = 'gasfinder_stations_v4';
+const POSTS_STORAGE_KEY = 'gasfinder_posts_v4';
+
+function purgeStaleLocalStorage() {
+  try {
+    const keysToRemove = [
+      'gasfinder_stations_v1',
+      'gasfinder_stations_v2',
+      'gasfinder_stations_v3',
+      'gasfinder_posts_v1',
+      'gasfinder_posts_v2',
+      'gasfinder_posts_v3',
+    ];
+    keysToRemove.forEach((k) => localStorage.removeItem(k));
+  } catch {
+    // Ignore storage errors
+  }
+}
 
 function getLocalStations(): GasStation[] {
+  purgeStaleLocalStorage();
   try {
     const saved = localStorage.getItem(STATIONS_STORAGE_KEY);
-    return saved ? JSON.parse(saved) : INITIAL_STATIONS;
+    if (!saved) return INITIAL_STATIONS;
+    const parsed = JSON.parse(saved);
+    if (!Array.isArray(parsed) || parsed.length < INITIAL_STATIONS.length) {
+      return INITIAL_STATIONS;
+    }
+    return parsed;
   } catch {
     return INITIAL_STATIONS;
   }
