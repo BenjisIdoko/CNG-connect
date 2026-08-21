@@ -32,6 +32,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
   const [minPressure, setMinPressure] = useState<number>(0);
   const [maxDistanceKm, setMaxDistanceKm] = useState<number>(0); // 0 = any distance
   const [sheetMode, setSheetMode] = useState<'standard' | 'expanded' | 'collapsed'>('standard');
+  const toggleSheetMode = () => setSheetMode((prev) => (prev === 'expanded' ? 'standard' : 'expanded'));
   const [isRecentering, setIsRecentering] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -300,14 +301,6 @@ export const MapScreen: React.FC<MapScreenProps> = ({
     }
   };
 
-  const handleZoomIn = () => {
-    if (mapInstanceRef.current) mapInstanceRef.current.zoomIn();
-  };
-
-  const handleZoomOut = () => {
-    if (mapInstanceRef.current) mapInstanceRef.current.zoomOut();
-  };
-
   const getStatusIndicator = (status: StationStatus) => {
     switch (status) {
       case 'full':
@@ -417,30 +410,10 @@ export const MapScreen: React.FC<MapScreenProps> = ({
         </div>
       </div>
 
-      {/* Floating Zoom Controls on Map Right */}
-      <div className="absolute right-4 top-36 z-30 flex flex-col gap-2 pointer-events-auto">
-        <div className="bg-white rounded-2xl shadow-[0_4px_16px_rgba(0,0,0,0.1)] border border-slate-200/80 flex flex-col overflow-hidden">
-          <button
-            onClick={handleZoomIn}
-            aria-label="Zoom in"
-            className="w-9 h-9 flex items-center justify-center text-slate-700 hover:bg-slate-50 active:bg-slate-100 transition-colors border-b border-slate-100 font-bold"
-          >
-            <span className="material-symbols-outlined text-[18px]">add</span>
-          </button>
-          <button
-            onClick={handleZoomOut}
-            aria-label="Zoom out"
-            className="w-9 h-9 flex items-center justify-center text-slate-700 hover:bg-slate-50 active:bg-slate-100 transition-colors font-bold"
-          >
-            <span className="material-symbols-outlined text-[18px]">remove</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Bottom Sheet: Nearby Petrol Stations Horizontal Carousel & List */}
+          {/* Bottom Sheet: Nearby Petrol Stations Vertical Ranked List & Expanded Gallery */}
       <div className="absolute bottom-0 left-0 right-0 z-30 max-w-xl mx-auto pointer-events-none">
         <div
-          className={`w-full bg-white rounded-t-[32px] shadow-[0_-8px_32px_rgba(0,0,0,0.14)] border-t border-slate-200/90 pointer-events-auto transition-all duration-300 flex flex-col overflow-hidden ${
+          className={`w-full bg-white rounded-t-[32px] shadow-[0_-8px_32px_rgba(0,0,0,0.14)] border-t border-outline-variant pointer-events-auto transition-all duration-300 flex flex-col overflow-hidden ${
             sheetMode === 'expanded'
               ? 'h-[calc(100vh-8rem)]'
               : sheetMode === 'collapsed'
@@ -448,65 +421,44 @@ export const MapScreen: React.FC<MapScreenProps> = ({
               : 'max-h-[58vh]'
           }`}
         >
-          {/* Drag Handle & Top Controls Bar */}
-          <div className="w-full pt-3 pb-2 px-5 flex items-center justify-between cursor-pointer hover:bg-slate-50 transition-colors shrink-0 border-b border-slate-100/60 select-none">
-            {sheetMode === 'collapsed' ? (
-              <div
-                onClick={() => setSheetMode('standard')}
-                className="flex items-center gap-2.5 flex-1 min-w-0 pr-2"
-              >
-                <div className="w-2.5 h-2.5 rounded-full bg-[#00c853] animate-pulse shrink-0" />
-                <div className="truncate">
-                  <span className="font-extrabold text-[14px] text-slate-900 truncate block">
-                    {nearestStation?.name || 'Nearest CNG Station'}
-                  </span>
-                  <span className="text-[11.5px] font-bold text-[#006c50]">
-                    {nearestStation?.distance} • {nearestStation?.statusLabel} (Tap to expand)
-                  </span>
-                </div>
-              </div>
-            ) : (
+          {/* Drawer Drag Bar & Header */}
+          <div
+            onClick={toggleSheetMode}
+            className="w-full pt-3 pb-2 px-4 flex flex-col items-center cursor-pointer select-none bg-white shrink-0 border-b border-outline-variant/30"
+          >
+            <div className="w-10 h-1.25 bg-outline-variant rounded-full mb-2" />
+            <div className="w-full flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="text-[12px] font-extrabold text-slate-500 uppercase tracking-wider">
-                  Nearby Petrol Stations
-                </span>
+                <span className="w-2.5 h-2.5 rounded-full bg-status-green animate-pulse" />
+                <h3 className="font-extrabold text-[15px] text-on-surface">
+                  {filteredStations.length} CNG Stations Near You
+                </h3>
               </div>
-            )}
-
-            <div
-              onClick={() => {
-                if (sheetMode === 'collapsed') setSheetMode('standard');
-                else if (sheetMode === 'standard') setSheetMode('expanded');
-                else setSheetMode('standard');
-              }}
-              className="w-10 h-1.5 bg-slate-300 rounded-full hover:bg-slate-400 transition-colors mx-auto"
-            />
-
-            <button
-              onClick={() => {
-                if (sheetMode === 'collapsed') setSheetMode('standard');
-                else setSheetMode('collapsed');
-              }}
-              aria-label={sheetMode === 'collapsed' ? 'Expand drawer' : 'Collapse drawer'}
-              className="flex items-center gap-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11.5px] font-bold px-2.5 py-1 rounded-full transition-all active:scale-95 shrink-0"
-            >
-              <span>{sheetMode === 'collapsed' ? 'Expand' : 'Collapse'}</span>
-              <span className="material-symbols-outlined text-[16px]">
-                {sheetMode === 'collapsed' ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}
-              </span>
-            </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleSheetMode();
+                }}
+                className="text-outline hover:text-on-surface text-[12px] font-bold flex items-center gap-0.5"
+              >
+                <span>{sheetMode === 'expanded' ? 'Collapse' : sheetMode === 'standard' ? 'Expand' : 'Show list'}</span>
+                <span className="material-symbols-outlined text-[16px]">
+                  {sheetMode === 'expanded' ? 'keyboard_arrow_down' : 'keyboard_arrow_up'}
+                </span>
+              </button>
+            </div>
           </div>
 
           {/* Drawer Scrollable Content */}
           {sheetMode !== 'collapsed' && (
             <div className="px-4 pb-20 pt-3 overflow-y-auto flex-1 hide-scrollbar flex flex-col gap-4">
               {filteredStations.length === 0 ? (
-                <div className="bg-white rounded-3xl p-6 text-center border border-slate-200/90 shadow-sm flex flex-col items-center gap-2 my-2">
-                  <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-[#006c50] flex items-center justify-center font-black">
+                <div className="bg-white rounded-3xl p-6 text-center border border-outline-variant shadow-xs flex flex-col items-center gap-2 my-2">
+                  <div className="w-12 h-12 rounded-2xl bg-surface-container text-primary flex items-center justify-center font-black">
                     <span className="material-symbols-outlined text-[28px]">filter_alt_off</span>
                   </div>
-                  <h4 className="font-extrabold text-slate-900 text-[15px]">No CNG Stations Found</h4>
-                  <p className="text-[12.5px] text-slate-500 font-medium max-w-xs">
+                  <h4 className="font-extrabold text-on-surface text-[15px]">No CNG Stations Found</h4>
+                  <p className="text-[12.5px] text-on-surface-variant font-medium max-w-xs">
                     No stations match your current search term or filter criteria.
                   </p>
                   <button
@@ -517,168 +469,173 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                       setMinPressure(0);
                       setMaxDistanceKm(0);
                     }}
-                    className="mt-1 px-5 py-2.5 bg-[#006c50] hover:bg-[#004D40] text-white text-[12.5px] font-extrabold rounded-full shadow-md active:scale-95 transition-all"
+                    className="mt-1 px-5 py-2.5 bg-primary hover:opacity-95 text-on-primary text-[12.5px] font-extrabold rounded-full shadow-md active:scale-95 transition-all"
                   >
                     Reset All Filters
                   </button>
                 </div>
               ) : (
                 <>
-                  {/* Section 1: Nearby Petrol Stations Horizontal Carousel */}
+                  {/* Vertical Ranked List (Primary Decision-Useful View) */}
                   <div>
                     <div className="flex items-center justify-between mb-2.5 px-1">
-                      <h3 className="font-black text-[16px] text-slate-900">
-                        Nearby CNG Stations ({filteredStations.length})
-                      </h3>
-                      <button
-                        onClick={() => setSheetMode('expanded')}
-                        className="text-[12px] font-extrabold text-[#006c50] hover:underline"
-                      >
-                        See all ({filteredStations.length})
-                      </button>
-                    </div>
-
-                {/* Horizontal Scroll Cards */}
-                <div className="flex overflow-x-auto gap-3.5 pb-2 px-1 hide-scrollbar">
-                  {nearestTop5Stations.map((st) => (
-                    <div
-                      key={`carousel-${st.id}`}
-                      onClick={() => {
-                        onSelectStation(st);
-                        onOpenStationDetails(st);
-                      }}
-                      className="w-56 shrink-0 bg-white rounded-2xl border border-slate-200/80 p-2.5 shadow-sm hover:shadow-md transition-all cursor-pointer flex flex-col justify-between active:scale-98"
-                    >
                       <div>
-                        {/* Hero Image Banner */}
-                        <div className="w-full h-24 rounded-xl overflow-hidden relative mb-2 bg-slate-100">
-                          <img
-                            src={st.photos?.[0] || ASSETS.stationWide}
-                            alt={st.name}
-                            className="w-full h-full object-cover"
-                          />
-                          <span className="absolute top-2 left-2 bg-[#004D40]/90 backdrop-blur-md text-[#00E676] text-[10px] font-black px-2 py-0.5 rounded-full border border-emerald-400/30">
-                            {st.statusLabel}
-                          </span>
-                        </div>
-
-                        {/* Name & Address */}
-                        <h4 className="font-extrabold text-[14px] text-slate-900 truncate leading-snug">
-                          {st.name}
-                        </h4>
-                        <p className="text-[11.5px] font-medium text-slate-500 truncate mt-0.5">
-                          {st.address}
-                        </p>
+                        <h3 className="font-black text-[16px] text-on-surface leading-tight">
+                          Nearest Stations
+                        </h3>
+                        <span className="text-[11.5px] font-bold text-outline">
+                          Sorted by GPS distance ({sheetMode === 'expanded' ? filteredStations.length : nearestTop5Stations.length} shown)
+                        </span>
                       </div>
-
-                      {/* Footer: Rating, Distance & Time */}
-                      <div className="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between">
-                        <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-600">
-                          <span className="text-[#FFB800]">★ {st.rating || '4.8'}</span>
-                          <span>•</span>
-                          <span>{st.distance}</span>
-                        </div>
-
+                      {sheetMode === 'standard' && (
                         <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onNavigate(st);
-                          }}
-                          className="px-2.5 py-1 bg-[#00c853] hover:bg-emerald-600 text-white rounded-full text-[11px] font-black shadow-xs active:scale-95 transition-all flex items-center gap-1"
+                          onClick={() => setSheetMode('expanded')}
+                          className="text-[12px] font-extrabold text-primary hover:underline"
                         >
-                          <span className="material-symbols-outlined text-[13px]">navigation</span>
-                          <span>Nav</span>
+                          See all ({filteredStations.length})
                         </button>
-                      </div>
+                      )}
                     </div>
-                  ))}
-                </div>
-              </div>
 
-              {/* Section 2: Most Nearest Stations Vertical List */}
-              <div>
-                <div className="flex items-center justify-between mb-2 px-1">
-                  <h3 className="font-black text-[16px] text-slate-900">
-                    Most Nearest
-                  </h3>
-                  <span className="text-[11.5px] font-bold text-slate-500">
-                    5 Closest by GPS
-                  </span>
-                </div>
+                    <div className="flex flex-col gap-2">
+                      {(sheetMode === 'expanded' ? filteredStations : nearestTop5Stations).map((station) => {
+                        const statusInfo = getStatusIndicator(station.status);
+                        const isSelected = selectedStation?.id === station.id;
 
-                <div className="flex flex-col gap-2">
-                  {nearestTop5Stations.map((station) => {
-                    const statusInfo = getStatusIndicator(station.status);
-                    const isSelected = selectedStation?.id === station.id;
+                        return (
+                          <div
+                            key={station.id}
+                            onClick={() => {
+                              onSelectStation(station);
+                            }}
+                            className={`bg-white border rounded-2xl p-3 shadow-2xs flex items-center justify-between cursor-pointer transition-all active:scale-[0.99] ${
+                              isSelected
+                                ? 'border-primary ring-2 ring-primary/15 bg-surface-container/50'
+                                : 'border-outline-variant/80 hover:border-outline-variant'
+                            }`}
+                          >
+                            <div className="flex items-center gap-3 min-w-0 flex-1 pr-2">
+                              <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${statusInfo.dotColor}`} />
 
-                    return (
-                      <div
-                        key={station.id}
-                        onClick={() => {
-                          onSelectStation(station);
-                        }}
-                        className={`bg-white border rounded-2xl p-3 shadow-2xs flex items-center justify-between cursor-pointer transition-all active:scale-[0.99] ${
-                          isSelected
-                            ? 'border-[#006c50] ring-2 ring-[#006c50]/15 bg-emerald-50/20'
-                            : 'border-slate-200/80 hover:border-slate-300'
-                        }`}
-                      >
-                        <div className="flex items-center gap-3 min-w-0 flex-1 pr-2">
-                          <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${statusInfo.dotColor}`} />
-
-                          <div className="min-w-0 flex-1">
-                            <h4 className="font-bold text-[14.5px] text-slate-900 truncate leading-snug">
-                              {station.name}
-                            </h4>
-                            <div className="flex items-center gap-2 text-[12px] text-slate-500 mt-0.5">
-                              <span>{station.distance}</span>
-                              <span>•</span>
-                              <span className="font-medium">{station.statusLabel}</span>
-                              {station.pumpPressure > 0 && (
-                                <>
+                              <div className="min-w-0 flex-1">
+                                <h4 className="font-bold text-[14.5px] text-on-surface truncate leading-snug">
+                                  {station.name}
+                                </h4>
+                                <div className="flex items-center gap-2 text-[12px] text-on-surface-variant mt-0.5">
+                                  <span className="font-bold text-primary">{station.distance}</span>
                                   <span>•</span>
-                                  <span className="font-semibold text-slate-600">{station.pumpPressure} bar</span>
-                                </>
-                              )}
+                                  <span className="font-medium">{station.statusLabel}</span>
+                                  {station.pumpPressure > 0 && (
+                                    <>
+                                      <span>•</span>
+                                      <span className="font-semibold text-on-surface-variant">{station.pumpPressure} bar</span>
+                                    </>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-1 shrink-0">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onNavigate(station);
+                                }}
+                                aria-label={`Navigate to ${station.name}`}
+                                className="w-8 h-8 rounded-full bg-surface-container text-primary hover:bg-surface-container-high flex items-center justify-center active:scale-95 transition-all"
+                              >
+                                <span className="material-symbols-outlined text-[17px]">
+                                  navigation
+                                </span>
+                              </button>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onOpenStationDetails(station);
+                                }}
+                                aria-label={`View details of ${station.name}`}
+                                className="w-7 h-7 rounded-full text-outline hover:text-on-surface flex items-center justify-center"
+                              >
+                                <span className="material-symbols-outlined text-[18px]">
+                                  chevron_right
+                                </span>
+                              </button>
                             </div>
                           </div>
-                        </div>
+                        );
+                      })}
+                    </div>
+                  </div>
 
-                        <div className="flex items-center gap-1 shrink-0">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onNavigate(station);
-                            }}
-                            aria-label={`Navigate to ${station.name}`}
-                            className="w-8 h-8 rounded-full bg-emerald-50 text-emerald-700 hover:bg-emerald-100 flex items-center justify-center active:scale-95 transition-all"
-                          >
-                            <span className="material-symbols-outlined text-[17px]">
-                              navigation
-                            </span>
-                          </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onOpenStationDetails(station);
-                            }}
-                            aria-label={`View details of ${station.name}`}
-                            className="w-7 h-7 rounded-full text-slate-400 hover:text-slate-700 flex items-center justify-center"
-                          >
-                            <span className="material-symbols-outlined text-[18px]">
-                              chevron_right
-                            </span>
-                          </button>
-                        </div>
+                  {/* Secondary Horizontal Carousel (Shown ONLY in Expanded Mode below the vertical list) */}
+                  {sheetMode === 'expanded' && (
+                    <div className="pt-2 border-t border-outline-variant/40">
+                      <div className="flex items-center justify-between mb-2.5 px-1">
+                        <h3 className="font-black text-[15px] text-on-surface">
+                          Browse Station Photos
+                        </h3>
+                        <span className="text-[11.5px] font-bold text-outline">
+                          Swipe to view
+                        </span>
                       </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </>
+
+                      <div className="flex overflow-x-auto gap-3.5 pb-2 px-1 hide-scrollbar">
+                        {nearestTop5Stations.map((st) => (
+                          <div
+                            key={`carousel-${st.id}`}
+                            onClick={() => {
+                              onSelectStation(st);
+                              onOpenStationDetails(st);
+                            }}
+                            className="w-56 shrink-0 bg-white rounded-2xl border border-outline-variant/80 p-2.5 shadow-xs hover:shadow-md transition-all cursor-pointer flex flex-col justify-between active:scale-98"
+                          >
+                            <div>
+                              <div className="w-full h-24 rounded-xl overflow-hidden relative mb-2 bg-surface-container">
+                                <img
+                                  src={st.photos?.[0] || ASSETS.stationWide}
+                                  alt={st.name}
+                                  className="w-full h-full object-cover"
+                                />
+                                <span className="absolute top-2 left-2 bg-primary/90 backdrop-blur-md text-status-green text-[10px] font-black px-2 py-0.5 rounded-full border border-status-green/30">
+                                  {st.statusLabel}
+                                </span>
+                              </div>
+
+                              <h4 className="font-extrabold text-[14px] text-on-surface truncate leading-snug">
+                                {st.name}
+                              </h4>
+                              <p className="text-[11.5px] font-medium text-on-surface-variant truncate mt-0.5">
+                                {st.address}
+                              </p>
+                            </div>
+
+                            <div className="mt-2.5 pt-2 border-t border-outline-variant/30 flex items-center justify-between">
+                              <div className="flex items-center gap-1.5 text-[11px] font-bold text-on-surface-variant">
+                                <span className="text-status-orange">★ {st.rating || '4.8'}</span>
+                                <span>•</span>
+                                <span>{st.distance}</span>
+                              </div>
+
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onNavigate(st);
+                                }}
+                                className="px-2.5 py-1 bg-status-green text-on-surface rounded-full text-[11px] font-black shadow-xs active:scale-95 transition-all flex items-center gap-1"
+                              >
+                                <span className="material-symbols-outlined text-[13px]">navigation</span>
+                                <span>Nav</span>
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
           )}
-        </div>
-      )}
         </div>
       </div>
 
