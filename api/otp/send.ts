@@ -49,11 +49,10 @@ export default async function handler(req: any, res: any) {
       return new Response(JSON.stringify({ error: rateLimitMsg, secondsLeft }), { status: 429 });
     }
 
-    // Check Dev Mode or Provider Configuration
-    const isDevMode =
-      process.env.VITE_DEV_MODE === 'true' ||
-      process.env.DEV_MODE === 'true' ||
-      (!process.env.TERMII_API_KEY && !process.env.AFRICAS_TALKING_API_KEY && !process.env.TWILIO_AUTH_TOKEN);
+    // Strict Production-Safe Environment Check for Dev-Mode Bypass
+    const isProduction = process.env.NODE_ENV === 'production';
+    const hasSmsKey = Boolean(process.env.TERMII_API_KEY || process.env.AFRICAS_TALKING_API_KEY || process.env.TWILIO_AUTH_TOKEN);
+    const isDevMode = !isProduction && (!hasSmsKey || process.env.DEV_MODE === 'true' || process.env.VITE_DEV_MODE === 'true');
 
     // Generate 6-Digit OTP Code
     const generatedOtp = isDevMode ? '123456' : Math.floor(100000 + Math.random() * 900000).toString();
@@ -66,10 +65,11 @@ export default async function handler(req: any, res: any) {
       lastSentAt: now,
     });
 
-    // 2. Dispatch real SMS if Provider Secret Keys exist on server
-    if (!isDevMode) {
+    if (isDevMode) {
+      console.log(`DEV MODE: would send OTP code ${generatedOtp} to ${normalizedPhone}`);
+    } else {
+      // Dispatch real SMS if Provider Secret Keys exist on server
       if (process.env.TERMII_API_KEY) {
-        // Termii Nigeria SMS Dispatch
         const termiiRes = await fetch('https://api.ng.termii.com/api/sms/send', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -86,7 +86,6 @@ export default async function handler(req: any, res: any) {
           console.error('Termii SMS Dispatch error:', await termiiRes.text());
         }
       } else if (process.env.AFRICAS_TALKING_API_KEY) {
-        // Africa's Talking SMS Dispatch
         const atRes = await fetch('https://api.africastalking.com/version1/messaging', {
           method: 'POST',
           headers: {
@@ -108,9 +107,10 @@ export default async function handler(req: any, res: any) {
     const payload = {
       success: true,
       message: isDevMode
-        ? `SMS code sent to ${normalizedPhone} (Dev Mode Code: ${generatedOtp})`
+        ? `DEV MODE: would send OTP to ${normalizedPhone} (Use code: ${generatedOtp})`
         : `SMS verification code sent to ${normalizedPhone}`,
       devCode: isDevMode ? generatedOtp : undefined,
+      isDevMode,
       cooldownSeconds: 60,
       expiresAt,
     };

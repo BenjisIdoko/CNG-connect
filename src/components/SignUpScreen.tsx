@@ -383,7 +383,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
                   </span>
                   {devCode && (
                     <span className="bg-[#004D40] text-[#00E676] text-[10.5px] font-black px-2.5 py-0.5 rounded-full border border-emerald-400/40">
-                      Dev Code: {devCode}
+                      Dev mode — use code {devCode}
                     </span>
                   )}
                 </div>
@@ -392,7 +392,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
                 </p>
                 <div className="flex items-center justify-between text-[11.5px] font-bold text-[#004D40] pt-1">
                   <span>Code expires in: <strong className="text-rose-600">{formatExpiryMinutes(expiryCountdown)}</strong></span>
-                  <span>Server Verified Gate</span>
+                  <span className="text-[#006c50] font-black">⚙️ Dev mode — use code 123456</span>
                 </div>
               </div>
 

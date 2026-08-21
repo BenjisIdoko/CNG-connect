@@ -37,13 +37,13 @@ export default async function handler(req: any, res: any) {
     normalizedPhone = '+' + normalizedPhone;
 
     const trimmedCode = String(code).trim();
-    const isDevMode =
-      process.env.VITE_DEV_MODE === 'true' ||
-      process.env.DEV_MODE === 'true' ||
-      (!process.env.TERMII_API_KEY && !process.env.AFRICAS_TALKING_API_KEY && !process.env.TWILIO_AUTH_TOKEN);
+    const isProduction = process.env.NODE_ENV === 'production';
+    const hasSmsKey = Boolean(process.env.TERMII_API_KEY || process.env.AFRICAS_TALKING_API_KEY || process.env.TWILIO_AUTH_TOKEN);
+    const isDevMode = !isProduction && (!hasSmsKey || process.env.DEV_MODE === 'true' || process.env.VITE_DEV_MODE === 'true');
 
     // Dev Mode Bypass Verification
     if (isDevMode && (trimmedCode === '123456' || trimmedCode === '000000')) {
+      console.log(`DEV MODE: verified test OTP code ${trimmedCode} for ${normalizedPhone}`);
       const payload = { verified: true, message: 'Dev Mode OTP verified successfully.' };
       if (res && typeof res.status === 'function') return res.status(200).json(payload);
       return new Response(JSON.stringify(payload), { status: 200 });
@@ -84,6 +84,6 @@ export default async function handler(req: any, res: any) {
     console.error('Server-side OTP verify error:', error);
     const err = error?.message || 'Failed to verify OTP code.';
     if (res && typeof res.status === 'function') return res.status(500).json({ verified: false, error: err });
-    return new Response(JSON.stringify({ verified: false, error: err }), { status: 500 });
+    return new Response(JSON.stringify({ error: err }), { status: 500 });
   }
 }
