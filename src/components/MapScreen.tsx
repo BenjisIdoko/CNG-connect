@@ -402,57 +402,6 @@ export const MapScreen: React.FC<MapScreenProps> = ({
             </button>
           </div>
         </div>
-
-        {/* State / Hub Quick Filter Pills Bar */}
-        <div className="flex overflow-x-auto gap-1.5 pb-0.5 hide-scrollbar -mx-4 px-4">
-          {[
-            { id: 'all', label: 'All Hubs' },
-            { id: 'abuja', label: 'Abuja FCT' },
-            { id: 'lagos', label: 'Lagos' },
-            { id: 'rivers', label: 'Rivers (P.H.)' },
-            { id: 'kano', label: 'Kano' },
-            { id: 'ogun', label: 'Ogun' },
-            { id: 'edo', label: 'Edo (Benin)' },
-            { id: 'oyo', label: 'Oyo (Ibadan)' },
-            { id: 'delta', label: 'Delta' },
-            { id: 'kaduna', label: 'Kaduna' },
-          ].map((city) => (
-            <button
-              key={city.id}
-              onClick={() => handleCitySelect(city.id)}
-              className={`shrink-0 px-3 py-1 rounded-full text-[11px] font-extrabold transition-all shadow-2xs active:scale-95 ${
-                activeCity === city.id
-                  ? 'bg-[#004D40] text-white shadow-xs'
-                  : 'bg-white/95 text-slate-700 border border-slate-200/80 hover:bg-white'
-              }`}
-            >
-              {city.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Status Quick Filter Pills Bar */}
-        <div className="flex overflow-x-auto gap-1.5 pb-0.5 hide-scrollbar -mx-4 px-4">
-          {[
-            { id: 'all', label: 'All Statuses' },
-            { id: 'full', label: '🟢 Full Stock' },
-            { id: 'queue', label: '🟡 Queuing' },
-            { id: 'low', label: '🟠 Low Pressure' },
-            { id: 'out', label: '🔴 Out of Gas' },
-          ].map((st) => (
-            <button
-              key={st.id}
-              onClick={() => setActiveFilter(st.id)}
-              className={`shrink-0 px-2.5 py-0.5 rounded-full text-[10.5px] font-extrabold transition-all shadow-2xs active:scale-95 ${
-                activeFilter === st.id
-                  ? 'bg-[#006c50] text-white shadow-xs'
-                  : 'bg-white/90 text-slate-600 border border-slate-200/70 hover:bg-white'
-              }`}
-            >
-              {st.label}
-            </button>
-          ))}
-        </div>
       </div>
 
       {/* Floating Zoom Controls on Map Right */}
