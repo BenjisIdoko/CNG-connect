@@ -41,6 +41,45 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
   const [isPresenceActiveState, setIsPresenceActiveState] = useState<boolean>(isPresenceActive);
   const [showInfoSheet, setShowInfoSheet] = useState(false);
 
+  const getFreshnessBadgeInfo = (timeAgo: string) => {
+    const lower = timeAgo.toLowerCase();
+    let minutes = 999;
+
+    if (lower.includes('min') || lower.includes('m ago')) {
+      const match = lower.match(/\d+/);
+      if (match) minutes = parseInt(match[0], 10);
+      else minutes = 15;
+    } else if (lower.includes('hour') || lower.includes('h ago')) {
+      const match = lower.match(/\d+/);
+      if (match) minutes = parseInt(match[0], 10) * 60;
+      else minutes = 60;
+    } else if (lower.includes('just now') || lower.includes('sec')) {
+      minutes = 2;
+    } else if (lower.includes('day') || lower.includes('yesterday')) {
+      minutes = 1440;
+    }
+
+    if (minutes < 30) {
+      return {
+        label: `🟢 Fresh (${timeAgo})`,
+        dotColor: 'bg-[#00c853]',
+        badgeStyle: 'bg-emerald-50 text-[#006c50] border-emerald-300/90 shadow-2xs',
+      };
+    } else if (minutes <= 120) {
+      return {
+        label: `🟡 Recent (${timeAgo})`,
+        dotColor: 'bg-[#f59e0b]',
+        badgeStyle: 'bg-amber-50 text-amber-900 border-amber-300/90 shadow-2xs',
+      };
+    } else {
+      return {
+        label: `🔴 Stale (${timeAgo})`,
+        dotColor: 'bg-rose-500',
+        badgeStyle: 'bg-rose-50 text-rose-900 border-rose-300/90 shadow-2xs',
+      };
+    }
+  };
+
   useEffect(() => {
     try {
       const hasSeen = localStorage.getItem('hasSeenGroupPolicy');
@@ -48,7 +87,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
         setShowInfoSheet(true);
       }
     } catch {
-      // localStorage fallback
+      // Ignore storage errors
     }
   }, []);
 
@@ -282,26 +321,69 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
             </span>
           </div>
 
-          <div className="bg-white rounded-2xl p-4 border border-[#dbe5de] shadow-xs flex flex-col justify-between">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-              Pump Pressure
-            </span>
-            <div className="flex items-baseline gap-1 my-1">
-              <span className="text-[26px] font-bold text-slate-900">
-                {station.pumpPressure}
+          {/* Interactive 220-Bar SVG Pump Pressure Arc Gauge Bento Card */}
+          <div className="bg-white rounded-2xl p-3.5 border border-[#dbe5de] shadow-xs flex flex-col justify-between relative overflow-hidden group">
+            <div className="flex justify-between items-center">
+              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                Pump Pressure
               </span>
-              <span className="text-[13px] font-normal text-slate-400">bar</span>
-            </div>
-            <div className="w-full bg-[#e6f0e9] h-2 rounded-full overflow-hidden">
-              <div
-                className={`h-full rounded-full transition-all ${
-                  station.pumpPressure >= 190
-                    ? 'bg-[#006c50] w-[90%]'
-                    : station.pumpPressure >= 140
-                    ? 'bg-[#fe9400] w-[65%]'
-                    : 'bg-[#ba1a1a] w-[35%]'
+              <span
+                className={`text-[9.5px] font-extrabold px-2 py-0.5 rounded-full border ${
+                  station.pumpPressure >= 180
+                    ? 'bg-emerald-50 text-[#006c50] border-emerald-200'
+                    : station.pumpPressure >= 130
+                    ? 'bg-amber-50 text-amber-900 border-amber-200'
+                    : 'bg-rose-50 text-rose-900 border-rose-200'
                 }`}
-              />
+              >
+                {station.pumpPressure >= 180 ? 'Optimal' : station.pumpPressure >= 130 ? 'Moderate' : 'Low'}
+              </span>
+            </div>
+
+            {/* SVG Arc Gauge */}
+            <div className="relative flex flex-col items-center justify-center my-0.5">
+              <svg viewBox="0 0 100 55" className="w-28 h-16 transform transition-transform group-hover:scale-105">
+                {/* Background Track Arc */}
+                <path
+                  d="M 10 50 A 40 40 0 0 1 90 50"
+                  fill="none"
+                  stroke="#e6f0e9"
+                  strokeWidth="9"
+                  strokeLinecap="round"
+                />
+                {/* Gauge Colored Arc */}
+                <path
+                  d="M 10 50 A 40 40 0 0 1 90 50"
+                  fill="none"
+                  stroke={
+                    station.pumpPressure >= 180
+                      ? '#00c853'
+                      : station.pumpPressure >= 130
+                      ? '#fe9400'
+                      : '#ba1a1a'
+                  }
+                  strokeWidth="9"
+                  strokeLinecap="round"
+                  strokeDasharray="125.6"
+                  strokeDashoffset={125.6 * (1 - Math.min(station.pumpPressure, 220) / 220)}
+                  className="transition-all duration-700 ease-out"
+                />
+              </svg>
+
+              <div className="absolute bottom-0 flex flex-col items-center text-center -mb-1">
+                <span className="text-[20px] font-black leading-none text-slate-900">
+                  {station.pumpPressure}
+                </span>
+                <span className="text-[9.5px] font-extrabold text-slate-400 uppercase tracking-widest -mt-0.5">
+                  bar
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between text-[10px] font-bold text-slate-400 pt-1 border-t border-slate-100">
+              <span>0 bar</span>
+              <span className="text-[#006c50] font-extrabold">{Math.round((station.pumpPressure / 220) * 100)}% Max</span>
+              <span>220 bar</span>
             </div>
           </div>
         </div>
@@ -438,54 +520,59 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
             </div>
 
             <div className="flex flex-col gap-3">
-              {reports.map((report) => (
-                <div
-                  key={report.id}
-                  className="bg-white rounded-2xl p-4 border border-[#dbe5de] shadow-xs flex flex-col gap-2"
-                >
-                  <div className="flex justify-between items-start">
-                    <div className="flex items-center gap-2.5">
-                      {report.authorAvatar ? (
-                        <img
-                          src={report.authorAvatar}
-                          alt={report.author}
-                          className="w-10 h-10 rounded-full object-cover border border-[#dbe5de]"
-                        />
+              {reports.map((report) => {
+                const freshness = getFreshnessBadgeInfo(report.timestamp);
+                return (
+                  <div
+                    key={report.id}
+                    className="bg-white rounded-2xl p-4 border border-[#dbe5de] shadow-xs flex flex-col gap-2"
+                  >
+                    <div className="flex justify-between items-start gap-2">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        {report.authorAvatar ? (
+                          <img
+                            src={report.authorAvatar}
+                            alt={report.author}
+                            className="w-10 h-10 rounded-full object-cover border border-[#dbe5de] shrink-0"
+                          />
+                        ) : (
+                          <div className="w-10 h-10 rounded-full bg-[#fe9400]/20 text-[#8c5000] font-extrabold flex items-center justify-center text-[16px] shrink-0">
+                            {report.author.charAt(0)}
+                          </div>
+                        )}
+
+                        <div className="min-w-0">
+                          <div className="text-[14px] font-bold text-[#141d19] truncate">
+                            {report.author}
+                          </div>
+                          <div className="flex items-center gap-1.5 mt-0.5">
+                            <span className={`inline-flex items-center gap-1 text-[10px] font-extrabold px-2 py-0.5 rounded-full border whitespace-nowrap ${freshness.badgeStyle}`}>
+                              <span className={`w-1.5 h-1.5 rounded-full ${freshness.dotColor}`} />
+                              <span>{freshness.label}</span>
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {report.verified && report.isPhotoVerified ? (
+                        <div className="bg-emerald-100 border border-emerald-300 text-[#006c50] px-2.5 py-1 rounded-full text-[10.5px] font-extrabold flex items-center gap-1 shadow-2xs shrink-0 whitespace-nowrap">
+                          <span
+                            className="material-symbols-outlined text-[14px]"
+                            style={{ fontVariationSettings: "'FILL' 1" }}
+                          >
+                            verified
+                          </span>
+                          <span>Photo Verified</span>
+                        </div>
                       ) : (
-                        <div className="w-10 h-10 rounded-full bg-[#fe9400]/20 text-[#8c5000] font-extrabold flex items-center justify-center text-[16px]">
-                          {report.author.charAt(0)}
+                        <div className="bg-amber-100 border border-amber-300/80 text-amber-900 px-2.5 py-1 rounded-full text-[10.5px] font-extrabold flex items-center gap-1 shadow-2xs shrink-0 whitespace-nowrap">
+                          <span className="material-symbols-outlined text-[14px]">
+                            gavel
+                          </span>
+                          <span>Unverified</span>
                         </div>
                       )}
-
-                      <div>
-                        <div className="text-[14px] font-bold text-[#141d19] flex items-center gap-1">
-                          {report.author}
-                        </div>
-                        <span className="text-[12px] text-[#6a7b72]">
-                          {report.timestamp}
-                        </span>
-                      </div>
                     </div>
-
-                    {report.verified && report.isPhotoVerified ? (
-                      <div className="bg-emerald-100 border border-emerald-300 text-[#006c50] px-2.5 py-1 rounded-full text-[10.5px] font-extrabold flex items-center gap-1 shadow-2xs">
-                        <span
-                          className="material-symbols-outlined text-[14px]"
-                          style={{ fontVariationSettings: "'FILL' 1" }}
-                        >
-                          verified
-                        </span>
-                        <span>Photo Verified</span>
-                      </div>
-                    ) : (
-                      <div className="bg-amber-100 border border-amber-300/80 text-amber-900 px-2.5 py-1 rounded-full text-[10.5px] font-extrabold flex items-center gap-1 shadow-2xs">
-                        <span className="material-symbols-outlined text-[14px]">
-                          gavel
-                        </span>
-                        <span>Unverified</span>
-                      </div>
-                    )}
-                  </div>
 
                   <div className="flex items-center gap-2">
                     <div
@@ -574,7 +661,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                     </button>
                   </div>
                 </div>
-              ))}
+              )})}
             </div>
           </div>
         )}
