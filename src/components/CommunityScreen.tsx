@@ -68,6 +68,8 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
     }
   };
 
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+
   const filteredPosts = postList.filter((p) => {
     const matchesCategory =
       activeCategory === 'all' || p.category === activeCategory;
@@ -80,12 +82,15 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
 
   const filteredStations = stations.filter((st) => {
     const q = searchQuery.toLowerCase();
-    return (
+    const matchesSearch =
       st.name.toLowerCase().includes(q) ||
       st.city.toLowerCase().includes(q) ||
+      st.state.toLowerCase().includes(q) ||
       st.address.toLowerCase().includes(q) ||
-      (st.operator && st.operator.toLowerCase().includes(q))
-    );
+      (st.operator && st.operator.toLowerCase().includes(q));
+
+    const matchesStatus = statusFilter === 'all' || st.status === statusFilter;
+    return matchesSearch && matchesStatus;
   });
 
   return (
@@ -179,9 +184,52 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
               </span>
             </div>
 
+            {/* Status Quick Filter Pills */}
+            <div className="flex overflow-x-auto gap-1.5 pb-1 hide-scrollbar">
+              {[
+                { id: 'all', label: 'All Statuses' },
+                { id: 'full', label: '🟢 Full Stock' },
+                { id: 'queue', label: '🟡 Queuing' },
+                { id: 'low', label: '🟠 Low Pressure' },
+                { id: 'out', label: '🔴 Out of Gas' },
+              ].map((st) => (
+                <button
+                  key={st.id}
+                  onClick={() => setStatusFilter(st.id)}
+                  className={`shrink-0 px-3 py-1 rounded-full text-[11px] font-extrabold transition-all shadow-2xs active:scale-95 ${
+                    statusFilter === st.id
+                      ? 'bg-[#006c50] text-white shadow-xs'
+                      : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
+                  }`}
+                >
+                  {st.label}
+                </button>
+              ))}
+            </div>
+
             {/* Station Groups Cards Grid */}
             <div className="flex flex-col gap-3">
-              {filteredStations.map((st) => (
+              {filteredStations.length === 0 ? (
+                <div className="bg-white rounded-3xl p-6 text-center border border-slate-200 shadow-sm flex flex-col items-center gap-2 my-2">
+                  <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-[#006c50] flex items-center justify-center font-black">
+                    <span className="material-symbols-outlined text-[28px]">search_off</span>
+                  </div>
+                  <h4 className="font-extrabold text-slate-900 text-[15px]">No Station Groups Found</h4>
+                  <p className="text-[12.5px] text-slate-500 font-medium max-w-xs">
+                    No station groups match your current search query or status filter.
+                  </p>
+                  <button
+                    onClick={() => {
+                      setSearchQuery('');
+                      setStatusFilter('all');
+                    }}
+                    className="mt-1 px-5 py-2.5 bg-[#006c50] hover:bg-[#004D40] text-white text-[12.5px] font-extrabold rounded-full shadow-md active:scale-95 transition-all"
+                  >
+                    Reset Filters
+                  </button>
+                </div>
+              ) : (
+                filteredStations.map((st) => (
                 <div
                   key={st.id}
                   onClick={() => onOpenStationGroup && onOpenStationGroup(st)}
@@ -246,7 +294,8 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                     </button>
                   </div>
                 </div>
-              ))}
+              ))
+              )}
             </div>
           </div>
         ) : (

@@ -287,6 +287,12 @@ export const MapScreen: React.FC<MapScreenProps> = ({
     }
   };
 
+  const activeFilterCount =
+    (activeFilter !== 'all' ? 1 : 0) +
+    (activeCity !== 'all' ? 1 : 0) +
+    (searchQuery.trim() !== '' ? 1 : 0) +
+    (minPressure > 0 ? 1 : 0);
+
   return (
     <div className="relative w-full h-[calc(100vh-4rem)] overflow-hidden bg-[#eaf4ed]">
       {/* Leaflet Map Container */}
@@ -300,23 +306,24 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       )}
 
       {/* Top Search & Controls Floating Container */}
-      <div className="relative z-30 p-4 max-w-xl mx-auto flex flex-col gap-2.5 pointer-events-auto">
+      <div className="relative z-30 p-4 max-w-xl mx-auto flex flex-col gap-2 pointer-events-auto">
         {/* Floating Search Pill Bar */}
         <div className="flex items-center bg-white/95 backdrop-blur-xl rounded-full shadow-[0_6px_24px_rgba(0,0,0,0.08)] border border-slate-200/80 p-2 pl-4 gap-2 transition-all focus-within:ring-2 focus-within:ring-emerald-500/30">
-          <span className="material-symbols-outlined text-slate-500 text-[20px]">
+          <span className="material-symbols-outlined text-[#006c50] text-[20px] shrink-0">
             search
           </span>
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Find a station by name or location..."
+            placeholder="Search by station, city, state, or operator..."
             className="flex-1 bg-transparent border-none outline-none text-[13.5px] font-medium text-slate-900 placeholder:text-slate-400"
           />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
-              className="p-1 rounded-full text-slate-400 hover:bg-slate-100"
+              className="p-1 rounded-full text-slate-400 hover:bg-slate-100 shrink-0"
+              aria-label="Clear search"
             >
               <span className="material-symbols-outlined text-[18px]">close</span>
             </button>
@@ -326,9 +333,14 @@ export const MapScreen: React.FC<MapScreenProps> = ({
             <button
               onClick={() => setIsFilterModalOpen(true)}
               aria-label="Filter stations"
-              className="w-9 h-9 bg-slate-100 hover:bg-slate-200 rounded-full text-slate-700 active:scale-95 transition-all flex items-center justify-center"
+              className="w-9 h-9 bg-slate-100 hover:bg-slate-200 rounded-full text-slate-700 active:scale-95 transition-all flex items-center justify-center relative"
             >
               <span className="material-symbols-outlined text-[18px]">tune</span>
+              {activeFilterCount > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-[#00E676] text-[#004D40] text-[9.5px] font-black rounded-full flex items-center justify-center border border-white shadow-xs">
+                  {activeFilterCount}
+                </span>
+              )}
             </button>
             <button
               onClick={handleRecenter}
@@ -349,25 +361,53 @@ export const MapScreen: React.FC<MapScreenProps> = ({
           </div>
         </div>
 
-        {/* City Filter Pills */}
-        <div className="flex overflow-x-auto gap-2 pb-0.5 hide-scrollbar -mx-4 px-4">
+        {/* State / Hub Quick Filter Pills Bar */}
+        <div className="flex overflow-x-auto gap-1.5 pb-0.5 hide-scrollbar -mx-4 px-4">
           {[
-            { id: 'all', label: 'All Cities' },
+            { id: 'all', label: 'All Hubs' },
             { id: 'abuja', label: 'Abuja FCT' },
             { id: 'lagos', label: 'Lagos' },
-            { id: 'benin', label: 'Benin City' },
-            { id: 'ibadan', label: 'Ibadan' },
+            { id: 'rivers', label: 'Rivers (P.H.)' },
+            { id: 'kano', label: 'Kano' },
+            { id: 'ogun', label: 'Ogun' },
+            { id: 'edo', label: 'Edo (Benin)' },
+            { id: 'oyo', label: 'Oyo (Ibadan)' },
+            { id: 'delta', label: 'Delta' },
+            { id: 'kaduna', label: 'Kaduna' },
           ].map((city) => (
             <button
               key={city.id}
               onClick={() => setActiveCity(city.id)}
-              className={`shrink-0 px-3.5 py-1 rounded-full text-[11.5px] font-extrabold transition-all shadow-xs active:scale-95 ${
+              className={`shrink-0 px-3 py-1 rounded-full text-[11px] font-extrabold transition-all shadow-2xs active:scale-95 ${
                 activeCity === city.id
-                  ? 'bg-[#004D40] text-white shadow-sm'
-                  : 'bg-white/90 text-slate-700 border border-slate-200 hover:bg-white'
+                  ? 'bg-[#004D40] text-white shadow-xs'
+                  : 'bg-white/95 text-slate-700 border border-slate-200/80 hover:bg-white'
               }`}
             >
               {city.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Status Quick Filter Pills Bar */}
+        <div className="flex overflow-x-auto gap-1.5 pb-0.5 hide-scrollbar -mx-4 px-4">
+          {[
+            { id: 'all', label: 'All Statuses' },
+            { id: 'full', label: '🟢 Full Stock' },
+            { id: 'queue', label: '🟡 Queuing' },
+            { id: 'low', label: '🟠 Low Pressure' },
+            { id: 'out', label: '🔴 Out of Gas' },
+          ].map((st) => (
+            <button
+              key={st.id}
+              onClick={() => setActiveFilter(st.id)}
+              className={`shrink-0 px-2.5 py-0.5 rounded-full text-[10.5px] font-extrabold transition-all shadow-2xs active:scale-95 ${
+                activeFilter === st.id
+                  ? 'bg-[#006c50] text-white shadow-xs'
+                  : 'bg-white/90 text-slate-600 border border-slate-200/70 hover:bg-white'
+              }`}
+            >
+              {st.label}
             </button>
           ))}
         </div>
@@ -456,19 +496,42 @@ export const MapScreen: React.FC<MapScreenProps> = ({
           {/* Drawer Scrollable Content */}
           {sheetMode !== 'collapsed' && (
             <div className="px-4 pb-20 pt-3 overflow-y-auto flex-1 hide-scrollbar flex flex-col gap-4">
-              {/* Section 1: Nearby Petrol Stations Horizontal Carousel */}
-              <div>
-                <div className="flex items-center justify-between mb-2.5 px-1">
-                  <h3 className="font-black text-[17px] text-slate-900">
-                    Nearby Petrol Stations
-                  </h3>
+              {filteredStations.length === 0 ? (
+                <div className="bg-white rounded-3xl p-6 text-center border border-slate-200/90 shadow-sm flex flex-col items-center gap-2 my-2">
+                  <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-[#006c50] flex items-center justify-center font-black">
+                    <span className="material-symbols-outlined text-[28px]">filter_alt_off</span>
+                  </div>
+                  <h4 className="font-extrabold text-slate-900 text-[15px]">No CNG Stations Found</h4>
+                  <p className="text-[12.5px] text-slate-500 font-medium max-w-xs">
+                    No stations match your current search term or filter criteria.
+                  </p>
                   <button
-                    onClick={() => setSheetMode('expanded')}
-                    className="text-[12.5px] font-extrabold text-[#006c50] hover:underline"
+                    onClick={() => {
+                      setSearchQuery('');
+                      setActiveFilter('all');
+                      setActiveCity('all');
+                      setMinPressure(0);
+                    }}
+                    className="mt-1 px-5 py-2.5 bg-[#006c50] hover:bg-[#004D40] text-white text-[12.5px] font-extrabold rounded-full shadow-md active:scale-95 transition-all"
                   >
-                    See all
+                    Reset All Filters
                   </button>
                 </div>
+              ) : (
+                <>
+                  {/* Section 1: Nearby Petrol Stations Horizontal Carousel */}
+                  <div>
+                    <div className="flex items-center justify-between mb-2.5 px-1">
+                      <h3 className="font-black text-[16px] text-slate-900">
+                        Nearby CNG Stations ({filteredStations.length})
+                      </h3>
+                      <button
+                        onClick={() => setSheetMode('expanded')}
+                        className="text-[12px] font-extrabold text-[#006c50] hover:underline"
+                      >
+                        See all ({filteredStations.length})
+                      </button>
+                    </div>
 
                 {/* Horizontal Scroll Cards */}
                 <div className="flex overflow-x-auto gap-3.5 pb-2 px-1 hide-scrollbar">
@@ -607,8 +670,10 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                   })}
                 </div>
               </div>
-            </div>
+            </>
           )}
+        </div>
+      )}
         </div>
       </div>
 
