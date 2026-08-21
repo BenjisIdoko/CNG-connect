@@ -243,8 +243,8 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
                   onClick={() => setShowLiveCamera(true)}
                   className="w-full py-3 px-3 bg-[#004D40] hover:bg-[#006c50] text-white rounded-xl font-extrabold text-[13px] shadow-xs flex items-center justify-center gap-2 active:scale-95 transition-all"
                 >
-                  <span className="material-symbols-outlined text-[20px] text-[#00E676]">photo_camera</span>
-                  <span>Take Live Camera Photo (Gallery Blocked)</span>
+                  <span className="material-symbols-outlined text-[20px] text-[#00E676] shrink-0">photo_camera</span>
+                  <span className="whitespace-nowrap">Take Live Photo</span>
                 </button>
                 <p className="text-[10.5px] font-semibold text-[#6a7b72] text-center">
                   🔒 Photo gallery access is disabled to prevent old/fake queue posts.
@@ -258,7 +258,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
             type="submit"
             className="w-full h-13 mt-2 bg-[#006c50] hover:bg-[#004D40] text-white font-extrabold text-[15px] rounded-full shadow-md active:scale-[0.98] transition-all"
           >
-            Publish Post
+            <span className="whitespace-nowrap">Publish Post</span>
           </button>
         </form>
       </div>

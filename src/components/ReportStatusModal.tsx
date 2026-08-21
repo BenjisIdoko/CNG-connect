@@ -370,10 +370,10 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
               {isSubmitting ? (
                 <div className="flex items-center gap-2">
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  <span>Submitting...</span>
+                  <span className="whitespace-nowrap">Submitting...</span>
                 </div>
               ) : (
-                'Submit report'
+                <span className="whitespace-nowrap">Submit Report</span>
               )}
             </button>
           </form>

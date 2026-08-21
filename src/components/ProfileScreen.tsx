@@ -297,24 +297,36 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
 
         {/* Action Buttons */}
         <div className="flex flex-col gap-2.5 pt-1">
+          {onOpenSignUp && (
+            <button
+              onClick={onOpenSignUp}
+              className="w-full py-3.5 px-4 bg-[#004D40] hover:bg-[#006c50] text-white font-extrabold text-[14px] rounded-2xl shadow-xs flex items-center justify-center gap-2 active:scale-98 transition-all"
+            >
+              <span className="material-symbols-outlined text-[#00E676] text-[20px] shrink-0">
+                person_add
+              </span>
+              <span className="whitespace-nowrap">Sign Up</span>
+            </button>
+          )}
+
           <button
             onClick={onOpenOnboarding}
             className="w-full py-3.5 px-4 bg-white hover:bg-slate-50 text-slate-800 font-bold text-[14px] rounded-2xl shadow-xs border border-slate-200 flex items-center justify-center gap-2 active:scale-98 transition-all"
           >
-            <span className="material-symbols-outlined text-[#006c50] text-[20px]">
+            <span className="material-symbols-outlined text-[#006c50] text-[20px] shrink-0">
               slideshow
             </span>
-            <span>Replay Onboarding Guide</span>
+            <span className="whitespace-nowrap">Replay Onboarding Guide</span>
           </button>
 
           <button
             onClick={onSignOut || onOpenOnboarding}
             className="w-full py-3.5 px-4 bg-amber-50 hover:bg-amber-100 text-amber-900 font-bold text-[14px] rounded-2xl border border-amber-200 flex items-center justify-center gap-2 active:scale-98 transition-all"
           >
-            <span className="material-symbols-outlined text-amber-700 text-[20px]">
+            <span className="material-symbols-outlined text-amber-700 text-[20px] shrink-0">
               logout
             </span>
-            <span>Sign Out / Log Out</span>
+            <span className="whitespace-nowrap">Sign Out</span>
           </button>
         </div>
       </div>

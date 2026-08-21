@@ -159,15 +159,15 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
                 onClick={onStartSignUp}
                 className="w-full h-13 bg-[#00E676] hover:bg-[#00c853] text-[#09140f] font-extrabold text-[15px] rounded-full flex items-center justify-center gap-2 shadow-xl active:scale-[0.98] transition-all"
               >
-                <span>Create Free Account</span>
-                <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
+                <span className="whitespace-nowrap">Sign Up</span>
+                <span className="material-symbols-outlined text-[20px] shrink-0">arrow_forward</span>
               </button>
 
               <button
                 onClick={onStartLogin}
                 className="w-full h-12 bg-white/10 hover:bg-white/20 text-white font-bold text-[14px] rounded-full border border-white/20 backdrop-blur-md flex items-center justify-center gap-1.5 active:scale-[0.98] transition-all"
               >
-                <span>I already have an account</span>
+                <span className="whitespace-nowrap">Log In</span>
               </button>
             </div>
           ) : (

@@ -593,14 +593,14 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
                 </div>
               ) : (
                 <>
-                  <span>
+                  <span className="whitespace-nowrap truncate">
                     {step === 1
                       ? 'Next: Verify Phone'
                       : step === 2
-                      ? 'Verify OTP & Continue'
-                      : 'Complete Registration'}
+                      ? 'Verify & Continue'
+                      : 'Complete Signup'}
                   </span>
-                  <span className="material-symbols-outlined text-[20px]">
+                  <span className="material-symbols-outlined text-[20px] shrink-0">
                     {step === 3 ? 'check_circle' : 'arrow_forward'}
                   </span>
                 </>

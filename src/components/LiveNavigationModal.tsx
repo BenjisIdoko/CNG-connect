@@ -90,8 +90,8 @@ export const LiveNavigationModal: React.FC<LiveNavigationModalProps> = ({
             onClick={handleLaunchMaps}
             className="w-full py-4 bg-[#00E676] hover:bg-emerald-400 text-[#004D40] font-black text-[15px] rounded-full shadow-lg flex items-center justify-center gap-2.5 active:scale-[0.98] transition-all"
           >
-            <span className="material-symbols-outlined text-[22px]">map</span>
-            <span>Launch Google / Apple Maps</span>
+            <span className="material-symbols-outlined text-[22px] shrink-0">map</span>
+            <span className="whitespace-nowrap">Open in Maps</span>
           </button>
 
           <button

@@ -624,12 +624,12 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
           <div className="flex items-center gap-2">
             <button
               onClick={() => onOpenReportModal(station)}
-              className="flex-1 h-12 bg-[#006c50] hover:bg-[#004D40] text-white font-extrabold text-[14px] rounded-full flex items-center justify-center gap-1.5 shadow-md active:scale-[0.98] transition-all"
+              className="flex-1 h-12 bg-[#006c50] hover:bg-[#004D40] text-white font-extrabold text-[13.5px] rounded-full flex items-center justify-center gap-1.5 shadow-md active:scale-[0.98] transition-all px-3 min-w-0"
             >
-              <span className="material-symbols-outlined text-[20px]">
+              <span className="material-symbols-outlined text-[18px] shrink-0">
                 edit_document
               </span>
-              <span>Update Gas Availability</span>
+              <span className="whitespace-nowrap truncate">Update Status</span>
             </button>
 
             <button
@@ -639,15 +639,18 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                   onNavigate(station);
                 }
               }}
-              className="px-5 h-12 bg-white text-[#006c50] border-2 border-[#006c50] hover:bg-[#e6f0e9] font-extrabold text-[14px] rounded-full flex items-center justify-center gap-1.5 shadow-xs active:scale-[0.98] transition-all shrink-0"
+              className="px-3.5 h-12 bg-white text-[#006c50] border-2 border-[#006c50] hover:bg-[#e6f0e9] font-extrabold text-[13px] rounded-full flex items-center justify-center gap-1.5 shadow-xs active:scale-[0.98] transition-all shrink-0"
             >
               <span
-                className="material-symbols-outlined text-[18px]"
+                className="material-symbols-outlined text-[18px] shrink-0"
                 style={{ fontVariationSettings: "'FILL' 1" }}
               >
                 navigation
               </span>
-              <span>Navigate</span>
+              <span className="whitespace-nowrap">Get Directions</span>
+              <span className="bg-emerald-100 text-[#006c50] text-[10.5px] font-black px-2 py-0.5 rounded-full ml-0.5 shrink-0">
+                {station.distance}
+              </span>
             </button>
           </div>
 
