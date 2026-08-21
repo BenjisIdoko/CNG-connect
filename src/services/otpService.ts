@@ -26,17 +26,29 @@ export const otpService = {
         body: JSON.stringify({ phone }),
       });
 
-      const data = await response.json();
+      let data: any = {};
+      const contentType = (response.headers && typeof response.headers.get === 'function')
+        ? (response.headers.get('content-type') || 'application/json')
+        : 'application/json';
+
+      if (contentType.includes('application/json')) {
+        try {
+          data = await response.json();
+        } catch {
+          data = {};
+        }
+      }
+
       if (!response.ok) {
         return {
           success: false,
-          error: data.error || 'Failed to send OTP verification code.',
+          error: data.error || 'Verification request failed, please try again.',
         };
       }
 
       return {
         success: true,
-        message: data.message,
+        message: data.message || 'SMS code dispatched.',
         devCode: data.devCode,
         cooldownSeconds: data.cooldownSeconds || 60,
         expiresAt: data.expiresAt,
@@ -45,7 +57,7 @@ export const otpService = {
       console.error('otpService.sendOtp error:', err);
       return {
         success: false,
-        error: err.message || 'Unable to connect to OTP service. Please try again.',
+        error: 'Verification failed, please try again.',
       };
     }
   },
@@ -62,23 +74,35 @@ export const otpService = {
         body: JSON.stringify({ phone, code }),
       });
 
-      const data = await response.json();
+      let data: any = {};
+      const contentType = (response.headers && typeof response.headers.get === 'function')
+        ? (response.headers.get('content-type') || 'application/json')
+        : 'application/json';
+
+      if (contentType.includes('application/json')) {
+        try {
+          data = await response.json();
+        } catch {
+          data = {};
+        }
+      }
+
       if (!response.ok || !data.verified) {
         return {
           verified: false,
-          error: data.error || 'Invalid or expired OTP code.',
+          error: data.error || 'Verification failed, please try again.',
         };
       }
 
       return {
         verified: true,
-        message: data.message,
+        message: data.message || 'Verified successfully.',
       };
     } catch (err: any) {
       console.error('otpService.verifyOtp error:', err);
       return {
         verified: false,
-        error: err.message || 'Network error verifying OTP code.',
+        error: 'Verification failed, please try again.',
       };
     }
   },

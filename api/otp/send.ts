@@ -2,19 +2,35 @@
 // Map key: normalized phone number -> { code, expiresAt, lastSentAt }
 export const otpSessionStore = new Map<string, { code: string; expiresAt: number; lastSentAt: number }>();
 
+function sendJsonResponse(res: any, statusCode: number, data: any) {
+  if (res) {
+    if (typeof res.status === 'function' && typeof res.json === 'function') {
+      return res.status(statusCode).json(data);
+    }
+    if (typeof res.setHeader === 'function' && typeof res.end === 'function') {
+      res.statusCode = statusCode;
+      res.setHeader('Content-Type', 'application/json');
+      res.end(JSON.stringify(data));
+      return;
+    }
+  }
+  return new Response(JSON.stringify(data), {
+    status: statusCode,
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
+
 export default async function handler(req: any, res: any) {
-  // CORS & Method Check
-  if (req.method === 'OPTIONS') {
-    if (res && typeof res.status === 'function') return res.status(200).json({});
-    return new Response(null, { status: 200 });
-  }
-
-  if (req.method !== 'POST') {
-    if (res && typeof res.status === 'function') return res.status(405).json({ error: 'Method not allowed' });
-    return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405 });
-  }
-
   try {
+    // CORS & Method Check
+    if (req.method === 'OPTIONS') {
+      return sendJsonResponse(res, 200, {});
+    }
+
+    if (req.method !== 'POST') {
+      return sendJsonResponse(res, 405, { error: 'Method not allowed' });
+    }
+
     let body = req.body;
     if (typeof body === 'string') {
       try { body = JSON.parse(body); } catch {}
@@ -22,9 +38,7 @@ export default async function handler(req: any, res: any) {
 
     const { phone } = body || {};
     if (!phone) {
-      const err = 'Phone number is required.';
-      if (res && typeof res.status === 'function') return res.status(400).json({ error: err });
-      return new Response(JSON.stringify({ error: err }), { status: 400 });
+      return sendJsonResponse(res, 400, { error: 'Phone number is required.' });
     }
 
     // Normalize phone number (e.g. +2348031234567)
@@ -44,15 +58,16 @@ export default async function handler(req: any, res: any) {
     // 1. Rate Limiting Check: 60-Second Cooldown between SMS dispatches
     if (existing && now - existing.lastSentAt < 60000) {
       const secondsLeft = Math.ceil((60000 - (now - existing.lastSentAt)) / 1000);
-      const rateLimitMsg = `Rate limit exceeded. Please wait ${secondsLeft} seconds before requesting a new code.`;
-      if (res && typeof res.status === 'function') return res.status(429).json({ error: rateLimitMsg, secondsLeft });
-      return new Response(JSON.stringify({ error: rateLimitMsg, secondsLeft }), { status: 429 });
+      return sendJsonResponse(res, 429, {
+        error: `Rate limit exceeded. Please wait ${secondsLeft} seconds before requesting a new code.`,
+        secondsLeft,
+      });
     }
 
-    // Strict Production-Safe Environment Check for Dev-Mode Bypass
+    // Strict Dev-Mode Check: Absence of Termii key, or explicit DEV_MODE / non-production env
     const isProduction = process.env.NODE_ENV === 'production';
-    const hasSmsKey = Boolean(process.env.TERMII_API_KEY || process.env.AFRICAS_TALKING_API_KEY || process.env.TWILIO_AUTH_TOKEN);
-    const isDevMode = !isProduction && (!hasSmsKey || process.env.DEV_MODE === 'true' || process.env.VITE_DEV_MODE === 'true');
+    const hasTermiiKey = Boolean(process.env.TERMII_API_KEY || process.env.AFRICAS_TALKING_API_KEY || process.env.TWILIO_AUTH_TOKEN);
+    const isDevMode = !isProduction && (!hasTermiiKey || process.env.DEV_MODE === 'true' || process.env.VITE_DEV_MODE === 'true');
 
     // Generate 6-Digit OTP Code
     const generatedOtp = isDevMode ? '123456' : Math.floor(100000 + Math.random() * 900000).toString();
@@ -68,7 +83,7 @@ export default async function handler(req: any, res: any) {
     if (isDevMode) {
       console.log(`DEV MODE: would send OTP code ${generatedOtp} to ${normalizedPhone}`);
     } else {
-      // Dispatch real SMS if Provider Secret Keys exist on server
+      // Dispatch real SMS if Termii API Key exists on server
       if (process.env.TERMII_API_KEY) {
         const termiiRes = await fetch('https://api.ng.termii.com/api/sms/send', {
           method: 'POST',
@@ -104,7 +119,7 @@ export default async function handler(req: any, res: any) {
       }
     }
 
-    const payload = {
+    return sendJsonResponse(res, 200, {
       success: true,
       message: isDevMode
         ? `DEV MODE: would send OTP to ${normalizedPhone} (Use code: ${generatedOtp})`
@@ -113,14 +128,9 @@ export default async function handler(req: any, res: any) {
       isDevMode,
       cooldownSeconds: 60,
       expiresAt,
-    };
-
-    if (res && typeof res.status === 'function') return res.status(200).json(payload);
-    return new Response(JSON.stringify(payload), { status: 200 });
+    });
   } catch (error: any) {
     console.error('Server-side OTP send error:', error);
-    const err = error?.message || 'Failed to send OTP code.';
-    if (res && typeof res.status === 'function') return res.status(500).json({ error: err });
-    return new Response(JSON.stringify({ error: err }), { status: 500 });
+    return sendJsonResponse(res, 500, { error: 'Something went wrong. Please try again.' });
   }
 }

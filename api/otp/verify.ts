@@ -1,18 +1,34 @@
 import { otpSessionStore } from './send';
 
+function sendJsonResponse(res: any, statusCode: number, data: any) {
+  if (res) {
+    if (typeof res.status === 'function' && typeof res.json === 'function') {
+      return res.status(statusCode).json(data);
+    }
+    if (typeof res.setHeader === 'function' && typeof res.end === 'function') {
+      res.statusCode = statusCode;
+      res.setHeader('Content-Type', 'application/json');
+      res.end(JSON.stringify(data));
+      return;
+    }
+  }
+  return new Response(JSON.stringify(data), {
+    status: statusCode,
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
+
 export default async function handler(req: any, res: any) {
-  // CORS & Method Check
-  if (req.method === 'OPTIONS') {
-    if (res && typeof res.status === 'function') return res.status(200).json({});
-    return new Response(null, { status: 200 });
-  }
-
-  if (req.method !== 'POST') {
-    if (res && typeof res.status === 'function') return res.status(405).json({ error: 'Method not allowed' });
-    return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405 });
-  }
-
   try {
+    // CORS & Method Check
+    if (req.method === 'OPTIONS') {
+      return sendJsonResponse(res, 200, {});
+    }
+
+    if (req.method !== 'POST') {
+      return sendJsonResponse(res, 405, { error: 'Method not allowed' });
+    }
+
     let body = req.body;
     if (typeof body === 'string') {
       try { body = JSON.parse(body); } catch {}
@@ -20,9 +36,10 @@ export default async function handler(req: any, res: any) {
 
     const { phone, code } = body || {};
     if (!phone || !code) {
-      const err = 'Phone number and verification code are required.';
-      if (res && typeof res.status === 'function') return res.status(400).json({ verified: false, error: err });
-      return new Response(JSON.stringify({ verified: false, error: err }), { status: 400 });
+      return sendJsonResponse(res, 400, {
+        verified: false,
+        error: 'Phone number and verification code are required.',
+      });
     }
 
     // Normalize phone number (e.g. +2348031234567)
@@ -38,52 +55,64 @@ export default async function handler(req: any, res: any) {
 
     const trimmedCode = String(code).trim();
     const isProduction = process.env.NODE_ENV === 'production';
-    const hasSmsKey = Boolean(process.env.TERMII_API_KEY || process.env.AFRICAS_TALKING_API_KEY || process.env.TWILIO_AUTH_TOKEN);
-    const isDevMode = !isProduction && (!hasSmsKey || process.env.DEV_MODE === 'true' || process.env.VITE_DEV_MODE === 'true');
+    const hasTermiiKey = Boolean(process.env.TERMII_API_KEY || process.env.AFRICAS_TALKING_API_KEY || process.env.TWILIO_AUTH_TOKEN);
+    const isDevMode = !isProduction && (!hasTermiiKey || process.env.DEV_MODE === 'true' || process.env.VITE_DEV_MODE === 'true');
 
-    // Dev Mode Bypass Verification
-    if (isDevMode && (trimmedCode === '123456' || trimmedCode === '000000')) {
-      console.log(`DEV MODE: verified test OTP code ${trimmedCode} for ${normalizedPhone}`);
-      const payload = { verified: true, message: 'Dev Mode OTP verified successfully.' };
-      if (res && typeof res.status === 'function') return res.status(200).json(payload);
-      return new Response(JSON.stringify(payload), { status: 200 });
+    // Identical Dev Mode Check: Skip real Termii API check entirely
+    if (isDevMode) {
+      console.log(`DEV MODE: verifying test OTP code "${trimmedCode}" for ${normalizedPhone}`);
+      if (trimmedCode === '123456' || trimmedCode === '000000') {
+        console.log(`DEV MODE: verified test OTP code ${trimmedCode} for ${normalizedPhone}`);
+        return sendJsonResponse(res, 200, {
+          verified: true,
+          message: 'Dev Mode OTP verified successfully.',
+        });
+      } else {
+        return sendJsonResponse(res, 400, {
+          verified: false,
+          error: 'Incorrect verification code. Use dev code 123456 to verify.',
+        });
+      }
     }
 
-    // Check Server-Side OTP Session Cache
+    // Real Mode Verification via cached session store
     const session = otpSessionStore.get(normalizedPhone);
     if (!session) {
-      const err = 'No active OTP verification code found for this phone number. Please request a new code.';
-      if (res && typeof res.status === 'function') return res.status(400).json({ verified: false, error: err });
-      return new Response(JSON.stringify({ verified: false, error: err }), { status: 400 });
+      return sendJsonResponse(res, 400, {
+        verified: false,
+        error: 'No active OTP verification code found for this phone number. Please request a new code.',
+      });
     }
 
     // Expiry Check (5 Minutes)
     if (Date.now() > session.expiresAt) {
       otpSessionStore.delete(normalizedPhone);
-      const err = 'OTP verification code has expired (5 minute limit). Please request a new code.';
-      if (res && typeof res.status === 'function') return res.status(400).json({ verified: false, error: err });
-      return new Response(JSON.stringify({ verified: false, error: err }), { status: 400 });
+      return sendJsonResponse(res, 400, {
+        verified: false,
+        error: 'OTP verification code has expired (5 minute limit). Please request a new code.',
+      });
     }
 
     // Code Match Check
     if (session.code !== trimmedCode) {
-      const err = isDevMode
-        ? `Incorrect verification code. Use dev code 123456 to verify.`
-        : 'Incorrect verification code. Please check the SMS sent to your phone.';
-      if (res && typeof res.status === 'function') return res.status(400).json({ verified: false, error: err });
-      return new Response(JSON.stringify({ verified: false, error: err }), { status: 400 });
+      return sendJsonResponse(res, 400, {
+        verified: false,
+        error: 'Incorrect verification code. Please check the SMS sent to your phone.',
+      });
     }
 
     // Success: Remove code from session store (one-time use)
     otpSessionStore.delete(normalizedPhone);
 
-    const payload = { verified: true, message: 'Phone number verified successfully.' };
-    if (res && typeof res.status === 'function') return res.status(200).json(payload);
-    return new Response(JSON.stringify(payload), { status: 200 });
+    return sendJsonResponse(res, 200, {
+      verified: true,
+      message: 'Phone number verified successfully.',
+    });
   } catch (error: any) {
     console.error('Server-side OTP verify error:', error);
-    const err = error?.message || 'Failed to verify OTP code.';
-    if (res && typeof res.status === 'function') return res.status(500).json({ verified: false, error: err });
-    return new Response(JSON.stringify({ error: err }), { status: 500 });
+    return sendJsonResponse(res, 500, {
+      verified: false,
+      error: 'Something went wrong. Please try again.',
+    });
   }
 }
