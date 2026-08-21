@@ -121,7 +121,8 @@ export const AiAssistantModal: React.FC<AiAssistantModalProps> = ({
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors"
+            aria-label="Close assistant modal"
+            className="w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors shrink-0"
           >
             <span className="material-symbols-outlined text-[20px]">close</span>
           </button>
@@ -143,40 +144,40 @@ export const AiAssistantModal: React.FC<AiAssistantModalProps> = ({
                     : 'bg-white border border-[#dbe5de] text-[#141d19] rounded-bl-none font-normal'
                 }`}
               >
-                <div className="whitespace-pre-wrap">{m.text}</div>
+                {m.text}
               </div>
             </div>
           ))}
 
           {loading && (
             <div className="flex items-center gap-2 text-[#006c50] text-[13px] font-semibold p-2 bg-emerald-50 rounded-xl w-fit border border-emerald-200">
-              <span className="material-symbols-outlined text-[18px] animate-spin">
-                sync
-              </span>
-              <span>GasFinder AI is analyzing live station data...</span>
+              <span className="w-2 h-2 rounded-full bg-[#00c853] animate-ping" />
+              <span>Checking live station status...</span>
             </div>
           )}
         </div>
 
-        {/* Quick Prompts */}
-        <div className="p-3 bg-white border-t border-[#dbe5de]/70 flex overflow-x-auto gap-2 hide-scrollbar">
-          {quickPrompts.map((prompt, idx) => (
+        {/* Quick Suggestion Chips */}
+        <div className="p-2 px-3 bg-white border-t border-[#dbe5de]/70 flex items-center gap-2 overflow-x-auto hide-scrollbar">
+          {['Lowest CNG Price', 'Zero Wait Queue', '220 Bar Gauge'].map((prompt) => (
             <button
-              key={idx}
-              onClick={() => handleSend(prompt)}
-              disabled={loading}
-              className="px-3 py-1.5 bg-[#e6f0e9] hover:bg-[#dbe5de] text-[#004D40] text-[12px] font-semibold rounded-full whitespace-nowrap border border-[#dbe5de] active:scale-95 transition-all shrink-0"
+              key={prompt}
+              onClick={() => {
+                setQuery(prompt);
+                handleSend(prompt);
+              }}
+              className="px-3 py-2 bg-[#e6f0e9] hover:bg-[#dbe5de] text-[#004D40] text-[12px] font-semibold rounded-full whitespace-nowrap border border-[#dbe5de] active:scale-95 transition-all shrink-0 min-h-[44px] flex items-center"
             >
               {prompt}
             </button>
           ))}
         </div>
 
-        {/* Input Bar */}
+        {/* Query Input Footer */}
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            handleSend();
+            handleSend(query);
           }}
           className="p-3 bg-white border-t border-[#dbe5de] flex items-center gap-2"
         >
@@ -191,7 +192,7 @@ export const AiAssistantModal: React.FC<AiAssistantModalProps> = ({
             type="submit"
             disabled={!query.trim() || loading}
             aria-label="Send query to AI"
-            className="w-10 h-10 rounded-full bg-[#006c50] hover:bg-[#004D40] disabled:opacity-40 text-white flex items-center justify-center shadow-md active:scale-95 transition-all shrink-0"
+            className="w-11 h-11 rounded-full bg-[#006c50] hover:bg-[#004D40] disabled:opacity-40 text-white flex items-center justify-center shadow-md active:scale-95 transition-all shrink-0"
           >
             <span className="material-symbols-outlined text-[20px]">send</span>
           </button>

@@ -36,7 +36,7 @@ export const StationGroupInfoSheet: React.FC<StationGroupInfoSheetProps> = ({
           <button
             onClick={handleDismiss}
             aria-label="Close"
-            className="w-8 h-8 rounded-full bg-surface-container hover:bg-surface-container-high flex items-center justify-center text-on-surface-variant transition-all active:scale-95"
+            className="w-11 h-11 rounded-full bg-surface-container hover:bg-surface-container-high flex items-center justify-center text-on-surface-variant transition-all active:scale-95 shrink-0"
           >
             <span className="material-symbols-outlined text-[18px]">close</span>
           </button>
@@ -52,7 +52,7 @@ export const StationGroupInfoSheet: React.FC<StationGroupInfoSheetProps> = ({
         {/* Primary Action Button */}
         <button
           onClick={handleDismiss}
-          className="w-full py-3 bg-primary hover:opacity-95 text-on-primary font-bold text-[14px] rounded-full shadow-md active:scale-95 transition-all"
+          className="w-full py-3 min-h-[44px] bg-primary hover:opacity-95 text-on-primary font-bold text-[14px] rounded-full shadow-md active:scale-95 transition-all"
         >
           Got it
         </button>

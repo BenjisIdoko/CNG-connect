@@ -141,7 +141,8 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
             </div>
             <button
               onClick={onClose}
-              className="w-8 h-8 rounded-full flex items-center justify-center text-[#6a7b72] hover:bg-[#e6f0e9]"
+              aria-label="Close modal"
+              className="w-11 h-11 rounded-full flex items-center justify-center text-[#6a7b72] hover:bg-[#e6f0e9]"
             >
               <span className="material-symbols-outlined text-[22px]">close</span>
             </button>
@@ -247,15 +248,17 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
               </button>
             </div>
 
-            {/* Wait Time Stepper */}
             <div>
-              <label className="block text-[13px] font-semibold text-[#3a4a43] mb-1.5">
-                Wait time estimate
-              </label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-[13px] font-semibold text-[#3a4a43]">
+                  Wait time estimate
+                </label>
+              </div>
               <div className="flex items-center justify-between bg-[#e6f0e9] rounded-2xl p-2 px-3 border border-[#dbe5de]">
                 <button
                   type="button"
                   onClick={() => setWaitTime((t) => Math.max(0, t - 5))}
+                  aria-label="Decrease wait time estimate by 5 minutes"
                   className="w-11 h-11 flex items-center justify-center text-[#141d19] hover:bg-white rounded-full transition-colors active:scale-90"
                 >
                   <span className="material-symbols-outlined text-[24px]">remove</span>
@@ -266,6 +269,7 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
                 <button
                   type="button"
                   onClick={() => setWaitTime((t) => Math.min(120, t + 5))}
+                  aria-label="Increase wait time estimate by 5 minutes"
                   className="w-11 h-11 flex items-center justify-center text-[#141d19] hover:bg-white rounded-full transition-colors active:scale-90"
                 >
                   <span className="material-symbols-outlined text-[24px]">add</span>
@@ -311,7 +315,8 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
                       setAttachedPhoto(null);
                       setPhotoError(null);
                     }}
-                    className="absolute top-2 right-2 bg-black/70 text-white p-1.5 rounded-full hover:bg-black"
+                    aria-label="Delete attached photo"
+                    className="absolute top-2 right-2 w-11 h-11 bg-black/70 text-white rounded-full hover:bg-black flex items-center justify-center"
                   >
                     <span className="material-symbols-outlined text-[18px]">delete</span>
                   </button>

@@ -28,7 +28,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               onClick={onBack}
               aria-label="Go back"
-              className="w-9 h-9 -ml-1 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container active:scale-95 transition-all"
+              className="w-11 h-11 -ml-1 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container active:scale-95 transition-all"
             >
               <span className="material-symbols-outlined text-[22px]">arrow_back</span>
             </button>
@@ -54,7 +54,7 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 onClick={onOpenAiAssistant}
                 aria-label="Open AI Assistant"
-                className="flex items-center gap-1.5 bg-primary hover:opacity-95 text-on-primary text-[12px] font-bold px-3.5 py-1.5 rounded-full shadow-xs active:scale-95 transition-all"
+                className="flex items-center gap-1.5 bg-primary hover:opacity-95 text-on-primary text-[12px] font-bold px-3.5 py-2.5 rounded-full shadow-xs active:scale-95 transition-all min-h-[44px]"
               >
                 <span className="material-symbols-outlined text-[16px] text-status-green">
                   auto_awesome
@@ -65,7 +65,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               onClick={onAvatarClick}
               aria-label="Open profile"
-              className="w-9 h-9 rounded-full object-cover p-0.5 border-2 border-primary/30 hover:border-primary transition-all active:scale-95 focus:outline-none"
+              className="w-11 h-11 rounded-full object-cover p-0.5 border-2 border-primary/30 hover:border-primary transition-all active:scale-95 focus:outline-none"
             >
               <img
                 src={userAvatar}

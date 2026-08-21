@@ -86,7 +86,8 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
           </h2>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full flex items-center justify-center text-outline hover:bg-surface-container"
+            aria-label="Close modal"
+            className="w-11 h-11 rounded-full flex items-center justify-center text-outline hover:bg-surface-container shrink-0"
           >
             <span className="material-symbols-outlined text-[22px]">close</span>
           </button>
@@ -101,10 +102,10 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
             type="button"
             onClick={() => setShowInfoSheet(true)}
             aria-label="Station Group Policy Info"
-            className="w-6 h-6 rounded-full bg-surface-container-high text-primary flex items-center justify-center transition-all shrink-0 ml-2"
+            className="w-11 h-11 rounded-full bg-surface-container-high text-primary flex items-center justify-center transition-all shrink-0 ml-2"
             title="Policy Info"
           >
-            <span className="material-symbols-outlined text-[15px]">info</span>
+            <span className="material-symbols-outlined text-[16px]">info</span>
           </button>
         </div>
 

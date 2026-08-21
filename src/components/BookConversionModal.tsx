@@ -35,7 +35,7 @@ export const BookConversionModal: React.FC<BookConversionModalProps> = ({
       <div className="bg-white w-full max-w-lg rounded-3xl p-6 shadow-2xl animate-fade-in border border-outline-variant max-h-[90vh] overflow-y-auto">
         {bookingSuccessRef ? (
           <div className="py-6 text-center space-y-4">
-            <div className="w-16 h-16 rounded-full bg-status-green/15 text-status-green flex items-center justify-center mx-auto border border-status-green/30">
+            <div className="w-16 h-16 rounded-full bg-surface-container text-primary flex items-center justify-center mx-auto border border-outline-variant">
               <span className="material-symbols-outlined text-[36px]">verified</span>
             </div>
 

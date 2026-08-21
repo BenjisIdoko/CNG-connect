@@ -483,7 +483,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
                       }`}
                     >
                       <p className="font-bold text-[13.5px]">{v.label}</p>
-                      <p className={`text-[11px] mt-0.5 ${vehicleType === v.id ? 'text-status-green' : 'text-outline'}`}>
+                      <p className={`text-[11px] mt-0.5 ${vehicleType === v.id ? 'text-emerald-100' : 'text-outline'}`}>
                         {v.sub}
                       </p>
                     </button>
@@ -543,7 +543,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
                       }`}
                     >
                       <p className="font-bold text-[13px]">{st.label}</p>
-                      <p className={`text-[11px] ${cngStatus === st.id ? 'text-status-green' : 'text-outline'}`}>
+                      <p className={`text-[11px] ${cngStatus === st.id ? 'text-emerald-100' : 'text-outline'}`}>
                         {st.desc}
                       </p>
                     </button>

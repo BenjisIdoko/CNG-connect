@@ -169,14 +169,15 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
       <div className="bg-white border-b border-slate-200/80 px-4 py-3 sticky top-0 z-30 flex items-center justify-between shadow-xs">
         <button
           onClick={onBack}
-          className="flex items-center gap-1.5 text-slate-700 font-extrabold text-[13.5px] hover:text-[#006c50] active:scale-95 transition-all"
+          aria-label="Go back"
+          className="flex items-center gap-1.5 text-slate-700 font-bold text-[13.5px] hover:text-[#006c50] active:scale-95 transition-all min-h-[44px] min-w-[44px] px-1"
         >
           <span className="material-symbols-outlined text-[20px]">arrow_back</span>
           <span>Back</span>
         </button>
 
         <div className="flex items-center gap-2">
-          <div className="bg-emerald-50 text-[#006c50] border border-emerald-200 px-3 py-1 rounded-full text-[12px] font-extrabold flex items-center gap-1.5 shadow-2xs">
+          <div className="bg-emerald-50 text-[#006c50] border border-emerald-200 px-3 py-1.5 rounded-full text-[12px] font-semibold flex items-center gap-1.5 shadow-2xs">
             <span className="w-2 h-2 rounded-full bg-[#00c853] animate-pulse" />
             <span>{presenceCount} drivers here now</span>
           </div>
@@ -184,7 +185,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
           <button
             onClick={handleShareStation}
             aria-label="Share Station Group"
-            className="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-[#006c50] flex items-center justify-center active:scale-95 transition-all"
+            className="w-11 h-11 rounded-full bg-slate-100 hover:bg-slate-200 text-[#006c50] flex items-center justify-center active:scale-95 transition-all shrink-0"
           >
             <span className="material-symbols-outlined text-[18px]">share</span>
           </button>
@@ -198,17 +199,17 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
           <div className="flex items-start justify-between gap-2">
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <span className="bg-[#006c50] text-white text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1">
+                <span className="bg-[#006c50] text-white text-[10px] font-semibold px-2.5 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1">
                   <span className="material-symbols-outlined text-[13px]">groups</span>
                   <span>Station Group</span>
                 </span>
                 <button
                   onClick={() => setShowInfoSheet(true)}
                   aria-label="Station Group Policy Info"
-                  className="w-6 h-6 rounded-full bg-emerald-100 hover:bg-emerald-200 text-[#006c50] flex items-center justify-center transition-all active:scale-95"
+                  className="w-11 h-11 rounded-full bg-emerald-100 hover:bg-emerald-200 text-[#006c50] flex items-center justify-center transition-all active:scale-95 shrink-0"
                   title="Policy Info"
                 >
-                  <span className="material-symbols-outlined text-[15px]">info</span>
+                  <span className="material-symbols-outlined text-[16px]">info</span>
                 </button>
                 <span className="text-[12px] font-extrabold text-[#006c50] flex items-center gap-1 ml-auto">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#00c853] animate-pulse" />

@@ -611,7 +611,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
 
                             <div className="mt-2.5 pt-2 border-t border-outline-variant/30 flex items-center justify-between">
                               <div className="flex items-center gap-1.5 text-[11px] font-medium text-on-surface-variant">
-                                <span className="text-status-orange font-semibold">★ {st.rating || '4.8'}</span>
+                                <span className="text-secondary font-semibold">★ {st.rating || '4.8'}</span>
                                 <span>•</span>
                                 <span>{st.distance}</span>
                               </div>

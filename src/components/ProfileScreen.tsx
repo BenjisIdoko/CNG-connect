@@ -55,7 +55,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
 
           <button
             onClick={() => showToast('Profile edit opened')}
-            className="w-9 h-9 rounded-full bg-surface-container hover:bg-surface-container-high text-on-surface-variant flex items-center justify-center transition-all active:scale-95"
+            className="w-11 h-11 rounded-full bg-surface-container hover:bg-surface-container-high text-on-surface-variant flex items-center justify-center transition-all active:scale-95 shrink-0"
             aria-label="Edit Profile"
           >
             <span className="material-symbols-outlined text-[18px]">edit</span>
@@ -99,7 +99,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
 
           {/* Reputation */}
           <div className="bg-white rounded-2xl p-3 border border-outline-variant shadow-xs flex flex-col justify-between">
-            <span className="material-symbols-outlined text-status-orange text-[18px]">
+            <span className="material-symbols-outlined text-secondary text-[18px]">
               star
             </span>
             <div className="mt-2">
@@ -321,9 +321,9 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
 
           <button
             onClick={onSignOut || onOpenOnboarding}
-            className="w-full py-3.5 px-4 bg-status-orange-container hover:opacity-90 text-status-orange font-semibold text-[14px] rounded-2xl border border-status-orange/30 flex items-center justify-center gap-2 active:scale-98 transition-all"
+            className="w-full py-3.5 px-4 bg-status-orange-container hover:opacity-90 text-secondary font-semibold text-[14px] rounded-2xl border border-secondary/30 flex items-center justify-center gap-2 active:scale-98 transition-all min-h-[44px]"
           >
-            <span className="material-symbols-outlined text-status-orange text-[20px] shrink-0">
+            <span className="material-symbols-outlined text-secondary text-[20px] shrink-0">
               logout
             </span>
             <span className="whitespace-nowrap">Sign Out</span>
