@@ -312,31 +312,31 @@ export const MapScreen: React.FC<MapScreenProps> = ({
     switch (status) {
       case 'full':
         return {
-          barColor: 'bg-[#00c853]',
-          badgeBg: 'bg-emerald-50 border-emerald-200 text-emerald-800',
-          dotColor: 'bg-[#00c853]',
+          barColor: 'bg-status-green',
+          badgeBg: 'bg-surface-container border-outline-variant text-on-surface-variant',
+          dotColor: 'bg-status-green',
           label: 'Full stock',
         };
       case 'queue':
         return {
-          barColor: 'bg-[#f59e0b]',
-          badgeBg: 'bg-amber-50 border-amber-200 text-amber-800',
-          dotColor: 'bg-[#f59e0b]',
+          barColor: 'bg-status-orange',
+          badgeBg: 'bg-surface-container border-outline-variant text-on-surface-variant',
+          dotColor: 'bg-status-orange',
           label: 'Queuing',
         };
       case 'low':
         return {
-          barColor: 'bg-[#fe9400]',
-          badgeBg: 'bg-orange-50 border-orange-200 text-orange-800',
-          dotColor: 'bg-[#fe9400]',
+          barColor: 'bg-status-orange',
+          badgeBg: 'bg-surface-container border-outline-variant text-on-surface-variant',
+          dotColor: 'bg-status-orange',
           label: 'Low pressure',
         };
       case 'out':
       default:
         return {
-          barColor: 'bg-slate-400',
-          badgeBg: 'bg-slate-100 border-slate-200 text-slate-700',
-          dotColor: 'bg-slate-400',
+          barColor: 'bg-outline',
+          badgeBg: 'bg-surface-container border-outline-variant text-on-surface-variant',
+          dotColor: 'bg-outline',
           label: 'Out of gas',
         };
     }

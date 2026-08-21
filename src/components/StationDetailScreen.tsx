@@ -61,21 +61,18 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
 
     if (minutes < 30) {
       return {
-        label: `🟢 Fresh (${timeAgo})`,
-        dotColor: 'bg-[#00c853]',
-        badgeStyle: 'bg-emerald-50 text-[#006c50] border-emerald-300/90 shadow-2xs',
+        label: `Fresh · ${timeAgo}`,
+        dotColor: 'bg-status-green',
       };
     } else if (minutes <= 120) {
       return {
-        label: `🟡 Recent (${timeAgo})`,
-        dotColor: 'bg-[#f59e0b]',
-        badgeStyle: 'bg-amber-50 text-amber-900 border-amber-300/90 shadow-2xs',
+        label: `Recent · ${timeAgo}`,
+        dotColor: 'bg-status-orange',
       };
     } else {
       return {
-        label: `🔴 Stale (${timeAgo})`,
-        dotColor: 'bg-rose-500',
-        badgeStyle: 'bg-rose-50 text-rose-900 border-rose-300/90 shadow-2xs',
+        label: `Stale · ${timeAgo}`,
+        dotColor: 'bg-status-red',
       };
     }
   };
@@ -546,7 +543,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                             {report.author}
                           </div>
                           <div className="flex items-center gap-1.5 mt-0.5">
-                            <span className={`inline-flex items-center gap-1 text-[10px] font-extrabold px-2 py-0.5 rounded-full border whitespace-nowrap ${freshness.badgeStyle}`}>
+                            <span className="inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-surface-container text-on-surface-variant border border-outline-variant whitespace-nowrap">
                               <span className={`w-1.5 h-1.5 rounded-full ${freshness.dotColor}`} />
                               <span>{freshness.label}</span>
                             </span>
