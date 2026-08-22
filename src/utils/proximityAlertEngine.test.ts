@@ -2,6 +2,8 @@ import { describe, it, expect } from 'vitest';
 import {
   isStationStale,
   getDistanceInKm,
+  isSameState,
+  normalizeStateName,
 } from './proximityAlertEngine';
 
 describe('Proximity Alert Engine', () => {
@@ -26,6 +28,26 @@ describe('Proximity Alert Engine', () => {
       const dist = getDistanceInKm(9.0765, 7.4853, 8.9772, 7.3756);
       expect(dist).toBeGreaterThan(15);
       expect(dist).toBeLessThan(20);
+    });
+  });
+
+  describe('State Name Normalization & Matching', () => {
+    it('should match "FCT Abuja" with "Abuja FCT"', () => {
+      expect(normalizeStateName('FCT Abuja')).toBe('abuja');
+      expect(normalizeStateName('Abuja FCT')).toBe('abuja');
+      expect(isSameState('FCT Abuja', 'Abuja FCT')).toBe(true);
+    });
+
+    it('should match "Lagos" with "Lagos State"', () => {
+      expect(isSameState('Lagos', 'Lagos State')).toBe(true);
+    });
+
+    it('should match "Edo" with "Edo State (Benin)"', () => {
+      expect(isSameState('Edo', 'Edo State (Benin)')).toBe(true);
+    });
+
+    it('should match "Rivers" with "Rivers State (PH)"', () => {
+      expect(isSameState('Rivers', 'Rivers State (PH)')).toBe(true);
     });
   });
 });

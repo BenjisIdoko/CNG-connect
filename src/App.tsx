@@ -37,6 +37,7 @@ import {
   isStationOnCooldown,
   setStationCooldown,
   getDistanceInKm,
+  isSameState,
 } from './utils/proximityAlertEngine';
 import { apiService } from './services/apiService';
 
@@ -105,20 +106,12 @@ export const App: React.FC = () => {
     }
   });
 
-  // Helper: Strict State Matching
-  const isSameState = useCallback((stState?: string, uState?: string) => {
-    if (!stState || !uState) return true;
-    const a = stState.toLowerCase();
-    const b = uState.toLowerCase();
-    return a === b || a.includes(b) || b.includes(a);
-  }, []);
-
-  // Strict State-Level Scoping: Driver only sees stations in their current/registered state
+  // State-Level Scoping: Driver sees stations in their current/registered state
   const scopedStations = useMemo(() => {
     if (!userProfile.state) return stations;
     const filtered = stations.filter((st) => isSameState(st.state, userProfile.state));
     return filtered.length > 0 ? filtered : stations;
-  }, [stations, userProfile.state, isSameState]);
+  }, [stations, userProfile.state]);
 
   // Load backend data from API Service on mount
   useEffect(() => {
