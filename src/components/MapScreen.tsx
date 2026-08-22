@@ -12,6 +12,7 @@ interface MapScreenProps {
   onOpenStationDetails: (station: GasStation) => void;
   onNavigate: (station: GasStation) => void;
   gpsStatus?: GpsStatus;
+  userGps?: { lat: number; lng: number } | null;
   onGpsStatusChange?: (status: GpsStatus, coords?: { lat: number; lng: number }) => void;
 }
 
@@ -22,6 +23,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
   onOpenStationDetails,
   onNavigate,
   gpsStatus: propGpsStatus,
+  userGps: propUserGps,
   onGpsStatusChange,
 }) => {
   const [activeFilter, setActiveFilter] = useState<string>('all');
@@ -36,14 +38,59 @@ export const MapScreen: React.FC<MapScreenProps> = ({
   const [isRecentering, setIsRecentering] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  const [userGps, setUserGps] = useState<{ lat: number; lng: number } | null>(null);
+  const [userGps, setUserGps] = useState<{ lat: number; lng: number } | null>(() => {
+    if (propUserGps) return propUserGps;
+    try {
+      const saved = localStorage.getItem('gasfinder_user_coords');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
   const [gpsStatus, setGpsStatus] = useState<GpsStatus>(propGpsStatus || 'unavailable');
-  const [gpsStatusText, setGpsStatusText] = useState<string>('GPS Location Unavailable (Abuja Default)');
+  const [gpsStatusText, setGpsStatusText] = useState<string>(
+    userGps ? `GPS Active: ${userGps.lat.toFixed(4)}°N, ${userGps.lng.toFixed(4)}°E` : 'GPS Location Unavailable (Abuja Default)'
+  );
 
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
   const markersLayerRef = useRef<L.LayerGroup | null>(null);
   const initialFitRef = useRef(false);
+  const userSelectedRef = useRef(false);
+
+  // Sync propUserGps when parent passes updated coordinates
+  useEffect(() => {
+    if (propUserGps) {
+      setUserGps(propUserGps);
+      setGpsStatus('active');
+      setGpsStatusText(`GPS Active: ${propUserGps.lat.toFixed(4)}°N, ${propUserGps.lng.toFixed(4)}°E`);
+    }
+  }, [propUserGps]);
+
+  // Auto-acquire position on mount if userGps is not set
+  useEffect(() => {
+    if (!userGps && 'geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const { latitude, longitude } = pos.coords;
+          const coords = { lat: latitude, lng: longitude };
+          setUserGps(coords);
+          setGpsStatus('active');
+          setGpsStatusText(`GPS Active: ${latitude.toFixed(4)}°N, ${longitude.toFixed(4)}°E`);
+          if (onGpsStatusChange) {
+            onGpsStatusChange('active', coords);
+          }
+          if (mapInstanceRef.current) {
+            mapInstanceRef.current.flyTo([latitude, longitude], 14, { duration: 1.2 });
+          }
+        },
+        () => {
+          // silently handle fallback
+        },
+        { enableHighAccuracy: true, timeout: 8000 }
+      );
+    }
+  }, []);
 
   const CITY_COORDINATES: Record<string, { lat: number; lng: number; zoom: number }> = {
     all: { lat: 9.0765, lng: 7.4853, zoom: 6 },
@@ -63,11 +110,15 @@ export const MapScreen: React.FC<MapScreenProps> = ({
     const cityInfo = CITY_COORDINATES[cityId];
     if (mapInstanceRef.current && cityInfo) {
       if (cityId === 'all') {
-        const matchCoords = stations.filter((s) => s.lat && s.lng).map((s) => [s.lat, s.lng] as [number, number]);
-        if (matchCoords.length > 0) {
-          mapInstanceRef.current.flyToBounds(L.latLngBounds(matchCoords), { padding: [50, 50], maxZoom: 12, duration: 1.2 });
+        if (userGps) {
+          mapInstanceRef.current.flyTo([userGps.lat, userGps.lng], 13, { duration: 1.2 });
         } else {
-          mapInstanceRef.current.flyTo([cityInfo.lat, cityInfo.lng], cityInfo.zoom, { duration: 1.2 });
+          const matchCoords = stations.filter((s) => s.lat && s.lng).map((s) => [s.lat, s.lng] as [number, number]);
+          if (matchCoords.length > 0) {
+            mapInstanceRef.current.flyToBounds(L.latLngBounds(matchCoords), { padding: [50, 50], maxZoom: 12, duration: 1.2 });
+          } else {
+            mapInstanceRef.current.flyTo([cityInfo.lat, cityInfo.lng], cityInfo.zoom, { duration: 1.2 });
+          }
         }
       } else {
         const cityStations = stations.filter(
@@ -131,6 +182,11 @@ export const MapScreen: React.FC<MapScreenProps> = ({
 
   useEffect(() => {
     if (!mapInstanceRef.current || initialFitRef.current) return;
+    if (userGps) {
+      initialFitRef.current = true;
+      mapInstanceRef.current.flyTo([userGps.lat, userGps.lng], 13);
+      return;
+    }
     const validCoords = filteredStations
       .filter((s) => s.lat != null && s.lng != null)
       .map((s) => [s.lat!, s.lng!] as [number, number]);
@@ -139,7 +195,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       initialFitRef.current = true;
       mapInstanceRef.current.fitBounds(L.latLngBounds(validCoords), { padding: [50, 50], maxZoom: 13 });
     }
-  }, [filteredStations]);
+  }, [filteredStations, userGps]);
 
   const nearestTop5Stations = [...filteredStations]
     .sort((a, b) => getDistanceKm(a) - getDistanceKm(b))
@@ -150,9 +206,11 @@ export const MapScreen: React.FC<MapScreenProps> = ({
   useEffect(() => {
     if (!mapContainerRef.current || mapInstanceRef.current) return;
 
+    const initialCenter: [number, number] = userGps ? [userGps.lat, userGps.lng] : [9.0765, 7.4853];
+
     const map = L.map(mapContainerRef.current, {
-      center: [9.0765, 7.4853],
-      zoom: 13,
+      center: initialCenter,
+      zoom: userGps ? 14 : 13,
       zoomControl: false,
       attributionControl: false,
     });
@@ -203,6 +261,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
 
       const marker = L.marker([lat, lng], { icon: customIcon });
       marker.on('click', () => {
+        userSelectedRef.current = true;
         onSelectStation(st);
         setSheetMode('standard');
       });
@@ -223,24 +282,25 @@ export const MapScreen: React.FC<MapScreenProps> = ({
   }, [filteredStations, selectedStation, userGps]);
 
   useEffect(() => {
-    if (!mapInstanceRef.current) return;
-    if (selectedStation && selectedStation.lat && selectedStation.lng) {
+    if (!mapInstanceRef.current || !selectedStation) return;
+    if (userSelectedRef.current && selectedStation.lat && selectedStation.lng) {
       mapInstanceRef.current.panTo([selectedStation.lat, selectedStation.lng], { animate: true });
     }
   }, [selectedStation]);
 
   useEffect(() => {
     if (!mapInstanceRef.current) return;
-    if (activeCity === 'lagos') {
-      mapInstanceRef.current.flyTo([6.5821, 3.3791], 12);
-    } else if (activeCity === 'edo') {
-      mapInstanceRef.current.flyTo([6.3012, 5.6201], 12);
-    } else if (activeCity === 'oyo') {
-      mapInstanceRef.current.flyTo([7.3512, 3.8901], 12);
-    } else if (activeCity === 'abuja' || activeCity === 'all') {
-      mapInstanceRef.current.flyTo([9.0765, 7.4853], 13);
+    const cityKey = activeCity.toLowerCase();
+    const cityInfo = CITY_COORDINATES[cityKey];
+
+    if (cityKey !== 'all' && cityInfo) {
+      mapInstanceRef.current.flyTo([cityInfo.lat, cityInfo.lng], cityInfo.zoom, { duration: 1.2 });
+    } else if (cityKey === 'all') {
+      if (userGps) {
+        mapInstanceRef.current.flyTo([userGps.lat, userGps.lng], 13, { duration: 1.2 });
+      }
     }
-  }, [activeCity]);
+  }, [activeCity, userGps]);
 
   const handleRecenter = () => {
     setIsRecentering(true);

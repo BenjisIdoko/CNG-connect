@@ -149,64 +149,89 @@ export const App: React.FC = () => {
     }
   }, [userProfile]);
 
-  // Real navigator.geolocation.watchPosition + Haversine distance calculation
+  const [userCoords, setUserCoords] = useState<{ lat: number; lng: number } | null>(() => {
+    try {
+      const saved = localStorage.getItem('gasfinder_user_coords');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  // Real navigator.geolocation.watchPosition & getCurrentPosition + Haversine distance calculation
   useEffect(() => {
     if (!('geolocation' in navigator)) return;
 
-    const userKey = userProfile.email || userProfile.phone || 'default_driver';
+    const handlePosSuccess = (pos: GeolocationPosition) => {
+      const { latitude, longitude } = pos.coords;
+      const coords = { lat: latitude, lng: longitude };
+      setUserCoords(coords);
+      setGpsStatus('active');
+      try {
+        localStorage.setItem('gasfinder_user_coords', JSON.stringify(coords));
+      } catch {
+        // storage error
+      }
 
+      // Dynamically compute exact distance & drive time for all stations relative to user's real GPS position
+      setStations((prevStations) => {
+        const updated = prevStations.map((st) => {
+          if (st.lat != null && st.lng != null) {
+            const distKm = getDistanceInKm(latitude, longitude, st.lat, st.lng);
+            const driveMins = Math.round(distKm * 2.5 + 2);
+            return {
+              ...st,
+              distance: `${distKm.toFixed(1)} km`,
+              driveTime: `${driveMins} min drive`,
+            };
+          }
+          return st;
+        });
+
+        // Sort by closest distance to driver's live location
+        return updated.sort((a, b) => {
+          const numA = parseFloat(a.distance) || 999;
+          const numB = parseFloat(b.distance) || 999;
+          return numA - numB;
+        });
+      });
+
+      // Find nearby station in user's state requiring status update
+      const userKey = userProfile.email || userProfile.phone || 'default_driver';
+      const nearbyStaleStation = stations.find((st) => {
+        if (!isSameState(st.state, userProfile.state)) return false;
+        if (st.lat == null || st.lng == null) return false;
+
+        const distKm = getDistanceInKm(latitude, longitude, st.lat, st.lng);
+        // Radius threshold: within 0.8 km (800 meters)
+        if (distKm > 0.8) return false;
+
+        // (a) Check staleness (>30 min)
+        if (!isStationStale(st.lastUpdated, 30)) return false;
+
+        // (b) Check per-station per-user 2-hour cooldown
+        if (isStationOnCooldown(userKey, st.id, 2)) return false;
+
+        return true;
+      });
+
+      if (nearbyStaleStation && (!proximityAlertStation || proximityAlertStation.id !== nearbyStaleStation.id)) {
+        setProximityAlertStation(nearbyStaleStation);
+        setStationCooldown(userKey, nearbyStaleStation.id);
+        showToast(`📍 Geofence Nudge: You arrived near ${nearbyStaleStation.name}`);
+      }
+    };
+
+    // Immediate acquisition on mount
+    navigator.geolocation.getCurrentPosition(
+      handlePosSuccess,
+      (err) => console.debug('Initial position error:', err.message),
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 15000 }
+    );
+
+    // Continuous watch for movement
     const watchId = navigator.geolocation.watchPosition(
-      (pos) => {
-        const { latitude, longitude } = pos.coords;
-        setGpsStatus('active');
-
-        // Dynamically compute exact distance & drive time for all stations relative to user's real GPS position
-        setStations((prevStations) => {
-          const updated = prevStations.map((st) => {
-            if (st.lat != null && st.lng != null) {
-              const distKm = getDistanceInKm(latitude, longitude, st.lat, st.lng);
-              const driveMins = Math.round(distKm * 2.5 + 2);
-              return {
-                ...st,
-                distance: `${distKm.toFixed(1)} km`,
-                driveTime: `${driveMins} min drive`,
-              };
-            }
-            return st;
-          });
-
-          // Sort by closest distance to driver's live location
-          return updated.sort((a, b) => {
-            const numA = parseFloat(a.distance) || 999;
-            const numB = parseFloat(b.distance) || 999;
-            return numA - numB;
-          });
-        });
-
-        // Find nearby station in user's state requiring status update
-        const nearbyStaleStation = stations.find((st) => {
-          if (!isSameState(st.state, userProfile.state)) return false;
-          if (st.lat == null || st.lng == null) return false;
-
-          const distKm = getDistanceInKm(latitude, longitude, st.lat, st.lng);
-          // Radius threshold: within 0.8 km (800 meters)
-          if (distKm > 0.8) return false;
-
-          // (a) Check staleness (>30 min)
-          if (!isStationStale(st.lastUpdated, 30)) return false;
-
-          // (b) Check per-station per-user 2-hour cooldown
-          if (isStationOnCooldown(userKey, st.id, 2)) return false;
-
-          return true;
-        });
-
-        if (nearbyStaleStation && (!proximityAlertStation || proximityAlertStation.id !== nearbyStaleStation.id)) {
-          setProximityAlertStation(nearbyStaleStation);
-          setStationCooldown(userKey, nearbyStaleStation.id);
-          showToast(`📍 Geofence Nudge: You arrived near ${nearbyStaleStation.name}`);
-        }
-      },
+      handlePosSuccess,
       (err) => {
         console.debug('Geolocation watch status:', err.message);
         setGpsStatus(err.code === err.PERMISSION_DENIED ? 'denied' : 'unavailable');
@@ -471,7 +496,11 @@ export const App: React.FC = () => {
             onOpenStationDetails={handleOpenStationDetail}
             onNavigate={handleNavigate}
             gpsStatus={gpsStatus}
-            onGpsStatusChange={(status) => setGpsStatus(status)}
+            userGps={userCoords}
+            onGpsStatusChange={(status, coords) => {
+              setGpsStatus(status);
+              if (coords) setUserCoords(coords);
+            }}
           />
         ) : activeTab === 'conversions' ? (
           <ConversionCentersScreen
