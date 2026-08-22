@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, lazy, Suspense } from 'react';
 import {
   GasStation,
   CommunityPost,
@@ -16,22 +16,46 @@ import { ConversionCenter } from './types';
 import { Header } from './components/Header';
 import { BottomNav } from './components/BottomNav';
 import { MapScreen, GpsStatus } from './components/MapScreen';
-import { StationDetailScreen } from './components/StationDetailScreen';
-import { CommunityScreen } from './components/CommunityScreen';
-import { ConversionCentersScreen } from './components/ConversionCentersScreen';
-import { BookConversionModal } from './components/BookConversionModal';
-import { DiscussionScreen } from './components/DiscussionScreen';
-import { ChatScreen } from './components/ChatScreen';
-import { ProfileScreen } from './components/ProfileScreen';
-import { ReportStatusModal } from './components/ReportStatusModal';
 import { OnboardingModal } from './components/OnboardingModal';
 import { OnboardingScreen } from './components/OnboardingScreen';
 import { ProximityAlertBanner } from './components/ProximityAlertBanner';
-import { CreatePostModal } from './components/CreatePostModal';
-import { AiAssistantModal } from './components/AiAssistantModal';
 import { SignUpScreen } from './components/SignUpScreen';
-import { LiveNavigationModal } from './components/LiveNavigationModal';
 import { SplashScreen } from './components/SplashScreen';
+
+// Code-split secondary screens & modals with React.lazy
+const StationDetailScreen = lazy(() =>
+  import('./components/StationDetailScreen').then((m) => ({ default: m.StationDetailScreen }))
+);
+const CommunityScreen = lazy(() =>
+  import('./components/CommunityScreen').then((m) => ({ default: m.CommunityScreen }))
+);
+const ConversionCentersScreen = lazy(() =>
+  import('./components/ConversionCentersScreen').then((m) => ({ default: m.ConversionCentersScreen }))
+);
+const BookConversionModal = lazy(() =>
+  import('./components/BookConversionModal').then((m) => ({ default: m.BookConversionModal }))
+);
+const DiscussionScreen = lazy(() =>
+  import('./components/DiscussionScreen').then((m) => ({ default: m.DiscussionScreen }))
+);
+const ChatScreen = lazy(() =>
+  import('./components/ChatScreen').then((m) => ({ default: m.ChatScreen }))
+);
+const ProfileScreen = lazy(() =>
+  import('./components/ProfileScreen').then((m) => ({ default: m.ProfileScreen }))
+);
+const ReportStatusModal = lazy(() =>
+  import('./components/ReportStatusModal').then((m) => ({ default: m.ReportStatusModal }))
+);
+const CreatePostModal = lazy(() =>
+  import('./components/CreatePostModal').then((m) => ({ default: m.CreatePostModal }))
+);
+const AiAssistantModal = lazy(() =>
+  import('./components/AiAssistantModal').then((m) => ({ default: m.AiAssistantModal }))
+);
+const LiveNavigationModal = lazy(() =>
+  import('./components/LiveNavigationModal').then((m) => ({ default: m.LiveNavigationModal }))
+);
 import {
   isStationStale,
   isStationOnCooldown,
@@ -456,77 +480,88 @@ export const App: React.FC = () => {
       )}
 
       {/* Main Content Area */}
-      <main className="flex-1 w-full pt-16 pb-20">
+      <main className="flex-1 overflow-y-auto relative pb-24">
         {!isOnline && (
           <div className="fixed top-3 left-1/2 -translate-x-1/2 z-50 bg-[#004D40]/95 text-white text-[11.5px] font-extrabold px-4 py-1.5 rounded-full shadow-lg border border-emerald-400/40 backdrop-blur-md flex items-center gap-1.5 animate-pulse pointer-events-none">
             <span className="material-symbols-outlined text-[16px] text-amber-400">wifi_off</span>
             <span>Offline Mode — Showing Cached Stations</span>
           </div>
         )}
-        {activeChatPost ? (
-          <ChatScreen
-            post={activeChatPost}
-            onBack={() => setActiveChatPost(null)}
-          />
-        ) : activeDiscussionPost ? (
-          <DiscussionScreen
-            post={activeDiscussionPost}
-            onBack={() => setActiveDiscussionPost(null)}
-          />
-        ) : activeDetailStation ? (
-          <StationDetailScreen
-            station={activeDetailStation}
-            onBack={() => setActiveDetailStation(null)}
-            onOpenReportModal={handleOpenReportModal}
-            onNavigate={handleNavigate}
-            onAddStationComment={handleAddStationComment}
-          />
-        ) : activeTab === 'map' ? (
-          <MapScreen
-            stations={scopedStations}
-            selectedStation={selectedStation}
-            onSelectStation={(st) => setSelectedStation(st)}
-            onOpenStationDetails={handleOpenStationDetail}
-            onNavigate={handleNavigate}
-            gpsStatus={gpsStatus}
-            userGps={userCoords}
-            onGpsStatusChange={(status, coords) => {
-              setGpsStatus(status);
-              if (coords) setUserCoords(coords);
-            }}
-          />
-        ) : activeTab === 'conversions' ? (
-          <ConversionCentersScreen
-            centers={INITIAL_CONVERSION_CENTERS as ConversionCenter[]}
-            onBookAppointment={(center) => setSelectedBookingCenter(center)}
-          />
-        ) : activeTab === 'community' ? (
-          <CommunityScreen
-            posts={posts}
-            stations={scopedStations}
-            onOpenDiscussion={(p) => setActiveDiscussionPost(p)}
-            onOpenChat={(p) => setActiveChatPost(p)}
-            onOpenCreatePost={() => setIsCreatePostOpen(true)}
-            onOpenStationGroup={(st) => setActiveDetailStation(st)}
-            onOpenNotifications={() => {
-              handleSimulateProximityNudge();
-            }}
-          />
-        ) : (
-          <ProfileScreen
-            user={userProfile}
-            onOpenOnboarding={() => setAuthMode('onboarding')}
-            onOpenSignUp={() => setAuthMode('signup')}
-            onSignOut={handleSignOut}
-            onUpdateState={(newState) => {
-              setUserProfile((prev) => ({ ...prev, state: newState }));
-            }}
-            onTriggerProximityAlert={() => {
-              handleSimulateProximityNudge();
-              setActiveTab('map');
-            }}
-          />
-        )}
+        <Suspense
+          fallback={
+            <div className="flex-1 flex items-center justify-center p-12 min-h-[60vh]">
+              <div className="flex flex-col items-center gap-3">
+                <span className="w-9 h-9 border-3 border-primary border-t-transparent rounded-full animate-spin"></span>
+                <span className="text-xs font-semibold text-outline">Loading view...</span>
+              </div>
+            </div>
+          }
+        >
+          {activeChatPost ? (
+            <ChatScreen
+              post={activeChatPost}
+              onBack={() => setActiveChatPost(null)}
+            />
+          ) : activeDiscussionPost ? (
+            <DiscussionScreen
+              post={activeDiscussionPost}
+              onBack={() => setActiveDiscussionPost(null)}
+            />
+          ) : activeDetailStation ? (
+            <StationDetailScreen
+              station={activeDetailStation}
+              onBack={() => setActiveDetailStation(null)}
+              onOpenReportModal={handleOpenReportModal}
+              onNavigate={handleNavigate}
+              onAddStationComment={handleAddStationComment}
+            />
+          ) : activeTab === 'map' ? (
+            <MapScreen
+              stations={scopedStations}
+              selectedStation={selectedStation}
+              onSelectStation={(st) => setSelectedStation(st)}
+              onOpenStationDetails={handleOpenStationDetail}
+              onNavigate={handleNavigate}
+              gpsStatus={gpsStatus}
+              userGps={userCoords}
+              onGpsStatusChange={(status, coords) => {
+                setGpsStatus(status);
+                if (coords) setUserCoords(coords);
+              }}
+            />
+          ) : activeTab === 'conversions' ? (
+            <ConversionCentersScreen
+              centers={INITIAL_CONVERSION_CENTERS as ConversionCenter[]}
+              onBookAppointment={(center) => setSelectedBookingCenter(center)}
+            />
+          ) : activeTab === 'community' ? (
+            <CommunityScreen
+              posts={posts}
+              stations={scopedStations}
+              onOpenDiscussion={(p) => setActiveDiscussionPost(p)}
+              onOpenChat={(p) => setActiveChatPost(p)}
+              onOpenCreatePost={() => setIsCreatePostOpen(true)}
+              onOpenStationGroup={(st) => setActiveDetailStation(st)}
+              onOpenNotifications={() => {
+                handleSimulateProximityNudge();
+              }}
+            />
+          ) : (
+            <ProfileScreen
+              user={userProfile}
+              onOpenOnboarding={() => setAuthMode('onboarding')}
+              onOpenSignUp={() => setAuthMode('signup')}
+              onSignOut={handleSignOut}
+              onUpdateState={(newState) => {
+                setUserProfile((prev) => ({ ...prev, state: newState }));
+              }}
+              onTriggerProximityAlert={() => {
+                handleSimulateProximityNudge();
+                setActiveTab('map');
+              }}
+            />
+          )}
+        </Suspense>
       </main>
 
       {/* Auth-Gated Onboarding & Registration Screen */}
@@ -557,18 +592,66 @@ export const App: React.FC = () => {
         </div>
       )}
 
-      {/* Book Conversion Kit Modal */}
-      {selectedBookingCenter && (
-        <BookConversionModal
-          center={selectedBookingCenter}
+      {/* Lazy Loaded Modals */}
+      <Suspense fallback={null}>
+        {/* Book Conversion Kit Modal */}
+        {selectedBookingCenter && (
+          <BookConversionModal
+            center={selectedBookingCenter}
+            user={userProfile}
+            onClose={() => setSelectedBookingCenter(null)}
+            onSuccess={(appointmentInfo) => {
+              showToast(`Appointment requested at ${appointmentInfo.centerName} for ${appointmentInfo.preferredDate}!`);
+              setSelectedBookingCenter(null);
+            }}
+          />
+        )}
+
+        {/* Modals */}
+        {isReportModalOpen && reportingStation && (
+          <ReportStatusModal
+            station={reportingStation}
+            user={userProfile}
+            isPresenceActive={
+              Boolean(
+                gpsStatus === 'active' &&
+                reportingStation.distance &&
+                parseFloat(reportingStation.distance) <= 0.8
+              )
+            }
+            onClose={() => {
+              setIsReportModalOpen(false);
+              setReportingStation(null);
+            }}
+            onSubmitReport={handleSubmitReport}
+          />
+        )}
+
+        <CreatePostModal
+          isOpen={isCreatePostOpen}
           user={userProfile}
-          onClose={() => setSelectedBookingCenter(null)}
-          onSuccess={(appointmentInfo) => {
-            showToast(`Appointment requested at ${appointmentInfo.centerName} for ${appointmentInfo.preferredDate}!`);
-            setSelectedBookingCenter(null);
+          onClose={() => setIsCreatePostOpen(false)}
+          onSubmitPost={handleCreatePost}
+        />
+
+        <AiAssistantModal
+          isOpen={isAiModalOpen}
+          onClose={() => setIsAiModalOpen(false)}
+          stations={scopedStations}
+          onSelectStation={(st) => {
+            setSelectedStation(st);
+            setActiveDetailStation(st);
+            setIsAiModalOpen(false);
           }}
         />
-      )}
+
+        {navigatingStation && (
+          <LiveNavigationModal
+            station={navigatingStation}
+            onClose={() => setNavigatingStation(null)}
+          />
+        )}
+      </Suspense>
 
       {/* Bottom Navigation Bar (Shown when authenticated & not in sub-screens) */}
       {isAuthenticated && !activeDetailStation && !activeDiscussionPost && !activeChatPost && !authMode && (
@@ -582,54 +665,8 @@ export const App: React.FC = () => {
           }}
         />
       )}
-
-      {/* Modals */}
-      {isReportModalOpen && reportingStation && (
-        <ReportStatusModal
-          station={reportingStation}
-          user={userProfile}
-          isPresenceActive={
-            Boolean(
-              gpsStatus === 'active' &&
-              reportingStation.distance &&
-              parseFloat(reportingStation.distance) <= 0.8
-            )
-          }
-          onClose={() => {
-            setIsReportModalOpen(false);
-            setReportingStation(null);
-          }}
-          onSubmitReport={handleSubmitReport}
-        />
-      )}
-
-      <CreatePostModal
-        isOpen={isCreatePostOpen}
-        user={userProfile}
-        onClose={() => setIsCreatePostOpen(false)}
-        onSubmitPost={handleCreatePost}
-      />
-
-      <AiAssistantModal
-        isOpen={isAiModalOpen}
-        onClose={() => setIsAiModalOpen(false)}
-        stations={scopedStations}
-        onSelectStation={(st) => {
-          setSelectedStation(st);
-          setActiveDetailStation(st);
-          setIsAiModalOpen(false);
-        }}
-      />
-
-      {navigatingStation && (
-        <LiveNavigationModal
-          station={navigatingStation}
-          onClose={() => setNavigatingStation(null)}
-        />
-      )}
     </div>
   );
 };
 
 export default App;
-

@@ -115,5 +115,29 @@ export default defineConfig(() => {
       hmr: process.env.DISABLE_HMR !== 'true',
       watch: process.env.DISABLE_HMR === 'true' ? null : {},
     },
+    build: {
+      target: 'esnext',
+      minify: 'esbuild',
+      cssCodeSplit: true,
+      chunkSizeWarningLimit: 600,
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes('node_modules')) {
+              if (id.includes('leaflet')) return 'leaflet-vendor';
+              if (id.includes('@supabase')) return 'supabase-vendor';
+              if (id.includes('lucide-react')) return 'icons-vendor';
+              return 'vendor';
+            }
+            if (id.includes('pci-conversion-centers-seed.json')) {
+              return 'conversion-centers-seed';
+            }
+            if (id.includes('pci-stations-seed.json')) {
+              return 'stations-seed';
+            }
+          },
+        },
+      },
+    },
   };
 });
