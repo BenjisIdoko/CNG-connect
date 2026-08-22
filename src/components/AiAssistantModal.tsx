@@ -28,7 +28,7 @@ export const AiAssistantModal: React.FC<AiAssistantModalProps> = ({
     'Which station in Abuja has the highest pressure right now?',
     'How much will I save converting my car to CNG?',
     'What is the best time to refuel at Total Wuse 2?',
-    'Show me Pi-CNG accredited stations in Lagos',
+    'Show me CNG stations in Lagos',
   ];
 
   const getKnowledgeEngineFallback = (promptText: string): string => {
@@ -38,13 +38,13 @@ export const AiAssistantModal: React.FC<AiAssistantModalProps> = ({
       const best = [...stations].sort((a, b) => b.pumpPressure - a.pumpPressure)[0];
       return `⚡ **${best.name}** currently has the highest pressure at **${best.pumpPressure} bar** (${best.statusLabel}). High pressure ensures your tank fills to 100% capacity faster!`;
     } else if (lower.includes('save') || lower.includes('cost') || lower.includes('converting')) {
-      return `💰 **CNG Savings Estimate:**\n• Petrol price: ~₦1,100/liter\n• CNG price: **₦230/kg** at Pi-CNG stations\n• An average driver using 15kg/week saves approximately **₦78,500 monthly** (over **₦940,000 yearly**)!`;
+      return `💰 **CNG Savings Estimate:**\n• Petrol price: ~₦1,100/liter\n• CNG price: **₦230/kg** at CNG stations\n• An average driver using 15kg/week saves approximately **₦78,500 monthly** (over **₦940,000 yearly**)!`;
     } else if (lower.includes('wuse') || lower.includes('best time')) {
       return `🕒 **Total CNG - Wuse 2 Tip:** The queue is lightest between **7:00 AM - 8:30 AM** and **2:00 PM - 4:00 PM**. Current wait time is around **4 minutes** with 215 bar pressure.`;
-    } else if (lower.includes('lagos') || lower.includes('pi-cng')) {
+    } else if (lower.includes('lagos')) {
       const lagosStations = stations.filter((s) => s.state.toLowerCase().includes('lagos'));
       return (
-        `🇳🇬 Found **${lagosStations.length} Pi-CNG accredited stations** in Lagos:\n` +
+        `🇳🇬 Found **${lagosStations.length} CNG stations** in Lagos:\n` +
         lagosStations.map((s) => `• **${s.name}** (${s.city}) - ${s.statusLabel}, ₦${s.cngPrice}/kg`).join('\n')
       );
     } else {
