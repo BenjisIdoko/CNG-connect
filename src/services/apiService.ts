@@ -1,5 +1,5 @@
 import { GasStation, DriverReport, CommunityPost, StationStatus, VerificationLevel, StationMedia } from '../types';
-import { INITIAL_STATIONS, INITIAL_POSTS } from '../data/mockData';
+import { INITIAL_STATIONS, INITIAL_POSTS, deduplicateStations } from '../data/mockData';
 import { supabase, isSupabaseConfigured } from './supabaseClient';
 import { checkNotificationPermission } from '../utils/permissionManager';
 
@@ -29,8 +29,8 @@ export function calculateVerificationMetadata(report: DriverReport): {
 }
 
 // LocalStorage Persistence Fallback Keys
-const STATIONS_STORAGE_KEY = 'gasfinder_stations_v4';
-const POSTS_STORAGE_KEY = 'gasfinder_posts_v4';
+const STATIONS_STORAGE_KEY = 'gasfinder_stations_v5';
+const POSTS_STORAGE_KEY = 'gasfinder_posts_v5';
 
 function purgeStaleLocalStorage() {
   try {
@@ -38,9 +38,11 @@ function purgeStaleLocalStorage() {
       'gasfinder_stations_v1',
       'gasfinder_stations_v2',
       'gasfinder_stations_v3',
+      'gasfinder_stations_v4',
       'gasfinder_posts_v1',
       'gasfinder_posts_v2',
       'gasfinder_posts_v3',
+      'gasfinder_posts_v4',
     ];
     keysToRemove.forEach((k) => localStorage.removeItem(k));
   } catch {
@@ -52,14 +54,14 @@ function getLocalStations(): GasStation[] {
   purgeStaleLocalStorage();
   try {
     const saved = localStorage.getItem(STATIONS_STORAGE_KEY);
-    if (!saved) return INITIAL_STATIONS;
+    if (!saved) return deduplicateStations(INITIAL_STATIONS);
     const parsed = JSON.parse(saved);
     if (!Array.isArray(parsed) || parsed.length < INITIAL_STATIONS.length) {
-      return INITIAL_STATIONS;
+      return deduplicateStations(INITIAL_STATIONS);
     }
-    return parsed;
+    return deduplicateStations(parsed);
   } catch {
-    return INITIAL_STATIONS;
+    return deduplicateStations(INITIAL_STATIONS);
   }
 }
 

@@ -48,7 +48,24 @@ export const INITIAL_USER: UserProfile = {
   state: 'Abuja FCT',
 };
 
-export const INITIAL_STATIONS: GasStation[] = [
+export function deduplicateStations(stationsList: GasStation[]): GasStation[] {
+  const seenIds = new Set<string>();
+  const seenNames = new Set<string>();
+
+  return stationsList.filter((st) => {
+    const idKey = st.id;
+    const normName = st.name.toLowerCase().replace(/[^a-z0-9]/g, '').trim();
+
+    if (seenIds.has(idKey) || seenNames.has(normName)) {
+      return false;
+    }
+    seenIds.add(idKey);
+    seenNames.add(normName);
+    return true;
+  });
+}
+
+export const INITIAL_STATIONS: GasStation[] = deduplicateStations([
   ...(pciStationsSeed as GasStation[]),
   // ABUJA FCT (Pi-CNG Official Network)
   {
@@ -127,56 +144,6 @@ export const INITIAL_STATIONS: GasStation[] = [
         waitMinutes: 6,
         comment: 'Paid ₦3,450 for full 15kg fill. Both dispensers working perfectly.',
         likes: 12,
-      },
-    ],
-  },
-  {
-    id: 'nnpc-retail-dutse-bwari',
-    name: 'NNPC Retail - Dutse-Bwari Road',
-    address: 'Dutse-Bwari Road, Dutse Alhaji Junction, Abuja',
-    city: 'Dutse-Bwari',
-    state: 'Abuja FCT',
-    distance: '0.8 km',
-    driveTime: '3 min drive',
-    status: 'full',
-    statusLabel: 'Full stock',
-    cngPrice: 230,
-    priceTrend: 'stable',
-    pumpPressure: 218,
-    busyEstimate: 'Fast moving (2 cars)',
-    lastUpdated: '5 min ago',
-    verifiedByCommunity: true,
-    isPiCngAccredited: true,
-    operator: 'NNPC Retail / Pi-CNG',
-    phone: '+234 863 500 1063',
-    lat: 9.1672,
-    lng: 7.4128,
-    images: [ASSETS.stationWide, ASSETS.dispenserGreen, ASSETS.pumpMeter],
-    activePresenceCount: 22,
-    stationNotice: 'Official NNPC Retail Pi-CNG refuelling hub on Dutse-Bwari Road. Share live pump pressure updates and queue reports here!',
-    stationComments: [
-      {
-        id: 'st-c-dutse-1',
-        author: 'Garba S.',
-        authorAvatar: ASSETS.babaAvatar,
-        timeAgo: '10 min ago',
-        content: 'Dutse-Bwari NNPC retail station is operating smoothly! 218 bar pressure today.',
-      },
-    ],
-    reports: [
-      {
-        id: 'rep-dutse-1',
-        author: 'Garba S.',
-        authorAvatar: ASSETS.babaAvatar,
-        verified: true,
-        isPhotoVerified: true,
-        timestamp: '5 min ago',
-        status: 'full',
-        statusLabel: 'Full stock',
-        waitMinutes: 4,
-        comment: 'Dutse-Bwari station running at 218 bar cascade pressure. Zero delay, fast dispense!',
-        likes: 16,
-        photo: ASSETS.dispenserGreen,
       },
     ],
   },
@@ -765,7 +732,7 @@ export const INITIAL_STATIONS: GasStation[] = [
       },
     ],
   },
-];
+]);
 
 export const INITIAL_COMMUNITY_POSTS: CommunityPost[] = [
   {
