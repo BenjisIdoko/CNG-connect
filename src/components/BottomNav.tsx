@@ -49,7 +49,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
             activeTab === 'conversions' ? 'material-symbols-fill' : ''
           }`}
         >
-          build_circle
+          wrench
         </span>
       </button>
 
