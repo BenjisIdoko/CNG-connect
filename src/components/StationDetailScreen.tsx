@@ -293,7 +293,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                 </span>
                 {station.operator && (
                   <span className="bg-[#006c50]/90 backdrop-blur-md text-white text-[11px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider shadow-sm">
-                    {station.operator}
+                    {station.operator.replace(/\s*\/\s*(CNG|Pi-CNG).*/gi, '').trim()}
                   </span>
                 )}
               </div>
