@@ -70,32 +70,15 @@ export function getDistanceInKm(lat1: number, lon1: number, lat2: number, lon2: 
   return R * c;
 }
 
-export function normalizeStateName(s?: string): string {
-  if (!s) return '';
-  const lower = s.toLowerCase().trim();
-  if (lower.includes('abuja') || lower.includes('fct')) return 'abuja';
-  if (lower.includes('lagos')) return 'lagos';
-  if (lower.includes('edo') || lower.includes('benin')) return 'edo';
-  if (lower.includes('oyo') || lower.includes('ibadan')) return 'oyo';
-  if (lower.includes('rivers') || lower.includes('ph') || lower.includes('port harcourt')) return 'rivers';
-  if (lower.includes('kano')) return 'kano';
-  if (lower.includes('ogun') || lower.includes('abeokuta')) return 'ogun';
-  if (lower.includes('delta') || lower.includes('warri')) return 'delta';
-  if (lower.includes('kaduna')) return 'kaduna';
-  if (lower.includes('katsina')) return 'katsina';
-  if (lower.includes('enugu')) return 'enugu';
-  if (lower.includes('imo')) return 'imo';
-  if (lower.includes('ondo')) return 'ondo';
-  if (lower.includes('osun')) return 'osun';
-  if (lower.includes('ekiti')) return 'ekiti';
-  return lower.replace(/\s*(state|\(.*\))/gi, '').trim();
-}
+import { normalizeStateName } from './permissionManager';
+
+export { normalizeStateName };
 
 export function isSameState(stState?: string, uState?: string): boolean {
-  if (!stState || !uState) return true;
+  if (!stState || !uState) return false;
   const normA = normalizeStateName(stState);
   const normB = normalizeStateName(uState);
-  if (!normA || !normB) return true;
+  if (!normA || !normB) return false;
   if (normA === normB) return true;
   return normA.includes(normB) || normB.includes(normA);
 }

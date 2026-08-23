@@ -33,8 +33,8 @@ describe('Proximity Alert Engine', () => {
 
   describe('State Name Normalization & Matching', () => {
     it('should match "FCT Abuja" with "Abuja FCT"', () => {
-      expect(normalizeStateName('FCT Abuja')).toBe('abuja');
-      expect(normalizeStateName('Abuja FCT')).toBe('abuja');
+      expect(normalizeStateName('FCT Abuja')).toBe('abuja fct');
+      expect(normalizeStateName('Abuja FCT')).toBe('abuja fct');
       expect(isSameState('FCT Abuja', 'Abuja FCT')).toBe(true);
     });
 

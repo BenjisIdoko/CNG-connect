@@ -16,6 +16,15 @@ export const ProximityAlertBanner: React.FC<ProximityAlertBannerProps> = ({
 }) => {
   const [selectedQuickStatus, setSelectedQuickStatus] = useState<StationStatus | null>(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const dismissTimerRef = React.useRef<NodeJS.Timeout | null>(null);
+
+  React.useEffect(() => {
+    return () => {
+      if (dismissTimerRef.current) {
+        clearTimeout(dismissTimerRef.current);
+      }
+    };
+  }, []);
 
   const handleQuickTap = (status: StationStatus) => {
     setSelectedQuickStatus(status);
@@ -45,7 +54,7 @@ export const ProximityAlertBanner: React.FC<ProximityAlertBannerProps> = ({
     }
 
     setIsSubmitted(true);
-    setTimeout(() => {
+    dismissTimerRef.current = setTimeout(() => {
       onDismiss();
     }, 2200);
   };

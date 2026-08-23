@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
-import { ConversionCenter } from '../types';
+import { ConversionCenter, UserProfile } from '../types';
+import { Modal } from './common/Modal';
 
 interface BookConversionModalProps {
   center: ConversionCenter;
+  user?: UserProfile;
   onClose: () => void;
-  onSuccess: (bookingRef: string) => void;
+  onSuccess: (appointmentInfo: { centerName: string; preferredDate: string; bookingRef: string }) => void;
 }
 
 export const BookConversionModal: React.FC<BookConversionModalProps> = ({
   center,
+  user,
   onClose,
   onSuccess,
 }) => {
@@ -31,9 +34,8 @@ export const BookConversionModal: React.FC<BookConversionModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-3 font-['Plus_Jakarta_Sans',sans-serif]">
-      <div className="bg-white w-full max-w-lg rounded-3xl p-6 shadow-2xl animate-fade-in border border-outline-variant max-h-[90vh] overflow-y-auto">
-        {bookingSuccessRef ? (
+    <Modal isOpen={true} onClose={onClose} title="Book CNG Kit Conversion" className="p-6 max-h-[90vh] overflow-y-auto">
+      {bookingSuccessRef ? (
           <div className="py-6 text-center space-y-4">
             <div className="w-16 h-16 rounded-full bg-surface-container text-primary flex items-center justify-center mx-auto border border-outline-variant">
               <span className="material-symbols-outlined text-[36px]">verified</span>
@@ -77,7 +79,11 @@ export const BookConversionModal: React.FC<BookConversionModalProps> = ({
 
             <button
               onClick={() => {
-                onSuccess(bookingSuccessRef);
+                onSuccess({
+                  centerName: center.name,
+                  preferredDate: selectedDate,
+                  bookingRef: bookingSuccessRef || '',
+                });
                 onClose();
               }}
               className="w-full py-3.5 bg-primary text-on-primary font-bold text-[14px] rounded-full shadow-md hover:opacity-95 transition-all"
@@ -219,7 +225,6 @@ export const BookConversionModal: React.FC<BookConversionModalProps> = ({
             </form>
           </div>
         )}
-      </div>
-    </div>
+    </Modal>
   );
 };

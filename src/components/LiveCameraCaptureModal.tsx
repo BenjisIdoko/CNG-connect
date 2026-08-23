@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
+import { Modal } from './common/Modal';
 
 interface LiveCameraCaptureModalProps {
   onCapture: (imageDataUrl: string) => void;
@@ -13,20 +14,27 @@ export const LiveCameraCaptureModal: React.FC<LiveCameraCaptureModalProps> = ({
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const captureTimerRef = useRef<NodeJS.Timeout | null>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [cameraError, setCameraError] = useState<string | null>(null);
   const [isCapturing, setIsCapturing] = useState(false);
   const [facingMode, setFacingMode] = useState<'environment' | 'user'>('environment');
   const [isPermissionRequested, setIsPermissionRequested] = useState(false);
 
+  const stopCurrentStream = () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((t) => t.stop());
+      streamRef.current = null;
+    }
+  };
+
   const startCamera = async (mode: 'environment' | 'user') => {
     setCameraError(null);
     setIsPermissionRequested(true);
 
     try {
-      if (stream) {
-        stream.getTracks().forEach((t) => t.stop());
-      }
+      stopCurrentStream();
 
       const mediaStream = await navigator.mediaDevices.getUserMedia({
         video: {
@@ -37,6 +45,7 @@ export const LiveCameraCaptureModal: React.FC<LiveCameraCaptureModalProps> = ({
         audio: false,
       });
 
+      streamRef.current = mediaStream;
       setStream(mediaStream);
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
@@ -55,8 +64,9 @@ export const LiveCameraCaptureModal: React.FC<LiveCameraCaptureModalProps> = ({
     startCamera(facingMode);
 
     return () => {
-      if (stream) {
-        stream.getTracks().forEach((track) => track.stop());
+      stopCurrentStream();
+      if (captureTimerRef.current) {
+        clearTimeout(captureTimerRef.current);
       }
     };
   }, [facingMode]);
@@ -96,18 +106,16 @@ export const LiveCameraCaptureModal: React.FC<LiveCameraCaptureModalProps> = ({
 
       const dataUrl = canvas.toDataURL('image/jpeg', 0.88);
 
-      setTimeout(() => {
+      captureTimerRef.current = setTimeout(() => {
         setIsCapturing(false);
-        if (stream) {
-          stream.getTracks().forEach((t) => t.stop());
-        }
+        stopCurrentStream();
         onCapture(dataUrl);
       }, 300);
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black flex flex-col justify-between p-4 font-['Plus_Jakarta_Sans',sans-serif] animate-fade-in">
+    <Modal isOpen={true} onClose={onClose} title={title} className="bg-black text-white h-full max-w-full p-4 flex flex-col justify-between rounded-none sm:rounded-none">
       {/* Top Header */}
       <div className="flex items-center justify-between text-white z-10 pt-2 pb-2">
         <div className="flex items-center gap-2">
@@ -199,6 +207,6 @@ export const LiveCameraCaptureModal: React.FC<LiveCameraCaptureModalProps> = ({
           </button>
         )}
       </div>
-    </div>
+    </Modal>
   );
 };

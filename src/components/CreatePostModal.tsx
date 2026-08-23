@@ -3,6 +3,7 @@ import { CommunityPost, UserProfile } from '../types';
 import { ASSETS } from '../data/mockData';
 import { LiveCameraCaptureModal } from './LiveCameraCaptureModal';
 import { StationGroupInfoSheet } from './StationGroupInfoSheet';
+import { Modal } from './common/Modal';
 
 interface CreatePostModalProps {
   isOpen: boolean;
@@ -25,8 +26,6 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
   const [imageError, setImageError] = useState<string | null>(null);
   const [showLiveCamera, setShowLiveCamera] = useState(false);
   const [showInfoSheet, setShowInfoSheet] = useState(false);
-
-  if (!isOpen) return null;
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -78,8 +77,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
-      <div className="w-full max-w-lg bg-surface rounded-t-3xl sm:rounded-3xl shadow-2xl p-5 border border-outline-variant max-h-[90vh] overflow-y-auto pb-safe animate-slide-up">
+    <Modal isOpen={isOpen} onClose={onClose} title="Create Community Post" className="p-5 max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-3">
           <h2 className="text-[20px] font-bold text-on-surface">
             Create Community Post
@@ -262,7 +260,6 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
             <span className="whitespace-nowrap">Publish Post</span>
           </button>
         </form>
-      </div>
 
       {showLiveCamera && (
         <LiveCameraCaptureModal
@@ -280,6 +277,6 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
         isOpen={showInfoSheet}
         onClose={() => setShowInfoSheet(false)}
       />
-    </div>
+    </Modal>
   );
 };

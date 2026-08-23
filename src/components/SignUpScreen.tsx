@@ -381,7 +381,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
                     <span className="material-symbols-outlined text-[16px]">sms</span>
                     Serverless SMS OTP Verification
                   </span>
-                  {devCode && (
+                  {import.meta.env.DEV && devCode && (
                     <span className="bg-primary text-status-green text-[10.5px] font-black px-2.5 py-0.5 rounded-full border border-status-green/40">
                       Dev mode — use code {devCode}
                     </span>
@@ -392,7 +392,6 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
                 </p>
                 <div className="flex items-center justify-between text-[11.5px] font-bold text-primary pt-1">
                   <span>Code expires in: <strong className="text-status-red">{formatExpiryMinutes(expiryCountdown)}</strong></span>
-                  <span className="text-primary font-black">⚙️ Dev mode — use code 123456</span>
                 </div>
               </div>
 

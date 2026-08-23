@@ -5,6 +5,7 @@ import { verifyImageMetadata } from '../utils/imageMetadataVerifier';
 import { LiveCameraCaptureModal } from './LiveCameraCaptureModal';
 import { checkLiveUpdatePermission } from '../utils/permissionManager';
 import { StationGroupInfoSheet } from './StationGroupInfoSheet';
+import { Modal } from './common/Modal';
 
 interface ReportStatusModalProps {
   station: GasStation;
@@ -30,6 +31,10 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
   const [presenceActive, setPresenceActive] = useState<boolean>(isPresenceActive);
   const [showLiveCamera, setShowLiveCamera] = useState(false);
   const [showInfoSheet, setShowInfoSheet] = useState(false);
+
+  React.useEffect(() => {
+    setPresenceActive(isPresenceActive);
+  }, [isPresenceActive]);
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -100,19 +105,12 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
       onSubmitReport(newReport, selectedStatus);
       setIsSubmitting(false);
       onClose();
-    }, 400);
+    }, 600);
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
-      {/* Scrim Backdrop */}
-      <div
-        onClick={onClose}
-        className="fixed inset-0 bg-[#29322e]/50 backdrop-blur-xs transition-opacity duration-300"
-      />
-
-      {/* Bottom Sheet */}
-      <div className="relative w-full max-w-lg bg-[#f2fcf5] rounded-t-3xl sm:rounded-3xl shadow-2xl z-10 max-h-[90vh] overflow-y-auto border border-[#dbe5de] pb-safe animate-slide-up">
+    <Modal isOpen={true} onClose={onClose} title="Report CNG Station Status" className="bg-[#f2fcf5] border-[#dbe5de] max-h-[90vh] overflow-y-auto">
+      <div className="relative w-full max-w-lg bg-[#f2fcf5] rounded-t-3xl sm:rounded-3xl shadow-2xl z-10 max-h-[90vh] overflow-y-auto border border-[#dbe5de] pb-safe">
         {/* Drag Handle */}
         <div className="flex justify-center pt-3 pb-2 touch-none">
           <div className="w-12 h-1.5 bg-[#b9cbc1] rounded-full" />
@@ -401,6 +399,6 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
         isOpen={showInfoSheet}
         onClose={() => setShowInfoSheet(false)}
       />
-    </div>
+    </Modal>
   );
 };

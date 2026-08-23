@@ -1,4 +1,4 @@
-import { otpSessionStore } from './send';
+import { getOtpSession, deleteOtpSession } from './store';
 
 function sendJsonResponse(res: any, statusCode: number, data: any) {
   if (res) {
@@ -58,7 +58,7 @@ export default async function handler(req: any, res: any) {
     const hasTermiiKey = Boolean(process.env.TERMII_API_KEY || process.env.AFRICAS_TALKING_API_KEY || process.env.TWILIO_AUTH_TOKEN);
     const isDevMode = !isProduction && (!hasTermiiKey || process.env.DEV_MODE === 'true' || process.env.VITE_DEV_MODE === 'true');
 
-    // Identical Dev Mode Check: Skip real Termii API check entirely
+    // Strict Dev Mode Check: Skip real SMS check ONLY in local dev environment
     if (isDevMode) {
       console.log(`DEV MODE: verifying test OTP code "${trimmedCode}" for ${normalizedPhone}`);
       if (trimmedCode === '123456' || trimmedCode === '000000') {
@@ -70,13 +70,13 @@ export default async function handler(req: any, res: any) {
       } else {
         return sendJsonResponse(res, 400, {
           verified: false,
-          error: 'Incorrect verification code. Use dev code 123456 to verify.',
+          error: 'Incorrect verification code.',
         });
       }
     }
 
-    // Real Mode Verification via cached session store
-    const session = otpSessionStore.get(normalizedPhone);
+    // Real Mode Verification via persistent session store
+    const session = await getOtpSession(normalizedPhone);
     if (!session) {
       return sendJsonResponse(res, 400, {
         verified: false,
@@ -86,7 +86,7 @@ export default async function handler(req: any, res: any) {
 
     // Expiry Check (5 Minutes)
     if (Date.now() > session.expiresAt) {
-      otpSessionStore.delete(normalizedPhone);
+      await deleteOtpSession(normalizedPhone);
       return sendJsonResponse(res, 400, {
         verified: false,
         error: 'OTP verification code has expired (5 minute limit). Please request a new code.',
@@ -102,7 +102,7 @@ export default async function handler(req: any, res: any) {
     }
 
     // Success: Remove code from session store (one-time use)
-    otpSessionStore.delete(normalizedPhone);
+    await deleteOtpSession(normalizedPhone);
 
     return sendJsonResponse(res, 200, {
       verified: true,

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ASSETS } from '../data/mockData';
+import { Modal } from './common/Modal';
 
 interface OnboardingModalProps {
   isOpen: boolean;
@@ -18,8 +19,6 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
   const [isEmailMode, setIsEmailMode] = useState(false);
   const [email, setEmail] = useState('');
   const [showCountryPicker, setShowCountryPicker] = useState(false);
-
-  if (!isOpen) return null;
 
   const countries = [
     { code: '+234', flag: '🇳🇬', name: 'Nigeria' },
@@ -56,8 +55,8 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-0 sm:p-4 overflow-y-auto">
-      <div className="w-full max-w-md min-h-screen sm:min-h-0 bg-surface sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col justify-between border border-outline-variant animate-fade-in">
+    <Modal isOpen={isOpen} onClose={onClose} title="Welcome to GasFinder" className="max-w-md min-h-screen sm:min-h-0 bg-surface border border-outline-variant flex flex-col justify-between">
+      <div className="w-full max-w-md min-h-screen sm:min-h-0 bg-surface sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col justify-between border border-outline-variant">
         {/* Top Graphic Illustration Header */}
         <div className="w-full flex-shrink-0 relative overflow-hidden bg-surface-container rounded-b-[36px] pt-8 pb-6 border-b border-outline-variant/60">
           <button
@@ -186,6 +185,6 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
           </div>
         </div>
       </div>
-    </div>
+    </Modal>
   );
 };

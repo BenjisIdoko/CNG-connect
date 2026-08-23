@@ -1,6 +1,4 @@
-// Server-Side In-Memory Cache for OTP Verification Challenges
-// Map key: normalized phone number -> { code, expiresAt, lastSentAt }
-export const otpSessionStore = new Map<string, { code: string; expiresAt: number; lastSentAt: number }>();
+import { getOtpSession, saveOtpSession } from './store';
 
 function sendJsonResponse(res: any, statusCode: number, data: any) {
   if (res) {
@@ -53,7 +51,7 @@ export default async function handler(req: any, res: any) {
     normalizedPhone = '+' + normalizedPhone;
 
     const now = Date.now();
-    const existing = otpSessionStore.get(normalizedPhone);
+    const existing = await getOtpSession(normalizedPhone);
 
     // 1. Rate Limiting Check: 60-Second Cooldown between SMS dispatches
     if (existing && now - existing.lastSentAt < 60000) {
@@ -64,7 +62,7 @@ export default async function handler(req: any, res: any) {
       });
     }
 
-    // Strict Dev-Mode Check: Absence of Termii key, or explicit DEV_MODE / non-production env
+    // Strict Dev-Mode Check: strictly disabled in production
     const isProduction = process.env.NODE_ENV === 'production';
     const hasTermiiKey = Boolean(process.env.TERMII_API_KEY || process.env.AFRICAS_TALKING_API_KEY || process.env.TWILIO_AUTH_TOKEN);
     const isDevMode = !isProduction && (!hasTermiiKey || process.env.DEV_MODE === 'true' || process.env.VITE_DEV_MODE === 'true');
@@ -73,8 +71,8 @@ export default async function handler(req: any, res: any) {
     const generatedOtp = isDevMode ? '123456' : Math.floor(100000 + Math.random() * 900000).toString();
     const expiresAt = now + 5 * 60 * 1000; // 5-minute expiry
 
-    // Save challenge in server-side session cache
-    otpSessionStore.set(normalizedPhone, {
+    // Save challenge in persistent session store
+    await saveOtpSession(normalizedPhone, {
       code: generatedOtp,
       expiresAt,
       lastSentAt: now,

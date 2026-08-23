@@ -9,31 +9,52 @@ export interface PermissionCheckResult {
  * Normalizes state names for accurate state-scoped matching.
  * e.g., 'Abuja FCT' -> 'abuja fct', 'FCT' -> 'abuja fct', 'Lagos State' -> 'lagos'
  */
+/**
+ * Normalizes state names for accurate state-scoped matching.
+ * e.g., 'Abuja FCT' -> 'abuja', 'FCT' -> 'abuja', 'Lagos State' -> 'lagos'
+ */
 export function normalizeStateName(stateStr?: string): string {
   if (!stateStr) return '';
-  let cleaned = stateStr.trim().toLowerCase();
-  
-  // Clean up common suffix/prefix variations
-  cleaned = cleaned.replace(/\bstate\b/g, '').trim();
-  if (cleaned === 'fct' || cleaned === 'abuja') {
-    return 'abuja fct';
-  }
-  return cleaned;
+  const lower = stateStr.toLowerCase().trim();
+  if (lower.includes('abuja') || lower.includes('fct')) return 'abuja fct';
+  if (lower.includes('lagos')) return 'lagos';
+  if (lower.includes('edo') || lower.includes('benin')) return 'edo';
+  if (lower.includes('oyo') || lower.includes('ibadan')) return 'oyo';
+  if (lower.includes('rivers') || lower.includes('ph') || lower.includes('port harcourt')) return 'rivers';
+  if (lower.includes('kano')) return 'kano';
+  if (lower.includes('ogun') || lower.includes('abeokuta')) return 'ogun';
+  if (lower.includes('delta') || lower.includes('warri')) return 'delta';
+  if (lower.includes('kaduna')) return 'kaduna';
+  if (lower.includes('katsina')) return 'katsina';
+  if (lower.includes('enugu')) return 'enugu';
+  if (lower.includes('imo')) return 'imo';
+  if (lower.includes('ondo')) return 'ondo';
+  if (lower.includes('osun')) return 'osun';
+  if (lower.includes('ekiti')) return 'ekiti';
+  return lower.replace(/\s*(state|\(.*\))/gi, '').trim();
 }
 
 /**
  * PERMISSION CHECK 1: State-Scoped Broadcast Notifications
  * Push notifications are delivered ONLY when the recipient's registered/detected
  * state matches the station's state. Not nationwide, not proximity-gated.
+ * Fail-closed: blocks notification if userState or stationState is unassigned.
  */
 export function checkNotificationPermission(
   userState?: string,
   stationState?: string
 ): PermissionCheckResult {
-  const normUser = normalizeStateName(userState || 'Abuja FCT');
-  const normStation = normalizeStateName(stationState || 'Abuja FCT');
+  if (!userState || !stationState) {
+    return {
+      allowed: false,
+      reason: `Push notification blocked: Destination station state (${stationState || 'Unassigned'}) or user state (${userState || 'Unassigned'}) is missing. Notifications are scoped by state.`,
+    };
+  }
 
-  if (normUser === normStation) {
+  const normUser = normalizeStateName(userState);
+  const normStation = normalizeStateName(stationState);
+
+  if (normUser && normStation && (normUser === normStation || normUser.includes(normStation) || normStation.includes(normUser))) {
     return {
       allowed: true,
     };
@@ -41,7 +62,7 @@ export function checkNotificationPermission(
 
   return {
     allowed: false,
-    reason: `Push notification blocked: Destination station state (${stationState}) does not match driver registered state (${userState || 'Unassigned'}). Notifications are scoped by state.`,
+    reason: `Push notification blocked: Destination station state (${stationState}) does not match driver registered state (${userState}). Notifications are scoped by state.`,
   };
 }
 

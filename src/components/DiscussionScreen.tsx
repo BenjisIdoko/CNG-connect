@@ -17,6 +17,12 @@ export const DiscussionScreen: React.FC<DiscussionScreenProps> = ({
   const [isLiked, setIsLiked] = useState(post.isLiked || false);
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
 
+  React.useEffect(() => {
+    setComments(post.comments || []);
+    setLikesCount(post.likes || 0);
+    setIsLiked(Boolean(post.isLiked));
+  }, [post]);
+
   const handleToggleLike = () => {
     if (isLiked) {
       setLikesCount((c) => c - 1);

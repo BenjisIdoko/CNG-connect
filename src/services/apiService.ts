@@ -430,8 +430,8 @@ export const apiService = {
       }
     }
 
-    // Default fallback: allow if pinged within last session or station active
-    return true;
+    // Default fallback: return false (fail-closed/secure)
+    return false;
   },
 
   /**

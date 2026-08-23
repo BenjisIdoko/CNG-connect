@@ -59,6 +59,9 @@ export interface GasStation {
   activePresenceCount?: number;
   stationComments?: CommentItem[];
   stationNotice?: string;
+  photos?: string[];
+  rating?: number;
+  memberCount?: number;
   locationPrecision?: 'geocoded' | 'gps_confirmed';
   dataSource?: string;
   dataSourceDate?: string;

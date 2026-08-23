@@ -78,24 +78,41 @@ CREATE TABLE IF NOT EXISTS community_posts (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Enable Row Level Security (RLS) & Public Read/Insert Access Policies
+-- 5. Create 'otp_sessions' table for serverless OTP verification
+CREATE TABLE IF NOT EXISTS otp_sessions (
+  phone TEXT PRIMARY KEY,
+  code TEXT NOT NULL,
+  expires_at BIGINT NOT NULL,
+  last_sent_at BIGINT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Enable Row Level Security (RLS) & Secure Authenticated Write Access Policies
 ALTER TABLE stations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE station_reports ENABLE ROW LEVEL SECURITY;
 ALTER TABLE station_media ENABLE ROW LEVEL SECURITY;
 ALTER TABLE community_posts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE otp_sessions ENABLE ROW LEVEL SECURITY;
 
+-- Stations RLS Policies
 CREATE POLICY "Allow public read on stations" ON stations FOR SELECT USING (true);
-CREATE POLICY "Allow public write on stations" ON stations FOR INSERT WITH CHECK (true);
-CREATE POLICY "Allow public update on stations" ON stations FOR UPDATE USING (true);
+CREATE POLICY "Allow authenticated write on stations" ON stations FOR INSERT TO authenticated WITH CHECK (auth.role() = 'authenticated');
+CREATE POLICY "Allow authenticated update on stations" ON stations FOR UPDATE TO authenticated USING (auth.role() = 'authenticated');
 
+-- Station Reports RLS Policies
 CREATE POLICY "Allow public read on station_reports" ON station_reports FOR SELECT USING (true);
-CREATE POLICY "Allow public write on station_reports" ON station_reports FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow authenticated write on station_reports" ON station_reports FOR INSERT TO authenticated WITH CHECK (auth.role() = 'authenticated');
 
+-- Station Media RLS Policies
 CREATE POLICY "Allow public read on station_media" ON station_media FOR SELECT USING (true);
-CREATE POLICY "Allow public write on station_media" ON station_media FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow authenticated write on station_media" ON station_media FOR INSERT TO authenticated WITH CHECK (auth.role() = 'authenticated');
 
+-- Community Posts RLS Policies
 CREATE POLICY "Allow public read on community_posts" ON community_posts FOR SELECT USING (true);
-CREATE POLICY "Allow public write on community_posts" ON community_posts FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow authenticated write on community_posts" ON community_posts FOR INSERT TO authenticated WITH CHECK (auth.role() = 'authenticated');
+
+-- OTP Sessions RLS Policies (Service Role / Auth)
+CREATE POLICY "Allow service role full access on otp_sessions" ON otp_sessions FOR ALL USING (true);
 
 -- Initial Seed Data Insertion
 INSERT INTO stations (id, name, address, city, state, lat, lng, status, status_label, pump_pressure, cng_price, operator, is_pi_cng_accredited, rating)

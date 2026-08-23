@@ -1,6 +1,7 @@
 import React from 'react';
 import { GasStation } from '../types';
 import { openExternalMaps } from '../utils/navigationHelper';
+import { Modal } from './common/Modal';
 
 interface LiveNavigationModalProps {
   station: GasStation;
@@ -17,9 +18,8 @@ export const LiveNavigationModal: React.FC<LiveNavigationModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-end sm:items-center justify-center p-0 sm:p-4 font-['Plus_Jakarta_Sans',sans-serif] animate-fade-in">
-      {/* Container Card */}
-      <div className="bg-[#141d19] text-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl border border-emerald-500/30 flex flex-col gap-5">
+    <Modal isOpen={true} onClose={onClose} title="Station Navigation Summary" className="bg-[#141d19] text-white p-6 border border-emerald-500/30">
+      <div className="flex flex-col gap-5">
         {/* Modal Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -102,6 +102,6 @@ export const LiveNavigationModal: React.FC<LiveNavigationModalProps> = ({
           </button>
         </div>
       </div>
-    </div>
+    </Modal>
   );
 };

@@ -41,6 +41,17 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
   const [isPresenceActiveState, setIsPresenceActiveState] = useState<boolean>(isPresenceActive);
   const [showInfoSheet, setShowInfoSheet] = useState(false);
 
+  useEffect(() => {
+    setReports(station.reports || []);
+    if (station.stationComments && station.stationComments.length > 0) {
+      setComments(station.stationComments);
+    }
+  }, [station]);
+
+  useEffect(() => {
+    setIsPresenceActiveState(isPresenceActive);
+  }, [isPresenceActive]);
+
   const getFreshnessBadgeInfo = (timeAgo: string) => {
     const lower = timeAgo.toLowerCase();
     let minutes = 999;
