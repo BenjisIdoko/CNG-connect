@@ -106,7 +106,10 @@ export const App: React.FC = () => {
   useEffect(() => {
     const handleOnline = () => {
       setIsOnline(true);
-      setGlobalToast('Network connection restored. Syncing live stations...');
+      showToast('Back online. Syncing stations...');
+      apiService.fetchStations().then((data) => {
+        if (data.length > 0) setStations(data);
+      });
     };
     const handleOffline = () => {
       setIsOnline(false);
@@ -179,9 +182,12 @@ export const App: React.FC = () => {
     }
   });
 
-  // Real navigator.geolocation.watchPosition & getCurrentPosition + Haversine distance calculation
+  // Single Source of Truth: Geolocation Watch & Distance Updates
   useEffect(() => {
-    if (!('geolocation' in navigator)) return;
+    if (!('geolocation' in navigator)) {
+      setGpsStatus('unavailable');
+      return;
+    }
 
     const handlePosSuccess = (pos: GeolocationPosition) => {
       const { latitude, longitude } = pos.coords;
@@ -224,13 +230,9 @@ export const App: React.FC = () => {
         if (st.lat == null || st.lng == null) return false;
 
         const distKm = getDistanceInKm(latitude, longitude, st.lat, st.lng);
-        // Radius threshold: within 0.8 km (800 meters)
         if (distKm > 0.8) return false;
 
-        // (a) Check staleness (>30 min)
         if (!isStationStale(st.lastUpdated, 30)) return false;
-
-        // (b) Check per-station per-user 2-hour cooldown
         if (isStationOnCooldown(userKey, st.id, 2)) return false;
 
         return true;
@@ -243,20 +245,27 @@ export const App: React.FC = () => {
       }
     };
 
+    const handlePosError = (err: GeolocationPositionError) => {
+      console.debug('Geolocation watch status:', err.message);
+      if (err.code === err.PERMISSION_DENIED) {
+        setGpsStatus('denied');
+        showToast('Turn on location to find nearby stations');
+      } else {
+        setGpsStatus('unavailable');
+      }
+    };
+
     // Immediate acquisition on mount
     navigator.geolocation.getCurrentPosition(
       handlePosSuccess,
-      (err) => console.debug('Initial position error:', err.message),
+      handlePosError,
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 15000 }
     );
 
     // Continuous watch for movement
     const watchId = navigator.geolocation.watchPosition(
       handlePosSuccess,
-      (err) => {
-        console.debug('Geolocation watch status:', err.message);
-        setGpsStatus(err.code === err.PERMISSION_DENIED ? 'denied' : 'unavailable');
-      },
+      handlePosError,
       {
         enableHighAccuracy: true,
         maximumAge: 15000,
@@ -349,15 +358,7 @@ export const App: React.FC = () => {
       };
     });
 
-    if (broadcast.isDelivered) {
-      showToast(
-        `${broadcast.title}: ${broadcast.message} (+${pointsAwarded} PTS)`
-      );
-    } else {
-      showToast(
-        `Report submitted (+${pointsAwarded} PTS). Push broadcast skipped for driver: Registered state (${userProfile.state || 'Unassigned'}) does not match station state (${reportingStation.state}).`
-      );
-    }
+    showToast('Thanks. Other drivers can see this.');
   };
 
   const handleAddStationComment = (stationId: string, commentText: string) => {
@@ -505,7 +506,7 @@ export const App: React.FC = () => {
         {!isOnline && (
           <div className="fixed top-3 left-1/2 -translate-x-1/2 z-50 bg-[#004D40]/95 text-white text-[11.5px] font-extrabold px-4 py-1.5 rounded-full shadow-lg border border-emerald-400/40 backdrop-blur-md flex items-center gap-1.5 animate-pulse pointer-events-none">
             <span className="material-symbols-outlined text-[16px] text-amber-400">wifi_off</span>
-            <span>Offline Mode — Showing Cached Stations</span>
+            <span>No network. Showing last known stations.</span>
           </div>
         )}
         <Suspense

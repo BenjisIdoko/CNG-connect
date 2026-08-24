@@ -30,7 +30,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
             activeTab === 'map' ? 'material-symbols-fill' : ''
           }`}
         >
-          map
+          ev_station
         </span>
       </button>
 

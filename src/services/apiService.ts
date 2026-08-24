@@ -32,6 +32,43 @@ export function calculateVerificationMetadata(report: DriverReport): {
 const STATIONS_STORAGE_KEY = 'gasfinder_stations_v7';
 const POSTS_STORAGE_KEY = 'gasfinder_posts_v7';
 
+let memoryStore: Record<string, string> = {};
+
+function getStorageItem(key: string): string | null {
+  try {
+    if (typeof localStorage !== 'undefined') {
+      return localStorage.getItem(key);
+    }
+  } catch {
+    // Fallback
+  }
+  return memoryStore[key] || null;
+}
+
+function setStorageItem(key: string, value: string): void {
+  try {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem(key, value);
+      return;
+    }
+  } catch {
+    // Fallback
+  }
+  memoryStore[key] = value;
+}
+
+function removeStorageItem(key: string): void {
+  try {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.removeItem(key);
+      return;
+    }
+  } catch {
+    // Fallback
+  }
+  delete memoryStore[key];
+}
+
 function purgeStaleLocalStorage() {
   try {
     const keysToRemove = [
@@ -48,7 +85,7 @@ function purgeStaleLocalStorage() {
       'gasfinder_posts_v5',
       'gasfinder_posts_v6',
     ];
-    keysToRemove.forEach((k) => localStorage.removeItem(k));
+    keysToRemove.forEach((k) => removeStorageItem(k));
   } catch {
     // Ignore storage errors
   }
@@ -57,10 +94,10 @@ function purgeStaleLocalStorage() {
 function getLocalStations(): GasStation[] {
   purgeStaleLocalStorage();
   try {
-    const saved = localStorage.getItem(STATIONS_STORAGE_KEY);
+    const saved = getStorageItem(STATIONS_STORAGE_KEY);
     if (!saved) return deduplicateStations(INITIAL_STATIONS);
     const parsed = JSON.parse(saved);
-    if (!Array.isArray(parsed) || parsed.length < INITIAL_STATIONS.length) {
+    if (!Array.isArray(parsed) || parsed.length === 0) {
       return deduplicateStations(INITIAL_STATIONS);
     }
     return deduplicateStations(parsed);
@@ -71,7 +108,7 @@ function getLocalStations(): GasStation[] {
 
 function saveLocalStations(stations: GasStation[]) {
   try {
-    localStorage.setItem(STATIONS_STORAGE_KEY, JSON.stringify(stations));
+    setStorageItem(STATIONS_STORAGE_KEY, JSON.stringify(stations));
   } catch (e) {
     console.error('Failed to save stations locally', e);
   }
@@ -79,7 +116,7 @@ function saveLocalStations(stations: GasStation[]) {
 
 function getLocalPosts(): CommunityPost[] {
   try {
-    const saved = localStorage.getItem(POSTS_STORAGE_KEY);
+    const saved = getStorageItem(POSTS_STORAGE_KEY);
     return saved ? JSON.parse(saved) : INITIAL_POSTS;
   } catch {
     return INITIAL_POSTS;
@@ -88,7 +125,7 @@ function getLocalPosts(): CommunityPost[] {
 
 function saveLocalPosts(posts: CommunityPost[]) {
   try {
-    localStorage.setItem(POSTS_STORAGE_KEY, JSON.stringify(posts));
+    setStorageItem(POSTS_STORAGE_KEY, JSON.stringify(posts));
   } catch (e) {
     console.error('Failed to save posts locally', e);
   }
@@ -187,7 +224,11 @@ export const apiService = {
           };
         });
 
-        return stations.length > 0 ? stations : getLocalStations();
+        if (stations.length > 0) {
+          saveLocalStations(stations);
+          return stations;
+        }
+        return getLocalStations();
       } catch (err) {
         console.error('API Service fetchStations failed:', err);
         return getLocalStations();
@@ -212,9 +253,37 @@ export const apiService = {
       verificationWeight,
     };
 
+    const statusLabels: Record<StationStatus, string> = {
+      full: 'Full stock',
+      low: 'Low pressure',
+      queue: 'Queuing',
+      out: 'Out of gas',
+      unknown: 'No recent reports',
+    };
+
+    // 1. ALWAYS update local cache and persist to localStorage (gasfinder_stations_v7)
+    const currentStations = getLocalStations();
+    const updatedLocalStations = currentStations.map((st) => {
+      if (st.id === stationId) {
+        const existingReports = st.reports || [];
+        const filteredReports = existingReports.filter((r) => r.id !== enrichedReport.id);
+        return {
+          ...st,
+          status: newStatus,
+          statusLabel: statusLabels[newStatus],
+          lastUpdated: 'Just now',
+          reports: [enrichedReport, ...filteredReports],
+        };
+      }
+      return st;
+    });
+
+    saveLocalStations(updatedLocalStations);
+
+    // 2. Sync to Supabase if configured (log errors clearly; never fail silently)
     if (isSupabaseConfigured && supabase) {
       try {
-        // 1. Insert into station_reports table
+        // A. Insert into station_reports table
         const { error: reportError } = await supabase.from('station_reports').insert({
           id: enrichedReport.id,
           station_id: stationId,
@@ -233,78 +302,88 @@ export const apiService = {
           dislikes: enrichedReport.dislikes || 0,
           photo: enrichedReport.photo,
         });
+
         if (reportError) {
-          console.error('Supabase station_reports insert failed:', reportError.message);
+          console.error('Supabase station_reports insert failed:', reportError.message, reportError);
         }
 
-        // 2. Insert into station_media table if photo attached
+        // B. Insert into station_media table if photo attached
         if (enrichedReport.photo) {
+          const targetStation = currentStations.find((s) => s.id === stationId);
+          let mediaLat = targetStation?.lat ?? 9.0765;
+          let mediaLng = targetStation?.lng ?? 7.4853;
+          try {
+            const savedUserCoords = getStorageItem('gasfinder_user_coords');
+            if (savedUserCoords) {
+              const parsedCoords = JSON.parse(savedUserCoords);
+              if (parsedCoords?.lat && parsedCoords?.lng) {
+                mediaLat = parsedCoords.lat;
+                mediaLng = parsedCoords.lng;
+              }
+            }
+          } catch {
+            // fallback to station coords
+          }
+
           const { error: mediaError } = await supabase.from('station_media').insert({
             station_id: stationId,
             report_id: enrichedReport.id,
             media_url: enrichedReport.photo,
             is_verified: Boolean(enrichedReport.isPhotoVerified),
-            geo_lat: 9.0765, // verified station lat
-            geo_lng: 7.4853, // verified station lng
+            geo_lat: mediaLat,
+            geo_lng: mediaLng,
             geo_accuracy_meters: 10,
             photo_timestamp: new Date().toISOString(),
             perceptual_hash: `phash-${Date.now()}`,
           });
+
           if (mediaError) {
-            console.error('Supabase station_media insert failed:', mediaError.message);
+            console.error('Supabase station_media insert failed:', mediaError.message, mediaError);
           }
         }
 
-        // 3. Update station status via SECURITY DEFINER RPC (anon clients are
-        // not granted direct UPDATE on stations — see supabase/schema.sql)
-        const statusLabels: Record<StationStatus, string> = {
-          full: 'Full stock',
-          low: 'Low pressure',
-          queue: 'Queuing',
-          out: 'Out of gas',
-          unknown: 'No recent reports',
-        };
+        // C. Update station status via SECURITY DEFINER RPC report_station_status
+        if (newStatus !== 'unknown') {
+          const { error: rpcError } = await supabase.rpc('report_station_status', {
+            p_station_id: stationId,
+            p_status: newStatus,
+            p_status_label: statusLabels[newStatus],
+          });
 
-        const { error: rpcError } = await supabase.rpc('report_station_status', {
-          p_station_id: stationId,
-          p_status: newStatus,
-          p_status_label: statusLabels[newStatus],
-        });
-        if (rpcError) {
-          console.error('Supabase report_station_status rpc failed:', rpcError.message);
+          if (rpcError) {
+            console.error('Supabase report_station_status rpc failed:', rpcError.message, rpcError);
+          }
         }
 
-        return await this.fetchStations();
+        // D. Fetch updated stations from Supabase and merge local report
+        const freshStations = await this.fetchStations();
+        if (freshStations && freshStations.length > 0) {
+          const mergedStations = freshStations.map((st) => {
+            if (st.id === stationId) {
+              const existingReports = st.reports || [];
+              const hasReport = existingReports.some((r) => r.id === enrichedReport.id);
+              const reports = hasReport ? existingReports : [enrichedReport, ...existingReports];
+              return {
+                ...st,
+                status: newStatus,
+                statusLabel: statusLabels[newStatus],
+                lastUpdated: 'Just now',
+                reports,
+              };
+            }
+            return st;
+          });
+
+          saveLocalStations(mergedStations);
+          return mergedStations;
+        }
       } catch (err) {
-        console.error('API Service submitReport failed, using local fallback:', err);
+        console.error('API Service submitReport Supabase exception, using updated local cache:', err);
       }
     }
 
-    // Local fallback logic
-    const currentStations = getLocalStations();
-    const statusLabels: Record<StationStatus, string> = {
-      full: 'Full stock',
-      low: 'Low pressure',
-      queue: 'Queuing',
-      out: 'Out of gas',
-      unknown: 'No recent reports',
-    };
-
-    const updated = currentStations.map((st) => {
-      if (st.id === stationId) {
-        return {
-          ...st,
-          status: newStatus,
-          statusLabel: statusLabels[newStatus],
-          lastUpdated: 'Just now',
-          reports: [enrichedReport, ...st.reports],
-        };
-      }
-      return st;
-    });
-
-    saveLocalStations(updated);
-    return updated;
+    // 3. Return full updated stations list
+    return updatedLocalStations;
   },
 
   /**

@@ -3,6 +3,7 @@ import { GasStation, CommentItem, UserProfile } from '../types';
 import { ASSETS } from '../data/mockData';
 import { openExternalMaps } from '../utils/navigationHelper';
 import { StationGroupInfoSheet } from './StationGroupInfoSheet';
+import { formatStationAge } from '../utils/timeUtils';
 
 interface StationDetailScreenProps {
   station: GasStation;
@@ -295,8 +296,8 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
 
             {/* Time / Distance Info */}
             <div className="flex items-center gap-2 text-[12px] font-medium text-slate-500 ml-auto">
-              <span className="flex items-center gap-1 text-[#006c50] font-semibold">
-                Updated {station.lastUpdated}
+              <span className={`flex items-center gap-1 font-bold ${station.status === 'unknown' ? 'text-slate-400' : 'text-[#006c50]'}`}>
+                {formatStationAge(station)}
               </span>
             </div>
           </div>

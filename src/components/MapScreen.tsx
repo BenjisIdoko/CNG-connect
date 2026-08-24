@@ -6,6 +6,7 @@ import 'leaflet.markercluster';
 import { GasStation, StationStatus } from '../types';
 import { ASSETS } from '../data/mockData';
 import { Modal } from './common/Modal';
+import { formatStationAge } from '../utils/timeUtils';
 
 export type GpsStatus = 'active' | 'denied' | 'unavailable';
 
@@ -43,59 +44,20 @@ export const MapScreen: React.FC<MapScreenProps> = ({
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [visibleCount, setVisibleCount] = useState(25);
 
-  const [userGps, setUserGps] = useState<{ lat: number; lng: number } | null>(() => {
-    if (propUserGps) return propUserGps;
-    try {
-      const saved = localStorage.getItem('gasfinder_user_coords');
-      return saved ? JSON.parse(saved) : null;
-    } catch {
-      return null;
-    }
-  });
-  const [gpsStatus, setGpsStatus] = useState<GpsStatus>(propGpsStatus || 'unavailable');
-  const [gpsStatusText, setGpsStatusText] = useState<string>(
-    userGps ? `GPS Active: ${userGps.lat.toFixed(4)}°N, ${userGps.lng.toFixed(4)}°E` : 'GPS Location Unavailable (Abuja Default)'
-  );
+  const userGps = propUserGps || null;
+  const gpsStatus = propGpsStatus || 'unavailable';
+  const gpsStatusText =
+    gpsStatus === 'active' && userGps
+      ? `GPS Active: ${userGps.lat.toFixed(4)}°N, ${userGps.lng.toFixed(4)}°E`
+      : gpsStatus === 'denied'
+      ? 'Turn on location to find nearby stations'
+      : 'GPS Location Unavailable (Showing Default)';
 
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
   const markersLayerRef = useRef<L.LayerGroup | null>(null);
   const initialFitRef = useRef(false);
   const userSelectedRef = useRef(false);
-
-  // Sync propUserGps when parent passes updated coordinates
-  useEffect(() => {
-    if (propUserGps) {
-      setUserGps(propUserGps);
-      setGpsStatus('active');
-      setGpsStatusText(`GPS Active: ${propUserGps.lat.toFixed(4)}°N, ${propUserGps.lng.toFixed(4)}°E`);
-    }
-  }, [propUserGps]);
-
-  // Auto-acquire position on mount if userGps is not set
-  useEffect(() => {
-    if (!userGps && 'geolocation' in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          const { latitude, longitude } = pos.coords;
-          const coords = { lat: latitude, lng: longitude };
-          setUserGps(coords);
-          setGpsStatus('active');
-          setGpsStatusText(`GPS Active: ${latitude.toFixed(4)}°N, ${longitude.toFixed(4)}°E`);
-          if (onGpsStatusChange) {
-            onGpsStatusChange('active', coords);
-          }
-          if (mapInstanceRef.current) {
-            mapInstanceRef.current.flyTo([latitude, longitude], 14, { duration: 1.2 });
-          }
-        },
-        () => {
-          // silently handle fallback
-        },
-        { enableHighAccuracy: true, timeout: 8000 }
-      );
-    }
-  }, []);
 
   const CITY_COORDINATES: Record<string, { lat: number; lng: number; zoom: number }> = {
     all: { lat: 9.0765, lng: 7.4853, zoom: 6 },
@@ -326,60 +288,24 @@ export const MapScreen: React.FC<MapScreenProps> = ({
   const handleRecenter = () => {
     setIsRecentering(true);
 
-    if ('geolocation' in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          const { latitude, longitude } = pos.coords;
-          setUserGps({ lat: latitude, lng: longitude });
-          setGpsStatus('active');
-          setGpsStatusText(`GPS Active: ${latitude.toFixed(4)}°N, ${longitude.toFixed(4)}°E`);
-          showToast(`Live GPS Acquired: ${latitude.toFixed(4)}° N, ${longitude.toFixed(4)}° E`);
-          if (onGpsStatusChange) {
-            onGpsStatusChange('active', { lat: latitude, lng: longitude });
-          }
-          if (mapInstanceRef.current) {
-            mapInstanceRef.current.flyTo([latitude, longitude], 14);
-          }
-          setIsRecentering(false);
-        },
-        (err) => {
-          console.warn('Geolocation permission error or unavailable:', err.message);
-          const isDenied = err.code === err.PERMISSION_DENIED;
-          const status: GpsStatus = isDenied ? 'denied' : 'unavailable';
-          setUserGps(null);
-          setGpsStatus(status);
-          setGpsStatusText(
-            isDenied
-              ? 'GPS Permission Denied (Showing Abuja Default)'
-              : 'GPS Location Unavailable (Showing Abuja Default)'
-          );
-          const failMsg = isDenied
-            ? "Couldn't get your location — permission denied. Showing Abuja as default."
-            : "Couldn't get your location — showing Abuja as default";
-          showToast(failMsg);
-          if (onGpsStatusChange) {
-            onGpsStatusChange(status);
-          }
-          if (mapInstanceRef.current) {
-            mapInstanceRef.current.flyTo([9.0765, 7.4853], 13);
-          }
-          setTimeout(() => setIsRecentering(false), 900);
-        },
-        { enableHighAccuracy: true, timeout: 5000 }
-      );
-    } else {
-      setUserGps(null);
-      setGpsStatus('unavailable');
-      setGpsStatusText('GPS Not Supported (Showing Abuja Default)');
-      showToast("Couldn't get your location — showing Abuja as default");
-      if (onGpsStatusChange) {
-        onGpsStatusChange('unavailable');
+    if (gpsStatus === 'active' && userGps) {
+      showToast(`Live GPS: ${userGps.lat.toFixed(4)}° N, ${userGps.lng.toFixed(4)}° E`);
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.flyTo([userGps.lat, userGps.lng], 14, { duration: 1.2 });
       }
+    } else if (gpsStatus === 'denied') {
+      showToast('Turn on location to find nearby stations');
       if (mapInstanceRef.current) {
         mapInstanceRef.current.flyTo([9.0765, 7.4853], 13);
       }
-      setTimeout(() => setIsRecentering(false), 900);
+    } else {
+      showToast("Couldn't get your location — showing default view");
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.flyTo([9.0765, 7.4853], 13);
+      }
     }
+
+    setTimeout(() => setIsRecentering(false), 600);
   };
 
   const getStatusIndicator = (status: StationStatus) => {
@@ -609,7 +535,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                                 <h4 className="font-bold text-[14.5px] text-on-surface truncate leading-snug">
                                   {station.name}
                                 </h4>
-                                <div className="flex items-center gap-2 text-[12px] text-on-surface-variant mt-0.5">
+                                <div className="flex flex-wrap items-center gap-1.5 text-[12px] text-on-surface-variant mt-0.5">
                                   <span className="font-bold text-primary">{station.distance}</span>
                                   <span>•</span>
                                   <span className="font-medium">{station.statusLabel}</span>
@@ -619,6 +545,10 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                                       <span className="font-semibold text-on-surface-variant">{station.pumpPressure} bar</span>
                                     </>
                                   )}
+                                  <span>•</span>
+                                  <span className={`font-bold ${station.status === 'unknown' ? 'text-slate-400' : 'text-[#006c50]'}`}>
+                                    {formatStationAge(station)}
+                                  </span>
                                 </div>
                               </div>
                             </div>
@@ -709,7 +639,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
 
                             <div className="mt-2.5 pt-2 border-t border-outline-variant/30 flex items-center justify-between">
                               <div className="flex items-center gap-1.5 text-[11px] font-medium text-on-surface-variant">
-                                <span className="text-secondary font-semibold">{st.busyEstimate}</span>
+                                <span className="font-semibold text-[#006c50]">{formatStationAge(st)}</span>
                                 <span>•</span>
                                 <span>{st.distance}</span>
                               </div>

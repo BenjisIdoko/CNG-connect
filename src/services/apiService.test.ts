@@ -58,4 +58,39 @@ describe('Verification Weighting & Level Calculation', () => {
     expect(metadata.verificationLevel).toBe('unverified_text');
     expect(metadata.verificationWeight).toBe(0.5);
   });
+
+  it('should update station status, lastUpdated, and persist report in localStorage when submitReport is called', async () => {
+    const { apiService } = await import('./apiService');
+    const stations = await apiService.fetchStations();
+    expect(stations.length).toBeGreaterThan(0);
+
+    const targetStation = stations[0];
+    const testReport: DriverReport = {
+      id: `rep-test-${Date.now()}`,
+      author: 'Guest Driver',
+      authorAvatar: '',
+      verified: false,
+      timestamp: 'Just now',
+      status: 'out',
+      statusLabel: 'Out of gas',
+      comment: 'Pump is undergoing maintenance',
+      likes: 0,
+    };
+
+    const updatedStations = await apiService.submitReport(targetStation.id, testReport, 'out');
+    const updatedTarget = updatedStations.find((s) => s.id === targetStation.id);
+
+    expect(updatedTarget).toBeDefined();
+    expect(updatedTarget?.status).toBe('out');
+    expect(updatedTarget?.statusLabel).toBe('Out of gas');
+    expect(updatedTarget?.lastUpdated).toBe('Just now');
+    expect(updatedTarget?.reports.some((r) => r.id === testReport.id)).toBe(true);
+
+    // Simulate page reload (re-querying fetchStations)
+    const reloadedStations = await apiService.fetchStations();
+    const reloadedTarget = reloadedStations.find((s) => s.id === targetStation.id);
+
+    expect(reloadedTarget?.status).toBe('out');
+    expect(reloadedTarget?.reports.some((r) => r.id === testReport.id)).toBe(true);
+  });
 });

@@ -173,8 +173,8 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
           <h2 className="text-[16px] font-bold text-slate-900 tracking-tight">
             Accredited Centers ({filteredCenters.length})
           </h2>
-          <span className="text-[11.5px] font-normal text-[#006c50]">
-            Real-time Verification
+          <span className="text-[11.5px] font-normal text-slate-500">
+            Pi-CNG Directory
           </span>
         </div>
 

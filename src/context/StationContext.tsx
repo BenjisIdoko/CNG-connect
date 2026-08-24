@@ -96,10 +96,6 @@ export const StationProvider: React.FC<{ children: React.ReactNode }> = ({ child
   }, [activeDetailStation?.id, selectedStation?.id]);
 
   const handleOpenReportModal = (station: GasStation) => {
-    if (!isAuthenticated) {
-      setAuthMode('signup');
-      return;
-    }
     setReportingStation(station);
     setIsReportModalOpen(true);
   };
