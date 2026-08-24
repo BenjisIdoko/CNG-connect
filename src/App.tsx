@@ -393,6 +393,22 @@ export const App: React.FC = () => {
     showToast('Post published to GasFinder Community!');
   };
 
+  const handleToggleLikePost = (postId: string) => {
+    setPosts((prevPosts) =>
+      prevPosts.map((p) => {
+        if (p.id === postId) {
+          const isLiked = !p.isLiked;
+          return {
+            ...p,
+            isLiked,
+            likes: isLiked ? p.likes + 1 : Math.max(0, p.likes - 1),
+          };
+        }
+        return p;
+      })
+    );
+  };
+
   const handleAuthSuccess = (newUserProfile: UserProfile) => {
     setUserProfile(newUserProfile);
     setIsAuthenticated(true);
@@ -546,6 +562,8 @@ export const App: React.FC = () => {
               onOpenNotifications={() => {
                 handleSimulateProximityNudge();
               }}
+              onToggleLikePost={handleToggleLikePost}
+              onOpenConversions={() => setActiveTab('conversions')}
             />
           ) : (
             <ProfileScreen

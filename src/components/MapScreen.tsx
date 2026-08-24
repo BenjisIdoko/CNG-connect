@@ -469,48 +469,6 @@ export const MapScreen: React.FC<MapScreenProps> = ({
             </button>
           </div>
         </div>
-
-        {/* Quick Filter Tag Chips */}
-        <div className="flex items-center gap-1.5 overflow-x-auto hide-scrollbar pt-1 pb-0.5 pointer-events-auto">
-          {[
-            { label: 'All', filter: 'all', city: 'all' },
-            { label: 'Full Stock', filter: 'full', city: 'all' },
-            { label: 'Queuing', filter: 'queue', city: 'all' },
-            { label: 'Abuja', filter: 'all', city: 'Abuja' },
-            { label: 'Lagos', filter: 'all', city: 'Lagos' },
-            { label: '200+ Bar', filter: 'all', city: 'all', pressure: 200 },
-          ].map((chip) => {
-            const isActive =
-              (chip.filter !== 'all' && activeFilter === chip.filter) ||
-              (chip.city !== 'all' && activeCity === chip.city) ||
-              (chip.pressure && minPressure === chip.pressure) ||
-              (chip.label === 'All' && activeFilter === 'all' && activeCity === 'all' && minPressure === 0);
-
-            return (
-              <button
-                key={chip.label}
-                onClick={() => {
-                  if (chip.label === 'All') {
-                    setActiveFilter('all');
-                    setActiveCity('all');
-                    setMinPressure(0);
-                  } else {
-                    if (chip.filter !== 'all') setActiveFilter(chip.filter as any);
-                    if (chip.city !== 'all') setActiveCity(chip.city);
-                    if (chip.pressure) setMinPressure(chip.pressure);
-                  }
-                }}
-                className={`px-3 py-1.5 rounded-full text-[11.5px] font-bold whitespace-nowrap shadow-xs backdrop-blur-md transition-all active:scale-95 shrink-0 ${
-                  isActive
-                    ? 'bg-[#004D40] text-[#00E676] border border-[#00E676]/40'
-                    : 'bg-white/95 text-slate-700 border border-slate-200/90 hover:bg-white'
-                }`}
-              >
-                {chip.label}
-              </button>
-            );
-          })}
-        </div>
       </div>
 
           {/* Bottom Sheet: Nearby Petrol Stations Vertical Ranked List & Expanded Gallery */}

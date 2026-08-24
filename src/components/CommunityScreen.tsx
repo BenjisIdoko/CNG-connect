@@ -10,6 +10,8 @@ interface CommunityScreenProps {
   onOpenCreatePost: () => void;
   onOpenStationGroup?: (station: GasStation) => void;
   onOpenNotifications?: () => void;
+  onToggleLikePost?: (postId: string) => void;
+  onOpenConversions?: () => void;
 }
 
 export const CommunityScreen: React.FC<CommunityScreenProps> = ({
@@ -20,6 +22,8 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
   onOpenCreatePost,
   onOpenStationGroup,
   onOpenNotifications,
+  onToggleLikePost,
+  onOpenConversions,
 }) => {
   const [activeMainTab, setActiveMainTab] = useState<'station_groups' | 'general'>('station_groups');
   const [activeCategory, setActiveCategory] = useState<string>('all');
@@ -45,6 +49,9 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
 
   const handleToggleLike = (postId: string, e: React.MouseEvent) => {
     e.stopPropagation();
+    if (onToggleLikePost) {
+      onToggleLikePost(postId);
+    }
     setLikeOverrides((prev) => {
       const current = prev[postId] || {
         isLiked: Boolean(posts.find((p) => p.id === postId)?.isLiked),
@@ -54,7 +61,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
         ...prev,
         [postId]: {
           isLiked: !current.isLiked,
-          likes: current.isLiked ? current.likes - 1 : current.likes + 1,
+          likes: current.isLiked ? Math.max(0, current.likes - 1) : current.likes + 1,
         },
       };
     });
@@ -113,7 +120,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
       )}
 
       {/* Sticky Top Bar: Main Segment Control + Search */}
-      <div className="sticky top-16 z-30 bg-[#f2fcf5]/90 backdrop-blur-md py-2.5 px-4 md:px-6 border-b border-[#dbe5de]/70 max-w-xl mx-auto flex flex-col gap-2">
+      <div className="sticky top-0 z-30 bg-[#f2fcf5]/95 backdrop-blur-md py-2.5 px-4 md:px-6 border-b border-[#dbe5de]/70 max-w-xl mx-auto flex flex-col gap-2">
         {/* Main Section Tab Switcher */}
         <div className="flex bg-[#e6f0e9] p-1 rounded-2xl border border-[#dbe5de]">
           <button
@@ -141,7 +148,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
 
         {/* Search Bar & Notification Button */}
         <div className="flex items-center gap-2">
-          <div className="flex-1 relative">
+          <div className="flex-1 relative flex items-center">
             <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-[#6a7b72] text-[20px]">
               search
             </span>
@@ -154,8 +161,17 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                   ? 'Search station groups by name, city or operator...'
                   : 'Search community topics...'
               }
-              className="w-full bg-[#e6f0e9] border border-[#dbe5de]/70 rounded-full py-2 pl-10 pr-4 text-[13.5px] font-normal text-[#141d19] placeholder:text-[#6a7b72] focus:outline-none focus:ring-2 focus:ring-[#006c50]/30 focus:bg-white transition-all"
+              className="w-full bg-[#e6f0e9] border border-[#dbe5de]/70 rounded-full py-2 pl-10 pr-9 text-[13.5px] font-normal text-[#141d19] placeholder:text-[#6a7b72] focus:outline-none focus:ring-2 focus:ring-[#006c50]/30 focus:bg-white transition-all"
             />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-[#6a7b72] hover:text-[#141d19] rounded-full shrink-0"
+                aria-label="Clear search"
+              >
+                <span className="material-symbols-outlined text-[18px]">close</span>
+              </button>
+            )}
           </div>
 
           <button
@@ -341,11 +357,15 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
               <div className="grid grid-cols-2 gap-2.5">
                 {/* Pi-CNG Conversion Kit Centers */}
                 <div
-                  onClick={() =>
-                    setActiveCategory(
-                      activeCategory === 'conversions' ? 'all' : 'conversions'
-                    )
-                  }
+                  onClick={() => {
+                    if (onOpenConversions) {
+                      onOpenConversions();
+                    } else {
+                      setActiveCategory(
+                        activeCategory === 'conversions' ? 'all' : 'conversions'
+                      );
+                    }
+                  }}
                   className={`col-span-2 rounded-2xl p-3.5 flex items-center gap-3 transition-all cursor-pointer shadow-xs border active:scale-[0.98] ${
                     activeCategory === 'conversions'
                       ? 'bg-emerald-500/20 border-[#006c50] ring-2 ring-[#006c50]/20'
@@ -522,7 +542,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
 
                         <div className="inline-flex items-center gap-1 bg-[#00ffc2]/20 text-[#007255] px-2.5 py-0.5 rounded-full mt-0.5">
                           <span className="text-[10.5px] font-black tracking-wider uppercase">
-                            {post.categoryLabel}
+                            {post.categoryLabel || post.category}
                           </span>
                         </div>
                       </div>
