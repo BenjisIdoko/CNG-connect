@@ -73,18 +73,18 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
   return (
     <div className="pb-32 min-h-screen bg-slate-50 font-['Plus_Jakarta_Sans',sans-serif]">
       {/* Top Banner Hero */}
-      <div className="bg-gradient-to-b from-[#004D40] via-[#006c50] to-[#004D40] text-white pt-6 pb-8 px-4 rounded-b-[2.5rem] shadow-lg relative overflow-hidden">
+      <div className="bg-gradient-to-b from-deep-teal via-primary to-deep-teal text-white pt-6 pb-8 px-4 rounded-b-[2.5rem] shadow-lg relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-400/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="max-w-2xl mx-auto text-center relative z-10">
-          <div className="inline-flex items-center gap-1.5 bg-[#00E676]/20 border border-[#00E676]/40 text-[#00E676] text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-3 shadow-xs">
+          <div className="inline-flex items-center gap-1.5 bg-status-green/20 border border-status-green/40 text-status-green text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-3 shadow-xs">
             <span className="material-symbols-outlined text-[14px]">verified</span>
             Official Pi-CNG Network (pci.gov.ng)
           </div>
 
           <h1 className="text-[24px] sm:text-[28px] font-extrabold tracking-tight leading-tight">
             Find CNG Vehicle <br />
-            <span className="text-[#00E676]">Conversion Kit Centers</span>
+            <span className="text-status-green">Conversion Kit Centers</span>
           </h1>
           <p className="text-[13px] text-emerald-100/80 font-normal mt-1.5 max-w-md mx-auto">
             Search certified workshops for dual-fuel CNG kit installation, Italian ECU tuning &amp; 220 bar cylinder safety testing.
@@ -97,7 +97,7 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
               <span className="text-[10px] font-semibold text-emerald-200 uppercase tracking-wider">Certified Centers</span>
             </div>
             <div className="text-center border-x border-white/15">
-              <span className="text-[18px] font-bold text-[#00E676] block">28</span>
+              <span className="text-[18px] font-bold text-status-green block">28</span>
               <span className="text-[10px] font-semibold text-emerald-200 uppercase tracking-wider">States Covered</span>
             </div>
             <div className="text-center">
@@ -138,7 +138,7 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
                 onClick={() => setSelectedState(st)}
                 className={`shrink-0 px-3.5 py-1.5 rounded-full text-[12px] font-semibold transition-all active:scale-95 ${
                   selectedState.toLowerCase() === st.toLowerCase()
-                    ? 'bg-[#004D40] text-white shadow-sm'
+                    ? 'bg-deep-teal text-white shadow-sm'
                     : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200/60'
                 }`}
               >
@@ -150,13 +150,13 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
           {/* Toggle Pi-CNG Accredited Only */}
           <div className="flex items-center justify-between pt-1 border-t border-slate-100 text-[12px] font-semibold text-slate-700">
             <div className="flex items-center gap-1.5">
-              <span className="material-symbols-outlined text-[#006c50] text-[18px]">workspace_premium</span>
+              <span className="material-symbols-outlined text-primary text-[18px]">workspace_premium</span>
               <span>Pi-CNG Accredited Only</span>
             </div>
             <button
               onClick={() => setOnlyAccredited(!onlyAccredited)}
               className={`w-11 h-6 rounded-full transition-colors relative p-0.5 ${
-                onlyAccredited ? 'bg-[#00c853]' : 'bg-slate-300'
+                onlyAccredited ? 'bg-live-pulse' : 'bg-slate-300'
               }`}
             >
               <div
@@ -197,7 +197,7 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
                   setSelectedState('all');
                   setOnlyAccredited(false);
                 }}
-                className="mt-3 px-4 py-2 bg-[#006c50] text-white text-[12px] font-semibold rounded-full"
+                className="mt-3 px-4 py-2 bg-primary text-white text-[12px] font-semibold rounded-full"
               >
                 Reset All Filters
               </button>
@@ -212,11 +212,11 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap mb-1">
-                      <span className="bg-emerald-100 text-[#006c50] text-[10.5px] font-semibold px-2.5 py-0.5 rounded-full border border-emerald-200">
+                      <span className="bg-emerald-100 text-primary text-[10.5px] font-semibold px-2.5 py-0.5 rounded-full border border-emerald-200">
                         Code: {center.code}
                       </span>
                       {center.isPiCngAccredited && (
-                        <span className="bg-[#004D40] text-[#00E676] text-[10.5px] font-semibold px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                        <span className="bg-deep-teal text-status-green text-[10.5px] font-semibold px-2.5 py-0.5 rounded-full flex items-center gap-1">
                           <span className="material-symbols-outlined text-[12px]">verified</span>
                           Pi-CNG Accredited
                         </span>
@@ -238,7 +238,7 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
                   {/* Rating Badge */}
                   {center.reviewsCount > 0 && center.rating > 0 ? (
                     <div className="bg-emerald-50 rounded-2xl p-2 text-center border border-emerald-100 shrink-0">
-                      <div className="flex items-center gap-0.5 text-[#006c50] font-bold text-[13px]">
+                      <div className="flex items-center gap-0.5 text-primary font-bold text-[13px]">
                         <span className="material-symbols-outlined text-[15px]" style={{ fontVariationSettings: "'FILL' 1" }}>
                           star
                         </span>
@@ -267,7 +267,7 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
                         key={idx}
                         className="bg-white border border-slate-200 text-slate-700 text-[11px] font-medium px-2.5 py-1 rounded-lg shadow-2xs flex items-center gap-1"
                       >
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#00c853]" />
+                        <span className="w-1.5 h-1.5 rounded-full bg-live-pulse" />
                         {srv}
                       </span>
                     ))}
@@ -285,7 +285,7 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
                   {Boolean(center.estimatedHours) && (
                     <div className="text-right">
                       <span className="text-slate-400 text-[11px] block">Installation Time:</span>
-                      <span className="text-[#006c50] font-bold">
+                      <span className="text-primary font-bold">
                         {center.estimatedHours}
                       </span>
                     </div>
@@ -306,7 +306,7 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
                     onClick={() => handleOpenDirections(center)}
                     className="py-2.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-200 rounded-xl font-semibold text-[12px] flex items-center justify-center gap-1 transition-colors"
                   >
-                    <span className="material-symbols-outlined text-[16px] text-[#006c50]" style={{ fontVariationSettings: "'FILL' 1" }}>
+                    <span className="material-symbols-outlined text-[16px] text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>
                       near_me
                     </span>
                     Directions
@@ -314,7 +314,7 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
 
                   <button
                     onClick={() => onBookAppointment(center)}
-                    className="py-2.5 bg-[#004D40] hover:bg-[#00382f] text-white rounded-xl font-bold text-[12.5px] flex items-center justify-center gap-1 shadow-xs active:scale-95 transition-all"
+                    className="py-2.5 bg-deep-teal hover:bg-deep-teal/90 text-white rounded-xl font-bold text-[12.5px] flex items-center justify-center gap-1 shadow-xs active:scale-95 transition-all"
                   >
                     <span className="material-symbols-outlined text-[16px]">calendar_add_on</span>
                     Book Kit

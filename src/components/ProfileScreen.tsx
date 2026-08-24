@@ -102,7 +102,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
               <p className="text-[12.5px] text-on-surface-variant font-normal mt-0.5 truncate">
                 {user.email || user.phone || 'driver@cngconnect.ng'}
               </p>
-              <div className="flex items-center gap-1.5 mt-1 text-[11px] font-semibold text-[#006c50]">
+              <div className="flex items-center gap-1.5 mt-1 text-[11px] font-semibold text-primary">
                 <span className="material-symbols-outlined text-[14px]">directions_car</span>
                 <span className="truncate">{user.vehicle || 'Toyota Corolla 1.8L (CNG)'}</span>
               </div>
@@ -118,7 +118,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
               setEditState(user.state || 'Abuja FCT');
               setIsEditModalOpen(true);
             }}
-            className="w-11 h-11 rounded-full bg-emerald-50 hover:bg-emerald-100 text-[#006c50] flex items-center justify-center transition-all active:scale-95 shrink-0 ml-2 border border-emerald-200"
+            className="w-11 h-11 rounded-full bg-emerald-50 hover:bg-emerald-100 text-primary flex items-center justify-center transition-all active:scale-95 shrink-0 ml-2 border border-emerald-200"
             aria-label="Edit Profile"
           >
             <span className="material-symbols-outlined text-[19px]">edit</span>
@@ -177,17 +177,17 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
         </div>
 
         {/* Embedded Interactive CNG ROI & Savings Calculator Card */}
-        <div className="bg-gradient-to-br from-[#004D40] via-[#006c50] to-emerald-950 rounded-3xl p-4 sm:p-5 text-white shadow-lg border border-emerald-500/20 space-y-4">
+        <div className="bg-gradient-to-br from-deep-teal via-primary to-emerald-950 rounded-3xl p-4 sm:p-5 text-white shadow-lg border border-emerald-500/20 space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="w-8 h-8 rounded-full bg-emerald-400/20 text-[#00E676] flex items-center justify-center border border-[#00E676]/30">
+              <span className="w-8 h-8 rounded-full bg-emerald-400/20 text-status-green flex items-center justify-center border border-status-green/30">
                 <span className="material-symbols-outlined text-[18px]">calculate</span>
               </span>
               <h3 className="font-extrabold text-[15px] sm:text-[16px] text-white">
                 CNG Fuel Savings &amp; ROI Calculator
               </h3>
             </div>
-            <span className="bg-[#00E676]/20 text-[#00E676] text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase border border-[#00E676]/30">
+            <span className="bg-status-green/20 text-status-green text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase border border-status-green/30">
               Interactive
             </span>
           </div>
@@ -199,7 +199,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
               <span className="text-[28px] sm:text-[32px] font-black text-white leading-none">
                 ₦{monthlySavings.toLocaleString()}
               </span>
-              <span className="text-[13px] font-extrabold text-[#00E676]">
+              <span className="text-[13px] font-extrabold text-status-green">
                 ({savingsPercent}% Saved vs Petrol)
               </span>
             </div>
@@ -210,7 +210,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
             <div>
               <div className="flex justify-between text-[11.5px] font-bold text-emerald-100 mb-1">
                 <span>Daily Driving Distance</span>
-                <span className="text-[#00E676]">{dailyKm} km / day</span>
+                <span className="text-status-green">{dailyKm} km / day</span>
               </div>
               <input
                 type="range"
@@ -219,7 +219,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                 step="5"
                 value={dailyKm}
                 onChange={(e) => setDailyKm(Number(e.target.value))}
-                className="w-full accent-[#00E676] h-1.5 bg-white/20 rounded-lg cursor-pointer"
+                className="w-full accent-status-green h-1.5 bg-white/20 rounded-lg cursor-pointer"
               />
             </div>
 
@@ -230,7 +230,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                   type="number"
                   value={petrolPrice}
                   onChange={(e) => setPetrolPrice(Number(e.target.value))}
-                  className="w-full bg-white/10 border border-white/20 rounded-xl px-2.5 py-1.5 text-[12px] font-bold text-white outline-none focus:border-[#00E676]"
+                  className="w-full bg-white/10 border border-white/20 rounded-xl px-2.5 py-1.5 text-[12px] font-bold text-white outline-none focus:border-status-green"
                 />
               </div>
               <div>
@@ -239,7 +239,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                   type="number"
                   value={cngPrice}
                   onChange={(e) => setCngPrice(Number(e.target.value))}
-                  className="w-full bg-white/10 border border-white/20 rounded-xl px-2.5 py-1.5 text-[12px] font-bold text-white outline-none focus:border-[#00E676]"
+                  className="w-full bg-white/10 border border-white/20 rounded-xl px-2.5 py-1.5 text-[12px] font-bold text-white outline-none focus:border-status-green"
                 />
               </div>
             </div>
@@ -253,7 +253,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
             </div>
             <div className="bg-white/10 rounded-xl p-2.5 border border-white/10">
               <span className="text-[10px] text-emerald-200 block uppercase font-bold">CO₂ Reduced / Year</span>
-              <span className="font-extrabold text-[#00E676] text-[14px]">{annualCo2SavedTons} Tons</span>
+              <span className="font-extrabold text-status-green text-[14px]">{annualCo2SavedTons} Tons</span>
             </div>
           </div>
 
@@ -437,7 +437,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
 
       {/* Edit Profile Modal Dialog */}
       <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} title="Edit Driver Profile">
-        <form onSubmit={handleSaveProfile} className="flex flex-col gap-4 text-[#141d19]">
+        <form onSubmit={handleSaveProfile} className="flex flex-col gap-4 text-on-surface">
           <div>
             <label className="block text-[12px] font-bold text-slate-700 mb-1">Full Name</label>
             <input
@@ -445,7 +445,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
               required
               value={editName}
               onChange={(e) => setEditName(e.target.value)}
-              className="w-full bg-[#f2fcf5] border border-[#dbe5de] rounded-xl px-3.5 py-2.5 text-[13.5px] font-semibold text-slate-900 outline-none focus:border-[#006c50]"
+              className="w-full bg-surface border border-surface-container-highest rounded-xl px-3.5 py-2.5 text-[13.5px] font-semibold text-slate-900 outline-none focus:border-primary"
             />
           </div>
 
@@ -456,7 +456,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
               required
               value={editPhone}
               onChange={(e) => setEditPhone(e.target.value)}
-              className="w-full bg-[#f2fcf5] border border-[#dbe5de] rounded-xl px-3.5 py-2.5 text-[13.5px] font-semibold text-slate-900 outline-none focus:border-[#006c50]"
+              className="w-full bg-surface border border-surface-container-highest rounded-xl px-3.5 py-2.5 text-[13.5px] font-semibold text-slate-900 outline-none focus:border-primary"
             />
           </div>
 
@@ -466,7 +466,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
               type="email"
               value={editEmail}
               onChange={(e) => setEditEmail(e.target.value)}
-              className="w-full bg-[#f2fcf5] border border-[#dbe5de] rounded-xl px-3.5 py-2.5 text-[13.5px] font-semibold text-slate-900 outline-none focus:border-[#006c50]"
+              className="w-full bg-surface border border-surface-container-highest rounded-xl px-3.5 py-2.5 text-[13.5px] font-semibold text-slate-900 outline-none focus:border-primary"
             />
           </div>
 
@@ -477,7 +477,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
               placeholder="e.g. Toyota Corolla 1.8L (Dual Fuel CNG)"
               value={editVehicle}
               onChange={(e) => setEditVehicle(e.target.value)}
-              className="w-full bg-[#f2fcf5] border border-[#dbe5de] rounded-xl px-3.5 py-2.5 text-[13.5px] font-semibold text-slate-900 outline-none focus:border-[#006c50]"
+              className="w-full bg-surface border border-surface-container-highest rounded-xl px-3.5 py-2.5 text-[13.5px] font-semibold text-slate-900 outline-none focus:border-primary"
             />
           </div>
 
@@ -486,7 +486,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
             <select
               value={editState}
               onChange={(e) => setEditState(e.target.value)}
-              className="w-full bg-[#f2fcf5] border border-[#dbe5de] rounded-xl px-3.5 py-2.5 text-[13.5px] font-semibold text-slate-900 outline-none focus:border-[#006c50]"
+              className="w-full bg-surface border border-surface-container-highest rounded-xl px-3.5 py-2.5 text-[13.5px] font-semibold text-slate-900 outline-none focus:border-primary"
             >
               <option value="Abuja FCT">Abuja FCT</option>
               <option value="Lagos">Lagos</option>
@@ -510,7 +510,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
             </button>
             <button
               type="submit"
-              className="px-5 py-2.5 rounded-full text-[13px] font-extrabold text-white bg-[#006c50] hover:bg-[#004D40] shadow-sm"
+              className="px-5 py-2.5 rounded-full text-[13px] font-extrabold text-white bg-primary hover:bg-deep-teal shadow-sm"
             >
               Save Changes
             </button>

@@ -122,38 +122,38 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
   };
 
   return (
-    <Modal isOpen={true} onClose={onClose} title="Report CNG Station Status" className="bg-[#f2fcf5] border-[#dbe5de] max-h-[90vh] overflow-y-auto">
-      <div className="relative w-full max-w-lg bg-[#f2fcf5] rounded-t-3xl sm:rounded-3xl shadow-2xl z-10 max-h-[90vh] overflow-y-auto border border-[#dbe5de] pb-safe">
+    <Modal isOpen={true} onClose={onClose} title="Report CNG Station Status" className="bg-surface border-surface-container-highest max-h-[90vh] overflow-y-auto">
+      <div className="relative w-full max-w-lg bg-surface rounded-t-3xl sm:rounded-3xl shadow-2xl z-10 max-h-[90vh] overflow-y-auto border border-surface-container-highest pb-safe">
         {/* Drag Handle */}
         <div className="flex justify-center pt-3 pb-2 touch-none">
-          <div className="w-12 h-1.5 bg-[#b9cbc1] rounded-full" />
+          <div className="w-12 h-1.5 bg-outline-variant rounded-full" />
         </div>
 
         {/* Content */}
         <div className="px-5 pb-6 pt-1">
           <div className="flex justify-between items-start mb-3">
             <div>
-              <div className="flex items-center gap-1.5 text-[11px] font-semibold text-[#006c50] uppercase tracking-wider mb-0.5">
+              <div className="flex items-center gap-1.5 text-[11px] font-semibold text-primary uppercase tracking-wider mb-0.5">
                 <span className="material-symbols-outlined text-[15px]">groups</span>
                 <span>{station.name} Group Feed</span>
                 <button
                   type="button"
                   onClick={() => setShowInfoSheet(true)}
                   aria-label="Station Group Policy Info"
-                  className="w-5 h-5 rounded-full bg-emerald-100 hover:bg-emerald-200 text-[#006c50] flex items-center justify-center transition-all ml-1"
+                  className="w-5 h-5 rounded-full bg-emerald-100 hover:bg-emerald-200 text-primary flex items-center justify-center transition-all ml-1"
                   title="Policy Info"
                 >
                   <span className="material-symbols-outlined text-[13px]">info</span>
                 </button>
               </div>
-              <h2 className="text-[19px] font-bold text-[#141d19] leading-snug">
+              <h2 className="text-[19px] font-bold text-on-surface leading-snug">
                 Update Gas Availability
               </h2>
             </div>
             <button
               onClick={onClose}
               aria-label="Close modal"
-              className="w-11 h-11 rounded-full flex items-center justify-center text-[#6a7b72] hover:bg-[#e6f0e9]"
+              className="w-11 h-11 rounded-full flex items-center justify-center text-outline hover:bg-surface-container"
             >
               <span className="material-symbols-outlined text-[22px]">close</span>
             </button>
@@ -270,23 +270,23 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
                     <label className="block text-[12.5px] font-bold text-slate-700 mb-1">
                       Wait time estimate (Optional)
                     </label>
-                    <div className="flex items-center justify-between bg-[#e6f0e9] rounded-2xl p-1.5 px-3 border border-[#dbe5de]">
+                    <div className="flex items-center justify-between bg-surface-container rounded-2xl p-1.5 px-3 border border-surface-container-highest">
                       <button
                         type="button"
                         onClick={() => setWaitTime((t) => Math.max(0, t - 5))}
                         aria-label="Decrease wait time estimate by 5 minutes"
-                        className="w-10 h-10 flex items-center justify-center text-[#141d19] hover:bg-white rounded-full transition-colors active:scale-90"
+                        className="w-10 h-10 flex items-center justify-center text-on-surface hover:bg-white rounded-full transition-colors active:scale-90"
                       >
                         <span className="material-symbols-outlined text-[22px]">remove</span>
                       </button>
-                      <div className="text-[16px] font-extrabold text-[#141d19]">
+                      <div className="text-[16px] font-extrabold text-on-surface">
                         {waitTime} min
                       </div>
                       <button
                         type="button"
                         onClick={() => setWaitTime((t) => Math.min(120, t + 5))}
                         aria-label="Increase wait time estimate by 5 minutes"
-                        className="w-10 h-10 flex items-center justify-center text-[#141d19] hover:bg-white rounded-full transition-colors active:scale-90"
+                        className="w-10 h-10 flex items-center justify-center text-on-surface hover:bg-white rounded-full transition-colors active:scale-90"
                       >
                         <span className="material-symbols-outlined text-[22px]">add</span>
                       </button>
@@ -299,7 +299,7 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
                       <label className="block text-[12.5px] font-bold text-slate-700">
                         Live Photo of Pump (Camera Only)
                       </label>
-                      <span className="text-[10px] font-bold text-[#006c50] bg-emerald-100 px-2 py-0.5 rounded-full">
+                      <span className="text-[10px] font-bold text-primary bg-emerald-100 px-2 py-0.5 rounded-full">
                         Gallery Blocked
                       </span>
                     </div>
@@ -312,9 +312,9 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
                     )}
 
                     {attachedPhoto ? (
-                      <div className="relative rounded-xl overflow-hidden border-2 border-[#006c50] max-h-36 bg-black/10">
+                      <div className="relative rounded-xl overflow-hidden border-2 border-primary max-h-36 bg-black/10">
                         <img src={attachedPhoto} alt="Verified meter snapshot" className="w-full h-32 object-cover" />
-                        <div className="absolute bottom-2 left-2 bg-[#004D40]/90 text-[#00E676] text-[10px] font-bold px-2.5 py-1 rounded-full backdrop-blur-md flex items-center gap-1 border border-emerald-400/40">
+                        <div className="absolute bottom-2 left-2 bg-deep-teal/90 text-status-green text-[10px] font-bold px-2.5 py-1 rounded-full backdrop-blur-md flex items-center gap-1 border border-emerald-400/40">
                           <span className="material-symbols-outlined text-[13px]">verified</span>
                           Live Camera Verified
                         </div>
@@ -334,9 +334,9 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
                       <button
                         type="button"
                         onClick={() => setShowLiveCamera(true)}
-                        className="w-full py-3 px-4 bg-[#004D40] hover:bg-[#006c50] text-white rounded-xl font-bold text-[13px] shadow-sm flex items-center justify-center gap-2 active:scale-95 transition-all"
+                        className="w-full py-3 px-4 bg-deep-teal hover:bg-primary text-white rounded-xl font-bold text-[13px] shadow-sm flex items-center justify-center gap-2 active:scale-95 transition-all"
                       >
-                        <span className="material-symbols-outlined text-[20px] text-[#00E676]">photo_camera</span>
+                        <span className="material-symbols-outlined text-[20px] text-status-green">photo_camera</span>
                         <span>Take Live Camera Photo</span>
                       </button>
                     )}
@@ -352,7 +352,7 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
                       onChange={(e) => setComment(e.target.value)}
                       placeholder="e.g. Line moving fast, POS terminal active..."
                       rows={2}
-                      className="w-full bg-[#e6f0e9] border border-[#dbe5de] rounded-xl p-2.5 text-[13.5px] text-[#141d19] placeholder:text-[#6a7b72] focus:outline-none focus:ring-2 focus:ring-[#006c50]/30"
+                      className="w-full bg-surface-container border border-surface-container-highest rounded-xl p-2.5 text-[13.5px] text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary/30"
                     />
                   </div>
                 </div>
@@ -381,7 +381,7 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
             <button
               type="submit"
               disabled={!presenceActive || isSubmitting}
-              className="w-full h-13 flex items-center justify-center bg-[#006c50] hover:bg-[#004D40] text-white rounded-full font-extrabold text-[15px] shadow-md active:scale-[0.98] transition-all disabled:opacity-50 mt-1"
+              className="w-full h-13 flex items-center justify-center bg-primary hover:bg-deep-teal text-white rounded-full font-extrabold text-[15px] shadow-md active:scale-[0.98] transition-all disabled:opacity-50 mt-1"
             >
               {isSubmitting ? (
                 <div className="flex items-center gap-2">

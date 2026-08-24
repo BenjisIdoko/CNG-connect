@@ -194,7 +194,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       iconCreateFunction: (cluster: any) => {
         const childCount = cluster.getChildCount();
         return L.divIcon({
-          html: `<div class="w-9 h-9 rounded-full bg-[#006c50] text-white font-extrabold text-[12px] flex items-center justify-center border-2 border-white shadow-md transition-transform hover:scale-110"><span>${childCount}</span></div>`,
+          html: `<div class="w-9 h-9 rounded-full bg-primary text-white font-extrabold text-[12px] flex items-center justify-center border-2 border-white shadow-md transition-transform hover:scale-110"><span>${childCount}</span></div>`,
           className: 'custom-cluster-icon',
           iconSize: [36, 36],
         });
@@ -314,22 +314,22 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       case 'full':
         return {
           barColor: 'bg-status-green',
-          badgeBg: 'bg-emerald-50 border-emerald-200 text-[#006c50]',
+          badgeBg: 'bg-emerald-50 border-emerald-200 text-primary',
           dotColor: 'bg-status-green',
           label: 'Full stock',
         };
       case 'queue':
         return {
-          barColor: 'bg-[#f59e0b]',
+          barColor: 'bg-electric-amber',
           badgeBg: 'bg-amber-50 border-amber-200 text-amber-900',
-          dotColor: 'bg-[#f59e0b]',
+          dotColor: 'bg-electric-amber',
           label: 'Queuing',
         };
       case 'low':
         return {
-          barColor: 'bg-[#fe9400]',
+          barColor: 'bg-secondary-container',
           badgeBg: 'bg-orange-50 border-orange-200 text-orange-900',
-          dotColor: 'bg-[#fe9400]',
+          dotColor: 'bg-secondary-container',
           label: 'Low pressure',
         };
       case 'out':
@@ -357,13 +357,13 @@ export const MapScreen: React.FC<MapScreenProps> = ({
     (minPressure > 0 ? 1 : 0);
 
   return (
-    <div className="relative w-full h-[calc(100vh-4rem)] overflow-hidden bg-[#eaf4ed]">
+    <div className="relative w-full h-[calc(100vh-4rem)] overflow-hidden bg-surface-container-low">
       {/* Leaflet Map Container */}
       <div ref={mapContainerRef} className="absolute inset-0 z-0" />
 
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="absolute top-20 left-1/2 -translate-x-1/2 z-50 bg-[#141d19]/90 text-white text-[13px] font-semibold px-4 py-2 rounded-full shadow-lg backdrop-blur-md animate-fade-in pointer-events-none">
+        <div className="absolute top-20 left-1/2 -translate-x-1/2 z-50 bg-on-surface/90 text-white text-[13px] font-semibold px-4 py-2 rounded-full shadow-lg backdrop-blur-md animate-fade-in pointer-events-none">
           {toastMessage}
         </div>
       )}
@@ -372,7 +372,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       <div className="relative z-30 p-4 max-w-xl mx-auto flex flex-col gap-2 pointer-events-auto">
         {/* Floating Search Pill Bar */}
         <div className="flex items-center bg-white/95 backdrop-blur-xl rounded-full shadow-[0_6px_24px_rgba(0,0,0,0.08)] border border-slate-200/80 p-2 pl-4 gap-2 transition-all focus-within:ring-2 focus-within:ring-emerald-500/30">
-          <span className="material-symbols-outlined text-[#006c50] text-[20px] shrink-0">
+          <span className="material-symbols-outlined text-primary text-[20px] shrink-0">
             search
           </span>
           <input
@@ -400,7 +400,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
             >
               <span className="material-symbols-outlined text-[18px]">tune</span>
               {activeFilterCount > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-[#00E676] text-[#004D40] text-[9.5px] font-black rounded-full flex items-center justify-center border border-white shadow-xs">
+                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-status-green text-deep-teal text-[9.5px] font-black rounded-full flex items-center justify-center border border-white shadow-xs">
                   {activeFilterCount}
                 </span>
               )}
@@ -411,7 +411,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
               title={gpsStatusText}
               className={`w-9 h-9 text-white rounded-full active:scale-95 transition-all flex items-center justify-center shadow-md ${
                 gpsStatus === 'active'
-                  ? 'bg-[#00c853] hover:bg-emerald-600 shadow-[#00c853]/25'
+                  ? 'bg-live-pulse hover:bg-emerald-600 shadow-emerald-500/25'
                   : gpsStatus === 'denied'
                   ? 'bg-rose-600 hover:bg-rose-700 shadow-rose-600/25'
                   : 'bg-amber-600 hover:bg-amber-700 shadow-amber-600/25'
@@ -547,7 +547,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                                     </>
                                   )}
                                   <span>•</span>
-                                  <span className={`font-bold ${station.status === 'unknown' ? 'text-slate-400' : 'text-[#006c50]'}`}>
+                                  <span className={`font-bold ${station.status === 'unknown' ? 'text-slate-400' : 'text-primary'}`}>
                                     {formatStationAge(station)}
                                   </span>
                                 </div>
@@ -562,7 +562,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                                 }}
                                 aria-label={`Share ${station.name} on WhatsApp`}
                                 title="Share update on WhatsApp"
-                                className="w-8 h-8 rounded-full bg-emerald-50 text-[#25D366] hover:bg-emerald-100 flex items-center justify-center active:scale-95 transition-all"
+                                className="w-8 h-8 rounded-full bg-emerald-50 text-whatsapp hover:bg-emerald-100 flex items-center justify-center active:scale-95 transition-all"
                               >
                                 <span className="material-symbols-outlined text-[16px]">
                                   share
@@ -601,7 +601,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                     {sheetMode === 'expanded' && filteredStations.length > visibleCount && (
                       <button
                         onClick={() => setVisibleCount((prev) => prev + 25)}
-                        className="w-full py-2.5 my-2 bg-emerald-50 hover:bg-emerald-100 text-[#006c50] border border-emerald-200 text-[13px] font-extrabold rounded-full transition-all active:scale-[0.98] flex items-center justify-center gap-1.5 shadow-2xs"
+                        className="w-full py-2.5 my-2 bg-emerald-50 hover:bg-emerald-100 text-primary border border-emerald-200 text-[13px] font-extrabold rounded-full transition-all active:scale-[0.98] flex items-center justify-center gap-1.5 shadow-2xs"
                       >
                         <span className="material-symbols-outlined text-[18px]">expand_more</span>
                         <span>Load More Stations (Showing {visibleCount} of {filteredStations.length})</span>
@@ -653,7 +653,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
 
                             <div className="mt-2.5 pt-2 border-t border-outline-variant/30 flex items-center justify-between">
                               <div className="flex items-center gap-1.5 text-[11px] font-medium text-on-surface-variant">
-                                <span className="font-semibold text-[#006c50]">{formatStationAge(st)}</span>
+                                <span className="font-semibold text-primary">{formatStationAge(st)}</span>
                                 <span>•</span>
                                 <span>{st.distance}</span>
                               </div>
@@ -665,7 +665,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                                   }}
                                   aria-label={`Share ${st.name} on WhatsApp`}
                                   title="Share to WhatsApp"
-                                  className="w-6 h-6 rounded-full bg-emerald-50 text-[#25D366] hover:bg-emerald-100 flex items-center justify-center active:scale-95 transition-all"
+                                  className="w-6 h-6 rounded-full bg-emerald-50 text-whatsapp hover:bg-emerald-100 flex items-center justify-center active:scale-95 transition-all"
                                 >
                                   <span className="material-symbols-outlined text-[13px]">share</span>
                                 </button>
@@ -695,12 +695,12 @@ export const MapScreen: React.FC<MapScreenProps> = ({
 
       {/* Filter Modal */}
       <Modal isOpen={isFilterModalOpen} onClose={() => setIsFilterModalOpen(false)} title="Filter Stations">
-        <div className="flex flex-col gap-4 py-1 text-[#141d19]">
+        <div className="flex flex-col gap-4 py-1 text-on-surface">
           {/* Minimum Pressure */}
           <div>
             <div className="flex justify-between text-[12.5px] font-bold text-slate-700 mb-1.5">
               <span>Minimum Pump Pressure</span>
-              <span className="text-[#006c50] font-extrabold">{minPressure} bar</span>
+              <span className="text-primary font-extrabold">{minPressure} bar</span>
             </div>
             <input
               type="range"
@@ -709,7 +709,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
               step="20"
               value={minPressure}
               onChange={(e) => setMinPressure(Number(e.target.value))}
-              className="w-full accent-[#006c50] h-2 bg-slate-100 rounded-lg cursor-pointer"
+              className="w-full accent-primary h-2 bg-slate-100 rounded-lg cursor-pointer"
             />
             <div className="flex justify-between text-[10.5px] font-semibold text-slate-400 mt-1">
               <span>Any (0 bar)</span>
@@ -722,7 +722,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
           <div>
             <div className="flex justify-between text-[12.5px] font-bold text-slate-700 mb-1.5">
               <span>Maximum Distance Radius</span>
-              <span className="text-[#006c50] font-extrabold">
+              <span className="text-primary font-extrabold">
                 {maxDistanceKm === 0 ? 'Any Distance' : `Within ${maxDistanceKm} km`}
               </span>
             </div>
@@ -734,7 +734,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                   onClick={() => setMaxDistanceKm(dist)}
                   className={`flex-1 py-2 px-2 rounded-xl text-[12px] font-extrabold border transition-all active:scale-95 ${
                     maxDistanceKm === dist
-                      ? 'bg-[#006c50] text-white border-[#006c50]'
+                      ? 'bg-primary text-white border-primary'
                       : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
                   }`}
                 >
@@ -757,7 +757,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                   onClick={() => setActiveFilter(st)}
                   className={`p-2.5 rounded-xl text-[12px] font-extrabold border transition-all active:scale-95 text-center ${
                     activeFilter === st
-                      ? 'bg-[#006c50] text-white border-[#006c50]'
+                      ? 'bg-primary text-white border-primary'
                       : 'bg-slate-50 text-slate-800 border-slate-200 hover:bg-slate-100'
                   }`}
                 >
@@ -792,7 +792,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
             <button
               type="button"
               onClick={() => setIsFilterModalOpen(false)}
-              className="flex-1 py-3 bg-[#006c50] text-white font-extrabold text-[13px] rounded-full shadow-md hover:bg-[#004D40] active:scale-95 transition-all"
+              className="flex-1 py-3 bg-primary text-white font-extrabold text-[13px] rounded-full shadow-md hover:bg-deep-teal active:scale-95 transition-all"
             >
               Apply Filters
             </button>

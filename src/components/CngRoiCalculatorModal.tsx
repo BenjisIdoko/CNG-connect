@@ -48,11 +48,11 @@ export const CngRoiCalculatorModal: React.FC<CngRoiCalculatorModalProps> = ({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="CNG Conversion ROI & Savings Calculator" className="max-w-lg">
-      <div className="flex flex-col gap-4 text-[#141d19] font-['Plus_Jakarta_Sans',sans-serif]">
+      <div className="flex flex-col gap-4 text-on-surface font-['Plus_Jakarta_Sans',sans-serif]">
         {/* Header Hero Banner */}
-        <div className="bg-gradient-to-r from-[#004D40] via-[#006c50] to-emerald-900 rounded-2xl p-4 text-white shadow-xs">
+        <div className="bg-gradient-to-r from-deep-teal via-primary to-emerald-900 rounded-2xl p-4 text-white shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="bg-[#00E676]/20 border border-[#00E676]/40 text-[#00E676] text-[10.5px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+            <span className="bg-status-green/20 border border-status-green/40 text-status-green text-[10.5px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
               Fuel Cost Savings Simulator
             </span>
             <span className="text-[11px] font-semibold text-emerald-100/90">
@@ -66,15 +66,15 @@ export const CngRoiCalculatorModal: React.FC<CngRoiCalculatorModalProps> = ({
               <span className="text-[32px] sm:text-[36px] font-extrabold text-white leading-none">
                 ₦{monthlySavings.toLocaleString()}
               </span>
-              <span className="text-[13px] font-bold text-[#00E676]">/ month ({savingsPercent}% saved)</span>
+              <span className="text-[13px] font-bold text-status-green">/ month ({savingsPercent}% saved)</span>
             </div>
           </div>
         </div>
 
         {/* Interactive Sliders & Inputs */}
-        <div className="bg-white rounded-2xl p-4 border border-[#dbe5de] shadow-2xs flex flex-col gap-4">
+        <div className="bg-white rounded-2xl p-4 border border-surface-container-highest shadow-2xs flex flex-col gap-4">
           <h3 className="font-bold text-[14px] text-slate-900 flex items-center gap-1.5">
-            <span className="material-symbols-outlined text-[#006c50] text-[18px]">tune</span>
+            <span className="material-symbols-outlined text-primary text-[18px]">tune</span>
             <span>Customize Your Driving Parameters</span>
           </h3>
 
@@ -82,7 +82,7 @@ export const CngRoiCalculatorModal: React.FC<CngRoiCalculatorModalProps> = ({
           <div>
             <div className="flex justify-between items-center text-[12.5px] font-semibold text-slate-700 mb-1">
               <span>Daily Driving Distance</span>
-              <span className="text-[#006c50] font-extrabold">{dailyKm} km / day</span>
+              <span className="text-primary font-extrabold">{dailyKm} km / day</span>
             </div>
             <input
               type="range"
@@ -91,7 +91,7 @@ export const CngRoiCalculatorModal: React.FC<CngRoiCalculatorModalProps> = ({
               step="5"
               value={dailyKm}
               onChange={(e) => setDailyKm(Number(e.target.value))}
-              className="w-full accent-[#006c50] h-2 bg-[#e6f0e9] rounded-lg cursor-pointer"
+              className="w-full accent-primary h-2 bg-surface-container rounded-lg cursor-pointer"
             />
             <div className="flex justify-between text-[10px] text-slate-400 font-medium mt-1">
               <span>20 km (Short commute)</span>
@@ -104,7 +104,7 @@ export const CngRoiCalculatorModal: React.FC<CngRoiCalculatorModalProps> = ({
           <div>
             <div className="flex justify-between items-center text-[12.5px] font-semibold text-slate-700 mb-1">
               <span>Vehicle Mileage / Efficiency</span>
-              <span className="text-[#006c50] font-extrabold">{kmPerLiter} km / liter</span>
+              <span className="text-primary font-extrabold">{kmPerLiter} km / liter</span>
             </div>
             <input
               type="range"
@@ -113,7 +113,7 @@ export const CngRoiCalculatorModal: React.FC<CngRoiCalculatorModalProps> = ({
               step="1"
               value={kmPerLiter}
               onChange={(e) => setKmPerLiter(Number(e.target.value))}
-              className="w-full accent-[#006c50] h-2 bg-[#e6f0e9] rounded-lg cursor-pointer"
+              className="w-full accent-primary h-2 bg-surface-container rounded-lg cursor-pointer"
             />
           </div>
 
@@ -125,7 +125,7 @@ export const CngRoiCalculatorModal: React.FC<CngRoiCalculatorModalProps> = ({
                 type="number"
                 value={petrolPrice}
                 onChange={(e) => setPetrolPrice(Number(e.target.value))}
-                className="w-full bg-[#f2fcf5] border border-[#dbe5de] rounded-xl px-3 py-2 text-[13px] font-bold text-slate-900 outline-none focus:border-[#006c50]"
+                className="w-full bg-surface border border-surface-container-highest rounded-xl px-3 py-2 text-[13px] font-bold text-slate-900 outline-none focus:border-primary"
               />
             </div>
             <div>
@@ -134,7 +134,7 @@ export const CngRoiCalculatorModal: React.FC<CngRoiCalculatorModalProps> = ({
                 type="number"
                 value={cngPrice}
                 onChange={(e) => setCngPrice(Number(e.target.value))}
-                className="w-full bg-[#f2fcf5] border border-[#dbe5de] rounded-xl px-3 py-2 text-[13px] font-bold text-slate-900 outline-none focus:border-[#006c50]"
+                className="w-full bg-surface border border-surface-container-highest rounded-xl px-3 py-2 text-[13px] font-bold text-slate-900 outline-none focus:border-primary"
               />
             </div>
           </div>
@@ -148,7 +148,7 @@ export const CngRoiCalculatorModal: React.FC<CngRoiCalculatorModalProps> = ({
                 onClick={() => setIsCommercialGrant(true)}
                 className={`py-2 px-3 rounded-xl text-[12px] font-bold transition-all text-center border ${
                   isCommercialGrant
-                    ? 'bg-emerald-50 text-[#006c50] border-[#006c50]'
+                    ? 'bg-emerald-50 text-primary border-primary'
                     : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
                 }`}
               >
@@ -159,7 +159,7 @@ export const CngRoiCalculatorModal: React.FC<CngRoiCalculatorModalProps> = ({
                 onClick={() => setIsCommercialGrant(false)}
                 className={`py-2 px-3 rounded-xl text-[12px] font-bold transition-all text-center border ${
                   !isCommercialGrant
-                    ? 'bg-emerald-50 text-[#006c50] border-[#006c50]'
+                    ? 'bg-emerald-50 text-primary border-primary'
                     : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
                 }`}
               >
@@ -171,19 +171,19 @@ export const CngRoiCalculatorModal: React.FC<CngRoiCalculatorModalProps> = ({
 
         {/* Detailed Financial & Environmental Breakdown */}
         <div className="grid grid-cols-3 gap-2.5 text-center">
-          <div className="bg-[#f2fcf5] rounded-xl p-3 border border-[#dbe5de]">
+          <div className="bg-surface rounded-xl p-3 border border-surface-container-highest">
             <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Annual Savings</span>
-            <span className="text-[15px] font-extrabold text-[#006c50] block mt-0.5">₦{annualSavings.toLocaleString()}</span>
+            <span className="text-[15px] font-extrabold text-primary block mt-0.5">₦{annualSavings.toLocaleString()}</span>
           </div>
 
-          <div className="bg-[#f2fcf5] rounded-xl p-3 border border-[#dbe5de]">
+          <div className="bg-surface rounded-xl p-3 border border-surface-container-highest">
             <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Payback Period</span>
             <span className="text-[13.5px] font-extrabold text-slate-900 block mt-0.5">{paybackMonths}</span>
           </div>
 
-          <div className="bg-[#f2fcf5] rounded-xl p-3 border border-[#dbe5de]">
+          <div className="bg-surface rounded-xl p-3 border border-surface-container-highest">
             <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">CO₂ Cut / Year</span>
-            <span className="text-[13.5px] font-extrabold text-[#006c50] block mt-0.5">{annualCo2SavedTons} Tons</span>
+            <span className="text-[13.5px] font-extrabold text-primary block mt-0.5">{annualCo2SavedTons} Tons</span>
           </div>
         </div>
 
@@ -195,7 +195,7 @@ export const CngRoiCalculatorModal: React.FC<CngRoiCalculatorModalProps> = ({
                 onClose();
                 onOpenConversions();
               }}
-              className="w-full h-12 bg-[#006c50] hover:bg-[#004D40] text-white font-extrabold text-[13.5px] rounded-full flex items-center justify-center gap-2 shadow-md active:scale-[0.98] transition-all"
+              className="w-full h-12 bg-primary hover:bg-deep-teal text-white font-extrabold text-[13.5px] rounded-full flex items-center justify-center gap-2 shadow-md active:scale-[0.98] transition-all"
             >
               <span className="material-symbols-outlined text-[18px]">build_circle</span>
               <span>Find &amp; Book Accredited Conversion Center</span>

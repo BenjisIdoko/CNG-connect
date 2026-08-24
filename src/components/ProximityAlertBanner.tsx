@@ -62,7 +62,7 @@ export const ProximityAlertBanner: React.FC<ProximityAlertBannerProps> = ({
 
   return (
     <div className="fixed top-16 left-0 right-0 z-50 px-3 max-w-xl mx-auto pointer-events-none animate-slide-down">
-      <div className="bg-[#141d19]/95 text-white rounded-3xl shadow-[0_16px_48px_rgba(0,0,0,0.35)] border border-status-green/30 p-4.5 flex flex-col gap-3 pointer-events-auto backdrop-blur-xl relative overflow-hidden">
+      <div className="bg-on-surface/95 text-white rounded-3xl shadow-[0_16px_48px_rgba(0,0,0,0.35)] border border-status-green/30 p-4.5 flex flex-col gap-3 pointer-events-auto backdrop-blur-xl relative overflow-hidden">
         {/* Decorative background glow */}
         <div className="absolute -top-12 -right-12 w-32 h-32 bg-status-green/15 rounded-full blur-2xl pointer-events-none" />
 

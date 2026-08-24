@@ -178,10 +178,10 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-[#f2fcf5] text-[#141d19] pb-36 font-['Plus_Jakarta_Sans',sans-serif]">
+    <div className="min-h-screen bg-surface text-on-surface pb-36 font-['Plus_Jakarta_Sans',sans-serif]">
       {/* Toast Notification */}
       {copiedNotification && (
-        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-[#141d19] text-white text-[13px] font-bold px-4 py-2 rounded-full shadow-lg">
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-on-surface text-white text-[13px] font-bold px-4 py-2 rounded-full shadow-lg">
           Station Group link copied!
         </div>
       )}
@@ -191,22 +191,22 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
         <button
           onClick={onBack}
           aria-label="Go back"
-          className="flex items-center gap-1.5 text-slate-700 font-bold text-[13.5px] hover:text-[#006c50] active:scale-95 transition-all min-h-[44px] min-w-[44px] px-1"
+          className="flex items-center gap-1.5 text-slate-700 font-bold text-[13.5px] hover:text-primary active:scale-95 transition-all min-h-[44px] min-w-[44px] px-1"
         >
           <span className="material-symbols-outlined text-[20px]">arrow_back</span>
           <span>Back</span>
         </button>
 
         <div className="flex items-center gap-2">
-          <div className="bg-emerald-50 text-[#006c50] border border-emerald-200 px-3 py-1.5 rounded-full text-[12px] font-semibold flex items-center gap-1.5 shadow-2xs">
-            <span className={`w-2 h-2 rounded-full ${presenceCount > 0 ? 'bg-[#00c853] animate-pulse' : 'bg-slate-300'}`} />
+          <div className="bg-emerald-50 text-primary border border-emerald-200 px-3 py-1.5 rounded-full text-[12px] font-semibold flex items-center gap-1.5 shadow-2xs">
+            <span className={`w-2 h-2 rounded-full ${presenceCount > 0 ? 'bg-live-pulse animate-pulse' : 'bg-slate-300'}`} />
             <span>{presenceCount > 0 ? `${presenceCount} drivers here now` : 'Live presence unavailable'}</span>
           </div>
 
           <button
             onClick={handleShareStation}
             aria-label="Share Station Group"
-            className="w-11 h-11 rounded-full bg-slate-100 hover:bg-slate-200 text-[#006c50] flex items-center justify-center active:scale-95 transition-all shrink-0"
+            className="w-11 h-11 rounded-full bg-slate-100 hover:bg-slate-200 text-primary flex items-center justify-center active:scale-95 transition-all shrink-0"
           >
             <span className="material-symbols-outlined text-[18px]">share</span>
           </button>
@@ -216,24 +216,24 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
       {/* Main Content Area */}
       <div className="max-w-xl mx-auto px-4 md:px-6 pt-4 flex flex-col gap-4">
         {/* Station Group Header & Title */}
-        <div className="bg-white rounded-3xl p-5 border border-[#dbe5de] shadow-xs flex flex-col gap-3">
+        <div className="bg-white rounded-3xl p-5 border border-surface-container-highest shadow-xs flex flex-col gap-3">
           <div className="flex items-start justify-between gap-2">
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <span className="bg-[#006c50] text-white text-[10px] font-semibold px-2.5 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1">
+                <span className="bg-primary text-white text-[10px] font-semibold px-2.5 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1">
                   <span className="material-symbols-outlined text-[13px]">groups</span>
                   <span>Station Group</span>
                 </span>
                 <button
                   onClick={() => setShowInfoSheet(true)}
                   aria-label="Station Group Policy Info"
-                  className="w-11 h-11 rounded-full bg-emerald-100 hover:bg-emerald-200 text-[#006c50] flex items-center justify-center transition-all active:scale-95 shrink-0"
+                  className="w-11 h-11 rounded-full bg-emerald-100 hover:bg-emerald-200 text-primary flex items-center justify-center transition-all active:scale-95 shrink-0"
                   title="Policy Info"
                 >
                   <span className="material-symbols-outlined text-[16px]">info</span>
                 </button>
-                <span className="text-[12px] font-extrabold text-[#006c50] flex items-center gap-1 ml-auto">
-                  <span className={`w-1.5 h-1.5 rounded-full ${presenceCount > 0 ? 'bg-[#00c853] animate-pulse' : 'bg-slate-300'}`} />
+                <span className="text-[12px] font-extrabold text-primary flex items-center gap-1 ml-auto">
+                  <span className={`w-1.5 h-1.5 rounded-full ${presenceCount > 0 ? 'bg-live-pulse animate-pulse' : 'bg-slate-300'}`} />
                   {presenceCount > 0 ? `${presenceCount} Active Nearby` : 'Join the group'}
                 </span>
               </div>
@@ -251,18 +251,18 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
           </p>
 
           {/* Live Status & Specs Summary */}
-          <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-[#dbe5de]/70">
+          <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-surface-container-highest/70">
             {/* Status Badge */}
             <div
               className={`rounded-full px-3 py-1 flex items-center gap-1.5 shadow-2xs ${
                 station.status === 'full'
-                  ? 'bg-[#00E676] text-white font-bold'
+                  ? 'bg-status-green text-white font-bold'
                   : station.status === 'low'
-                  ? 'bg-[#fe9400] text-white font-bold'
+                  ? 'bg-secondary-container text-white font-bold'
                   : station.status === 'queue'
-                  ? 'bg-[#FFB800] text-[#141d19] font-bold'
+                  ? 'bg-electric-amber text-on-surface font-bold'
                   : station.status === 'out'
-                  ? 'bg-[#ba1a1a] text-white font-bold'
+                  ? 'bg-error text-white font-bold'
                   : 'bg-slate-200 text-slate-700 border border-slate-300 font-bold'
               }`}
             >
@@ -286,18 +286,18 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
             </div>
 
             {/* Busy Status */}
-            <div className="bg-[#ffe149]/30 border border-[#FFB800]/60 rounded-full px-3 py-1 flex items-center gap-1.5">
-              <span className="material-symbols-outlined text-[#746300] text-[15px]">
+            <div className="bg-tertiary-container/30 border border-electric-amber/60 rounded-full px-3 py-1 flex items-center gap-1.5">
+              <span className="material-symbols-outlined text-on-tertiary-container text-[15px]">
                 schedule
               </span>
-              <span className="text-[11.5px] font-semibold text-[#746300]">
+              <span className="text-[11.5px] font-semibold text-on-tertiary-container">
                 {station.busyEstimate || 'No reports yet'}
               </span>
             </div>
 
             {/* Time / Distance Info */}
             <div className="flex items-center gap-2 text-[12px] font-medium text-slate-500 ml-auto">
-              <span className={`flex items-center gap-1 font-bold ${station.status === 'unknown' ? 'text-slate-400' : 'text-[#006c50]'}`}>
+              <span className={`flex items-center gap-1 font-bold ${station.status === 'unknown' ? 'text-slate-400' : 'text-primary'}`}>
                 {formatStationAge(station)}
               </span>
             </div>
@@ -306,7 +306,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
 
         {/* Station Image Banner with Distance Badge */}
         {images.length > 0 ? (
-          <div className="relative rounded-2xl overflow-hidden shadow-xs border border-[#dbe5de] h-36 bg-[#e6f0e9]">
+          <div className="relative rounded-2xl overflow-hidden shadow-xs border border-surface-container-highest h-36 bg-surface-container">
             <div
               className="w-full h-full bg-cover bg-center"
               style={{ backgroundImage: `url('${images[1] || images?.[0]}')` }}
@@ -314,7 +314,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent flex items-end p-4">
                 <div className="flex items-center justify-between w-full">
                   <span className="bg-black/60 backdrop-blur-md text-white text-[12px] font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm">
-                    <span className="material-symbols-outlined text-[16px] text-[#00E676]">near_me</span>
+                    <span className="material-symbols-outlined text-[16px] text-status-green">near_me</span>
                     <span>{station.distance} • {station.driveTime}</span>
                   </span>
                 </div>
@@ -322,9 +322,9 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
             </div>
           </div>
         ) : (
-          <div className="relative rounded-2xl overflow-hidden shadow-xs border border-[#dbe5de] p-4 bg-gradient-to-r from-[#004D40] via-[#006c50] to-emerald-900 text-white flex items-center justify-between gap-3">
+          <div className="relative rounded-2xl overflow-hidden shadow-xs border border-surface-container-highest p-4 bg-gradient-to-r from-deep-teal via-primary to-emerald-900 text-white flex items-center justify-between gap-3">
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-[#00E676] flex items-center gap-1">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-status-green flex items-center gap-1">
                 <span className="material-symbols-outlined text-[13px]">photo_camera</span>
                 <span>No Driver Photos Yet</span>
               </span>
@@ -333,7 +333,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
             </div>
             <button
               onClick={() => onOpenReportModal(station)}
-              className="bg-[#00E676] hover:opacity-95 text-[#004D40] text-[12px] font-extrabold px-3.5 py-2 rounded-full shadow-md shrink-0 active:scale-95 transition-all"
+              className="bg-status-green hover:opacity-95 text-deep-teal text-[12px] font-extrabold px-3.5 py-2 rounded-full shadow-md shrink-0 active:scale-95 transition-all"
             >
               Add Photo
             </button>
@@ -342,14 +342,14 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
 
         {/* Price & Pump Pressure Bento Cards */}
         <div className="grid grid-cols-2 gap-3">
-          <div className="bg-white rounded-2xl p-4 border border-[#dbe5de] shadow-xs flex flex-col justify-between">
+          <div className="bg-white rounded-2xl p-4 border border-surface-container-highest shadow-xs flex flex-col justify-between">
             <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
               CNG Price
             </span>
             <div className="flex items-baseline gap-1 my-1">
               {station.cngPrice ? (
                 <>
-                  <span className="text-[28px] font-bold text-[#004D40]">
+                  <span className="text-[28px] font-bold text-deep-teal">
                     ₦{station.cngPrice}
                   </span>
                   <span className="text-[13px] font-normal text-slate-400">/kg</span>
@@ -360,13 +360,13 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                 </span>
               )}
             </div>
-            <span className="text-[11px] font-semibold text-[#006c50] flex items-center gap-1">
+            <span className="text-[11px] font-semibold text-primary flex items-center gap-1">
               <span>{station.cngPrice ? (station.priceTrend === 'stable' ? 'Official Rate' : 'Updated') : 'No price reports yet'}</span>
             </span>
           </div>
 
           {/* Interactive 220-Bar SVG Pump Pressure Arc Gauge Bento Card */}
-          <div className="bg-white rounded-2xl p-3.5 border border-[#dbe5de] shadow-xs flex flex-col justify-between relative overflow-hidden group">
+          <div className="bg-white rounded-2xl p-3.5 border border-surface-container-highest shadow-xs flex flex-col justify-between relative overflow-hidden group">
             <div className="flex justify-between items-center">
               <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
                 Pump Pressure
@@ -376,7 +376,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                   !station.pumpPressure
                     ? 'bg-slate-100 text-slate-600 border-slate-200'
                     : station.pumpPressure >= 180
-                    ? 'bg-emerald-50 text-[#006c50] border-emerald-200'
+                    ? 'bg-emerald-50 text-primary border-emerald-200'
                     : station.pumpPressure >= 130
                     ? 'bg-amber-50 text-amber-900 border-amber-200'
                     : 'bg-rose-50 text-rose-900 border-rose-200'
@@ -400,7 +400,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                     <path
                       d="M 10 50 A 40 40 0 0 1 90 50"
                       fill="none"
-                      stroke="#e6f0e9"
+                      stroke="var(--color-surface-container)"
                       strokeWidth="9"
                       strokeLinecap="round"
                     />
@@ -410,10 +410,10 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                       fill="none"
                       stroke={
                         station.pumpPressure >= 180
-                          ? '#00c853'
+                          ? 'var(--color-live-pulse)'
                           : station.pumpPressure >= 130
-                          ? '#fe9400'
-                          : '#ba1a1a'
+                          ? 'var(--color-secondary-container)'
+                          : 'var(--color-error)'
                       }
                       strokeWidth="9"
                       strokeLinecap="round"
@@ -435,7 +435,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
 
                 <div className="flex items-center justify-between text-[10px] font-bold text-slate-400 pt-1 border-t border-slate-100">
                   <span>0 bar</span>
-                  <span className="text-[#006c50] font-semibold">{Math.round((station.pumpPressure / 220) * 100)}% Max</span>
+                  <span className="text-primary font-semibold">{Math.round((station.pumpPressure / 220) * 100)}% Max</span>
                   <span>220 bar</span>
                 </div>
               </>
@@ -449,12 +449,12 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
         </div>
 
         {/* Tab Switcher: Group Feed vs Verified Reports vs Photos */}
-        <div className="flex bg-[#e6f0e9] p-1 rounded-2xl border border-[#dbe5de]">
+        <div className="flex bg-surface-container p-1 rounded-2xl border border-surface-container-highest">
           <button
             onClick={() => setActiveTab('feed')}
             className={`flex-1 py-2.5 rounded-xl text-[12.5px] font-bold transition-all text-center ${
               activeTab === 'feed'
-                ? 'bg-white text-[#006c50] shadow-xs font-bold'
+                ? 'bg-white text-primary shadow-xs font-bold'
                 : 'text-slate-500 hover:text-slate-900'
             }`}
           >
@@ -465,7 +465,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
             onClick={() => setActiveTab('reports')}
             className={`flex-1 py-2.5 rounded-xl text-[12.5px] font-bold transition-all text-center ${
               activeTab === 'reports'
-                ? 'bg-white text-[#006c50] shadow-xs font-bold'
+                ? 'bg-white text-primary shadow-xs font-bold'
                 : 'text-slate-500 hover:text-slate-900'
             }`}
           >
@@ -476,7 +476,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
             onClick={() => setActiveTab('photos')}
             className={`flex-1 py-2.5 rounded-xl text-[12.5px] font-bold transition-all text-center ${
               activeTab === 'photos'
-                ? 'bg-white text-[#006c50] shadow-xs font-bold'
+                ? 'bg-white text-primary shadow-xs font-bold'
                 : 'text-slate-500 hover:text-slate-900'
             }`}
           >
@@ -489,12 +489,12 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
           <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between px-1">
               <h2 className="text-[16px] font-bold text-slate-900 flex items-center gap-2">
-                <span className="material-symbols-outlined text-[#006c50] text-[20px]">
+                <span className="material-symbols-outlined text-primary text-[20px]">
                   chat_bubble
                 </span>
                 <span>Group Discussion Feed</span>
               </h2>
-              <span className="text-[11.5px] font-semibold text-[#006c50] bg-emerald-100 px-2.5 py-0.5 rounded-full">
+              <span className="text-[11.5px] font-semibold text-primary bg-emerald-100 px-2.5 py-0.5 rounded-full">
                 Open Group Chat
               </span>
             </div>
@@ -504,7 +504,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
               {comments.map((comment) => (
                   <div
                     key={comment.id}
-                    className="bg-white rounded-2xl p-4 border border-[#dbe5de] shadow-xs flex flex-col gap-2"
+                    className="bg-white rounded-2xl p-4 border border-surface-container-highest shadow-xs flex flex-col gap-2"
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2.5">
@@ -512,10 +512,10 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                           <img
                             src={comment.authorAvatar}
                             alt={comment.author}
-                            className="w-9 h-9 rounded-full object-cover border border-[#dbe5de]"
+                            className="w-9 h-9 rounded-full object-cover border border-surface-container-highest"
                           />
                         ) : (
-                          <div className="w-9 h-9 rounded-full bg-[#006c50]/20 text-[#006c50] font-bold flex items-center justify-center text-[14px]">
+                          <div className="w-9 h-9 rounded-full bg-primary/20 text-primary font-bold flex items-center justify-center text-[14px]">
                             {comment.author.charAt(0)}
                           </div>
                         )}
@@ -536,7 +536,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
 
                     {/* Replies if any */}
                     {comment.replies && comment.replies.length > 0 && (
-                      <div className="mt-2 ml-4 pl-3 border-l-2 border-[#006c50]/30 flex flex-col gap-2">
+                      <div className="mt-2 ml-4 pl-3 border-l-2 border-primary/30 flex flex-col gap-2">
                         {comment.replies.map((reply) => (
                           <div key={reply.id} className="pt-1">
                             <div className="flex items-center gap-2">
@@ -571,8 +571,8 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
         {activeTab === 'reports' && (
           <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between px-1">
-              <h2 className="text-[17px] font-bold text-[#141d19] flex items-center gap-2">
-                <span className="material-symbols-outlined text-[#006c50] text-[20px]">
+              <h2 className="text-[17px] font-bold text-on-surface flex items-center gap-2">
+                <span className="material-symbols-outlined text-primary text-[20px]">
                   verified_user
                 </span>
                 <span>Verified Driver Status Reports ({reports.length})</span>
@@ -585,7 +585,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                 return (
                   <div
                     key={report.id}
-                    className="bg-white rounded-2xl p-4 border border-[#dbe5de] shadow-xs flex flex-col gap-2"
+                    className="bg-white rounded-2xl p-4 border border-surface-container-highest shadow-xs flex flex-col gap-2"
                   >
                     <div className="flex justify-between items-start gap-2">
                       <div className="flex items-center gap-2.5 min-w-0">
@@ -593,16 +593,16 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                           <img
                             src={report.authorAvatar}
                             alt={report.author}
-                            className="w-10 h-10 rounded-full object-cover border border-[#dbe5de] shrink-0"
+                            className="w-10 h-10 rounded-full object-cover border border-surface-container-highest shrink-0"
                           />
                         ) : (
-                          <div className="w-10 h-10 rounded-full bg-[#fe9400]/20 text-[#8c5000] font-bold flex items-center justify-center text-[16px] shrink-0">
+                          <div className="w-10 h-10 rounded-full bg-secondary-container/20 text-secondary font-bold flex items-center justify-center text-[16px] shrink-0">
                             {report.author.charAt(0)}
                           </div>
                         )}
 
                         <div className="min-w-0">
-                          <div className="text-[14px] font-bold text-[#141d19] truncate">
+                          <div className="text-[14px] font-bold text-on-surface truncate">
                             {report.author}
                           </div>
                           <div className="flex items-center gap-1.5 mt-0.5">
@@ -615,7 +615,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                       </div>
 
                       {report.verified && report.isPhotoVerified ? (
-                        <div className="bg-emerald-100 border border-emerald-300 text-[#006c50] px-2.5 py-1 rounded-full text-[10.5px] font-semibold flex items-center gap-1 shadow-2xs shrink-0 whitespace-nowrap">
+                        <div className="bg-emerald-100 border border-emerald-300 text-primary px-2.5 py-1 rounded-full text-[10.5px] font-semibold flex items-center gap-1 shadow-2xs shrink-0 whitespace-nowrap">
                           <span
                             className="material-symbols-outlined text-[14px]"
                             style={{ fontVariationSettings: "'FILL' 1" }}
@@ -638,22 +638,22 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                     <div
                       className={`w-2.5 h-2.5 rounded-full ${
                         report.status === 'full'
-                          ? 'bg-[#006c50]'
+                          ? 'bg-primary'
                           : report.status === 'low'
-                          ? 'bg-[#fe9400]'
+                          ? 'bg-secondary-container'
                           : report.status === 'queue'
-                          ? 'bg-[#FFB800]'
-                          : 'bg-[#ba1a1a]'
+                          ? 'bg-electric-amber'
+                          : 'bg-error'
                       }`}
                     />
-                    <span className="text-[13.5px] font-bold text-[#141d19]">
+                    <span className="text-[13.5px] font-bold text-on-surface">
                       {report.statusLabel}{' '}
                       {report.waitMinutes ? `(${report.waitMinutes}m wait)` : ''}
                     </span>
                   </div>
 
                   {report.comment && (
-                    <p className="text-[14px] font-normal text-[#3a4a43] leading-relaxed">
+                    <p className="text-[14px] font-normal text-on-surface-variant leading-relaxed">
                       {report.comment}
                     </p>
                   )}
@@ -668,7 +668,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                   {report.photo && (
                     <div
                       onClick={() => setSelectedPhoto(report.photo!)}
-                      className="w-32 h-24 rounded-lg overflow-hidden border border-[#dbe5de] mt-1 cursor-pointer"
+                      className="w-32 h-24 rounded-lg overflow-hidden border border-surface-container-highest mt-1 cursor-pointer"
                     >
                       <img
                         src={report.photo}
@@ -679,13 +679,13 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                   )}
 
                   {/* Actions (Like / Dislike) */}
-                  <div className="flex items-center gap-3 pt-2 border-t border-[#dbe5de]/50 mt-1">
+                  <div className="flex items-center gap-3 pt-2 border-t border-surface-container-highest/50 mt-1">
                     <button
                       onClick={() => handleVote(report.id, 'up')}
                       className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[13px] font-semibold transition-all ${
                         report.userVoted === 'up'
-                          ? 'bg-[#006c50] text-white'
-                          : 'bg-[#f2fcf5] text-[#3a4a43] hover:bg-[#e6f0e9]'
+                          ? 'bg-primary text-white'
+                          : 'bg-surface text-on-surface-variant hover:bg-surface-container'
                       }`}
                     >
                       <span
@@ -704,8 +704,8 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                       onClick={() => handleVote(report.id, 'down')}
                       className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[13px] font-semibold transition-all ${
                         report.userVoted === 'down'
-                          ? 'bg-[#ba1a1a] text-white'
-                          : 'bg-[#f2fcf5] text-[#3a4a43] hover:bg-[#e6f0e9]'
+                          ? 'bg-error text-white'
+                          : 'bg-surface text-on-surface-variant hover:bg-surface-container'
                       }`}
                     >
                       <span
@@ -730,12 +730,12 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
         {activeTab === 'photos' && (
           <div className="flex flex-col gap-3">
             <div className="flex justify-between items-center px-1">
-              <h2 className="text-[17px] font-bold text-[#141d19]">
+              <h2 className="text-[17px] font-bold text-on-surface">
                 Station &amp; Pump Photos ({images.length})
               </h2>
               <button
                 onClick={() => onOpenReportModal(station)}
-                className="text-[12.5px] font-semibold text-[#006c50] flex items-center gap-1 hover:underline"
+                className="text-[12.5px] font-semibold text-primary flex items-center gap-1 hover:underline"
               >
                 <span className="material-symbols-outlined text-[16px]">add_a_photo</span>
                 <span>Add Photo</span>
@@ -748,7 +748,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                   <div
                     key={idx}
                     onClick={() => setSelectedPhoto(imgUrl)}
-                    className="w-full h-36 rounded-xl overflow-hidden border border-[#dbe5de] shadow-xs cursor-pointer relative group bg-[#e6f0e9]"
+                    className="w-full h-36 rounded-xl overflow-hidden border border-surface-container-highest shadow-xs cursor-pointer relative group bg-surface-container"
                   >
                     <img
                       src={imgUrl}
@@ -767,7 +767,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                 </p>
                 <button
                   onClick={() => onOpenReportModal(station)}
-                  className="mt-1 px-4 py-2 bg-[#006c50] hover:bg-[#004D40] text-white text-[12px] font-extrabold rounded-full shadow-md active:scale-95 transition-all"
+                  className="mt-1 px-4 py-2 bg-primary hover:bg-deep-teal text-white text-[12px] font-extrabold rounded-full shadow-md active:scale-95 transition-all"
                 >
                   Capture Live Photo
                 </button>
@@ -778,7 +778,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
       </div>
 
       {/* Sticky Bottom Action & Group Comment Input Bar */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md p-3 px-4 border-t border-[#dbe5de] shadow-lg z-40 pb-safe">
+      <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md p-3 px-4 border-t border-surface-container-highest shadow-lg z-40 pb-safe">
         <div className="max-w-xl mx-auto flex flex-col gap-2">
           {/* Main Action Buttons */}
           <div className="flex items-center gap-2">
@@ -786,7 +786,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
               onClick={() => onOpenReportModal(station)}
               aria-label="Update station status"
               title="Update status"
-              className="w-12 h-12 min-w-[48px] min-h-[48px] bg-[#006c50] hover:bg-[#004D40] text-white rounded-full flex items-center justify-center shadow-md active:scale-95 transition-all shrink-0"
+              className="w-12 h-12 min-w-[48px] min-h-[48px] bg-primary hover:bg-deep-teal text-white rounded-full flex items-center justify-center shadow-md active:scale-95 transition-all shrink-0"
             >
               <span className="material-symbols-outlined text-[20px] shrink-0">
                 edit_document
@@ -800,7 +800,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                   onNavigate(station);
                 }
               }}
-              className="flex-1 h-12 bg-[#006c50] hover:bg-[#004D40] text-white font-extrabold text-[13.5px] rounded-full flex items-center justify-center gap-1.5 shadow-md active:scale-[0.98] transition-all px-3.5 min-w-0"
+              className="flex-1 h-12 bg-primary hover:bg-deep-teal text-white font-extrabold text-[13.5px] rounded-full flex items-center justify-center gap-1.5 shadow-md active:scale-[0.98] transition-all px-3.5 min-w-0"
             >
               <span
                 className="material-symbols-outlined text-[18px] shrink-0"
@@ -818,7 +818,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
               onClick={() => openWhatsAppShare(station)}
               aria-label="Share update on WhatsApp"
               title="Share to WhatsApp"
-              className="px-3.5 h-12 bg-emerald-50 hover:bg-emerald-100 text-[#006c50] border border-[#dbe5de] font-bold text-[13px] rounded-full flex items-center justify-center gap-1.5 active:scale-[0.98] transition-all shrink-0"
+              className="px-3.5 h-12 bg-emerald-50 hover:bg-emerald-100 text-primary border border-surface-container-highest font-bold text-[13px] rounded-full flex items-center justify-center gap-1.5 active:scale-[0.98] transition-all shrink-0"
             >
               <span className="material-symbols-outlined text-[18px] shrink-0">
                 share
@@ -829,20 +829,20 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
 
           {/* Station Group Comment Input (Open to All Drivers) */}
           <form onSubmit={handlePostGroupComment} className="flex items-center gap-2 pt-1">
-            <div className="flex-1 bg-[#e6f0e9] rounded-full h-11 flex items-center px-4 border border-[#dbe5de]">
+            <div className="flex-1 bg-surface-container rounded-full h-11 flex items-center px-4 border border-surface-container-highest">
               <input
                 type="text"
                 value={newCommentText}
                 onChange={(e) => setNewCommentText(e.target.value)}
                 placeholder={`Post message to ${station.name} Group...`}
-                className="w-full bg-transparent border-none outline-none text-[13.5px] text-[#141d19] placeholder:text-[#6a7b72]"
+                className="w-full bg-transparent border-none outline-none text-[13.5px] text-on-surface placeholder:text-outline"
               />
             </div>
             <button
               type="submit"
               disabled={!newCommentText.trim()}
               aria-label="Post comment to station group"
-              className="w-11 h-11 rounded-full bg-[#006c50] text-white flex items-center justify-center shadow-sm hover:bg-[#004D40] disabled:opacity-40 transition-all active:scale-95 shrink-0"
+              className="w-11 h-11 rounded-full bg-primary text-white flex items-center justify-center shadow-sm hover:bg-deep-teal disabled:opacity-40 transition-all active:scale-95 shrink-0"
             >
               <span
                 className="material-symbols-outlined text-[18px]"

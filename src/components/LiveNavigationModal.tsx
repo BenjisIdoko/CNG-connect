@@ -18,7 +18,7 @@ export const LiveNavigationModal: React.FC<LiveNavigationModalProps> = ({
   };
 
   return (
-    <Modal isOpen={true} onClose={onClose} title="Station Navigation Summary" className="bg-[#141d19] text-white p-6 border border-emerald-500/30">
+    <Modal isOpen={true} onClose={onClose} title="Station Navigation Summary" className="bg-on-surface text-white p-6 border border-emerald-500/30">
       <div className="flex flex-col gap-5">
         {/* Modal Header */}
         <div className="flex items-center justify-between">
@@ -40,7 +40,7 @@ export const LiveNavigationModal: React.FC<LiveNavigationModalProps> = ({
         </div>
 
         {/* Station Overview Card */}
-        <div className="bg-[#1c2923] rounded-2xl p-4 border border-status-green/20 flex flex-col gap-2.5">
+        <div className="bg-surface-container-high/20 rounded-2xl p-4 border border-status-green/20 flex flex-col gap-2.5">
           <div>
             <h2 className="font-bold text-[19px] text-white leading-snug truncate">
               {station.name}

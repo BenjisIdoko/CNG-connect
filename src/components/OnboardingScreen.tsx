@@ -23,7 +23,7 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
         'Locate accredited CNG stations across Nigeria. Check live pump pressure (bar), queue wait times, and verified stock updates reported directly by drivers.',
       icon: 'local_gas_station',
       badge: 'Live Station Finder',
-      accentColor: 'from-[#006c50] to-[#004D40]',
+      accentColor: 'from-primary to-deep-teal',
       image:
         'https://images.unsplash.com/photo-1545454675-3531b543be5d?q=80&w=1000&auto=format&fit=crop',
     },
@@ -35,7 +35,7 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
         'Get exact physical distances (km) and drive times to Dutse-Bwari, Wuse 2, Ikeja, Oyo, and all major hubs nationwide, sorted by proximity.',
       icon: 'near_me',
       badge: 'Live Geolocation',
-      accentColor: 'from-[#004D40] to-[#00281F]',
+      accentColor: 'from-deep-teal to-[#00281F]',
       image:
         'https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?q=80&w=1000&auto=format&fit=crop',
     },
@@ -47,7 +47,7 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
         'Receive instant state-wide push notifications when gas is restocked, and join physical proximity chats when refuelling at station hubs.',
       icon: 'campaign',
       badge: 'Driver Community',
-      accentColor: 'from-[#007255] to-[#003828]',
+      accentColor: 'from-on-primary-container to-[#003828]',
       image:
         'https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=1000&auto=format&fit=crop',
     },
@@ -59,7 +59,7 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
         'Browse Pi-CNG accredited conversion workshops in all 36 states. Verify registration codes, call technicians directly, and schedule cylinder inspections.',
       icon: 'build_circle',
       badge: 'Pi-CNG Accredited',
-      accentColor: 'from-[#006c50] to-[#00E676]',
+      accentColor: 'from-primary to-status-green',
       image:
         'https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=1000&auto=format&fit=crop',
     },
@@ -82,7 +82,7 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#0c1411] text-white flex flex-col justify-between overflow-hidden font-['Plus_Jakarta_Sans',sans-serif] selection:bg-[#00E676] selection:text-[#004D40]">
+    <div className="fixed inset-0 z-50 bg-[#0c1411] text-white flex flex-col justify-between overflow-hidden font-['Plus_Jakarta_Sans',sans-serif] selection:bg-status-green selection:text-deep-teal">
       {/* Dynamic Background Image with Smooth Gradient Overlay */}
       <div className="absolute inset-0 z-0">
         <img

@@ -99,13 +99,13 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ post, onBack }) => {
   const sellerAvatar = post?.authorAvatar || ASSETS.userAvatar;
 
   return (
-    <div className="min-h-screen bg-[#f2fcf5] text-[#141d19] flex flex-col justify-between pb-24">
+    <div className="min-h-screen bg-surface text-on-surface flex flex-col justify-between pb-24">
       {/* Sticky Chat Header */}
-      <div className="sticky top-16 z-30 bg-[#f2fcf5]/95 backdrop-blur-md border-b border-[#dbe5de]/70 max-w-xl w-full mx-auto px-4 py-2.5 flex items-center justify-between shadow-xs">
+      <div className="sticky top-16 z-30 bg-surface/95 backdrop-blur-md border-b border-surface-container-highest/70 max-w-xl w-full mx-auto px-4 py-2.5 flex items-center justify-between shadow-xs">
         <div className="flex items-center gap-3">
           <button
             onClick={onBack}
-            className="w-10 h-10 -ml-1 flex items-center justify-center rounded-full text-[#141d19] hover:bg-[#e6f0e9] active:scale-95"
+            className="w-10 h-10 -ml-1 flex items-center justify-center rounded-full text-on-surface hover:bg-surface-container active:scale-95"
           >
             <span className="material-symbols-outlined text-[24px]">
               arrow_back
@@ -117,22 +117,22 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ post, onBack }) => {
               <img
                 src={sellerAvatar}
                 alt={sellerName}
-                className="w-10 h-10 rounded-full object-cover border border-[#006c50]/20"
+                className="w-10 h-10 rounded-full object-cover border border-primary/20"
               />
-              <span className="absolute bottom-0 right-0 w-3 h-3 bg-[#00E676] border-2 border-white rounded-full shadow-xs" />
+              <span className="absolute bottom-0 right-0 w-3 h-3 bg-status-green border-2 border-white rounded-full shadow-xs" />
             </div>
             <div className="min-w-0">
-              <h2 className="text-[15px] font-bold text-[#141d19] leading-tight truncate max-w-[180px] sm:max-w-[240px]">
+              <h2 className="text-[15px] font-bold text-on-surface leading-tight truncate max-w-[180px] sm:max-w-[240px]">
                 {sellerName}
               </h2>
-              <span className="text-[12px] text-[#006c50] font-semibold block truncate">
+              <span className="text-[12px] text-primary font-semibold block truncate">
                 Active now
               </span>
             </div>
           </div>
         </div>
 
-        <button className="w-10 h-10 flex items-center justify-center rounded-full text-[#6a7b72] hover:bg-[#e6f0e9]">
+        <button className="w-10 h-10 flex items-center justify-center rounded-full text-outline hover:bg-surface-container">
           <span className="material-symbols-outlined text-[24px]">
             more_vert
           </span>
@@ -141,20 +141,20 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ post, onBack }) => {
 
       {/* Pinned Listing Context Card */}
       <div className="max-w-xl w-full mx-auto px-4 pt-3">
-        <div className="bg-white rounded-2xl shadow-xs p-3 flex items-center gap-3 border border-[#dbe5de]/70 hover:border-[#006c50]/40 transition-colors">
+        <div className="bg-white rounded-2xl shadow-xs p-3 flex items-center gap-3 border border-surface-container-highest/70 hover:border-primary/40 transition-colors">
           <div
-            className="w-13 h-13 rounded-xl bg-cover bg-center shrink-0 border border-[#dbe5de]"
+            className="w-13 h-13 rounded-xl bg-cover bg-center shrink-0 border border-surface-container-highest"
             style={{ backgroundImage: `url('${listingImage}')` }}
           />
           <div className="flex-1 min-w-0">
-            <h3 className="text-[14px] font-bold text-[#141d19] truncate">
+            <h3 className="text-[14px] font-bold text-on-surface truncate">
               {listingTitle}
             </h3>
-            <p className="text-[15px] font-bold text-[#006c50] mt-0.5">
+            <p className="text-[15px] font-bold text-primary mt-0.5">
               {listingPrice}
             </p>
           </div>
-          <button className="w-8 h-8 rounded-full flex items-center justify-center text-[#6a7b72] hover:bg-[#e6f0e9]">
+          <button className="w-8 h-8 rounded-full flex items-center justify-center text-outline hover:bg-surface-container">
             <span className="material-symbols-outlined text-[20px]">
               chevron_right
             </span>
@@ -166,7 +166,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ post, onBack }) => {
       <div className="flex-1 max-w-xl w-full mx-auto px-4 py-4 flex flex-col gap-3">
         {/* Date Divider */}
         <div className="flex items-center justify-center my-1">
-          <span className="text-[11px] font-semibold bg-[#e6f0e9] text-[#6a7b72] px-3.5 py-1 rounded-full uppercase tracking-wider">
+          <span className="text-[11px] font-semibold bg-surface-container text-outline px-3.5 py-1 rounded-full uppercase tracking-wider">
             Today
           </span>
         </div>
@@ -185,8 +185,8 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ post, onBack }) => {
                 <div
                   className={`rounded-2xl p-3.5 shadow-xs text-[14.5px] font-normal leading-relaxed relative ${
                     isMe
-                      ? 'bg-[#006c50] text-white rounded-br-xs'
-                      : 'bg-white text-[#141d19] border border-[#dbe5de] rounded-bl-xs'
+                      ? 'bg-primary text-white rounded-br-xs'
+                      : 'bg-white text-on-surface border border-surface-container-highest rounded-bl-xs'
                   }`}
                 >
                   {msg.image && (
@@ -203,14 +203,14 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ post, onBack }) => {
 
                 {/* Timestamp & Status */}
                 <div
-                  className={`flex items-center gap-1 text-[11px] text-[#6a7b72] px-1 ${
+                  className={`flex items-center gap-1 text-[11px] text-outline px-1 ${
                     isMe ? 'justify-end' : 'justify-start'
                   }`}
                 >
                   <span>{msg.time}</span>
                   {isMe && (
                     <span
-                      className="material-symbols-outlined text-[14px] text-[#006c50]"
+                      className="material-symbols-outlined text-[14px] text-primary"
                       style={{ fontVariationSettings: "'FILL' 1" }}
                     >
                       done_all
@@ -224,19 +224,19 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ post, onBack }) => {
 
         {/* Typing Indicator */}
         {isTyping && (
-          <div className="self-start flex items-center gap-2 bg-white px-4 py-2.5 rounded-2xl rounded-bl-xs border border-[#dbe5de] shadow-xs">
+          <div className="self-start flex items-center gap-2 bg-white px-4 py-2.5 rounded-2xl rounded-bl-xs border border-surface-container-highest shadow-xs">
             <div className="flex gap-1.5 items-center">
-              <div className="w-2 h-2 rounded-full bg-[#006c50] animate-bounce" />
+              <div className="w-2 h-2 rounded-full bg-primary animate-bounce" />
               <div
-                className="w-2 h-2 rounded-full bg-[#006c50] animate-bounce"
+                className="w-2 h-2 rounded-full bg-primary animate-bounce"
                 style={{ animationDelay: '0.2s' }}
               />
               <div
-                className="w-2 h-2 rounded-full bg-[#006c50] animate-bounce"
+                className="w-2 h-2 rounded-full bg-primary animate-bounce"
                 style={{ animationDelay: '0.4s' }}
               />
             </div>
-            <span className="text-[12px] font-medium text-[#6a7b72] ml-1">
+            <span className="text-[12px] font-medium text-outline ml-1">
               {sellerName} is typing...
             </span>
           </div>
@@ -246,8 +246,8 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ post, onBack }) => {
       </div>
 
       {/* Fixed Chat Input Footer */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-[#dbe5de] p-3 px-4 shadow-lg z-40 pb-safe">
-        <div className="max-w-xl mx-auto flex items-end gap-2 bg-[#e6f0e9] rounded-2xl p-1.5 px-2 border border-[#dbe5de] focus-within:ring-2 focus-within:ring-[#006c50]/30 transition-all">
+      <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-surface-container-highest p-3 px-4 shadow-lg z-40 pb-safe">
+        <div className="max-w-xl mx-auto flex items-end gap-2 bg-surface-container rounded-2xl p-1.5 px-2 border border-surface-container-highest focus-within:ring-2 focus-within:ring-primary/30 transition-all">
           <input
             type="file"
             ref={fileInputRef}
@@ -259,7 +259,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ post, onBack }) => {
             type="button"
             onClick={() => fileInputRef.current?.click()}
             aria-label="Add photo"
-            className="w-10 h-10 flex shrink-0 items-center justify-center rounded-full text-[#6a7b72] hover:bg-white hover:text-[#006c50] transition-colors mb-0.5"
+            className="w-10 h-10 flex shrink-0 items-center justify-center rounded-full text-outline hover:bg-white hover:text-primary transition-colors mb-0.5"
           >
             <span className="material-symbols-outlined text-[22px]">
               add_a_photo
@@ -278,7 +278,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ post, onBack }) => {
                 }
               }}
               placeholder="Type a message..."
-              className="w-full bg-transparent border-none outline-none resize-none max-h-28 text-[14.5px] text-[#141d19] placeholder:text-[#6a7b72] m-0 p-0 block"
+              className="w-full bg-transparent border-none outline-none resize-none max-h-28 text-[14.5px] text-on-surface placeholder:text-outline m-0 p-0 block"
             />
           </div>
 
@@ -287,7 +287,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ post, onBack }) => {
             onClick={() => handleSendMessage()}
             disabled={!inputText.trim()}
             aria-label="Send message"
-            className={`w-10 h-10 flex shrink-0 items-center justify-center rounded-full bg-[#006c50] text-white transition-all active:scale-95 shadow-xs mb-0.5 ${
+            className={`w-10 h-10 flex shrink-0 items-center justify-center rounded-full bg-primary text-white transition-all active:scale-95 shadow-xs mb-0.5 ${
               inputText.trim()
                 ? 'opacity-100 scale-105'
                 : 'opacity-40 cursor-not-allowed'
