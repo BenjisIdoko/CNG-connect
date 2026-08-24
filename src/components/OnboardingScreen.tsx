@@ -108,17 +108,17 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
           {onExploreAsGuest && (
             <button
               onClick={onExploreAsGuest}
-              className="text-[12.5px] font-bold text-status-green hover:text-white bg-status-green/10 hover:bg-status-green/20 px-3 py-1.5 rounded-full backdrop-blur-md transition-all active:scale-95 border border-status-green/30"
+              className="h-9 px-3.5 text-[12.5px] font-bold text-status-green hover:text-white bg-status-green/10 hover:bg-status-green/20 rounded-full backdrop-blur-md transition-all active:scale-95 border border-status-green/30 flex items-center justify-center whitespace-nowrap"
             >
-              <span>Explore as Guest</span>
+              <span>Explore</span>
             </button>
           )}
           <button
             onClick={onStartLogin}
-            className="text-[13px] font-semibold text-white/90 hover:text-white bg-white/10 hover:bg-white/20 px-3.5 py-1.5 rounded-full backdrop-blur-md transition-all active:scale-95 border border-white/15 flex items-center gap-1"
+            className="h-9 px-3.5 text-[12.5px] font-semibold text-white/90 hover:text-white bg-white/10 hover:bg-white/20 rounded-full backdrop-blur-md transition-all active:scale-95 border border-white/15 flex items-center justify-center gap-1.5 whitespace-nowrap"
           >
             <span>Log In</span>
-            <span className="material-symbols-outlined text-[16px]">login</span>
+            <span className="material-symbols-outlined text-[15px]">login</span>
           </button>
         </div>
       </div>
@@ -178,17 +178,17 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
               <div className="grid grid-cols-2 gap-2">
                 <button
                   onClick={onStartLogin}
-                  className="w-full h-11 bg-white/10 hover:bg-white/20 text-white font-bold text-[13.5px] rounded-full border border-white/20 backdrop-blur-md flex items-center justify-center gap-1.5 active:scale-[0.98] transition-all"
+                  className="w-full h-11 bg-white/10 hover:bg-white/20 text-white font-bold text-[13.5px] rounded-full border border-white/20 backdrop-blur-md flex items-center justify-center gap-1.5 active:scale-[0.98] transition-all whitespace-nowrap"
                 >
-                  <span className="whitespace-nowrap">Log In</span>
+                  <span>Log In</span>
                 </button>
 
                 {onExploreAsGuest && (
                   <button
                     onClick={onExploreAsGuest}
-                    className="w-full h-11 bg-white/5 hover:bg-white/15 text-slate-300 font-bold text-[13.5px] rounded-full border border-white/10 backdrop-blur-md flex items-center justify-center gap-1 active:scale-[0.98] transition-all"
+                    className="w-full h-11 bg-white/5 hover:bg-white/15 text-slate-300 font-bold text-[13.5px] rounded-full border border-white/10 backdrop-blur-md flex items-center justify-center gap-1 active:scale-[0.98] transition-all whitespace-nowrap"
                   >
-                    <span className="whitespace-nowrap">Explore Map</span>
+                    <span>Explore</span>
                   </button>
                 )}
               </div>
