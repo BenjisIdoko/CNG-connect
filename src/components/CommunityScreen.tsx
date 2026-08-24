@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { CommunityPost, GasStation } from '../types';
 import { StationGroupInfoSheet } from './StationGroupInfoSheet';
+import { EmptyState } from './common/EmptyState';
 
 interface CommunityScreenProps {
   posts: CommunityPost[];
@@ -221,20 +222,23 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
             <div className="flex overflow-x-auto gap-1.5 pb-1 hide-scrollbar">
               {[
                 { id: 'all', label: 'All Statuses' },
-                { id: 'full', label: '🟢 Full Stock' },
-                { id: 'queue', label: '🟡 Queuing' },
-                { id: 'low', label: '🟠 Low Pressure' },
-                { id: 'out', label: '🔴 Out of Gas' },
+                { id: 'full', label: 'Full Stock', dotColor: 'bg-live-pulse' },
+                { id: 'queue', label: 'Queuing', dotColor: 'bg-amber-500' },
+                { id: 'low', label: 'Low Pressure', dotColor: 'bg-secondary-container' },
+                { id: 'out', label: 'Out of Gas', dotColor: 'bg-slate-400' },
               ].map((st) => (
                 <button
                   key={st.id}
                   onClick={() => setStatusFilter(st.id)}
-                  className={`shrink-0 px-3 py-1 rounded-xl text-micro font-semibold transition-all shadow-2xs active:scale-95 ${
+                  className={`shrink-0 px-3 py-1 rounded-xl text-micro font-semibold transition-all shadow-2xs active:scale-95 flex items-center gap-1.5 ${
                     statusFilter === st.id
                       ? 'bg-primary text-white shadow-xs'
                       : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
                   }`}
                 >
+                  {st.dotColor && (
+                    <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${st.dotColor}`} />
+                  )}
                   <span className="whitespace-nowrap">{st.label}</span>
                 </button>
               ))}
@@ -243,24 +247,15 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
             {/* Station Groups Cards Grid */}
             <div className="flex flex-col gap-3">
               {filteredStations.length === 0 ? (
-                <div className="bg-white rounded-3xl p-6 text-center border border-slate-200 shadow-sm flex flex-col items-center gap-2 my-2">
-                  <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-primary flex items-center justify-center font-bold">
-                    <span className="material-symbols-outlined text-[28px]">search_off</span>
-                  </div>
-                  <h4 className="font-bold text-slate-900 text-body-lg">No Station Groups Found</h4>
-                  <p className="text-caption text-slate-500 font-normal max-w-xs">
-                    No station groups match your current search query or status filter.
-                  </p>
-                  <button
-                    onClick={() => {
-                      setSearchQuery('');
-                      setStatusFilter('all');
-                    }}
-                    className="mt-1 px-5 py-2.5 bg-primary hover:bg-deep-teal text-white text-caption font-bold rounded-full shadow-md active:scale-95 transition-all"
-                  >
-                    Reset Filters
-                  </button>
-                </div>
+                <EmptyState
+                  title="No Station Groups Found"
+                  message="No station groups match your current search query or status filter."
+                  actionLabel="Reset Filters"
+                  onAction={() => {
+                    setSearchQuery('');
+                    setStatusFilter('all');
+                  }}
+                />
               ) : (
                 filteredStations.map((st) => (
                   <div
@@ -397,6 +392,11 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                       337+ Pi-CNG certified centers nationwide
                     </p>
                   </div>
+                  <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center shadow-2xs transition-colors shrink-0">
+                    <span className="material-symbols-outlined text-[18px]">
+                      chevron_right
+                    </span>
+                  </div>
                 </div>
 
                 {/* Maintenance */}
@@ -505,32 +505,25 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
               </div>
 
               {filteredPosts.length === 0 ? (
-                <div className="bg-white rounded-3xl p-6 text-center border border-slate-200/80 shadow-xs flex flex-col items-center gap-2 my-2">
-                  <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-primary flex items-center justify-center font-bold">
-                    <span className="material-symbols-outlined text-[28px]">search_off</span>
-                  </div>
-                  <h4 className="font-extrabold text-slate-900 text-body-lg">
-                    {searchQuery ? `No results for "${searchQuery}"` : 'No posts found'}
-                  </h4>
-                  <p className="text-caption text-slate-500 font-normal max-w-xs">
-                    {searchQuery
+                <EmptyState
+                  title={searchQuery ? `No results for "${searchQuery}"` : 'No posts found'}
+                  message={
+                    searchQuery
                       ? `Try searching for other keywords like "pressure", "kit", "NIPCO", or "maintenance".`
                       : activeCategory !== 'all'
                       ? `There are no posts in the ${activeCategory} category yet.`
-                      : 'Be the first to share an update or question in the Community hub!'}
-                  </p>
-                  {(searchQuery || activeCategory !== 'all') && (
-                    <button
-                      onClick={() => {
-                        setSearchQuery('');
-                        setActiveCategory('all');
-                      }}
-                      className="mt-1 px-4 py-2 bg-primary hover:bg-deep-teal text-white text-caption font-bold rounded-full shadow-xs active:scale-95 transition-all"
-                    >
-                      Clear Search & Filters
-                    </button>
-                  )}
-                </div>
+                      : 'Be the first to share an update or question in the Community hub!'
+                  }
+                  actionLabel={searchQuery || activeCategory !== 'all' ? 'Clear Search & Filters' : undefined}
+                  onAction={
+                    searchQuery || activeCategory !== 'all'
+                      ? () => {
+                          setSearchQuery('');
+                          setActiveCategory('all');
+                        }
+                      : undefined
+                  }
+                />
               ) : (
                 filteredPosts.map((post) => (
                   <div
@@ -649,7 +642,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
       <button
         onClick={onOpenCreatePost}
         aria-label="Create Post"
-        className="fixed bottom-24 right-6 w-14 h-14 bg-live-pulse hover:opacity-90 text-white rounded-full shadow-[0_8px_24px_rgba(0,200,83,0.4)] flex items-center justify-center transition-all hover:scale-105 active:scale-95 z-40 border-2 border-white"
+        className="fixed bottom-24 right-6 w-14 h-14 bg-primary hover:bg-deep-teal text-white rounded-full shadow-[0_8px_24px_rgba(0,108,80,0.35)] flex items-center justify-center transition-all hover:scale-105 active:scale-95 z-40 border-2 border-white"
       >
         <span className="material-symbols-outlined text-[30px]">add</span>
       </button>
