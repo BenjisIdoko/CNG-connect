@@ -73,13 +73,13 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
       navigator
         .share({
           title: post.title,
-          text: `${post.title} by ${post.author} on GasFinder Community`,
+          text: `${post.title} by ${post.author} on CNG-Connect Community`,
           url: window.location.href,
         })
         .catch(() => {});
     } else {
       navigator.clipboard
-        .writeText(`"${post.title}" - ${post.content.slice(0, 100)}... on GasFinder`)
+        .writeText(`"${post.title}" - ${post.content.slice(0, 100)}... on CNG-Connect`)
         .then(() => showToast('Discussion link copied!'))
         .catch(() => showToast('Could not copy link on this device.'));
     }

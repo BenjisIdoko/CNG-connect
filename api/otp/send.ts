@@ -87,8 +87,8 @@ export default async function handler(req: any, res: any) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             to: normalizedPhone.replace('+', ''),
-            from: process.env.TERMII_SENDER_ID || 'GasFinder',
-            sms: `Your GasFinder CNG verification code is ${generatedOtp}. Valid for 5 minutes.`,
+            from: process.env.TERMII_SENDER_ID || 'CNGConnect',
+            sms: `Your CNG-Connect verification code is ${generatedOtp}. Valid for 5 minutes.`,
             type: 'plain',
             channel: 'generic',
             api_key: process.env.TERMII_API_KEY,
@@ -107,7 +107,7 @@ export default async function handler(req: any, res: any) {
           body: new URLSearchParams({
             username: process.env.AFRICAS_TALKING_USERNAME || 'sandbox',
             to: normalizedPhone,
-            message: `Your GasFinder CNG verification code is ${generatedOtp}. Valid for 5 minutes.`,
+            message: `Your CNG-Connect verification code is ${generatedOtp}. Valid for 5 minutes.`,
           }),
         });
         if (!atRes.ok) {

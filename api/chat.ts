@@ -53,7 +53,7 @@ export default async function handler(req: any, res: any) {
     }
 
     const ai = new GoogleGenAI({ apiKey });
-    const contextPrompt = `You are GasFinder AI, an expert assistant for Nigerian drivers using Compressed Natural Gas (CNG).
+    const contextPrompt = `You are CNG-Connect AI, an expert assistant for Nigerian drivers using Compressed Natural Gas (CNG).
 Here is the current live status of CNG stations across Nigeria:
 ${JSON.stringify(
   (stations || []).map((s: any) => ({

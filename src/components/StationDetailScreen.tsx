@@ -157,7 +157,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
       navigator
         .share({
           title: `${station.name} Station Group`,
-          text: `Join ${station.name} Station Group on GasFinder! Live CNG Status: ${station.statusLabel}, ₦${station.cngPrice}/kg, Pressure: ${station.pumpPressure} bar.`,
+          text: `Join ${station.name} Station Group on CNG-Connect! Live CNG Status: ${station.statusLabel}, ₦${station.cngPrice}/kg, Pressure: ${station.pumpPressure} bar.`,
           url: window.location.href,
         })
         .catch(() => {});

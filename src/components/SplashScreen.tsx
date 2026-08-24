@@ -54,10 +54,10 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
       <div className="relative z-10 p-6 pt-10 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-xl bg-white/90 p-1 backdrop-blur-md shadow-md flex items-center justify-center">
-            <img src={ASSETS.logo} alt="GasFinder Logo" className="w-full h-full object-contain" />
+            <img src={ASSETS.logo} alt="CNG-Connect Logo" className="w-full h-full object-contain" />
           </div>
           <span className="text-[22px] font-extrabold text-white tracking-tight">
-            Gas<span className="text-status-green">Finder</span>
+            CNG-<span className="text-status-green">Connect</span>
           </span>
         </div>
 

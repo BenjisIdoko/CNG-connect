@@ -499,4 +499,38 @@ export const apiService = {
       isDelivered: true,
     };
   },
+
+  /**
+   * Subscribe to live station status reports across all connected devices using Supabase Realtime.
+   */
+  subscribeToLiveStationUpdates(
+    onUpdate: (payload: { stationId: string; newStatus: StationStatus; statusLabel: string }) => void
+  ): () => void {
+    if (!isSupabaseConfigured || !supabase) {
+      return () => {};
+    }
+
+    const channel = supabase
+      .channel('public:station_reports')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'station_reports' },
+        (payload: any) => {
+          if (payload.new && payload.new.station_id) {
+            onUpdate({
+              stationId: payload.new.station_id,
+              newStatus: payload.new.status as StationStatus,
+              statusLabel: payload.new.status_label || payload.new.status,
+            });
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      if (supabase) {
+        supabase.removeChannel(channel);
+      }
+    };
+  },
 };

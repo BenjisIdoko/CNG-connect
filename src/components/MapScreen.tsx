@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import L from 'leaflet';
+import 'leaflet.markercluster/dist/MarkerCluster.css';
+import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
+import 'leaflet.markercluster';
 import { GasStation, StationStatus } from '../types';
 import { ASSETS } from '../data/mockData';
 import { Modal } from './common/Modal';
@@ -38,6 +41,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
   const toggleSheetMode = () => setSheetMode((prev) => (prev === 'expanded' ? 'standard' : 'expanded'));
   const [isRecentering, setIsRecentering] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [visibleCount, setVisibleCount] = useState(25);
 
   const [userGps, setUserGps] = useState<{ lat: number; lng: number } | null>(() => {
     if (propUserGps) return propUserGps;
@@ -221,8 +225,21 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       subdomains: 'abcd',
     }).addTo(map);
 
-    const markersLayer = L.layerGroup().addTo(map);
-    markersLayerRef.current = markersLayer;
+    const clusterGroup = (L as any).markerClusterGroup({
+      showCoverageOnHover: false,
+      maxClusterRadius: 40,
+      iconCreateFunction: (cluster: any) => {
+        const childCount = cluster.getChildCount();
+        return L.divIcon({
+          html: `<div class="w-9 h-9 rounded-full bg-[#006c50] text-white font-extrabold text-[12px] flex items-center justify-center border-2 border-white shadow-md transition-transform hover:scale-110"><span>${childCount}</span></div>`,
+          className: 'custom-cluster-icon',
+          iconSize: [36, 36],
+        });
+      },
+    });
+
+    markersLayerRef.current = clusterGroup;
+    clusterGroup.addTo(map);
     mapInstanceRef.current = map;
 
     return () => {
@@ -569,7 +586,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                     </div>
 
                     <div className="flex flex-col gap-2">
-                      {(sheetMode === 'expanded' ? filteredStations : nearestTop5Stations).map((station) => {
+                      {(sheetMode === 'expanded' ? filteredStations.slice(0, visibleCount) : nearestTop5Stations).map((station) => {
                         const statusInfo = getStatusIndicator(station.status);
                         const isSelected = selectedStation?.id === station.id;
 
@@ -636,6 +653,16 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                         );
                       })}
                     </div>
+
+                    {sheetMode === 'expanded' && filteredStations.length > visibleCount && (
+                      <button
+                        onClick={() => setVisibleCount((prev) => prev + 25)}
+                        className="w-full py-2.5 my-2 bg-emerald-50 hover:bg-emerald-100 text-[#006c50] border border-emerald-200 text-[13px] font-extrabold rounded-full transition-all active:scale-[0.98] flex items-center justify-center gap-1.5 shadow-2xs"
+                      >
+                        <span className="material-symbols-outlined text-[18px]">expand_more</span>
+                        <span>Load More Stations (Showing {visibleCount} of {filteredStations.length})</span>
+                      </button>
+                    )}
                   </div>
 
                   {/* Secondary Horizontal Carousel (Shown ONLY in Expanded Mode below the vertical list) */}
@@ -711,25 +738,13 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       </div>
 
       {/* Filter Modal */}
-      <Modal isOpen={isFilterModalOpen} onClose={() => setIsFilterModalOpen(false)} title="Filter Stations" className="p-6">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="font-bold text-[20px] text-slate-900">
-            Filter Stations
-          </h3>
-          <button
-            onClick={() => setIsFilterModalOpen(false)}
-            className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:bg-slate-100"
-          >
-            <span className="material-symbols-outlined text-[22px]">close</span>
-          </button>
-        </div>
-
-        <div className="space-y-4">
+      <Modal isOpen={isFilterModalOpen} onClose={() => setIsFilterModalOpen(false)} title="Filter Stations">
+        <div className="flex flex-col gap-4 py-1 text-[#141d19]">
           {/* Minimum Pressure */}
           <div>
-            <div className="flex justify-between text-[13px] font-bold text-slate-700 mb-1.5">
+            <div className="flex justify-between text-[12.5px] font-bold text-slate-700 mb-1.5">
               <span>Minimum Pump Pressure</span>
-              <span className="text-[#006c50]">{minPressure} bar</span>
+              <span className="text-[#006c50] font-extrabold">{minPressure} bar</span>
             </div>
             <input
               type="range"
@@ -738,9 +753,9 @@ export const MapScreen: React.FC<MapScreenProps> = ({
               step="20"
               value={minPressure}
               onChange={(e) => setMinPressure(Number(e.target.value))}
-              className="w-full accent-[#006c50]"
+              className="w-full accent-[#006c50] h-2 bg-slate-100 rounded-lg cursor-pointer"
             />
-            <div className="flex justify-between text-[11px] text-slate-400 mt-1">
+            <div className="flex justify-between text-[10.5px] font-semibold text-slate-400 mt-1">
               <span>Any (0 bar)</span>
               <span>150 bar</span>
               <span>220 bar (Max)</span>
@@ -749,9 +764,9 @@ export const MapScreen: React.FC<MapScreenProps> = ({
 
           {/* Maximum Distance Radius */}
           <div>
-            <div className="flex justify-between text-[13px] font-bold text-slate-700 mb-1.5">
-              <span>Maximum Distance</span>
-              <span className="text-[#006c50]">
+            <div className="flex justify-between text-[12.5px] font-bold text-slate-700 mb-1.5">
+              <span>Maximum Distance Radius</span>
+              <span className="text-[#006c50] font-extrabold">
                 {maxDistanceKm === 0 ? 'Any Distance' : `Within ${maxDistanceKm} km`}
               </span>
             </div>
@@ -761,7 +776,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                   key={dist}
                   type="button"
                   onClick={() => setMaxDistanceKm(dist)}
-                  className={`flex-1 py-2 rounded-xl text-[12px] font-bold border transition-all ${
+                  className={`flex-1 py-2 px-2 rounded-xl text-[12px] font-extrabold border transition-all active:scale-95 ${
                     maxDistanceKm === dist
                       ? 'bg-[#006c50] text-white border-[#006c50]'
                       : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
@@ -775,18 +790,19 @@ export const MapScreen: React.FC<MapScreenProps> = ({
 
           {/* Status checkboxes */}
           <div>
-            <label className="block text-[13px] font-bold text-slate-700 mb-2">
-              Status Availability
+            <label className="block text-[12.5px] font-bold text-slate-700 mb-2">
+              Fuel &amp; Pump Status Availability
             </label>
             <div className="grid grid-cols-2 gap-2">
               {['all', 'full', 'queue', 'low', 'out'].map((st) => (
                 <button
                   key={st}
+                  type="button"
                   onClick={() => setActiveFilter(st)}
-                  className={`p-2.5 rounded-xl text-[12px] font-bold border transition-all ${
+                  className={`p-2.5 rounded-xl text-[12px] font-extrabold border transition-all active:scale-95 text-center ${
                     activeFilter === st
                       ? 'bg-[#006c50] text-white border-[#006c50]'
-                      : 'bg-slate-50 text-slate-800 border-slate-200'
+                      : 'bg-slate-50 text-slate-800 border-slate-200 hover:bg-slate-100'
                   }`}
                 >
                   {st === 'all'
@@ -802,26 +818,29 @@ export const MapScreen: React.FC<MapScreenProps> = ({
               ))}
             </div>
           </div>
-        </div>
 
-        <div className="mt-6 flex gap-3">
-          <button
-            onClick={() => {
-              setMinPressure(0);
-              setMaxDistanceKm(0);
-              setActiveFilter('all');
-              setIsFilterModalOpen(false);
-            }}
-            className="flex-1 py-3 text-slate-700 font-bold text-[14px] bg-slate-100 rounded-full hover:bg-slate-200"
-          >
-            Reset
-          </button>
-          <button
-            onClick={() => setIsFilterModalOpen(false)}
-            className="flex-1 py-3 bg-[#006c50] text-white font-bold text-[14px] rounded-full shadow-md hover:bg-[#004D40]"
-          >
-            Apply Filters
-          </button>
+          {/* Bottom Action Buttons */}
+          <div className="pt-3 border-t border-slate-100 flex gap-2.5 mt-1">
+            <button
+              type="button"
+              onClick={() => {
+                setMinPressure(0);
+                setMaxDistanceKm(0);
+                setActiveFilter('all');
+                setIsFilterModalOpen(false);
+              }}
+              className="flex-1 py-3 text-slate-700 font-extrabold text-[13px] bg-slate-100 hover:bg-slate-200 rounded-full active:scale-95 transition-all"
+            >
+              Reset Filters
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsFilterModalOpen(false)}
+              className="flex-1 py-3 bg-[#006c50] text-white font-extrabold text-[13px] rounded-full shadow-md hover:bg-[#004D40] active:scale-95 transition-all"
+            >
+              Apply Filters
+            </button>
+          </div>
         </div>
       </Modal>
     </div>

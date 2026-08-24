@@ -4,11 +4,13 @@ import { ASSETS } from '../data/mockData';
 interface OnboardingScreenProps {
   onStartSignUp: () => void;
   onStartLogin: () => void;
+  onExploreAsGuest?: () => void;
 }
 
 export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
   onStartSignUp,
   onStartLogin,
+  onExploreAsGuest,
 }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
 
@@ -95,20 +97,30 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
       <div className="relative z-10 p-5 pt-8 max-w-xl mx-auto w-full flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-xl bg-white/90 p-1 shadow-md flex items-center justify-center">
-            <img src={ASSETS.logo} alt="GasFinder Logo" className="w-full h-full object-contain" />
+            <img src={ASSETS.logo} alt="CNG-Connect Logo" className="w-full h-full object-contain" />
           </div>
           <span className="text-[20px] font-extrabold text-white tracking-tight">
-            Gas<span className="text-status-green">Finder</span>
+            CNG-<span className="text-status-green">Connect</span>
           </span>
         </div>
 
-        <button
-          onClick={onStartLogin}
-          className="text-[13px] font-semibold text-white/90 hover:text-white bg-white/10 hover:bg-white/20 px-3.5 py-1.5 rounded-full backdrop-blur-md transition-all active:scale-95 border border-white/15 flex items-center gap-1"
-        >
-          <span>Log In</span>
-          <span className="material-symbols-outlined text-[16px]">login</span>
-        </button>
+        <div className="flex items-center gap-2">
+          {onExploreAsGuest && (
+            <button
+              onClick={onExploreAsGuest}
+              className="text-[12.5px] font-bold text-status-green hover:text-white bg-status-green/10 hover:bg-status-green/20 px-3 py-1.5 rounded-full backdrop-blur-md transition-all active:scale-95 border border-status-green/30"
+            >
+              <span>Explore as Guest</span>
+            </button>
+          )}
+          <button
+            onClick={onStartLogin}
+            className="text-[13px] font-semibold text-white/90 hover:text-white bg-white/10 hover:bg-white/20 px-3.5 py-1.5 rounded-full backdrop-blur-md transition-all active:scale-95 border border-white/15 flex items-center gap-1"
+          >
+            <span>Log In</span>
+            <span className="material-symbols-outlined text-[16px]">login</span>
+          </button>
+        </div>
       </div>
 
       {/* Main Slide Content Card */}
@@ -163,12 +175,23 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
                 <span className="material-symbols-outlined text-[20px] shrink-0">arrow_forward</span>
               </button>
 
-              <button
-                onClick={onStartLogin}
-                className="w-full h-12 bg-white/10 hover:bg-white/20 text-white font-bold text-[14px] rounded-full border border-white/20 backdrop-blur-md flex items-center justify-center gap-1.5 active:scale-[0.98] transition-all"
-              >
-                <span className="whitespace-nowrap">Log In</span>
-              </button>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={onStartLogin}
+                  className="w-full h-11 bg-white/10 hover:bg-white/20 text-white font-bold text-[13.5px] rounded-full border border-white/20 backdrop-blur-md flex items-center justify-center gap-1.5 active:scale-[0.98] transition-all"
+                >
+                  <span className="whitespace-nowrap">Log In</span>
+                </button>
+
+                {onExploreAsGuest && (
+                  <button
+                    onClick={onExploreAsGuest}
+                    className="w-full h-11 bg-white/5 hover:bg-white/15 text-slate-300 font-bold text-[13.5px] rounded-full border border-white/10 backdrop-blur-md flex items-center justify-center gap-1 active:scale-[0.98] transition-all"
+                  >
+                    <span className="whitespace-nowrap">Explore Map</span>
+                  </button>
+                )}
+              </div>
             </div>
           ) : (
             /* Navigation Buttons */

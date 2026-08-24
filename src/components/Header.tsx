@@ -7,6 +7,7 @@ interface HeaderProps {
   onBack?: () => void;
   onAvatarClick?: () => void;
   onOpenAiAssistant?: () => void;
+  onOpenRoiCalculator?: () => void;
   userAvatar?: string;
   rightAction?: React.ReactNode;
 }
@@ -17,33 +18,39 @@ export const Header: React.FC<HeaderProps> = ({
   onBack,
   onAvatarClick,
   onOpenAiAssistant,
+  onOpenRoiCalculator,
   userAvatar = ASSETS.userAvatar,
   rightAction
 }) => {
   return (
     <header className="fixed top-0 w-full z-50 bg-white/95 backdrop-blur-xl border-b border-outline-variant/80 shadow-[0_1px_6px_rgba(0,0,0,0.03)]">
       <div className="h-16 px-4 md:px-6 max-w-xl mx-auto flex items-center justify-between pt-safe">
-        <div className="flex items-center gap-2.5">
-          {showBack && (
-            <button
-              onClick={onBack}
-              aria-label="Go back"
-              className="w-11 h-11 -ml-1 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container active:scale-95 transition-all"
-            >
-              <span className="material-symbols-outlined text-[22px]">arrow_back</span>
-            </button>
+        <div className="flex items-center gap-2 min-w-0 flex-1 pr-2">
+          {showBack ? (
+            <div className="flex items-center gap-2 min-w-0 flex-1">
+              <button
+                onClick={onBack}
+                aria-label="Go back"
+                className="w-10 h-10 -ml-1 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container active:scale-95 transition-all shrink-0"
+              >
+                <span className="material-symbols-outlined text-[22px]">arrow_back</span>
+              </button>
+              <span className="font-extrabold text-[17px] sm:text-[18px] text-slate-900 tracking-tight truncate">
+                {title}
+              </span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2 min-w-0">
+              <img
+                src={ASSETS.logo}
+                alt="CNG-Connect Logo"
+                className="h-7 w-auto object-contain shrink-0"
+              />
+              <span className="font-extrabold text-[19px] sm:text-[20px] text-primary tracking-tight truncate max-w-[160px] sm:max-w-[240px]">
+                {title || 'CNG-Connect'}
+              </span>
+            </div>
           )}
-
-          <div className="flex items-center gap-2">
-            <img
-              src={ASSETS.logo}
-              alt="GasFinder Logo"
-              className="h-7 w-auto object-contain"
-            />
-            <span className="font-extrabold text-[19px] sm:text-[20px] text-primary tracking-tight truncate max-w-[160px] sm:max-w-[240px]">
-              {title}
-            </span>
-          </div>
         </div>
 
         {rightAction ? (

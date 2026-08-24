@@ -19,7 +19,7 @@ export const AiAssistantModal: React.FC<AiAssistantModalProps> = ({
   const [messages, setMessages] = useState<Array<{ role: 'user' | 'assistant'; text: string }>>([
     {
       role: 'assistant',
-      text: 'Hello! I am GasFinder AI. Ask me about CNG station queues, pump pressure, optimal refuelling times, or calculating your monthly fuel savings!',
+      text: 'Hello! I am CNG-Connect AI. Ask me about CNG station queues, pump pressure, optimal refuelling times, or calculating your monthly fuel savings!',
     },
   ]);
 
@@ -28,7 +28,7 @@ export const AiAssistantModal: React.FC<AiAssistantModalProps> = ({
     const safeStations = Array.isArray(stations) ? stations : [];
 
     if (safeStations.length === 0) {
-      return `GasFinder AI is currently tracking live CNG stations across Nigeria. Please connect to the internet or reload stations to see real-time updates.`;
+      return `CNG-Connect AI is currently tracking live CNG stations across Nigeria. Please connect to the internet or reload stations to see real-time updates.`;
     }
 
     if (lower.includes('pressure') || lower.includes('highest')) {
@@ -102,7 +102,7 @@ export const AiAssistantModal: React.FC<AiAssistantModalProps> = ({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="GasFinder AI Assistant" className="h-[85vh] sm:h-[620px] flex flex-col">
+    <Modal isOpen={isOpen} onClose={onClose} title="CNG-Connect AI Assistant" className="h-[85vh] sm:h-[620px] flex flex-col">
       {/* Header */}
       <div className="bg-gradient-to-r from-[#004D40] to-[#006c50] text-white p-4 flex items-center justify-between shadow-md">
         <div className="flex items-center gap-3">
@@ -111,7 +111,7 @@ export const AiAssistantModal: React.FC<AiAssistantModalProps> = ({
           </div>
           <div>
             <h3 className="font-bold text-[16px] text-white flex items-center gap-1.5">
-              GasFinder AI Assistant
+              CNG-Connect AI Assistant
               <span className="bg-[#00E676] text-[#004D40] text-[9.5px] font-semibold uppercase px-2 py-0.5 rounded-full">
                 Live
               </span>
@@ -187,7 +187,7 @@ export const AiAssistantModal: React.FC<AiAssistantModalProps> = ({
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Ask GasFinder AI..."
+          placeholder="Ask CNG-Connect AI..."
           className="flex-1 bg-[#e6f0e9] border border-[#dbe5de] rounded-full px-4 py-2.5 text-[14px] font-normal text-[#141d19] placeholder:text-[#6a7b72] focus:outline-none focus:ring-2 focus:ring-[#006c50]/30"
         />
         <button

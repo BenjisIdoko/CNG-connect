@@ -56,6 +56,9 @@ const AiAssistantModal = lazy(() =>
 const LiveNavigationModal = lazy(() =>
   import('./components/LiveNavigationModal').then((m) => ({ default: m.LiveNavigationModal }))
 );
+const CngRoiCalculatorModal = lazy(() =>
+  import('./components/CngRoiCalculatorModal').then((m) => ({ default: m.CngRoiCalculatorModal }))
+);
 import {
   isStationStale,
   isStationOnCooldown,
@@ -84,6 +87,7 @@ export const App: React.FC = () => {
   const [reportingStation, setReportingStation] = useState<GasStation | null>(null);
   const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
   const [isAiModalOpen, setIsAiModalOpen] = useState(false);
+  const [isRoiModalOpen, setIsRoiModalOpen] = useState(false);
   const [proximityAlertStation, setProximityAlertStation] = useState<GasStation | null>(null);
   const [globalToast, setGlobalToast] = useState<string | null>(null);
   const [gpsStatus, setGpsStatus] = useState<GpsStatus>('unavailable');
@@ -390,7 +394,7 @@ export const App: React.FC = () => {
   const handleCreatePost = async (newPost: CommunityPost) => {
     const updatedPosts = await apiService.createPost(newPost);
     setPosts(updatedPosts);
-    showToast('Post published to GasFinder Community!');
+    showToast('Post published to CNG-Connect Community!');
   };
 
   const handleToggleLikePost = (postId: string) => {
@@ -415,7 +419,7 @@ export const App: React.FC = () => {
     setAuthMode(null);
     localStorage.setItem('cng_user_authenticated', 'true');
     localStorage.setItem('cng_user_profile', JSON.stringify(newUserProfile));
-    showToast(`Welcome to GasFinder, ${newUserProfile.name}!`);
+    showToast(`Welcome to CNG-Connect, ${newUserProfile.name}!`);
   };
 
   const handleLoginSuccess = (identifier: string) => {
@@ -483,10 +487,11 @@ export const App: React.FC = () => {
       {/* Main Top Header (hidden in chat mode as chat has its own custom bar) */}
       {!activeChatPost && (
         <Header
-          title={headerTitle || 'GasFinder'}
+          title={headerTitle || 'CNG-Connect'}
           showBack={showHeaderBack}
           onBack={onHeaderBack}
           onOpenAiAssistant={() => setIsAiModalOpen(true)}
+          onOpenRoiCalculator={() => setIsRoiModalOpen(true)}
           onAvatarClick={() => {
             setActiveDetailStation(null);
             setActiveDiscussionPost(null);
@@ -574,6 +579,18 @@ export const App: React.FC = () => {
               onUpdateState={(newState) => {
                 setUserProfile((prev) => ({ ...prev, state: newState }));
               }}
+              onUpdateProfile={(updatedUser) => {
+                setUserProfile((prev) => {
+                  const next = { ...prev, ...updatedUser };
+                  try {
+                    localStorage.setItem('cng_user_profile', JSON.stringify(next));
+                  } catch (e) {
+                    console.error('Failed to update profile storage', e);
+                  }
+                  return next;
+                });
+              }}
+              onOpenRoiCalculator={() => setIsRoiModalOpen(true)}
               onTriggerProximityAlert={() => {
                 handleSimulateProximityNudge();
                 setActiveTab('map');
@@ -590,6 +607,7 @@ export const App: React.FC = () => {
             <OnboardingScreen
               onStartSignUp={() => setAuthMode('signup')}
               onStartLogin={() => setAuthMode('login')}
+              onExploreAsGuest={() => setAuthMode(null)}
             />
           )}
 
@@ -670,10 +688,19 @@ export const App: React.FC = () => {
             onClose={() => setNavigatingStation(null)}
           />
         )}
+
+        <CngRoiCalculatorModal
+          isOpen={isRoiModalOpen}
+          onClose={() => setIsRoiModalOpen(false)}
+          onOpenConversions={() => {
+            setIsRoiModalOpen(false);
+            setActiveTab('conversions');
+          }}
+        />
       </Suspense>
 
-      {/* Bottom Navigation Bar (Shown when authenticated & not in sub-screens) */}
-      {isAuthenticated && !activeDetailStation && !activeDiscussionPost && !activeChatPost && !authMode && (
+      {/* Bottom Navigation Bar (Shown when not in sub-screens or auth modals) */}
+      {!activeDetailStation && !activeDiscussionPost && !activeChatPost && !authMode && (
         <BottomNav
           activeTab={activeTab}
           onTabChange={(tab) => {

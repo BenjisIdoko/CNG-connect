@@ -1,5 +1,5 @@
 {
-  "name": "GasFinder",
+  "name": "CNG-Connect",
   "description": "Live CNG & fuel station status finder, queue tracker, and driver community for real-time station availability and vehicle discussions.",
   "requestFramePermissions": ["geolocation"],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]

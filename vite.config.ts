@@ -34,7 +34,7 @@ function apiChatPlugin(): Plugin {
 
             const { prompt, stations } = JSON.parse(bodyStr || '{}');
             const ai = new GoogleGenAI({ apiKey });
-            const contextPrompt = `You are GasFinder AI, an expert assistant for Nigerian drivers using Compressed Natural Gas (CNG).
+            const contextPrompt = `You are CNG-Connect AI, an expert assistant for Nigerian drivers using Compressed Natural Gas (CNG).
 Here is the current live status of CNG stations across Nigeria:
 ${JSON.stringify(
   (stations || []).map((s: any) => ({

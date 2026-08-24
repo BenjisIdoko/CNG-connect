@@ -198,8 +198,8 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
       {/* Top Bar */}
       <div className="flex items-center justify-between pt-3 pb-2">
         <div className="flex items-center gap-2">
-          <img src={ASSETS.logo} alt="GasFinder Logo" className="h-7 w-auto object-contain" />
-          <span className="font-extrabold text-[19px] text-primary">GasFinder</span>
+          <img src={ASSETS.logo} alt="CNG-Connect Logo" className="h-7 w-auto object-contain" />
+          <span className="font-extrabold text-[19px] text-primary">CNG-Connect</span>
         </div>
         {onCancel && (
           <button
@@ -614,7 +614,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
       {/* Bottom Switch to Login Link */}
       <div className="text-center py-3">
         <p className="text-[13px] text-on-surface-variant font-medium">
-          Already have a GasFinder account?{' '}
+          Already have a CNG-Connect account?{' '}
           {onSwitchToLogin ? (
             <button
               onClick={onSwitchToLogin}

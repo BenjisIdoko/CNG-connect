@@ -55,7 +55,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Welcome to GasFinder" className="max-w-md min-h-screen sm:min-h-0 bg-surface border border-outline-variant flex flex-col justify-between">
+    <Modal isOpen={isOpen} onClose={onClose} title="Welcome to CNG-Connect" className="max-w-md min-h-screen sm:min-h-0 bg-surface border border-outline-variant flex flex-col justify-between">
       <div className="w-full max-w-md min-h-screen sm:min-h-0 bg-surface sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col justify-between border border-outline-variant">
         {/* Top Graphic Illustration Header */}
         <div className="w-full flex-shrink-0 relative overflow-hidden bg-surface-container rounded-b-[36px] pt-8 pb-6 border-b border-outline-variant/60">
@@ -70,7 +70,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
           <div className="relative w-full h-56 max-w-sm mx-auto px-4">
             <img
               src={ASSETS.onboardingIllustration}
-              alt="GasFinder Ultra Realistic CNG Car"
+              alt="CNG-Connect Ultra Realistic CNG Car"
               className="w-full h-full object-cover rounded-2xl shadow-xl border border-white/40"
             />
           </div>
@@ -172,7 +172,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
           {/* Legal Disclaimer */}
           <div className="mt-auto pt-6 text-center">
             <p className="text-[12px] text-outline leading-relaxed max-w-[280px] mx-auto">
-              By continuing, you agree to GasFinder{' '}
+              By continuing, you agree to CNG-Connect{' '}
               <a href="#" className="text-primary underline font-medium">
                 Terms of Service
               </a>{' '}
