@@ -61,12 +61,12 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 onClick={onOpenAiAssistant}
                 aria-label="Open AI Assistant"
-                className="flex items-center gap-1.5 bg-primary hover:opacity-95 text-on-primary text-[12px] font-bold px-3.5 py-2.5 rounded-full shadow-xs active:scale-95 transition-all min-h-[44px]"
+                title="AI Assistant Guide"
+                className="w-10 h-10 rounded-full bg-emerald-50 hover:bg-emerald-100 text-[#006c50] border border-emerald-200/80 flex items-center justify-center shadow-2xs active:scale-95 transition-all shrink-0"
               >
-                <span className="material-symbols-outlined text-[16px] text-status-green">
+                <span className="material-symbols-outlined text-[18px] text-[#006c50]">
                   auto_awesome
                 </span>
-                <span>AI Guide</span>
               </button>
             )}
             <button
