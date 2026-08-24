@@ -480,7 +480,7 @@ export const App: React.FC = () => {
       )}
 
       {/* Main Content Area */}
-      <main className="flex-1 overflow-y-auto relative pb-24">
+      <main className="flex-1 overflow-y-auto relative pt-16 pb-24">
         {!isOnline && (
           <div className="fixed top-3 left-1/2 -translate-x-1/2 z-50 bg-[#004D40]/95 text-white text-[11.5px] font-extrabold px-4 py-1.5 rounded-full shadow-lg border border-emerald-400/40 backdrop-blur-md flex items-center gap-1.5 animate-pulse pointer-events-none">
             <span className="material-symbols-outlined text-[16px] text-amber-400">wifi_off</span>
@@ -510,6 +510,7 @@ export const App: React.FC = () => {
           ) : activeDetailStation ? (
             <StationDetailScreen
               station={activeDetailStation}
+              user={userProfile}
               onBack={() => setActiveDetailStation(null)}
               onOpenReportModal={handleOpenReportModal}
               onNavigate={handleNavigate}

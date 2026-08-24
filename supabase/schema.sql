@@ -1,7 +1,10 @@
--- GasFinder Postgres/Supabase Database Schema
--- Run this script in your Supabase SQL Editor or migration runner
+-- ====================================================================
+-- CNG CONNECT — CANONICAL SUPABASE SCHEMA (single source of truth)
+-- Run this script in your Supabase SQL Editor (https://supabase.com)
+--
+-- NOTE: supabase_schema.sql (repo root) is deprecated and points here.
+-- ====================================================================
 
--- Enable PostGIS extension for spatial queries (optional, fallback to lat/lng numbers)
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- 1. STATIONS TABLE
@@ -114,6 +117,17 @@ CREATE TABLE IF NOT EXISTS community_posts (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
+-- 7. OTP SESSIONS TABLE (server-side OTP challenges)
+-- Accessed ONLY via the service-role key from serverless functions.
+-- No anon/authenticated policies are created => blocked for all non-service clients.
+CREATE TABLE IF NOT EXISTS otp_sessions (
+    phone TEXT PRIMARY KEY,
+    code TEXT NOT NULL,
+    expires_at BIGINT NOT NULL,
+    last_sent_at BIGINT NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- INDEXES FOR FAST QUERYING
 CREATE INDEX IF NOT EXISTS idx_stations_status ON stations(status);
 CREATE INDEX IF NOT EXISTS idx_stations_city ON stations(city);
@@ -121,6 +135,7 @@ CREATE INDEX IF NOT EXISTS idx_station_reports_station_id ON station_reports(sta
 CREATE INDEX IF NOT EXISTS idx_station_media_station_id ON station_media(station_id);
 CREATE INDEX IF NOT EXISTS idx_station_media_hash ON station_media(perceptual_hash);
 CREATE INDEX IF NOT EXISTS idx_community_posts_category ON community_posts(category);
+CREATE INDEX IF NOT EXISTS idx_otp_sessions_expiry ON otp_sessions(expires_at);
 
 -- ROW LEVEL SECURITY (RLS) POLICIES
 ALTER TABLE stations ENABLE ROW LEVEL SECURITY;
@@ -129,19 +144,53 @@ ALTER TABLE station_media ENABLE ROW LEVEL SECURITY;
 ALTER TABLE station_presence ENABLE ROW LEVEL SECURITY;
 ALTER TABLE station_nudges ENABLE ROW LEVEL SECURITY;
 ALTER TABLE community_posts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE otp_sessions ENABLE ROW LEVEL SECURITY;
 
--- Allow public read access to all tables
+-- Public read access (anon key may read)
 CREATE POLICY "Allow public read stations" ON stations FOR SELECT USING (true);
 CREATE POLICY "Allow public read station_reports" ON station_reports FOR SELECT USING (true);
 CREATE POLICY "Allow public read station_media" ON station_media FOR SELECT USING (true);
 CREATE POLICY "Allow public read station_presence" ON station_presence FOR SELECT USING (true);
 CREATE POLICY "Allow public read community_posts" ON community_posts FOR SELECT USING (true);
 
--- Allow public insert/update for demo app driver actions
-CREATE POLICY "Allow public insert station_reports" ON station_reports FOR INSERT WITH CHECK (true);
-CREATE POLICY "Allow public insert station_media" ON station_media FOR INSERT WITH CHECK (true);
-CREATE POLICY "Allow public insert station_presence" ON station_presence FOR INSERT WITH CHECK (true);
-CREATE POLICY "Allow public update station_presence" ON station_presence FOR UPDATE USING (true);
-CREATE POLICY "Allow public update stations" ON stations FOR UPDATE USING (true);
-CREATE POLICY "Allow public insert community_posts" ON community_posts FOR INSERT WITH CHECK (true);
-CREATE POLICY "Allow public update community_posts" ON community_posts FOR UPDATE USING (true);
+-- Driver-generated content: anon INSERT allowed.
+-- The app uses custom OTP verification (not Supabase Auth yet). When Supabase
+-- Auth is wired in, tighten these to `TO authenticated`.
+CREATE POLICY "Allow insert station_reports" ON station_reports FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow insert station_media" ON station_media FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow insert station_presence" ON station_presence FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow update station_presence" ON station_presence FOR UPDATE USING (true);
+CREATE POLICY "Allow insert community_posts" ON community_posts FOR INSERT WITH CHECK (true);
+
+-- Stations status updates are crowdsourced but the rest of the row must not be
+-- editable by anonymous clients. Direct UPDATE is intentionally NOT granted.
+-- Instead, writes go through this SECURITY DEFINER function which can ONLY
+-- change status/status_label/last_updated for an existing station.
+CREATE OR REPLACE FUNCTION report_station_status(
+    p_station_id TEXT,
+    p_status TEXT,
+    p_status_label TEXT
+)
+RETURNS VOID
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  IF p_status NOT IN ('full', 'low', 'queue', 'out') THEN
+    RAISE EXCEPTION 'Invalid status';
+  END IF;
+
+  UPDATE stations
+     SET status = p_status,
+         status_label = p_status_label,
+         last_updated = 'Just now'
+   WHERE id = p_station_id;
+
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'Station not found: %', p_station_id;
+  END IF;
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION report_station_status(TEXT, TEXT, TEXT) TO anon, authenticated;

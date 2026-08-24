@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import L from 'leaflet';
 import { GasStation, StationStatus } from '../types';
 import { ASSETS } from '../data/mockData';
+import { Modal } from './common/Modal';
 
 export type GpsStatus = 'active' | 'denied' | 'unavailable';
 
@@ -468,6 +469,48 @@ export const MapScreen: React.FC<MapScreenProps> = ({
             </button>
           </div>
         </div>
+
+        {/* Quick Filter Tag Chips */}
+        <div className="flex items-center gap-1.5 overflow-x-auto hide-scrollbar pt-1 pb-0.5 pointer-events-auto">
+          {[
+            { label: 'All', filter: 'all', city: 'all' },
+            { label: 'Full Stock', filter: 'full', city: 'all' },
+            { label: 'Queuing', filter: 'queue', city: 'all' },
+            { label: 'Abuja', filter: 'all', city: 'Abuja' },
+            { label: 'Lagos', filter: 'all', city: 'Lagos' },
+            { label: '200+ Bar', filter: 'all', city: 'all', pressure: 200 },
+          ].map((chip) => {
+            const isActive =
+              (chip.filter !== 'all' && activeFilter === chip.filter) ||
+              (chip.city !== 'all' && activeCity === chip.city) ||
+              (chip.pressure && minPressure === chip.pressure) ||
+              (chip.label === 'All' && activeFilter === 'all' && activeCity === 'all' && minPressure === 0);
+
+            return (
+              <button
+                key={chip.label}
+                onClick={() => {
+                  if (chip.label === 'All') {
+                    setActiveFilter('all');
+                    setActiveCity('all');
+                    setMinPressure(0);
+                  } else {
+                    if (chip.filter !== 'all') setActiveFilter(chip.filter as any);
+                    if (chip.city !== 'all') setActiveCity(chip.city);
+                    if (chip.pressure) setMinPressure(chip.pressure);
+                  }
+                }}
+                className={`px-3 py-1.5 rounded-full text-[11.5px] font-bold whitespace-nowrap shadow-xs backdrop-blur-md transition-all active:scale-95 shrink-0 ${
+                  isActive
+                    ? 'bg-[#004D40] text-[#00E676] border border-[#00E676]/40'
+                    : 'bg-white/95 text-slate-700 border border-slate-200/90 hover:bg-white'
+                }`}
+              >
+                {chip.label}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
           {/* Bottom Sheet: Nearby Petrol Stations Vertical Ranked List & Expanded Gallery */}
@@ -652,7 +695,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                             <div>
                               <div className="w-full h-24 rounded-xl overflow-hidden relative mb-2 bg-surface-container">
                                 <img
-                                  src={st.photos?.[0] || ASSETS.stationWide}
+                                  src={st.images?.[0] || ASSETS.stationWide}
                                   alt={st.name}
                                   className="w-full h-full object-cover"
                                 />
@@ -671,7 +714,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
 
                             <div className="mt-2.5 pt-2 border-t border-outline-variant/30 flex items-center justify-between">
                               <div className="flex items-center gap-1.5 text-[11px] font-medium text-on-surface-variant">
-                                <span className="text-secondary font-semibold">★ {st.rating || '4.8'}</span>
+                                <span className="text-secondary font-semibold">{st.busyEstimate}</span>
                                 <span>•</span>
                                 <span>{st.distance}</span>
                               </div>
@@ -700,123 +743,119 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       </div>
 
       {/* Filter Modal */}
-      {isFilterModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-end sm:items-center justify-center p-4 font-['Plus_Jakarta_Sans',sans-serif]">
-          <div className="bg-white w-full max-w-md rounded-3xl p-6 shadow-2xl animate-fade-in border border-slate-200">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="font-bold text-[20px] text-slate-900">
-                Filter Stations
-              </h3>
-              <button
-                onClick={() => setIsFilterModalOpen(false)}
-                className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:bg-slate-100"
-              >
-                <span className="material-symbols-outlined text-[22px]">close</span>
-              </button>
+      <Modal isOpen={isFilterModalOpen} onClose={() => setIsFilterModalOpen(false)} title="Filter Stations" className="p-6">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="font-bold text-[20px] text-slate-900">
+            Filter Stations
+          </h3>
+          <button
+            onClick={() => setIsFilterModalOpen(false)}
+            className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:bg-slate-100"
+          >
+            <span className="material-symbols-outlined text-[22px]">close</span>
+          </button>
+        </div>
+
+        <div className="space-y-4">
+          {/* Minimum Pressure */}
+          <div>
+            <div className="flex justify-between text-[13px] font-bold text-slate-700 mb-1.5">
+              <span>Minimum Pump Pressure</span>
+              <span className="text-[#006c50]">{minPressure} bar</span>
             </div>
-
-            <div className="space-y-4">
-              {/* Minimum Pressure */}
-              <div>
-                <div className="flex justify-between text-[13px] font-bold text-slate-700 mb-1.5">
-                  <span>Minimum Pump Pressure</span>
-                  <span className="text-[#006c50]">{minPressure} bar</span>
-                </div>
-                <input
-                  type="range"
-                  min="0"
-                  max="220"
-                  step="20"
-                  value={minPressure}
-                  onChange={(e) => setMinPressure(Number(e.target.value))}
-                  className="w-full accent-[#006c50]"
-                />
-                <div className="flex justify-between text-[11px] text-slate-400 mt-1">
-                  <span>Any (0 bar)</span>
-                  <span>150 bar</span>
-                  <span>220 bar (Max)</span>
-                </div>
-              </div>
-
-              {/* Maximum Distance Radius */}
-              <div>
-                <div className="flex justify-between text-[13px] font-bold text-slate-700 mb-1.5">
-                  <span>Maximum Distance</span>
-                  <span className="text-[#006c50]">
-                    {maxDistanceKm === 0 ? 'Any Distance' : `Within ${maxDistanceKm} km`}
-                  </span>
-                </div>
-                <div className="flex gap-1.5 overflow-x-auto pb-1 hide-scrollbar">
-                  {[0, 5, 10, 25, 50].map((dist) => (
-                    <button
-                      key={dist}
-                      type="button"
-                      onClick={() => setMaxDistanceKm(dist)}
-                      className={`flex-1 py-2 rounded-xl text-[12px] font-bold border transition-all ${
-                        maxDistanceKm === dist
-                          ? 'bg-[#006c50] text-white border-[#006c50]'
-                          : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
-                      }`}
-                    >
-                      {dist === 0 ? 'Any' : `${dist}km`}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Status checkboxes */}
-              <div>
-                <label className="block text-[13px] font-bold text-slate-700 mb-2">
-                  Status Availability
-                </label>
-                <div className="grid grid-cols-2 gap-2">
-                  {['all', 'full', 'queue', 'low', 'out'].map((st) => (
-                    <button
-                      key={st}
-                      onClick={() => setActiveFilter(st)}
-                      className={`p-2.5 rounded-xl text-[12px] font-bold border transition-all ${
-                        activeFilter === st
-                          ? 'bg-[#006c50] text-white border-[#006c50]'
-                          : 'bg-slate-50 text-slate-800 border-slate-200'
-                      }`}
-                    >
-                      {st === 'all'
-                        ? 'All Statuses'
-                        : st === 'full'
-                        ? 'Full Stock Only'
-                        : st === 'queue'
-                        ? 'Queuing'
-                        : st === 'low'
-                        ? 'Low Pressure'
-                        : 'Out of Gas'}
-                    </button>
-                  ))}
-                </div>
-              </div>
+            <input
+              type="range"
+              min="0"
+              max="220"
+              step="20"
+              value={minPressure}
+              onChange={(e) => setMinPressure(Number(e.target.value))}
+              className="w-full accent-[#006c50]"
+            />
+            <div className="flex justify-between text-[11px] text-slate-400 mt-1">
+              <span>Any (0 bar)</span>
+              <span>150 bar</span>
+              <span>220 bar (Max)</span>
             </div>
+          </div>
 
-            <div className="mt-6 flex gap-3">
-              <button
-                onClick={() => {
-                  setMinPressure(0);
-                  setMaxDistanceKm(0);
-                  setActiveFilter('all');
-                  setIsFilterModalOpen(false);
-                }}
-                className="flex-1 py-3 text-slate-700 font-bold text-[14px] bg-slate-100 rounded-full hover:bg-slate-200"
-              >
-                Reset
-              </button>
-              <button
-                onClick={() => setIsFilterModalOpen(false)}
-                className="flex-1 py-3 bg-[#006c50] text-white font-bold text-[14px] rounded-full shadow-md hover:bg-[#004D40]"
-              >
-                Apply Filters
-              </button>
+          {/* Maximum Distance Radius */}
+          <div>
+            <div className="flex justify-between text-[13px] font-bold text-slate-700 mb-1.5">
+              <span>Maximum Distance</span>
+              <span className="text-[#006c50]">
+                {maxDistanceKm === 0 ? 'Any Distance' : `Within ${maxDistanceKm} km`}
+              </span>
+            </div>
+            <div className="flex gap-1.5 overflow-x-auto pb-1 hide-scrollbar">
+              {[0, 5, 10, 25, 50].map((dist) => (
+                <button
+                  key={dist}
+                  type="button"
+                  onClick={() => setMaxDistanceKm(dist)}
+                  className={`flex-1 py-2 rounded-xl text-[12px] font-bold border transition-all ${
+                    maxDistanceKm === dist
+                      ? 'bg-[#006c50] text-white border-[#006c50]'
+                      : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                  }`}
+                >
+                  {dist === 0 ? 'Any' : `${dist}km`}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Status checkboxes */}
+          <div>
+            <label className="block text-[13px] font-bold text-slate-700 mb-2">
+              Status Availability
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              {['all', 'full', 'queue', 'low', 'out'].map((st) => (
+                <button
+                  key={st}
+                  onClick={() => setActiveFilter(st)}
+                  className={`p-2.5 rounded-xl text-[12px] font-bold border transition-all ${
+                    activeFilter === st
+                      ? 'bg-[#006c50] text-white border-[#006c50]'
+                      : 'bg-slate-50 text-slate-800 border-slate-200'
+                  }`}
+                >
+                  {st === 'all'
+                    ? 'All Statuses'
+                    : st === 'full'
+                    ? 'Full Stock Only'
+                    : st === 'queue'
+                    ? 'Queuing'
+                    : st === 'low'
+                    ? 'Low Pressure'
+                    : 'Out of Gas'}
+                </button>
+              ))}
             </div>
           </div>
         </div>
-      )}
+
+        <div className="mt-6 flex gap-3">
+          <button
+            onClick={() => {
+              setMinPressure(0);
+              setMaxDistanceKm(0);
+              setActiveFilter('all');
+              setIsFilterModalOpen(false);
+            }}
+            className="flex-1 py-3 text-slate-700 font-bold text-[14px] bg-slate-100 rounded-full hover:bg-slate-200"
+          >
+            Reset
+          </button>
+          <button
+            onClick={() => setIsFilterModalOpen(false)}
+            className="flex-1 py-3 bg-[#006c50] text-white font-bold text-[14px] rounded-full shadow-md hover:bg-[#004D40]"
+          >
+            Apply Filters
+          </button>
+        </div>
+      </Modal>
     </div>
   );
 };

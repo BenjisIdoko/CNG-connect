@@ -102,7 +102,13 @@ export const ProximityAlertBanner: React.FC<ProximityAlertBannerProps> = ({
           <>
             {/* Subtext */}
             <p className="text-[12.5px] text-slate-300 leading-snug">
-              <strong className="text-status-green font-semibold">{station.activePresenceCount || 14} drivers</strong> near {station.name} right now — share what you see!
+              {station.activePresenceCount ? (
+                <>
+                  <strong className="text-status-green font-semibold">{station.activePresenceCount} drivers</strong> near {station.name} right now — share what you see!
+                </>
+              ) : (
+                <>You're near {station.name} — share what you see!</>
+              )}
             </p>
 
             {/* Quick 1-Tap Pills Grid */}

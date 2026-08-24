@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { GasStation, StationStatus, DriverReport, UserProfile } from '../types';
-import { ASSETS } from '../data/mockData';
-import { verifyImageMetadata } from '../utils/imageMetadataVerifier';
+import { verifyImageMetadata, registerSharedImageHash } from '../utils/imageMetadataVerifier';
 import { LiveCameraCaptureModal } from './LiveCameraCaptureModal';
 import { checkLiveUpdatePermission } from '../utils/permissionManager';
 import { StationGroupInfoSheet } from './StationGroupInfoSheet';
@@ -27,14 +26,23 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
   const [comment, setComment] = useState<string>('');
   const [attachedPhoto, setAttachedPhoto] = useState<string | null>(null);
   const [photoError, setPhotoError] = useState<string | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [presenceActive, setPresenceActive] = useState<boolean>(isPresenceActive);
   const [showLiveCamera, setShowLiveCamera] = useState(false);
   const [showInfoSheet, setShowInfoSheet] = useState(false);
+  const submitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   React.useEffect(() => {
     setPresenceActive(isPresenceActive);
   }, [isPresenceActive]);
+
+  // Clear pending submit timer if the modal unmounts mid-submit
+  useEffect(() => {
+    return () => {
+      if (submitTimerRef.current) clearTimeout(submitTimerRef.current);
+    };
+  }, []);
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -69,12 +77,10 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
 
     const perm = checkLiveUpdatePermission(presenceActive);
     if (!perm.allowed) {
-      setPhotoError(perm.reason || 'You need to be at the station to report its status');
-      setIsSubmitting(false);
+      setFormError(perm.reason || 'You need to be at the station to report its status');
       return;
     }
-
-    setIsSubmitting(true);
+    setFormError(null);
 
     const statusLabels: Record<StationStatus, string> = {
       full: 'Reported Full stock',
@@ -84,11 +90,15 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
     };
 
     const isPhotoVerified = Boolean(attachedPhoto);
+    // Register the photo hash only NOW (at publish time), not at capture time.
+    if (attachedPhoto) {
+      registerSharedImageHash(attachedPhoto);
+    }
 
     const newReport: DriverReport = {
       id: `report-${Date.now()}`,
-      author: user?.name || 'Tunde Adebayo',
-      authorAvatar: user?.avatar || ASSETS.userAvatar,
+      author: user?.name || 'Anonymous Driver',
+      authorAvatar: user?.avatar || '',
       verified: isPhotoVerified,
       isPhotoVerified: isPhotoVerified,
       timestamp: 'Just now',
@@ -101,7 +111,8 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
       photo: attachedPhoto || undefined,
     };
 
-    setTimeout(() => {
+    setIsSubmitting(true);
+    submitTimerRef.current = setTimeout(() => {
       onSubmitReport(newReport, selectedStatus);
       setIsSubmitting(false);
       onClose();
@@ -288,7 +299,7 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
               </div>
 
               {photoError && (
-                <div className="mb-2 p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-[12px] font-medium flex items-start gap-2">
+                <div role="alert" className="mb-2 p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-[12px] font-medium flex items-start gap-2">
                   <span className="material-symbols-outlined text-[18px] shrink-0 text-rose-600">
                     gpp_bad
                   </span>
@@ -364,6 +375,13 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
               </div>
             )}
 
+            {formError && (
+              <div role="alert" className="bg-rose-50 rounded-2xl p-3 border border-rose-200 text-rose-700 text-[12px] font-semibold flex items-start gap-2">
+                <span className="material-symbols-outlined text-[18px] shrink-0 text-rose-600">error</span>
+                <span>{formError}</span>
+              </div>
+            )}
+
             {/* Submit Button */}
             <button
               type="submit"
@@ -387,6 +405,14 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
         <LiveCameraCaptureModal
           title={`Live Photo of ${station.name}`}
           onCapture={(dataUrl) => {
+            // Freshness/duplicate CHECK at capture time (registration happens
+            // only when the report is actually submitted).
+            const verification = verifyImageMetadata(undefined, dataUrl);
+            if (!verification.isValid) {
+              setPhotoError(verification.reason || 'Photo rejected by anti-misinformation check.');
+              setShowLiveCamera(false);
+              return;
+            }
             setAttachedPhoto(dataUrl);
             setPhotoError(null);
             setShowLiveCamera(false);

@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
-import { CommunityPost, CommentItem } from '../types';
+import { CommunityPost, CommentItem, UserProfile } from '../types';
 import { ASSETS } from '../data/mockData';
 
 interface DiscussionScreenProps {
   post: CommunityPost;
+  user?: UserProfile;
   onBack: () => void;
 }
 
 export const DiscussionScreen: React.FC<DiscussionScreenProps> = ({
   post,
+  user,
   onBack,
 }) => {
   const [comments, setComments] = useState<CommentItem[]>(post.comments);

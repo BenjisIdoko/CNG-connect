@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { CommunityPost, UserProfile } from '../types';
-import { ASSETS } from '../data/mockData';
 import { LiveCameraCaptureModal } from './LiveCameraCaptureModal';
 import { StationGroupInfoSheet } from './StationGroupInfoSheet';
 import { Modal } from './common/Modal';
+import { verifyImageMetadata, registerSharedImageHash } from '../utils/imageMetadataVerifier';
 
 interface CreatePostModalProps {
   isOpen: boolean;
@@ -12,37 +12,55 @@ interface CreatePostModalProps {
   onSubmitPost: (newPost: CommunityPost) => void;
 }
 
+const emptyDraft = {
+  category: 'maintenance' as 'maintenance' | 'parts' | 'reviews' | 'deals',
+  title: '',
+  content: '',
+  price: '',
+  attachedImage: null as string | null,
+};
+
 export const CreatePostModal: React.FC<CreatePostModalProps> = ({
   isOpen,
   user,
   onClose,
   onSubmitPost,
 }) => {
-  const [category, setCategory] = useState<'maintenance' | 'parts' | 'reviews' | 'deals'>('maintenance');
+  const [category, setCategory] = useState(emptyDraft.category);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [price, setPrice] = useState('');
+  const [priceError, setPriceError] = useState<string | null>(null);
   const [attachedImage, setAttachedImage] = useState<string | null>(null);
   const [imageError, setImageError] = useState<string | null>(null);
   const [showLiveCamera, setShowLiveCamera] = useState(false);
   const [showInfoSheet, setShowInfoSheet] = useState(false);
 
-  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const dataUrl = event.target?.result as string;
-        setImageError(null);
-        setAttachedImage(dataUrl);
-      };
-      reader.readAsDataURL(file);
+  // Reset the draft whenever the modal closes so stale content/images
+  // from a previous post never leak into the next one.
+  useEffect(() => {
+    if (!isOpen) {
+      setCategory(emptyDraft.category);
+      setTitle('');
+      setContent('');
+      setPrice('');
+      setPriceError(null);
+      setAttachedImage(null);
+      setImageError(null);
     }
-  };
+  }, [isOpen]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim() || !content.trim()) return;
+
+    if (category === 'deals' && price.trim()) {
+      if (!/^\d+(\.\d{1,2})?$/.test(price.trim().replace(/,/g, ''))) {
+        setPriceError('Price must be a valid amount in Naira, digits only.');
+        return;
+      }
+    }
+    setPriceError(null);
 
     const categoryLabels = {
       maintenance: 'Maintenance',
@@ -52,11 +70,16 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
     };
 
     const hasVerifiedPhoto = Boolean(attachedImage);
+    // Register the photo hash only NOW (at publish time), not at capture time,
+    // so abandoning a draft doesn't blacklist the photo as a "duplicate".
+    if (attachedImage) {
+      registerSharedImageHash(attachedImage);
+    }
 
     const newPost: CommunityPost = {
       id: `post-${Date.now()}`,
-      author: user?.name || 'Tunde Adebayo',
-      authorAvatar: user?.avatar || ASSETS.userAvatar,
+      author: user?.name || 'Anonymous Driver',
+      authorAvatar: user?.avatar || '',
       verified: hasVerifiedPhoto,
       timeAgo: 'Just now',
       category,
@@ -69,7 +92,10 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
       repliesCount: 0,
       comments: [],
       isListing: category === 'deals',
-      price: category === 'deals' ? (price ? `₦${price}` : undefined) : undefined,
+      price:
+        category === 'deals' && price.trim()
+          ? `₦${Number(price.trim().replace(/,/g, '')).toLocaleString('en-NG')}`
+          : undefined,
     };
 
     onSubmitPost(newPost);
@@ -157,7 +183,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
           {/* If Deals, Price field */}
           {category === 'deals' && (
             <div>
-              <label className="block text-[13px] font-semibold text-on-surface-variant mb-1">
+              <label className="block text-[13px] font-semibold text-on-surface-variant mb-1" htmlFor="post-price">
                 Asking Price (Naira)
               </label>
               <div className="relative">
@@ -165,13 +191,20 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
                   ₦
                 </span>
                 <input
+                  id="post-price"
                   type="text"
+                  inputMode="numeric"
                   value={price}
                   onChange={(e) => setPrice(e.target.value)}
                   placeholder="8,500,000"
                   className="w-full bg-surface-container border border-outline-variant rounded-2xl p-3 pl-8 text-[14px] font-medium text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary/30"
                 />
               </div>
+              {priceError && (
+                <p role="alert" className="mt-1.5 text-[11.5px] font-semibold text-status-red">
+                  {priceError}
+                </p>
+              )}
             </div>
           )}
 
@@ -265,6 +298,14 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
         <LiveCameraCaptureModal
           title="Live Community Post Snapshot"
           onCapture={(dataUrl) => {
+            // Freshness/duplicate CHECK at capture time (no registration —
+            // the hash is registered only when the post is published).
+            const verification = verifyImageMetadata(undefined, dataUrl);
+            if (!verification.isValid) {
+              setImageError(verification.reason || 'Photo rejected by anti-misinformation check.');
+              setShowLiveCamera(false);
+              return;
+            }
             setAttachedImage(dataUrl);
             setImageError(null);
             setShowLiveCamera(false);

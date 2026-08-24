@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { GasStation, CommentItem } from '../types';
+import React, { useEffect, useRef, useState } from 'react';
+import { GasStation, CommentItem, UserProfile } from '../types';
 import { ASSETS } from '../data/mockData';
 import { openExternalMaps } from '../utils/navigationHelper';
 import { StationGroupInfoSheet } from './StationGroupInfoSheet';
 
 interface StationDetailScreenProps {
   station: GasStation;
+  user?: UserProfile;
   onBack: () => void;
   onOpenReportModal: (station: GasStation) => void;
   onNavigate: (station: GasStation) => void;
@@ -16,6 +17,7 @@ interface StationDetailScreenProps {
 
 export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
   station,
+  user,
   onBack,
   onOpenReportModal,
   onNavigate,
@@ -37,6 +39,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
   );
   const [newCommentText, setNewCommentText] = useState('');
   const [copiedNotification, setCopiedNotification] = useState(false);
+  const copiedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [activeTab, setActiveTab] = useState<'feed' | 'reports' | 'photos'>('feed');
   const [isPresenceActiveState, setIsPresenceActiveState] = useState<boolean>(isPresenceActive);
   const [showInfoSheet, setShowInfoSheet] = useState(false);
@@ -100,7 +103,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
   }, []);
 
   const images = station.images || [];
-  const presenceCount = station.activePresenceCount || 14;
+  const presenceCount = station.activePresenceCount || 0;
 
   const handleVote = (reportId: string, type: 'up' | 'down') => {
     setReports((prev) =>
@@ -136,8 +139,8 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
     const text = newCommentText.trim();
     const newComment: CommentItem = {
       id: `st-comment-${Date.now()}`,
-      author: 'Tunde Adebayo',
-      authorAvatar: ASSETS.userAvatar,
+      author: user?.name || 'Anonymous Driver',
+      authorAvatar: user?.avatar || '',
       timeAgo: 'Just now',
       content: text,
     };
@@ -159,11 +162,16 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
         })
         .catch(() => {});
     } else {
-      navigator.clipboard.writeText(
-        `${station.name} Station Group (${station.address}): Live Status: ${station.statusLabel} • ₦${station.cngPrice}/kg • Pressure: ${station.pumpPressure} bar`
-      );
-      setCopiedNotification(true);
-      setTimeout(() => setCopiedNotification(false), 2500);
+      navigator.clipboard
+        .writeText(
+          `${station.name} Station Group (${station.address}): Live Status: ${station.statusLabel} • ₦${station.cngPrice}/kg • Pressure: ${station.pumpPressure} bar`
+        )
+        .then(() => {
+          setCopiedNotification(true);
+          if (copiedTimerRef.current) clearTimeout(copiedTimerRef.current);
+          copiedTimerRef.current = setTimeout(() => setCopiedNotification(false), 2500);
+        })
+        .catch(() => {});
     }
   };
 
@@ -189,8 +197,8 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
 
         <div className="flex items-center gap-2">
           <div className="bg-emerald-50 text-[#006c50] border border-emerald-200 px-3 py-1.5 rounded-full text-[12px] font-semibold flex items-center gap-1.5 shadow-2xs">
-            <span className="w-2 h-2 rounded-full bg-[#00c853] animate-pulse" />
-            <span>{presenceCount} drivers here now</span>
+            <span className={`w-2 h-2 rounded-full ${presenceCount > 0 ? 'bg-[#00c853] animate-pulse' : 'bg-slate-300'}`} />
+            <span>{presenceCount > 0 ? `${presenceCount} drivers here now` : 'Live presence unavailable'}</span>
           </div>
 
           <button
@@ -223,8 +231,8 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                   <span className="material-symbols-outlined text-[16px]">info</span>
                 </button>
                 <span className="text-[12px] font-extrabold text-[#006c50] flex items-center gap-1 ml-auto">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#00c853] animate-pulse" />
-                  {presenceCount} Active Nearby
+                  <span className={`w-1.5 h-1.5 rounded-full ${presenceCount > 0 ? 'bg-[#00c853] animate-pulse' : 'bg-slate-300'}`} />
+                  {presenceCount > 0 ? `${presenceCount} Active Nearby` : 'Join the group'}
                 </span>
               </div>
               <h1 className="text-[22px] sm:text-[25px] font-extrabold text-slate-900 tracking-tight leading-snug line-clamp-2">

@@ -179,7 +179,7 @@ export const apiService = {
             images: s.images || [],
             reports: stationReports,
             stationMedia: stationMedia,
-            activePresenceCount: s.active_presence_count || 14,
+            activePresenceCount: s.active_presence_count ?? 0,
             stationComments: s.station_comments || [],
             stationNotice: s.station_notice,
           };
@@ -213,7 +213,7 @@ export const apiService = {
     if (isSupabaseConfigured && supabase) {
       try {
         // 1. Insert into station_reports table
-        await supabase.from('station_reports').insert({
+        const { error: reportError } = await supabase.from('station_reports').insert({
           id: enrichedReport.id,
           station_id: stationId,
           author: enrichedReport.author,
@@ -231,10 +231,13 @@ export const apiService = {
           dislikes: enrichedReport.dislikes || 0,
           photo: enrichedReport.photo,
         });
+        if (reportError) {
+          console.error('Supabase station_reports insert failed:', reportError.message);
+        }
 
         // 2. Insert into station_media table if photo attached
         if (enrichedReport.photo) {
-          await supabase.from('station_media').insert({
+          const { error: mediaError } = await supabase.from('station_media').insert({
             station_id: stationId,
             report_id: enrichedReport.id,
             media_url: enrichedReport.photo,
@@ -245,9 +248,13 @@ export const apiService = {
             photo_timestamp: new Date().toISOString(),
             perceptual_hash: `phash-${Date.now()}`,
           });
+          if (mediaError) {
+            console.error('Supabase station_media insert failed:', mediaError.message);
+          }
         }
 
-        // 3. Update stations status and last_updated
+        // 3. Update station status via SECURITY DEFINER RPC (anon clients are
+        // not granted direct UPDATE on stations — see supabase/schema.sql)
         const statusLabels: Record<StationStatus, string> = {
           full: 'Full stock',
           low: 'Low pressure',
@@ -255,14 +262,14 @@ export const apiService = {
           out: 'Out of gas',
         };
 
-        await supabase
-          .from('stations')
-          .update({
-            status: newStatus,
-            status_label: statusLabels[newStatus],
-            last_updated: 'Just now',
-          })
-          .eq('id', stationId);
+        const { error: rpcError } = await supabase.rpc('report_station_status', {
+          p_station_id: stationId,
+          p_status: newStatus,
+          p_status_label: statusLabels[newStatus],
+        });
+        if (rpcError) {
+          console.error('Supabase report_station_status rpc failed:', rpcError.message);
+        }
 
         return await this.fetchStations();
       } catch (err) {
@@ -343,7 +350,7 @@ export const apiService = {
   async createPost(newPost: CommunityPost): Promise<CommunityPost[]> {
     if (isSupabaseConfigured && supabase) {
       try {
-        await supabase.from('community_posts').insert({
+        const { error: insertError } = await supabase.from('community_posts').insert({
           id: newPost.id,
           author: newPost.author,
           author_avatar: newPost.authorAvatar,
@@ -361,6 +368,9 @@ export const apiService = {
           price: newPost.price,
           car_details: newPost.carDetails,
         });
+        if (insertError) {
+          console.error('Supabase community_posts insert failed:', insertError.message);
+        }
 
         return await this.fetchPosts();
       } catch (err) {
@@ -385,26 +395,33 @@ export const apiService = {
 
     if (isSupabaseConfigured && supabase) {
       try {
-        await supabase.from('station_presence').upsert({
+        const { error: pingError } = await supabase.from('station_presence').upsert({
           station_id: stationId,
           user_key: userKey,
           last_ping_at: nowIso,
           expires_at: expiresAt,
         });
+        if (pingError) {
+          console.error('Supabase station_presence upsert failed:', pingError.message);
+        }
 
-        const { count } = await supabase
+        const { count, error: countError } = await supabase
           .from('station_presence')
           .select('*', { count: 'exact', head: true })
           .eq('station_id', stationId)
           .gt('expires_at', nowIso);
 
-        return count || 14;
+        if (countError) {
+          console.error('Supabase station_presence count failed:', countError.message);
+          return 0;
+        }
+        return count || 0;
       } catch (err) {
         console.error('API Service pingStationPresence failed:', err);
       }
     }
 
-    return 14; // Default fallback presence count
+    return 0; // No backend configured or reachable — no presence data
   },
 
   /**

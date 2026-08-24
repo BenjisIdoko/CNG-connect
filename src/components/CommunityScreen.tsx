@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { CommunityPost, GasStation } from '../types';
 import { StationGroupInfoSheet } from './StationGroupInfoSheet';
 
@@ -24,30 +24,40 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
   const [activeMainTab, setActiveMainTab] = useState<'station_groups' | 'general'>('station_groups');
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [postList, setPostList] = useState<CommunityPost[]>(posts);
+  // Local like-state overlay keyed by post id; the post list itself stays in
+  // sync with the parent's `posts` prop so newly created posts appear live.
+  const [likeOverrides, setLikeOverrides] = useState<Record<string, { isLiked: boolean; likes: number }>>({});
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [showInfoSheet, setShowInfoSheet] = useState(false);
+  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    };
+  }, []);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 2500);
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    toastTimerRef.current = setTimeout(() => setToastMessage(null), 2500);
   };
 
   const handleToggleLike = (postId: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    setPostList((prev) =>
-      prev.map((p) => {
-        if (p.id === postId) {
-          const wasLiked = p.isLiked;
-          return {
-            ...p,
-            isLiked: !wasLiked,
-            likes: wasLiked ? p.likes - 1 : p.likes + 1,
-          };
-        }
-        return p;
-      })
-    );
+    setLikeOverrides((prev) => {
+      const current = prev[postId] || {
+        isLiked: Boolean(posts.find((p) => p.id === postId)?.isLiked),
+        likes: posts.find((p) => p.id === postId)?.likes || 0,
+      };
+      return {
+        ...prev,
+        [postId]: {
+          isLiked: !current.isLiked,
+          likes: current.isLiked ? current.likes - 1 : current.likes + 1,
+        },
+      };
+    });
   };
 
   const handleSharePost = (post: CommunityPost, e: React.MouseEvent) => {
@@ -61,16 +71,16 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
         })
         .catch(() => {});
     } else {
-      navigator.clipboard.writeText(
-        `"${post.title}" - ${post.content.slice(0, 100)}... on GasFinder`
-      );
-      showToast('Discussion link copied!');
+      navigator.clipboard
+        .writeText(`"${post.title}" - ${post.content.slice(0, 100)}... on GasFinder`)
+        .then(() => showToast('Discussion link copied!'))
+        .catch(() => showToast('Could not copy link on this device.'));
     }
   };
 
   const [statusFilter, setStatusFilter] = useState<string>('all');
 
-  const filteredPosts = postList.filter((p) => {
+  const filteredPosts = posts.filter((p) => {
     const matchesCategory =
       activeCategory === 'all' || p.category === activeCategory;
     const matchesSearch =
@@ -250,7 +260,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                           <span>{st.city}, {st.state}</span>
                           <span>•</span>
                           <span className="text-[#006c50] font-semibold">
-                            {st.memberCount || 135} members
+                            {st.reports.length} live report{st.reports.length === 1 ? '' : 's'}
                           </span>
                         </p>
                       </div>
@@ -540,8 +550,9 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                     <div className="flex items-center gap-4 pt-2.5 border-t border-slate-100">
                       <button
                         onClick={(e) => handleToggleLike(post.id, e)}
+                        aria-pressed={likeOverrides[post.id]?.isLiked ?? Boolean(post.isLiked)}
                         className={`flex items-center gap-1.5 text-[12.5px] font-extrabold transition-all active:scale-95 ${
-                          post.isLiked
+                          (likeOverrides[post.id]?.isLiked ?? Boolean(post.isLiked))
                             ? 'text-[#006c50]'
                             : 'text-slate-500 hover:text-slate-800'
                         }`}
@@ -549,14 +560,14 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                         <span
                           className="material-symbols-outlined text-[19px]"
                           style={{
-                            fontVariationSettings: post.isLiked
+                            fontVariationSettings: (likeOverrides[post.id]?.isLiked ?? Boolean(post.isLiked))
                               ? "'FILL' 1"
                               : "'FILL' 0",
                           }}
                         >
                           thumb_up
                         </span>
-                        <span>{post.likes}</span>
+                        <span>{likeOverrides[post.id]?.likes ?? post.likes}</span>
                       </button>
 
                       <button

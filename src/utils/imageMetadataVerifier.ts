@@ -10,13 +10,22 @@ export interface VerificationResult {
 const sharedImageHashes = new Set<string>();
 
 /**
- * Computes a fast perceptual string signature of an image Data URL
+ * Computes a fast perceptual string signature of an image Data URL.
+ * Samples characters across the ENTIRE payload (stride-based) instead of
+ * only the first N chars — long identical base64 headers no longer dominate
+ * the hash, which previously made distinct images collide as duplicates.
  */
 const computeImageHash = (dataUrl: string): string => {
   let hash = 0;
-  for (let i = 0; i < Math.min(dataUrl.length, 10000); i++) {
-    const char = dataUrl.charCodeAt(i);
-    hash = (hash << 5) - hash + char;
+  const len = dataUrl.length;
+  const stride = Math.max(1, Math.floor(len / 4096));
+  for (let i = 0; i < len; i += stride) {
+    hash = (hash << 5) - hash + dataUrl.charCodeAt(i);
+    hash |= 0;
+  }
+  // Always fold in the trailing bytes (most unique part of an image payload)
+  for (let i = Math.max(0, len - 256); i < len; i++) {
+    hash = (hash << 5) - hash + dataUrl.charCodeAt(i);
     hash |= 0;
   }
   return `img_hash_${Math.abs(hash)}`;
@@ -24,14 +33,25 @@ const computeImageHash = (dataUrl: string): string => {
 
 /**
  * Verifies image metadata freshness & anti-repost rules:
- * 1. Photo must be captured via live camera (lastModified within 30 minutes).
+ * 1. Photo must be captured via live camera (lastModified within maxAgeMinutes).
  * 2. Photo must not be a duplicate re-shared old image.
+ *
+ * NOTE: This check does NOT register the image hash. Registration happens
+ * exclusively via registerSharedImageHash() at publish time, so verifying a
+ * photo and then abandoning the draft must not blacklist the photo.
  */
 export const verifyImageMetadata = (
   file?: File,
   dataUrl?: string,
   maxAgeMinutes: number = 30
 ): VerificationResult => {
+  if (!file && !dataUrl) {
+    return {
+      isValid: false,
+      reason: 'No image provided for verification.',
+    };
+  }
+
   // If verifying file object from live camera input
   if (file) {
     const fileLastModified = file.lastModified;
@@ -58,7 +78,6 @@ export const verifyImageMetadata = (
         reason: 'Duplicate photo detected! This image was already shared previously in the community feed.',
       };
     }
-    sharedImageHashes.add(imageHash);
     return {
       isValid: true,
       hash: imageHash,
