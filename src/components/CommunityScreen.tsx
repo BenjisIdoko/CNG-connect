@@ -159,7 +159,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
               placeholder={
                 activeMainTab === 'station_groups'
                   ? 'Search station groups by name, city or operator...'
-                  : 'Search community topics...'
+                  : 'Search tips, station updates, deals...'
               }
               className="w-full bg-[#e6f0e9] border border-[#dbe5de]/70 rounded-full py-2 pl-10 pr-9 text-[13.5px] font-normal text-[#141d19] placeholder:text-[#6a7b72] focus:outline-none focus:ring-2 focus:ring-[#006c50]/30 focus:bg-white transition-all"
             />
@@ -498,13 +498,31 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
               </div>
 
               {filteredPosts.length === 0 ? (
-                <div className="bg-white rounded-3xl p-8 text-center border border-slate-200/80 shadow-xs">
-                  <span className="material-symbols-outlined text-[40px] text-slate-400 mb-2">
-                    forum
-                  </span>
-                  <p className="font-extrabold text-slate-900 text-[16px]">
-                    No posts found
+                <div className="bg-white rounded-3xl p-6 text-center border border-slate-200/80 shadow-xs flex flex-col items-center gap-2 my-2">
+                  <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-[#006c50] flex items-center justify-center font-bold">
+                    <span className="material-symbols-outlined text-[28px]">search_off</span>
+                  </div>
+                  <h4 className="font-extrabold text-slate-900 text-[15px]">
+                    {searchQuery ? `No results for "${searchQuery}"` : 'No posts found'}
+                  </h4>
+                  <p className="text-[12.5px] text-slate-500 font-normal max-w-xs">
+                    {searchQuery
+                      ? `Try searching for other keywords like "pressure", "kit", "NIPCO", or "maintenance".`
+                      : activeCategory !== 'all'
+                      ? `There are no posts in the ${activeCategory} category yet.`
+                      : 'Be the first to share an update or question in the Community hub!'}
                   </p>
+                  {(searchQuery || activeCategory !== 'all') && (
+                    <button
+                      onClick={() => {
+                        setSearchQuery('');
+                        setActiveCategory('all');
+                      }}
+                      className="mt-1 px-4 py-2 bg-[#006c50] hover:bg-[#004D40] text-white text-[12px] font-bold rounded-full shadow-xs active:scale-95 transition-all"
+                    >
+                      Clear Search & Filters
+                    </button>
+                  )}
                 </div>
               ) : (
                 filteredPosts.map((post) => (
