@@ -122,10 +122,10 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ post, onBack }) => {
               <span className="absolute bottom-0 right-0 w-3 h-3 bg-status-green border-2 border-white rounded-full shadow-xs" />
             </div>
             <div className="min-w-0">
-              <h2 className="text-[15px] font-bold text-on-surface leading-tight truncate max-w-[180px] sm:max-w-[240px]">
+              <h2 className="text-body-lg font-bold text-on-surface leading-tight truncate max-w-[180px] sm:max-w-[240px]">
                 {sellerName}
               </h2>
-              <span className="text-[12px] text-primary font-semibold block truncate">
+              <span className="text-caption text-primary font-semibold block truncate">
                 Active now
               </span>
             </div>
@@ -143,14 +143,14 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ post, onBack }) => {
       <div className="max-w-xl w-full mx-auto px-4 pt-3">
         <div className="bg-white rounded-2xl shadow-xs p-3 flex items-center gap-3 border border-surface-container-highest/70 hover:border-primary/40 transition-colors">
           <div
-            className="w-13 h-13 rounded-xl bg-cover bg-center shrink-0 border border-surface-container-highest"
+            className="w-12 h-12 rounded-xl bg-cover bg-center shrink-0 border border-surface-container-highest"
             style={{ backgroundImage: `url('${listingImage}')` }}
           />
           <div className="flex-1 min-w-0">
-            <h3 className="text-[14px] font-bold text-on-surface truncate">
+            <h3 className="text-body font-bold text-on-surface truncate">
               {listingTitle}
             </h3>
-            <p className="text-[15px] font-bold text-primary mt-0.5">
+            <p className="text-body-lg font-bold text-primary mt-0.5">
               {listingPrice}
             </p>
           </div>
@@ -166,7 +166,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ post, onBack }) => {
       <div className="flex-1 max-w-xl w-full mx-auto px-4 py-4 flex flex-col gap-3">
         {/* Date Divider */}
         <div className="flex items-center justify-center my-1">
-          <span className="text-[11px] font-semibold bg-surface-container text-outline px-3.5 py-1 rounded-full uppercase tracking-wider">
+          <span className="text-micro font-semibold bg-surface-container text-outline px-3 py-1 rounded-full uppercase tracking-wider">
             Today
           </span>
         </div>
@@ -183,7 +183,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ post, onBack }) => {
               <div className="flex flex-col gap-1">
                 {/* Bubble */}
                 <div
-                  className={`rounded-2xl p-3.5 shadow-xs text-[14.5px] font-normal leading-relaxed relative ${
+                  className={`rounded-2xl p-3 shadow-xs text-body-lg font-normal leading-relaxed relative ${
                     isMe
                       ? 'bg-primary text-white rounded-br-xs'
                       : 'bg-white text-on-surface border border-surface-container-highest rounded-bl-xs'
@@ -203,7 +203,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ post, onBack }) => {
 
                 {/* Timestamp & Status */}
                 <div
-                  className={`flex items-center gap-1 text-[11px] text-outline px-1 ${
+                  className={`flex items-center gap-1 text-micro text-outline px-1 ${
                     isMe ? 'justify-end' : 'justify-start'
                   }`}
                 >
@@ -236,7 +236,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ post, onBack }) => {
                 style={{ animationDelay: '0.4s' }}
               />
             </div>
-            <span className="text-[12px] font-medium text-outline ml-1">
+            <span className="text-caption font-medium text-outline ml-1">
               {sellerName} is typing...
             </span>
           </div>
@@ -278,7 +278,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ post, onBack }) => {
                 }
               }}
               placeholder="Type a message..."
-              className="w-full bg-transparent border-none outline-none resize-none max-h-28 text-[14.5px] text-on-surface placeholder:text-outline m-0 p-0 block"
+              className="w-full bg-transparent border-none outline-none resize-none max-h-28 text-body-lg text-on-surface placeholder:text-outline m-0 p-0 block"
             />
           </div>
 

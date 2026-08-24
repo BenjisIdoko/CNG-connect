@@ -81,12 +81,12 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   return (
     <div className="min-h-screen bg-surface text-on-surface pb-36 pt-4 font-['Plus_Jakarta_Sans',sans-serif]">
       {toastMessage && (
-        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-on-surface/90 text-white text-[12.5px] font-bold px-4 py-2 rounded-full shadow-lg backdrop-blur-md">
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-on-surface/90 text-white text-caption font-bold px-4 py-2 rounded-full shadow-lg backdrop-blur-md">
           {toastMessage}
         </div>
       )}
 
-      <div className="max-w-xl mx-auto px-4 md:px-6 flex flex-col gap-5">
+      <div className="max-w-xl mx-auto px-4 pt-4 flex flex-col gap-4">
         {/* Profile Card */}
         <div className="bg-white rounded-3xl p-4 shadow-sm border border-outline-variant flex items-center justify-between">
           <div className="flex items-center gap-3.5 min-w-0 flex-1">
@@ -96,13 +96,13 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
               className="w-14 h-14 rounded-full object-cover border-2 border-primary shadow-xs shrink-0"
             />
             <div className="min-w-0 flex-1">
-              <h2 className="font-bold text-[18px] text-on-surface leading-tight truncate">
+              <h2 className="font-bold text-title text-on-surface leading-tight truncate">
                 {user.name}
               </h2>
-              <p className="text-[12.5px] text-on-surface-variant font-normal mt-0.5 truncate">
+              <p className="text-caption text-on-surface-variant font-normal mt-0.5 truncate">
                 {user.email || user.phone || 'driver@cngconnect.ng'}
               </p>
-              <div className="flex items-center gap-1.5 mt-1 text-[11px] font-semibold text-primary">
+              <div className="flex items-center gap-1.5 mt-1 text-micro font-semibold text-primary">
                 <span className="material-symbols-outlined text-[14px]">directions_car</span>
                 <span className="truncate">{user.vehicle || 'Toyota Corolla 1.8L (CNG)'}</span>
               </div>
@@ -125,21 +125,21 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
           </button>
         </div>
 
-        {/* Driver Stats & Community Points Card */}
-        <div className="grid grid-cols-3 gap-2.5">
+        {/* Driver Stats */}
+        <div className="grid grid-cols-3 gap-2">
           {/* Points */}
           <div className="bg-primary text-on-primary rounded-2xl p-3 flex flex-col justify-between shadow-xs border border-primary">
             <div className="flex items-center justify-between text-status-green">
               <span className="material-symbols-outlined text-[18px]">emoji_events</span>
-              <span className="text-[9px] font-black uppercase tracking-wider bg-black/20 px-1.5 py-0.5 rounded-full border border-status-green/30">
+              <span className="text-micro font-black uppercase tracking-wider bg-black/20 px-1.5 py-0.5 rounded-xl border border-status-green/30">
                 PTS
               </span>
             </div>
             <div className="mt-2">
-              <span className="text-[20px] font-black text-status-green leading-none block">
+              <span className="text-heading font-black text-status-green leading-none block">
                 {user.communityPoints ?? 450}
               </span>
-              <span className="text-[10px] font-semibold text-white/90 uppercase tracking-wider">
+              <span className="text-micro font-semibold text-white/90 uppercase tracking-wider">
                 Points
               </span>
             </div>
@@ -151,10 +151,10 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
               edit_document
             </span>
             <div className="mt-2">
-              <span className="text-[20px] font-black text-on-surface leading-none block">
+              <span className="text-heading font-black text-on-surface leading-none block">
                 {user.reportsCount}
               </span>
-              <span className="text-[10px] font-semibold text-outline uppercase tracking-wider">
+              <span className="text-micro font-semibold text-outline uppercase tracking-wider">
                 Reports
               </span>
             </div>
@@ -166,10 +166,10 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
               star
             </span>
             <div className="mt-2">
-              <span className="text-[20px] font-black text-on-surface leading-none block">
+              <span className="text-heading font-black text-on-surface leading-none block">
                 {user.reputationScore}
               </span>
-              <span className="text-[10px] font-semibold text-outline uppercase tracking-wider">
+              <span className="text-micro font-semibold text-outline uppercase tracking-wider">
                 Rating
               </span>
             </div>
@@ -177,38 +177,38 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
         </div>
 
         {/* Embedded Interactive CNG ROI & Savings Calculator Card */}
-        <div className="bg-gradient-to-br from-deep-teal via-primary to-emerald-950 rounded-3xl p-4 sm:p-5 text-white shadow-lg border border-emerald-500/20 space-y-4">
+        <div className="bg-gradient-to-br from-deep-teal via-primary to-emerald-950 rounded-3xl p-5 text-white shadow-lg border border-emerald-500/20 space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="w-8 h-8 rounded-full bg-emerald-400/20 text-status-green flex items-center justify-center border border-status-green/30">
+              <div className="w-8 h-8 rounded-full bg-emerald-400/20 text-status-green flex items-center justify-center border border-status-green/30">
                 <span className="material-symbols-outlined text-[18px]">calculate</span>
-              </span>
-              <h3 className="font-extrabold text-[15px] sm:text-[16px] text-white">
+              </div>
+              <h3 className="font-extrabold text-body-lg text-white">
                 CNG Fuel Savings &amp; ROI Calculator
               </h3>
             </div>
-            <span className="bg-status-green/20 text-status-green text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase border border-status-green/30">
+            <span className="bg-status-green/20 text-status-green text-micro font-extrabold px-2.5 py-0.5 rounded-xl uppercase border border-status-green/30">
               Interactive
             </span>
           </div>
 
           {/* Real-time Display Hero */}
-          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-3.5 border border-white/15">
-            <span className="text-[11px] text-emerald-200 font-semibold block uppercase tracking-wider">Estimated Monthly Fuel Savings</span>
+          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/15">
+            <span className="text-micro text-emerald-200 font-semibold block uppercase tracking-wider">Estimated Monthly Fuel Savings</span>
             <div className="flex items-baseline gap-1.5 mt-0.5">
-              <span className="text-[28px] sm:text-[32px] font-black text-white leading-none">
+              <span className="text-display font-black text-white leading-none">
                 ₦{monthlySavings.toLocaleString()}
               </span>
-              <span className="text-[13px] font-extrabold text-status-green">
-                ({savingsPercent}% Saved vs Petrol)
+              <span className="text-body font-extrabold text-status-green">
+                ({savingsPercent}% Saved)
               </span>
             </div>
           </div>
 
           {/* Sliders */}
-          <div className="space-y-3 bg-black/20 p-3.5 rounded-2xl border border-white/10">
+          <div className="space-y-3 bg-black/20 p-4 rounded-2xl border border-white/10">
             <div>
-              <div className="flex justify-between text-[11.5px] font-bold text-emerald-100 mb-1">
+              <div className="flex justify-between text-micro font-bold text-emerald-100 mb-1">
                 <span>Daily Driving Distance</span>
                 <span className="text-status-green">{dailyKm} km / day</span>
               </div>
@@ -223,44 +223,44 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-2 pt-1 border-t border-white/10">
+            <div className="grid grid-cols-2 gap-3 pt-1 border-t border-white/10">
               <div>
-                <label className="block text-[10.5px] font-bold text-emerald-200 mb-1">Petrol Price (₦/L)</label>
+                <label className="block text-micro font-bold text-emerald-200 mb-1">Petrol Price (₦/L)</label>
                 <input
                   type="number"
                   value={petrolPrice}
                   onChange={(e) => setPetrolPrice(Number(e.target.value))}
-                  className="w-full bg-white/10 border border-white/20 rounded-xl px-2.5 py-1.5 text-[12px] font-bold text-white outline-none focus:border-status-green"
+                  className="w-full bg-white/10 border border-white/20 rounded-xl px-2.5 py-1.5 text-caption font-bold text-white outline-none focus:border-status-green"
                 />
               </div>
               <div>
-                <label className="block text-[10.5px] font-bold text-emerald-200 mb-1">CNG Price (₦/kg)</label>
+                <label className="block text-micro font-bold text-emerald-200 mb-1">CNG Price (₦/kg)</label>
                 <input
                   type="number"
                   value={cngPrice}
                   onChange={(e) => setCngPrice(Number(e.target.value))}
-                  className="w-full bg-white/10 border border-white/20 rounded-xl px-2.5 py-1.5 text-[12px] font-bold text-white outline-none focus:border-status-green"
+                  className="w-full bg-white/10 border border-white/20 rounded-xl px-2.5 py-1.5 text-caption font-bold text-white outline-none focus:border-status-green"
                 />
               </div>
             </div>
           </div>
 
           {/* Key Metrics Pill Bar */}
-          <div className="grid grid-cols-2 gap-2 text-center text-[12px]">
+          <div className="grid grid-cols-2 gap-2 text-center text-caption">
             <div className="bg-white/10 rounded-xl p-2.5 border border-white/10">
-              <span className="text-[10px] text-emerald-200 block uppercase font-bold">Annual Savings</span>
-              <span className="font-extrabold text-white text-[14px]">₦{annualSavings.toLocaleString()}</span>
+              <span className="text-micro text-emerald-200 block uppercase font-bold">Annual Savings</span>
+              <span className="font-extrabold text-white text-body">₦{annualSavings.toLocaleString()}</span>
             </div>
             <div className="bg-white/10 rounded-xl p-2.5 border border-white/10">
-              <span className="text-[10px] text-emerald-200 block uppercase font-bold">CO₂ Reduced / Year</span>
-              <span className="font-extrabold text-status-green text-[14px]">{annualCo2SavedTons} Tons</span>
+              <span className="text-micro text-emerald-200 block uppercase font-bold">CO₂ Reduced / Year</span>
+              <span className="font-extrabold text-status-green text-body">{annualCo2SavedTons} Tons</span>
             </div>
           </div>
 
           {onOpenRoiCalculator && (
             <button
               onClick={onOpenRoiCalculator}
-              className="w-full py-2.5 bg-white/15 hover:bg-white/25 text-white text-[12.5px] font-extrabold rounded-xl border border-white/20 transition-all flex items-center justify-center gap-1.5 active:scale-98"
+              className="w-full py-2.5 bg-white/15 hover:bg-white/25 text-white text-caption font-extrabold rounded-xl border border-white/20 transition-all flex items-center justify-center gap-1.5 active:scale-98"
             >
               <span className="material-symbols-outlined text-[16px]">open_in_full</span>
               <span>Open Detailed Kit Payback Calculator Modal</span>
@@ -268,24 +268,24 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
           )}
         </div>
 
-        {/* General Settings Group */}
+        {/* Preferences Section */}
         <div className="flex flex-col gap-2">
-          <span className="text-[13px] font-semibold text-on-surface-variant px-1">
-            General &amp; Preferences
+          <span className="text-body font-semibold text-on-surface-variant px-1">
+            Preferences &amp; Settings
           </span>
 
-          <div className="bg-white rounded-3xl p-1.5 shadow-sm border border-outline-variant flex flex-col divide-y divide-outline-variant/30">
-            {/* Registered State for Push Notification Scoping */}
-            <div className="p-3.5 flex items-center justify-between hover:bg-surface transition-colors rounded-2xl">
+          <div className="bg-white rounded-3xl shadow-sm border border-outline-variant overflow-hidden divide-y divide-outline-variant/30">
+            {/* Registered State */}
+            <div className="p-4 flex items-center justify-between hover:bg-surface transition-colors rounded-2xl">
               <div className="flex items-center gap-3">
                 <span className="material-symbols-outlined text-on-surface-variant text-[20px]">
                   location_on
                 </span>
                 <div>
-                  <span className="text-[14px] font-medium text-on-surface block leading-tight">
+                  <span className="text-body font-medium text-on-surface block leading-tight">
                     Registered State
                   </span>
-                  <span className="text-[11px] text-outline font-normal">
+                  <span className="text-micro text-outline font-normal">
                     Push notifications are scoped to this state
                   </span>
                 </div>
@@ -302,7 +302,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                   }
                   showToast(`Registered state updated to ${newState}`);
                 }}
-                className="bg-surface-container text-primary border border-outline-variant font-semibold text-[12.5px] rounded-xl px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary"
+                className="bg-surface-container text-primary border border-outline-variant font-semibold text-caption rounded-xl px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary"
               >
                 <option value="Abuja FCT">Abuja FCT</option>
                 <option value="Lagos">Lagos</option>
@@ -317,17 +317,16 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
             </div>
 
             {/* Notifications */}
-            <div className="p-3.5 flex items-center justify-between rounded-2xl">
+            <div className="p-4 flex items-center justify-between rounded-2xl">
               <div className="flex items-center gap-3">
                 <span className="material-symbols-outlined text-on-surface-variant text-[20px]">
                   notifications
                 </span>
-                <span className="text-[14px] font-medium text-on-surface">
+                <span className="text-body font-medium text-on-surface">
                   Proximity Alert Notifications
                 </span>
               </div>
 
-              {/* iOS style toggle switch */}
               <button
                 onClick={() => setNotificationsEnabled(!notificationsEnabled)}
                 className={`w-12 h-6 rounded-full transition-colors relative flex items-center px-0.5 ${
@@ -344,14 +343,13 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
           </div>
         </div>
 
-        {/* Support & Actions Group */}
+        {/* Community & Support */}
         <div className="flex flex-col gap-2">
-          <span className="text-[13px] font-semibold text-on-surface-variant px-1">
-            Support &amp; Community
+          <span className="text-body font-semibold text-on-surface-variant px-1">
+            Community &amp; Support
           </span>
 
-          <div className="bg-white rounded-3xl p-1.5 shadow-sm border border-outline-variant flex flex-col divide-y divide-outline-variant/30">
-            {/* Share */}
+          <div className="bg-white rounded-3xl shadow-sm border border-outline-variant overflow-hidden divide-y divide-outline-variant/30">
             <div
               onClick={() => {
                 if (navigator.share) {
@@ -364,13 +362,13 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                   showToast('App link copied!');
                 }
               }}
-              className="p-3.5 flex items-center justify-between hover:bg-surface transition-colors cursor-pointer rounded-2xl"
+              className="p-4 flex items-center justify-between hover:bg-surface transition-colors cursor-pointer rounded-2xl"
             >
               <div className="flex items-center gap-3">
                 <span className="material-symbols-outlined text-on-surface-variant text-[20px]">
                   share
                 </span>
-                <span className="text-[14px] font-medium text-on-surface">
+                <span className="text-body font-medium text-on-surface">
                   Share App with Drivers
                 </span>
               </div>
@@ -379,16 +377,15 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
               </span>
             </div>
 
-            {/* Help */}
             <div
               onClick={() => showToast('Help Center')}
-              className="p-3.5 flex items-center justify-between hover:bg-surface transition-colors cursor-pointer rounded-2xl"
+              className="p-4 flex items-center justify-between hover:bg-surface transition-colors cursor-pointer rounded-2xl"
             >
               <div className="flex items-center gap-3">
                 <span className="material-symbols-outlined text-on-surface-variant text-[20px]">
                   help
                 </span>
-                <span className="text-[14px] font-medium text-on-surface">
+                <span className="text-body font-medium text-on-surface">
                   Help &amp; FAQ
                 </span>
               </div>
@@ -400,11 +397,11 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-col gap-2.5 pt-1">
+        <div className="flex flex-col gap-2 pt-1">
           {onOpenSignUp && (
             <button
               onClick={onOpenSignUp}
-              className="w-full py-3.5 px-4 bg-primary hover:opacity-95 text-on-primary font-bold text-[14px] rounded-2xl shadow-xs flex items-center justify-center gap-2 active:scale-98 transition-all"
+              className="w-full py-3 px-4 bg-primary hover:opacity-95 text-on-primary font-bold text-body rounded-2xl shadow-xs flex items-center justify-center gap-2 active:scale-98 transition-all"
             >
               <span className="material-symbols-outlined text-status-green text-[20px] shrink-0">
                 person_add
@@ -415,7 +412,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
 
           <button
             onClick={onOpenOnboarding}
-            className="w-full py-3.5 px-4 bg-white hover:bg-surface text-on-surface font-semibold text-[14px] rounded-2xl shadow-xs border border-outline-variant flex items-center justify-center gap-2 active:scale-98 transition-all"
+            className="w-full py-3 px-4 bg-white hover:bg-surface text-on-surface font-semibold text-body rounded-2xl shadow-xs border border-outline-variant flex items-center justify-center gap-2 active:scale-98 transition-all"
           >
             <span className="material-symbols-outlined text-primary text-[20px] shrink-0">
               slideshow
@@ -425,7 +422,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
 
           <button
             onClick={onSignOut || onOpenOnboarding}
-            className="w-full py-3.5 px-4 bg-status-orange-container hover:opacity-90 text-secondary font-semibold text-[14px] rounded-2xl border border-secondary/30 flex items-center justify-center gap-2 active:scale-98 transition-all min-h-[44px]"
+            className="w-full py-3 px-4 bg-status-orange-container hover:opacity-90 text-secondary font-semibold text-body rounded-2xl border border-secondary/30 flex items-center justify-center gap-2 active:scale-98 transition-all min-h-[44px]"
           >
             <span className="material-symbols-outlined text-secondary text-[20px] shrink-0">
               logout
@@ -439,54 +436,54 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
       <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} title="Edit Driver Profile">
         <form onSubmit={handleSaveProfile} className="flex flex-col gap-4 text-on-surface">
           <div>
-            <label className="block text-[12px] font-bold text-slate-700 mb-1">Full Name</label>
+            <label className="block text-caption font-bold text-slate-700 mb-1">Full Name</label>
             <input
               type="text"
               required
               value={editName}
               onChange={(e) => setEditName(e.target.value)}
-              className="w-full bg-surface border border-surface-container-highest rounded-xl px-3.5 py-2.5 text-[13.5px] font-semibold text-slate-900 outline-none focus:border-primary"
+              className="w-full bg-surface border border-surface-container-highest rounded-xl px-3 py-2 text-body font-semibold text-slate-900 outline-none focus:border-primary"
             />
           </div>
 
           <div>
-            <label className="block text-[12px] font-bold text-slate-700 mb-1">Phone Number</label>
+            <label className="block text-caption font-bold text-slate-700 mb-1">Phone Number</label>
             <input
               type="tel"
               required
               value={editPhone}
               onChange={(e) => setEditPhone(e.target.value)}
-              className="w-full bg-surface border border-surface-container-highest rounded-xl px-3.5 py-2.5 text-[13.5px] font-semibold text-slate-900 outline-none focus:border-primary"
+              className="w-full bg-surface border border-surface-container-highest rounded-xl px-3 py-2 text-body font-semibold text-slate-900 outline-none focus:border-primary"
             />
           </div>
 
           <div>
-            <label className="block text-[12px] font-bold text-slate-700 mb-1">Email Address</label>
+            <label className="block text-caption font-bold text-slate-700 mb-1">Email Address</label>
             <input
               type="email"
               value={editEmail}
               onChange={(e) => setEditEmail(e.target.value)}
-              className="w-full bg-surface border border-surface-container-highest rounded-xl px-3.5 py-2.5 text-[13.5px] font-semibold text-slate-900 outline-none focus:border-primary"
+              className="w-full bg-surface border border-surface-container-highest rounded-xl px-3 py-2 text-body font-semibold text-slate-900 outline-none focus:border-primary"
             />
           </div>
 
           <div>
-            <label className="block text-[12px] font-bold text-slate-700 mb-1">Vehicle Details &amp; Kit</label>
+            <label className="block text-caption font-bold text-slate-700 mb-1">Vehicle Details &amp; Kit</label>
             <input
               type="text"
               placeholder="e.g. Toyota Corolla 1.8L (Dual Fuel CNG)"
               value={editVehicle}
               onChange={(e) => setEditVehicle(e.target.value)}
-              className="w-full bg-surface border border-surface-container-highest rounded-xl px-3.5 py-2.5 text-[13.5px] font-semibold text-slate-900 outline-none focus:border-primary"
+              className="w-full bg-surface border border-surface-container-highest rounded-xl px-3 py-2 text-body font-semibold text-slate-900 outline-none focus:border-primary"
             />
           </div>
 
           <div>
-            <label className="block text-[12px] font-bold text-slate-700 mb-1">Registered State</label>
+            <label className="block text-caption font-bold text-slate-700 mb-1">Registered State</label>
             <select
               value={editState}
               onChange={(e) => setEditState(e.target.value)}
-              className="w-full bg-surface border border-surface-container-highest rounded-xl px-3.5 py-2.5 text-[13.5px] font-semibold text-slate-900 outline-none focus:border-primary"
+              className="w-full bg-surface border border-surface-container-highest rounded-xl px-3 py-2 text-body font-semibold text-slate-900 outline-none focus:border-primary"
             >
               <option value="Abuja FCT">Abuja FCT</option>
               <option value="Lagos">Lagos</option>
@@ -504,13 +501,13 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
             <button
               type="button"
               onClick={() => setIsEditModalOpen(false)}
-              className="px-4 py-2.5 rounded-full text-[13px] font-bold text-slate-600 bg-slate-100 hover:bg-slate-200"
+              className="px-4 py-2 rounded-full text-body font-bold text-slate-600 bg-slate-100 hover:bg-slate-200"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-5 py-2.5 rounded-full text-[13px] font-extrabold text-white bg-primary hover:bg-deep-teal shadow-sm"
+              className="px-5 py-2 rounded-full text-body font-extrabold text-white bg-primary hover:bg-deep-teal shadow-sm"
             >
               Save Changes
             </button>

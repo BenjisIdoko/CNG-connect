@@ -114,7 +114,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
     <div className="min-h-screen bg-surface text-on-surface pb-28 relative">
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-on-surface/90 text-white text-[13px] font-bold px-4 py-2 rounded-full shadow-lg backdrop-blur-md">
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-on-surface/90 text-white text-body font-bold px-4 py-2 rounded-full shadow-lg backdrop-blur-md">
           {toastMessage}
         </div>
       )}
@@ -125,7 +125,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
         <div className="flex bg-surface-container p-1 rounded-2xl border border-surface-container-highest">
           <button
             onClick={() => setActiveMainTab('station_groups')}
-            className={`flex-1 py-2.5 rounded-xl text-[13px] font-bold transition-all text-center ${
+            className={`flex-1 py-2.5 rounded-xl text-body font-bold transition-all text-center ${
               activeMainTab === 'station_groups'
                 ? 'bg-primary text-white shadow-xs'
                 : 'text-on-surface-variant hover:text-on-surface'
@@ -136,7 +136,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
 
           <button
             onClick={() => setActiveMainTab('general')}
-            className={`flex-1 py-2.5 rounded-xl text-[13px] font-bold transition-all text-center ${
+            className={`flex-1 py-2.5 rounded-xl text-body font-bold transition-all text-center ${
               activeMainTab === 'general'
                 ? 'bg-primary text-white shadow-xs'
                 : 'text-on-surface-variant hover:text-on-surface'
@@ -158,10 +158,10 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={
                 activeMainTab === 'station_groups'
-                  ? 'Search station groups by name, city or operator...'
+                  ? 'Search station groups, city, state...'
                   : 'Search tips, station updates, deals...'
               }
-              className="w-full bg-surface-container border border-surface-container-highest/70 rounded-full py-2 pl-10 pr-9 text-[13.5px] font-normal text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary/30 focus:bg-white transition-all"
+              className="w-full bg-surface-container border border-surface-container-highest/70 rounded-full py-2 pl-10 pr-9 text-body font-normal text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary/30 focus:bg-white transition-all"
             />
             {searchQuery && (
               <button
@@ -200,7 +200,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
           <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between pt-1">
               <div className="flex items-center gap-2">
-                <h2 className="text-[18px] font-bold text-on-surface tracking-tight">
+                <h2 className="text-title font-bold text-on-surface tracking-tight">
                   All Station Groups ({filteredStations.length})
                 </h2>
                 <button
@@ -212,7 +212,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                   <span className="material-symbols-outlined text-[15px]">info</span>
                 </button>
               </div>
-              <span className="text-[11.5px] font-semibold text-primary bg-emerald-100 px-2.5 py-0.5 rounded-full shrink-0 whitespace-nowrap">
+              <span className="text-micro font-semibold text-primary bg-emerald-100 px-2.5 py-0.5 rounded-xl shrink-0 whitespace-nowrap">
                 Active Discussions
               </span>
             </div>
@@ -229,7 +229,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                 <button
                   key={st.id}
                   onClick={() => setStatusFilter(st.id)}
-                  className={`shrink-0 px-3 py-1 rounded-full text-[11px] font-semibold transition-all shadow-2xs active:scale-95 ${
+                  className={`shrink-0 px-3 py-1 rounded-xl text-micro font-semibold transition-all shadow-2xs active:scale-95 ${
                     statusFilter === st.id
                       ? 'bg-primary text-white shadow-xs'
                       : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
@@ -247,8 +247,8 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                   <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-primary flex items-center justify-center font-bold">
                     <span className="material-symbols-outlined text-[28px]">search_off</span>
                   </div>
-                  <h4 className="font-bold text-slate-900 text-[15px]">No Station Groups Found</h4>
-                  <p className="text-[12.5px] text-slate-500 font-normal max-w-xs">
+                  <h4 className="font-bold text-slate-900 text-body-lg">No Station Groups Found</h4>
+                  <p className="text-caption text-slate-500 font-normal max-w-xs">
                     No station groups match your current search query or status filter.
                   </p>
                   <button
@@ -256,7 +256,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                       setSearchQuery('');
                       setStatusFilter('all');
                     }}
-                    className="mt-1 px-5 py-2.5 bg-primary hover:bg-deep-teal text-white text-[12.5px] font-bold rounded-full shadow-md active:scale-95 transition-all"
+                    className="mt-1 px-5 py-2.5 bg-primary hover:bg-deep-teal text-white text-caption font-bold rounded-full shadow-md active:scale-95 transition-all"
                   >
                     Reset Filters
                   </button>
@@ -276,10 +276,10 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                           </span>
                         </div>
                         <div className="min-w-0 flex-1">
-                          <h3 className="text-[15.5px] font-bold text-on-surface leading-tight truncate">
+                          <h3 className="text-body-lg font-bold text-on-surface leading-tight truncate">
                             {st.name} Group
                           </h3>
-                          <p className="text-[12px] text-outline font-normal flex items-center gap-1 mt-0.5 truncate">
+                          <p className="text-caption text-outline font-normal flex items-center gap-1 mt-0.5 truncate">
                             <span>{st.city}, {st.state}</span>
                             <span>•</span>
                             <span className="text-primary font-semibold">
@@ -290,7 +290,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                       </div>
 
                       <div
-                        className={`px-2.5 py-1 rounded-full text-[10.5px] font-semibold uppercase tracking-wide flex items-center gap-1.5 shrink-0 shadow-2xs border ${
+                        className={`px-2.5 py-1 rounded-xl text-micro font-semibold uppercase tracking-wide flex items-center gap-1.5 shrink-0 shadow-2xs border ${
                           st.status === 'full'
                             ? 'bg-emerald-50 text-primary border-emerald-200'
                             : st.status === 'queue'
@@ -316,12 +316,12 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                     </div>
 
                     {/* Latest Notice or Report snippet */}
-                    <div className="bg-surface rounded-xl p-2.5 border border-surface-container-highest text-[12.5px] text-on-surface-variant">
+                    <div className="bg-surface rounded-xl p-2.5 border border-surface-container-highest text-caption text-on-surface-variant">
                       <span className="font-semibold text-primary mr-1">Latest Update:</span>
                       {st.reports?.[0]?.comment || st.stationNotice || `Active discussion feed on pressure (${st.pumpPressure} bar) & queues.`}
                     </div>
 
-                    <div className="flex items-center justify-between pt-1 text-[12px] font-medium text-outline">
+                    <div className="flex items-center justify-between pt-1 text-caption font-medium text-outline">
                       <span className="flex items-center gap-1">
                         <span className="material-symbols-outlined text-[15px]">schedule</span>
                         Updated {st.lastUpdated}
@@ -348,13 +348,13 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
             {/* Hub Categories Grid */}
             <div>
               <div className="flex justify-between items-center mb-2.5">
-                <h2 className="text-[18px] font-bold text-on-surface tracking-tight">
+                <h2 className="text-title font-bold text-on-surface tracking-tight">
                   Hub Categories
                 </h2>
                 {activeCategory !== 'all' && (
                   <button
                     onClick={() => setActiveCategory('all')}
-                    className="text-[12px] font-semibold text-primary hover:underline"
+                    className="text-caption font-semibold text-primary hover:underline"
                   >
                     Clear filter
                   </button>
@@ -386,14 +386,14 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5">
-                      <span className="text-[14px] font-bold text-slate-900 truncate">
+                      <span className="text-body font-bold text-slate-900 truncate">
                         CNG Kit Conversion Centers
                       </span>
-                      <span className="text-[10px] font-semibold text-primary bg-emerald-100 px-2 py-0.5 rounded-full">
+                      <span className="text-micro font-semibold text-primary bg-emerald-100 px-2 py-0.5 rounded-xl">
                         Pi-CNG
                       </span>
                     </div>
-                    <p className="text-[11.5px] font-normal text-slate-500 truncate">
+                    <p className="text-micro font-normal text-slate-500 truncate">
                       337+ Pi-CNG certified centers nationwide
                     </p>
                   </div>
@@ -417,7 +417,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                       build
                     </span>
                   </div>
-                  <span className="text-[13.5px] font-semibold text-on-surface text-center">
+                  <span className="text-body font-semibold text-on-surface text-center">
                     Maintenance
                   </span>
                 </div>
@@ -440,7 +440,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                       settings
                     </span>
                   </div>
-                  <span className="text-[13.5px] font-semibold text-on-surface text-center leading-tight">
+                  <span className="text-body font-semibold text-on-surface text-center leading-tight">
                     Parts &amp; Accessories
                   </span>
                 </div>
@@ -466,7 +466,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                       star
                     </span>
                   </div>
-                  <span className="text-[13.5px] font-semibold text-on-surface text-center">
+                  <span className="text-body font-semibold text-on-surface text-center">
                     Reviews
                   </span>
                 </div>
@@ -489,7 +489,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                       local_offer
                     </span>
                   </div>
-                  <span className="text-[13.5px] font-extrabold text-on-surface text-center">
+                  <span className="text-body font-extrabold text-on-surface text-center">
                     Car Deals
                   </span>
                 </div>
@@ -499,7 +499,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
             {/* General Discussions List */}
             <div className="flex flex-col gap-3.5">
               <div className="flex items-center justify-between">
-                <h2 className="text-[18px] font-black text-slate-900 tracking-tight">
+                <h2 className="text-title font-black text-slate-900 tracking-tight">
                   General Discussions
                 </h2>
               </div>
@@ -509,10 +509,10 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                   <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-primary flex items-center justify-center font-bold">
                     <span className="material-symbols-outlined text-[28px]">search_off</span>
                   </div>
-                  <h4 className="font-extrabold text-slate-900 text-[15px]">
+                  <h4 className="font-extrabold text-slate-900 text-body-lg">
                     {searchQuery ? `No results for "${searchQuery}"` : 'No posts found'}
                   </h4>
-                  <p className="text-[12.5px] text-slate-500 font-normal max-w-xs">
+                  <p className="text-caption text-slate-500 font-normal max-w-xs">
                     {searchQuery
                       ? `Try searching for other keywords like "pressure", "kit", "NIPCO", or "maintenance".`
                       : activeCategory !== 'all'
@@ -525,7 +525,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                         setSearchQuery('');
                         setActiveCategory('all');
                       }}
-                      className="mt-1 px-4 py-2 bg-primary hover:bg-deep-teal text-white text-[12px] font-bold rounded-full shadow-xs active:scale-95 transition-all"
+                      className="mt-1 px-4 py-2 bg-primary hover:bg-deep-teal text-white text-caption font-bold rounded-full shadow-xs active:scale-95 transition-all"
                     >
                       Clear Search & Filters
                     </button>
@@ -547,7 +547,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                         />
                       ) : (
                         <div
-                          className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-[15px] ${
+                          className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-body-lg ${
                             post.authorInitialBg || 'bg-secondary-container text-white'
                           }`}
                         >
@@ -557,16 +557,16 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
 
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between">
-                          <h3 className="text-[14.5px] font-black text-slate-900 truncate">
+                          <h3 className="text-body-lg font-black text-slate-900 truncate">
                             {post.author}
                           </h3>
-                          <span className="text-[11.5px] font-medium text-slate-400">
+                          <span className="text-micro font-medium text-slate-400">
                             {post.timeAgo}
                           </span>
                         </div>
 
-                        <div className="inline-flex items-center gap-1 bg-primary-container/20 text-on-primary-container px-2.5 py-0.5 rounded-full mt-0.5">
-                          <span className="text-[10.5px] font-black tracking-wider uppercase">
+                        <div className="inline-flex items-center gap-1 bg-primary-container/20 text-on-primary-container px-2.5 py-0.5 rounded-xl mt-0.5">
+                          <span className="text-micro font-black tracking-wider uppercase">
                             {post.categoryLabel || post.category}
                           </span>
                         </div>
@@ -574,10 +574,10 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                     </div>
 
                     <div>
-                      <h4 className="text-[16px] font-extrabold text-slate-900 mb-1 group-hover:text-primary transition-colors leading-snug">
+                      <h4 className="text-body-lg font-extrabold text-slate-900 mb-1 group-hover:text-primary transition-colors leading-snug">
                         {post.title}
                       </h4>
-                      <p className="text-[13.5px] font-medium text-slate-600 line-clamp-3 leading-relaxed">
+                      <p className="text-body font-medium text-slate-600 line-clamp-3 leading-relaxed">
                         {post.content}
                       </p>
                     </div>
@@ -596,7 +596,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                       <button
                         onClick={(e) => handleToggleLike(post.id, e)}
                         aria-pressed={likeOverrides[post.id]?.isLiked ?? Boolean(post.isLiked)}
-                        className={`flex items-center gap-1.5 text-[12.5px] font-extrabold transition-all active:scale-95 ${
+                        className={`flex items-center gap-1.5 text-caption font-extrabold transition-all active:scale-95 ${
                           (likeOverrides[post.id]?.isLiked ?? Boolean(post.isLiked))
                             ? 'text-primary'
                             : 'text-slate-500 hover:text-slate-800'
@@ -617,7 +617,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
 
                       <button
                         onClick={() => onOpenDiscussion(post)}
-                        className="flex items-center gap-1.5 text-[12.5px] font-extrabold text-slate-500 hover:text-slate-800 transition-colors"
+                        className="flex items-center gap-1.5 text-caption font-extrabold text-slate-500 hover:text-slate-800 transition-colors"
                       >
                         <span className="material-symbols-outlined text-[19px]">
                           chat_bubble

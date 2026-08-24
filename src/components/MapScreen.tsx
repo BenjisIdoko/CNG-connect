@@ -363,7 +363,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
 
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="absolute top-20 left-1/2 -translate-x-1/2 z-50 bg-on-surface/90 text-white text-[13px] font-semibold px-4 py-2 rounded-full shadow-lg backdrop-blur-md animate-fade-in pointer-events-none">
+        <div className="absolute top-20 left-1/2 -translate-x-1/2 z-50 bg-on-surface/90 text-white text-body font-semibold px-4 py-2 rounded-full shadow-lg backdrop-blur-md animate-fade-in pointer-events-none">
           {toastMessage}
         </div>
       )}
@@ -380,7 +380,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search by station, city, state, or operator..."
-            className="flex-1 bg-transparent border-none outline-none text-[13.5px] font-medium text-slate-900 placeholder:text-slate-400"
+            className="flex-1 bg-transparent border-none outline-none text-body font-medium text-slate-900 placeholder:text-slate-400"
           />
           {searchQuery && (
             <button
@@ -400,7 +400,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
             >
               <span className="material-symbols-outlined text-[18px]">tune</span>
               {activeFilterCount > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-status-green text-deep-teal text-[9.5px] font-black rounded-full flex items-center justify-center border border-white shadow-xs">
+                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-status-green text-deep-teal text-micro font-black rounded-full flex items-center justify-center border border-white shadow-xs">
                   {activeFilterCount}
                 </span>
               )}
@@ -445,7 +445,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
             <div className="w-full flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-status-green animate-pulse" />
-                <h3 className="font-extrabold text-[15px] text-on-surface">
+                <h3 className="font-extrabold text-body-lg text-on-surface">
                   {filteredStations.length} CNG Stations Near You
                 </h3>
               </div>
@@ -454,7 +454,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                   e.stopPropagation();
                   toggleSheetMode();
                 }}
-                className="text-outline hover:text-on-surface text-[12px] font-bold flex items-center gap-0.5"
+                className="text-outline hover:text-on-surface text-caption font-bold flex items-center gap-0.5"
               >
                 <span>{sheetMode === 'expanded' ? 'Collapse' : sheetMode === 'standard' ? 'Expand' : 'Show list'}</span>
                 <span className="material-symbols-outlined text-[16px]">
@@ -472,8 +472,8 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                   <div className="w-12 h-12 rounded-2xl bg-surface-container text-primary flex items-center justify-center font-black">
                     <span className="material-symbols-outlined text-[28px]">filter_alt_off</span>
                   </div>
-                  <h4 className="font-extrabold text-on-surface text-[15px]">No CNG Stations Found</h4>
-                  <p className="text-[12.5px] text-on-surface-variant font-medium max-w-xs">
+                  <h4 className="font-extrabold text-on-surface text-body-lg">No CNG Stations Found</h4>
+                  <p className="text-caption text-on-surface-variant font-medium max-w-xs">
                     No stations match your current search term or filter criteria.
                   </p>
                   <button
@@ -484,7 +484,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                       setMinPressure(0);
                       setMaxDistanceKm(0);
                     }}
-                    className="mt-1 px-5 py-2.5 bg-primary hover:opacity-95 text-on-primary text-[12.5px] font-extrabold rounded-full shadow-md active:scale-95 transition-all"
+                    className="mt-1 px-5 py-2.5 bg-primary hover:opacity-95 text-on-primary text-caption font-extrabold rounded-full shadow-md active:scale-95 transition-all"
                   >
                     Reset All Filters
                   </button>
@@ -495,17 +495,17 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                   <div>
                     <div className="flex items-center justify-between mb-2.5 px-1">
                       <div>
-                        <h3 className="font-black text-[16px] text-on-surface leading-tight">
+                        <h3 className="font-black text-body-lg text-on-surface leading-tight">
                           Nearest Stations
                         </h3>
-                        <span className="text-[11.5px] font-bold text-outline">
+                        <span className="text-micro font-bold text-outline">
                           Sorted by GPS distance ({sheetMode === 'expanded' ? filteredStations.length : nearestTop5Stations.length} shown)
                         </span>
                       </div>
                       {sheetMode === 'standard' && (
                         <button
                           onClick={() => setSheetMode('expanded')}
-                          className="text-[12px] font-extrabold text-primary hover:underline"
+                          className="text-caption font-extrabold text-primary hover:underline"
                         >
                           See all ({filteredStations.length})
                         </button>
@@ -533,10 +533,10 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                               <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${statusInfo.dotColor}`} />
 
                               <div className="min-w-0 flex-1">
-                                <h4 className="font-bold text-[14.5px] text-on-surface truncate leading-snug">
+                                <h4 className="font-bold text-body-lg text-on-surface truncate leading-snug">
                                   {station.name}
                                 </h4>
-                                <div className="flex flex-wrap items-center gap-1.5 text-[12px] text-on-surface-variant mt-0.5">
+                                <div className="flex flex-wrap items-center gap-1.5 text-caption text-on-surface-variant mt-0.5">
                                   <span className="font-bold text-primary">{station.distance}</span>
                                   <span>•</span>
                                   <span className="font-medium">{station.statusLabel}</span>
@@ -601,7 +601,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                     {sheetMode === 'expanded' && filteredStations.length > visibleCount && (
                       <button
                         onClick={() => setVisibleCount((prev) => prev + 25)}
-                        className="w-full py-2.5 my-2 bg-emerald-50 hover:bg-emerald-100 text-primary border border-emerald-200 text-[13px] font-extrabold rounded-full transition-all active:scale-[0.98] flex items-center justify-center gap-1.5 shadow-2xs"
+                        className="w-full py-2.5 my-2 bg-emerald-50 hover:bg-emerald-100 text-primary border border-emerald-200 text-body font-extrabold rounded-full transition-all active:scale-[0.98] flex items-center justify-center gap-1.5 shadow-2xs"
                       >
                         <span className="material-symbols-outlined text-[18px]">expand_more</span>
                         <span>Load More Stations (Showing {visibleCount} of {filteredStations.length})</span>
@@ -613,10 +613,10 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                   {sheetMode === 'expanded' && (
                     <div className="pt-2 border-t border-outline-variant/40">
                       <div className="flex items-center justify-between mb-2.5 px-1">
-                        <h3 className="font-bold text-[15px] text-on-surface">
+                        <h3 className="font-bold text-body-lg text-on-surface">
                           Browse Station Photos
                         </h3>
-                        <span className="text-[11.5px] font-semibold text-outline">
+                        <span className="text-micro font-semibold text-outline">
                           Swipe to view
                         </span>
                       </div>
@@ -638,21 +638,21 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                                   alt={st.name}
                                   className="w-full h-full object-cover"
                                 />
-                                <span className="absolute top-2 left-2 bg-primary/90 backdrop-blur-md text-status-green text-[10px] font-semibold px-2 py-0.5 rounded-full border border-status-green/30">
+                                <span className="absolute top-2 left-2 bg-primary/90 backdrop-blur-md text-status-green text-micro font-semibold px-2 py-0.5 rounded-xl border border-status-green/30">
                                   {st.statusLabel}
                                 </span>
                               </div>
 
-                              <h4 className="font-bold text-[14px] text-on-surface truncate leading-snug">
+                              <h4 className="font-bold text-body text-on-surface truncate leading-snug">
                                 {st.name}
                               </h4>
-                              <p className="text-[11.5px] font-normal text-on-surface-variant truncate mt-0.5">
+                              <p className="text-micro font-normal text-on-surface-variant truncate mt-0.5">
                                 {st.address}
                               </p>
                             </div>
 
                             <div className="mt-2.5 pt-2 border-t border-outline-variant/30 flex items-center justify-between">
-                              <div className="flex items-center gap-1.5 text-[11px] font-medium text-on-surface-variant">
+                              <div className="flex items-center gap-1.5 text-micro font-medium text-on-surface-variant">
                                 <span className="font-semibold text-primary">{formatStationAge(st)}</span>
                                 <span>•</span>
                                 <span>{st.distance}</span>
@@ -674,7 +674,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                                     e.stopPropagation();
                                     onNavigate(st);
                                   }}
-                                  className="px-2.5 py-1 bg-status-green text-on-surface rounded-full text-[11px] font-bold shadow-xs active:scale-95 transition-all flex items-center gap-1"
+                                  className="px-2.5 py-1 bg-status-green text-on-surface rounded-full text-micro font-bold shadow-xs active:scale-95 transition-all flex items-center gap-1"
                                 >
                                   <span className="material-symbols-outlined text-[13px]">navigation</span>
                                   <span>Nav</span>
@@ -698,7 +698,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
         <div className="flex flex-col gap-4 py-1 text-on-surface">
           {/* Minimum Pressure */}
           <div>
-            <div className="flex justify-between text-[12.5px] font-bold text-slate-700 mb-1.5">
+            <div className="flex justify-between text-caption font-bold text-slate-700 mb-1.5">
               <span>Minimum Pump Pressure</span>
               <span className="text-primary font-extrabold">{minPressure} bar</span>
             </div>
@@ -711,7 +711,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
               onChange={(e) => setMinPressure(Number(e.target.value))}
               className="w-full accent-primary h-2 bg-slate-100 rounded-lg cursor-pointer"
             />
-            <div className="flex justify-between text-[10.5px] font-semibold text-slate-400 mt-1">
+            <div className="flex justify-between text-micro font-semibold text-slate-400 mt-1">
               <span>Any (0 bar)</span>
               <span>150 bar</span>
               <span>220 bar (Max)</span>
@@ -720,7 +720,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
 
           {/* Maximum Distance Radius */}
           <div>
-            <div className="flex justify-between text-[12.5px] font-bold text-slate-700 mb-1.5">
+            <div className="flex justify-between text-caption font-bold text-slate-700 mb-1.5">
               <span>Maximum Distance Radius</span>
               <span className="text-primary font-extrabold">
                 {maxDistanceKm === 0 ? 'Any Distance' : `Within ${maxDistanceKm} km`}
@@ -732,7 +732,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                   key={dist}
                   type="button"
                   onClick={() => setMaxDistanceKm(dist)}
-                  className={`flex-1 py-2 px-2 rounded-xl text-[12px] font-extrabold border transition-all active:scale-95 ${
+                  className={`flex-1 py-2 px-2 rounded-xl text-caption font-extrabold border transition-all active:scale-95 ${
                     maxDistanceKm === dist
                       ? 'bg-primary text-white border-primary'
                       : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
@@ -746,7 +746,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
 
           {/* Status checkboxes */}
           <div>
-            <label className="block text-[12.5px] font-bold text-slate-700 mb-2">
+            <label className="block text-caption font-bold text-slate-700 mb-2">
               Fuel &amp; Pump Status Availability
             </label>
             <div className="grid grid-cols-2 gap-2">
@@ -755,7 +755,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                   key={st}
                   type="button"
                   onClick={() => setActiveFilter(st)}
-                  className={`p-2.5 rounded-xl text-[12px] font-extrabold border transition-all active:scale-95 text-center ${
+                  className={`p-2.5 rounded-xl text-caption font-extrabold border transition-all active:scale-95 text-center ${
                     activeFilter === st
                       ? 'bg-primary text-white border-primary'
                       : 'bg-slate-50 text-slate-800 border-slate-200 hover:bg-slate-100'
@@ -785,14 +785,14 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                 setActiveFilter('all');
                 setIsFilterModalOpen(false);
               }}
-              className="flex-1 py-3 text-slate-700 font-extrabold text-[13px] bg-slate-100 hover:bg-slate-200 rounded-full active:scale-95 transition-all"
+              className="flex-1 py-3 text-slate-700 font-extrabold text-body bg-slate-100 hover:bg-slate-200 rounded-full active:scale-95 transition-all"
             >
               Reset Filters
             </button>
             <button
               type="button"
               onClick={() => setIsFilterModalOpen(false)}
-              className="flex-1 py-3 bg-primary text-white font-extrabold text-[13px] rounded-full shadow-md hover:bg-deep-teal active:scale-95 transition-all"
+              className="flex-1 py-3 bg-primary text-white font-extrabold text-body rounded-full shadow-md hover:bg-deep-teal active:scale-95 transition-all"
             >
               Apply Filters
             </button>

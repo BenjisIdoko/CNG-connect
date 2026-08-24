@@ -69,7 +69,7 @@ export const DiscussionScreen: React.FC<DiscussionScreenProps> = ({
               />
             ) : (
               <div
-                className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-[18px] ${
+                className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-title ${
                   post.authorInitialBg || 'bg-secondary-container text-white'
                 }`}
               >
@@ -79,7 +79,7 @@ export const DiscussionScreen: React.FC<DiscussionScreenProps> = ({
 
             <div className="flex-1">
               <div className="flex items-center gap-1.5">
-                <span className="font-bold text-[16px] text-on-surface">
+                <span className="font-bold text-body-lg text-on-surface">
                   {post.author}
                 </span>
                 {post.verified && (
@@ -91,21 +91,21 @@ export const DiscussionScreen: React.FC<DiscussionScreenProps> = ({
                   </span>
                 )}
               </div>
-              <span className="text-[12px] text-outline">{post.timeAgo}</span>
+              <span className="text-caption text-outline">{post.timeAgo}</span>
             </div>
 
             {/* Category Tag */}
-            <div className="bg-primary-container/20 text-on-primary-container px-3 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wide">
+            <div className="bg-primary-container/20 text-on-primary-container px-3 py-1 rounded-xl text-micro font-semibold uppercase tracking-wide">
               {post.categoryLabel}
             </div>
           </div>
 
           {/* Post Title and Body */}
           <div>
-            <h1 className="text-[22px] font-bold text-on-surface leading-tight mb-2">
+            <h1 className="text-heading font-bold text-on-surface leading-tight mb-2">
               {post.title}
             </h1>
-            <p className="text-[15px] text-on-surface-variant font-normal leading-relaxed">
+            <p className="text-body-lg text-on-surface-variant font-normal leading-relaxed">
               {post.content}
             </p>
           </div>
@@ -119,7 +119,7 @@ export const DiscussionScreen: React.FC<DiscussionScreenProps> = ({
                 className="w-full h-full object-cover"
               />
               {post.price && (
-                <div className="absolute bottom-3 right-3 bg-primary text-white text-[14px] font-bold px-3.5 py-1.5 rounded-xl shadow-md">
+                <div className="absolute bottom-3 right-3 bg-primary text-white text-body font-bold px-3.5 py-1.5 rounded-xl shadow-md">
                   {post.price}
                 </div>
               )}
@@ -131,7 +131,7 @@ export const DiscussionScreen: React.FC<DiscussionScreenProps> = ({
             <div className="flex gap-4">
               <button
                 onClick={handleToggleLike}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[14px] font-medium transition-all active:scale-95 ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-body font-medium transition-all active:scale-95 ${
                   isLiked
                     ? 'bg-primary text-white'
                     : 'bg-surface text-on-surface-variant hover:bg-surface-container'
@@ -148,7 +148,7 @@ export const DiscussionScreen: React.FC<DiscussionScreenProps> = ({
                 <span>{likesCount}</span>
               </button>
 
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface text-on-surface-variant text-[14px] font-medium">
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface text-on-surface-variant text-body font-medium">
                 <span className="material-symbols-outlined text-[20px]">
                   chat_bubble_outline
                 </span>
@@ -181,7 +181,7 @@ export const DiscussionScreen: React.FC<DiscussionScreenProps> = ({
             <span className="material-symbols-outlined text-primary text-[22px]">
               forum
             </span>
-            <h2 className="text-[18px] font-bold text-on-surface">
+            <h2 className="text-title font-bold text-on-surface">
               {comments.length} Comments
             </h2>
           </div>
@@ -201,15 +201,15 @@ export const DiscussionScreen: React.FC<DiscussionScreenProps> = ({
                         className="w-9 h-9 rounded-full object-cover border border-surface-container-highest"
                       />
                     ) : (
-                      <div className="w-9 h-9 rounded-full bg-primary/20 text-primary font-bold flex items-center justify-center text-[14px]">
+                      <div className="w-9 h-9 rounded-full bg-primary/20 text-primary font-bold flex items-center justify-center text-body">
                         {comment.author.charAt(0)}
                       </div>
                     )}
                     <div>
-                      <span className="text-[14px] font-bold text-on-surface">
+                      <span className="text-body font-bold text-on-surface">
                         {comment.author}
                       </span>
-                      <span className="text-[11px] text-outline ml-2">
+                      <span className="text-micro text-outline ml-2">
                         {comment.timeAgo}
                       </span>
                     </div>
@@ -217,13 +217,13 @@ export const DiscussionScreen: React.FC<DiscussionScreenProps> = ({
 
                   <button
                     onClick={() => setReplyingTo(comment.author)}
-                    className="text-[12px] font-semibold text-primary hover:underline"
+                    className="text-caption font-semibold text-primary hover:underline"
                   >
                     Reply
                   </button>
                 </div>
 
-                <p className="text-[14px] text-on-surface-variant font-normal leading-relaxed pl-1">
+                <p className="text-body text-on-surface-variant font-normal leading-relaxed pl-1">
                   {comment.content}
                 </p>
 
@@ -238,14 +238,14 @@ export const DiscussionScreen: React.FC<DiscussionScreenProps> = ({
                             alt={reply.author}
                             className="w-6 h-6 rounded-full object-cover"
                           />
-                          <span className="text-[12px] font-semibold text-on-surface">
+                          <span className="text-caption font-semibold text-on-surface">
                             {reply.author}
                           </span>
-                          <span className="text-[10px] text-outline">
+                          <span className="text-micro text-outline">
                             {reply.timeAgo}
                           </span>
                         </div>
-                        <p className="text-[13px] text-on-surface-variant font-normal mt-0.5">
+                        <p className="text-body font-normal text-on-surface-variant mt-0.5">
                           {reply.content}
                         </p>
                       </div>
@@ -262,7 +262,7 @@ export const DiscussionScreen: React.FC<DiscussionScreenProps> = ({
       <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md p-3 px-4 border-t border-surface-container-highest shadow-lg z-40 pb-safe">
         <div className="max-w-xl mx-auto">
           {replyingTo && (
-            <div className="flex items-center justify-between text-[12px] text-primary font-semibold mb-1.5 px-2">
+            <div className="flex items-center justify-between text-caption text-primary font-semibold mb-1.5 px-2">
               <span>Replying to @{replyingTo}</span>
               <button
                 onClick={() => setReplyingTo(null)}
@@ -281,7 +281,7 @@ export const DiscussionScreen: React.FC<DiscussionScreenProps> = ({
                 placeholder={
                   replyingTo ? `Reply to ${replyingTo}...` : 'Add a comment...'
                 }
-                className="w-full bg-transparent border-none outline-none text-[14px] text-on-surface placeholder:text-outline"
+                className="w-full bg-transparent border-none outline-none text-body text-on-surface placeholder:text-outline"
               />
             </div>
             <button

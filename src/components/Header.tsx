@@ -35,7 +35,7 @@ export const Header: React.FC<HeaderProps> = ({
               >
                 <span className="material-symbols-outlined text-[22px]">arrow_back</span>
               </button>
-              <span className="font-extrabold text-[17px] sm:text-[18px] text-slate-900 tracking-tight truncate">
+              <span className="font-extrabold text-title text-slate-900 tracking-tight truncate">
                 {title}
               </span>
             </div>
@@ -46,7 +46,7 @@ export const Header: React.FC<HeaderProps> = ({
                 alt="CNG-Connect Logo"
                 className="h-7 w-auto object-contain shrink-0"
               />
-              <span className="font-extrabold text-[19px] sm:text-[20px] text-primary tracking-tight truncate max-w-[160px] sm:max-w-[240px]">
+              <span className="font-extrabold text-heading text-primary tracking-tight truncate max-w-[160px] sm:max-w-[240px]">
                 {title || 'CNG-Connect'}
               </span>
             </div>

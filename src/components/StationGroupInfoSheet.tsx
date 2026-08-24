@@ -29,7 +29,7 @@ export const StationGroupInfoSheet: React.FC<StationGroupInfoSheetProps> = ({
             <span className="material-symbols-outlined text-primary text-[22px]">
               info
             </span>
-            <h2 className="text-[16px] font-bold text-on-surface">
+            <h2 className="text-body-lg font-bold text-on-surface">
               Station Group Policy
             </h2>
           </div>
@@ -44,7 +44,7 @@ export const StationGroupInfoSheet: React.FC<StationGroupInfoSheetProps> = ({
 
         {/* Canonical 1-Sentence Explainer */}
         <div className="bg-surface border border-outline-variant rounded-2xl p-4">
-          <p className="text-[13.5px] font-medium text-primary leading-relaxed">
+          <p className="text-body font-medium text-primary leading-relaxed">
             Reports and availability chat only happen in a station's group.
           </p>
         </div>
@@ -52,7 +52,7 @@ export const StationGroupInfoSheet: React.FC<StationGroupInfoSheetProps> = ({
         {/* Primary Action Button */}
         <button
           onClick={handleDismiss}
-          className="w-full py-3 min-h-[44px] bg-primary hover:opacity-95 text-on-primary font-bold text-[14px] rounded-full shadow-md active:scale-95 transition-all"
+          className="w-full py-3 min-h-[44px] bg-primary hover:opacity-95 text-on-primary font-bold text-body rounded-full shadow-md active:scale-95 transition-all"
         >
           Got it
         </button>
