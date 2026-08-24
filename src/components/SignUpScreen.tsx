@@ -381,7 +381,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
                     <span className="material-symbols-outlined text-[16px]">sms</span>
                     Serverless SMS OTP Verification
                   </span>
-                  {import.meta.env.DEV && devCode && (
+                  {devCode && (
                     <span className="bg-primary text-status-green text-[10.5px] font-black px-2.5 py-0.5 rounded-full border border-status-green/40">
                       Dev mode — use code {devCode}
                     </span>

@@ -87,6 +87,7 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
       low: 'Reported Low pressure',
       queue: 'Reported Queuing',
       out: 'Reported Out of gas',
+      unknown: 'No recent reports',
     };
 
     const isPhotoVerified = Boolean(attachedPhoto);

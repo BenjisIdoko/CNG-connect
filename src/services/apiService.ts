@@ -29,8 +29,8 @@ export function calculateVerificationMetadata(report: DriverReport): {
 }
 
 // LocalStorage Persistence Fallback Keys
-const STATIONS_STORAGE_KEY = 'gasfinder_stations_v6';
-const POSTS_STORAGE_KEY = 'gasfinder_posts_v6';
+const STATIONS_STORAGE_KEY = 'gasfinder_stations_v7';
+const POSTS_STORAGE_KEY = 'gasfinder_posts_v7';
 
 function purgeStaleLocalStorage() {
   try {
@@ -40,11 +40,13 @@ function purgeStaleLocalStorage() {
       'gasfinder_stations_v3',
       'gasfinder_stations_v4',
       'gasfinder_stations_v5',
+      'gasfinder_stations_v6',
       'gasfinder_posts_v1',
       'gasfinder_posts_v2',
       'gasfinder_posts_v3',
       'gasfinder_posts_v4',
       'gasfinder_posts_v5',
+      'gasfinder_posts_v6',
     ];
     keysToRemove.forEach((k) => localStorage.removeItem(k));
   } catch {
@@ -260,6 +262,7 @@ export const apiService = {
           low: 'Low pressure',
           queue: 'Queuing',
           out: 'Out of gas',
+          unknown: 'No recent reports',
         };
 
         const { error: rpcError } = await supabase.rpc('report_station_status', {
@@ -284,6 +287,7 @@ export const apiService = {
       low: 'Low pressure',
       queue: 'Queuing',
       out: 'Out of gas',
+      unknown: 'No recent reports',
     };
 
     const updated = currentStations.map((st) => {
@@ -467,6 +471,7 @@ export const apiService = {
       low: 'Low Pressure',
       queue: 'Queuing Line',
       out: 'Out of Gas',
+      unknown: 'No recent reports',
     };
 
     const perm = checkNotificationPermission(targetUserState, station.state);

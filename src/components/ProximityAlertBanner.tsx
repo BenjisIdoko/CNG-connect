@@ -34,6 +34,7 @@ export const ProximityAlertBanner: React.FC<ProximityAlertBannerProps> = ({
       low: 'Low Pressure',
       queue: 'Queuing',
       out: 'Out of Gas',
+      unknown: 'No recent reports',
     };
 
     const quickReport: DriverReport = {

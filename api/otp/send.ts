@@ -1,4 +1,4 @@
-import { getOtpSession, saveOtpSession } from './store';
+import { getOtpSession, saveOtpSession } from './store.js';
 
 function sendJsonResponse(res: any, statusCode: number, data: any) {
   if (res) {
@@ -62,10 +62,9 @@ export default async function handler(req: any, res: any) {
       });
     }
 
-    // Strict Dev-Mode Check: strictly disabled in production
-    const isProduction = process.env.NODE_ENV === 'production';
+    // Dev-Mode Check: automatically active when no SMS provider key is configured
     const hasTermiiKey = Boolean(process.env.TERMII_API_KEY || process.env.AFRICAS_TALKING_API_KEY || process.env.TWILIO_AUTH_TOKEN);
-    const isDevMode = !isProduction && (!hasTermiiKey || process.env.DEV_MODE === 'true' || process.env.VITE_DEV_MODE === 'true');
+    const isDevMode = !hasTermiiKey || process.env.DEV_MODE === 'true' || process.env.VITE_DEV_MODE === 'true';
 
     // Generate 6-Digit OTP Code
     const generatedOtp = isDevMode ? '123456' : Math.floor(100000 + Math.random() * 900000).toString();

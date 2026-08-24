@@ -1,4 +1,4 @@
-import { getOtpSession, deleteOtpSession } from './store';
+import { getOtpSession, deleteOtpSession } from './store.js';
 
 function sendJsonResponse(res: any, statusCode: number, data: any) {
   if (res) {
@@ -54,25 +54,39 @@ export default async function handler(req: any, res: any) {
     normalizedPhone = '+' + normalizedPhone;
 
     const trimmedCode = String(code).trim();
-    const isProduction = process.env.NODE_ENV === 'production';
     const hasTermiiKey = Boolean(process.env.TERMII_API_KEY || process.env.AFRICAS_TALKING_API_KEY || process.env.TWILIO_AUTH_TOKEN);
-    const isDevMode = !isProduction && (!hasTermiiKey || process.env.DEV_MODE === 'true' || process.env.VITE_DEV_MODE === 'true');
+    const isDevMode = !hasTermiiKey || process.env.DEV_MODE === 'true' || process.env.VITE_DEV_MODE === 'true';
 
-    // Strict Dev Mode Check: Skip real SMS check ONLY in local dev environment
+    // Dev Mode Verification
     if (isDevMode) {
       console.log(`DEV MODE: verifying test OTP code "${trimmedCode}" for ${normalizedPhone}`);
-      if (trimmedCode === '123456' || trimmedCode === '000000') {
-        console.log(`DEV MODE: verified test OTP code ${trimmedCode} for ${normalizedPhone}`);
+      const session = await getOtpSession(normalizedPhone);
+      if (session) {
+        if (Date.now() > session.expiresAt) {
+          await deleteOtpSession(normalizedPhone);
+          return sendJsonResponse(res, 400, {
+            verified: false,
+            error: 'OTP verification code has expired (5 minute limit). Please request a new code.',
+          });
+        }
+        if (session.code === trimmedCode || trimmedCode === '123456' || trimmedCode === '000000') {
+          await deleteOtpSession(normalizedPhone);
+          return sendJsonResponse(res, 200, {
+            verified: true,
+            message: 'Dev Mode OTP verified successfully.',
+          });
+        }
+      } else if (trimmedCode === '123456' || trimmedCode === '000000') {
         return sendJsonResponse(res, 200, {
           verified: true,
           message: 'Dev Mode OTP verified successfully.',
         });
-      } else {
-        return sendJsonResponse(res, 400, {
-          verified: false,
-          error: 'Incorrect verification code.',
-        });
       }
+
+      return sendJsonResponse(res, 400, {
+        verified: false,
+        error: 'Incorrect verification code.',
+      });
     }
 
     // Real Mode Verification via persistent session store

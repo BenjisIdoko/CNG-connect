@@ -1,4 +1,4 @@
-export type StationStatus = 'full' | 'low' | 'queue' | 'out';
+export type StationStatus = 'full' | 'low' | 'queue' | 'out' | 'unknown';
 export type VerificationLevel = 'unverified_text' | 'quick_tap_geofence' | 'verified_live_photo';
 
 export interface StationMedia {
@@ -43,10 +43,10 @@ export interface GasStation {
   driveTime: string;
   status: StationStatus;
   statusLabel: string;
-  cngPrice: number;
-  priceTrend: 'stable' | 'up' | 'down';
-  pumpPressure: number; // in bar
-  busyEstimate: string;
+  cngPrice?: number;
+  priceTrend?: 'stable' | 'up' | 'down';
+  pumpPressure?: number; // in bar
+  busyEstimate?: string;
   lastUpdated: string;
   verifiedByCommunity: boolean;
   operator?: string; // NIPCO, NNPC, BOVAS, Portland Gas, Axxela, etc.

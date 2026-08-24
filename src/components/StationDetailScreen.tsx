@@ -259,7 +259,9 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                   ? 'bg-[#fe9400] text-white font-bold'
                   : station.status === 'queue'
                   ? 'bg-[#FFB800] text-[#141d19] font-bold'
-                  : 'bg-[#6a7b72] text-white font-bold'
+                  : station.status === 'out'
+                  ? 'bg-[#ba1a1a] text-white font-bold'
+                  : 'bg-slate-200 text-slate-700 border border-slate-300 font-bold'
               }`}
             >
               <span
@@ -272,10 +274,12 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                   ? 'schedule'
                   : station.status === 'low'
                   ? 'battery_3_bar'
-                  : 'not_interested'}
+                  : station.status === 'out'
+                  ? 'not_interested'
+                  : 'help_outline'}
               </span>
               <span className="text-[11.5px] tracking-wider uppercase font-extrabold">
-                {station.statusLabel}
+                {station.statusLabel || 'No recent reports'}
               </span>
             </div>
 
@@ -285,7 +289,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                 schedule
               </span>
               <span className="text-[11.5px] font-semibold text-[#746300]">
-                {station.busyEstimate}
+                {station.busyEstimate || 'No reports yet'}
               </span>
             </div>
 
@@ -299,21 +303,40 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
         </div>
 
         {/* Station Image Banner with Distance Badge */}
-        <div className="relative rounded-2xl overflow-hidden shadow-xs border border-[#dbe5de] h-36 bg-[#e6f0e9]">
-          <div
-            className="w-full h-full bg-cover bg-center"
-            style={{ backgroundImage: `url('${images[1] || images?.[0]}')` }}
-          >
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent flex items-end p-4">
-              <div className="flex items-center justify-between w-full">
-                <span className="bg-black/60 backdrop-blur-md text-white text-[12px] font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm">
-                  <span className="material-symbols-outlined text-[16px] text-[#00E676]">near_me</span>
-                  <span>{station.distance} • {station.driveTime}</span>
-                </span>
+        {images.length > 0 ? (
+          <div className="relative rounded-2xl overflow-hidden shadow-xs border border-[#dbe5de] h-36 bg-[#e6f0e9]">
+            <div
+              className="w-full h-full bg-cover bg-center"
+              style={{ backgroundImage: `url('${images[1] || images?.[0]}')` }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent flex items-end p-4">
+                <div className="flex items-center justify-between w-full">
+                  <span className="bg-black/60 backdrop-blur-md text-white text-[12px] font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm">
+                    <span className="material-symbols-outlined text-[16px] text-[#00E676]">near_me</span>
+                    <span>{station.distance} • {station.driveTime}</span>
+                  </span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <div className="relative rounded-2xl overflow-hidden shadow-xs border border-[#dbe5de] p-4 bg-gradient-to-r from-[#004D40] via-[#006c50] to-emerald-900 text-white flex items-center justify-between gap-3">
+            <div>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#00E676] flex items-center gap-1">
+                <span className="material-symbols-outlined text-[13px]">photo_camera</span>
+                <span>No Driver Photos Yet</span>
+              </span>
+              <h4 className="text-[14.5px] font-extrabold text-white mt-0.5">Be the first to capture a live photo</h4>
+              <p className="text-[11.5px] text-emerald-100/80 mt-0.5">{station.distance} • {station.driveTime}</p>
+            </div>
+            <button
+              onClick={() => onOpenReportModal(station)}
+              className="bg-[#00E676] hover:opacity-95 text-[#004D40] text-[12px] font-extrabold px-3.5 py-2 rounded-full shadow-md shrink-0 active:scale-95 transition-all"
+            >
+              Add Photo
+            </button>
+          </div>
+        )}
 
         {/* Price & Pump Pressure Bento Cards */}
         <div className="grid grid-cols-2 gap-3">
@@ -322,14 +345,21 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
               CNG Price
             </span>
             <div className="flex items-baseline gap-1 my-1">
-              <span className="text-[28px] font-bold text-[#004D40]">
-                ₦{station.cngPrice}
-              </span>
-              <span className="text-[13px] font-normal text-slate-400">/kg</span>
+              {station.cngPrice ? (
+                <>
+                  <span className="text-[28px] font-bold text-[#004D40]">
+                    ₦{station.cngPrice}
+                  </span>
+                  <span className="text-[13px] font-normal text-slate-400">/kg</span>
+                </>
+              ) : (
+                <span className="text-[18px] font-bold text-slate-400">
+                  Unreported
+                </span>
+              )}
             </div>
-            <span className="text-[11px] font-semibold text-[#00E676] flex items-center gap-1">
-              <span className="material-symbols-outlined text-[14px]">arrow_downward</span>
-              <span>{station.priceTrend === 'stable' ? 'Official Rate' : 'Updated'}</span>
+            <span className="text-[11px] font-semibold text-[#006c50] flex items-center gap-1">
+              <span>{station.cngPrice ? (station.priceTrend === 'stable' ? 'Official Rate' : 'Updated') : 'No price reports yet'}</span>
             </span>
           </div>
 
@@ -341,62 +371,78 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
               </span>
               <span
                 className={`text-[9.5px] font-semibold px-2 py-0.5 rounded-full border ${
-                  station.pumpPressure >= 180
+                  !station.pumpPressure
+                    ? 'bg-slate-100 text-slate-600 border-slate-200'
+                    : station.pumpPressure >= 180
                     ? 'bg-emerald-50 text-[#006c50] border-emerald-200'
                     : station.pumpPressure >= 130
                     ? 'bg-amber-50 text-amber-900 border-amber-200'
                     : 'bg-rose-50 text-rose-900 border-rose-200'
                 }`}
               >
-                {station.pumpPressure >= 180 ? 'Optimal' : station.pumpPressure >= 130 ? 'Moderate' : 'Low'}
+                {!station.pumpPressure
+                  ? 'No data'
+                  : station.pumpPressure >= 180
+                  ? 'Optimal'
+                  : station.pumpPressure >= 130
+                  ? 'Moderate'
+                  : 'Low'}
               </span>
             </div>
 
-            {/* SVG Arc Gauge */}
-            <div className="relative flex flex-col items-center justify-center my-0.5">
-              <svg viewBox="0 0 100 55" className="w-28 h-16 transform transition-transform group-hover:scale-105">
-                {/* Background Track Arc */}
-                <path
-                  d="M 10 50 A 40 40 0 0 1 90 50"
-                  fill="none"
-                  stroke="#e6f0e9"
-                  strokeWidth="9"
-                  strokeLinecap="round"
-                />
-                {/* Gauge Colored Arc */}
-                <path
-                  d="M 10 50 A 40 40 0 0 1 90 50"
-                  fill="none"
-                  stroke={
-                    station.pumpPressure >= 180
-                      ? '#00c853'
-                      : station.pumpPressure >= 130
-                      ? '#fe9400'
-                      : '#ba1a1a'
-                  }
-                  strokeWidth="9"
-                  strokeLinecap="round"
-                  strokeDasharray="125.6"
-                  strokeDashoffset={125.6 * (1 - Math.min(station.pumpPressure, 220) / 220)}
-                  className="transition-all duration-700 ease-out"
-                />
-              </svg>
+            {station.pumpPressure ? (
+              <>
+                <div className="relative flex flex-col items-center justify-center my-0.5">
+                  <svg viewBox="0 0 100 55" className="w-28 h-16 transform transition-transform group-hover:scale-105">
+                    {/* Background Track Arc */}
+                    <path
+                      d="M 10 50 A 40 40 0 0 1 90 50"
+                      fill="none"
+                      stroke="#e6f0e9"
+                      strokeWidth="9"
+                      strokeLinecap="round"
+                    />
+                    {/* Gauge Colored Arc */}
+                    <path
+                      d="M 10 50 A 40 40 0 0 1 90 50"
+                      fill="none"
+                      stroke={
+                        station.pumpPressure >= 180
+                          ? '#00c853'
+                          : station.pumpPressure >= 130
+                          ? '#fe9400'
+                          : '#ba1a1a'
+                      }
+                      strokeWidth="9"
+                      strokeLinecap="round"
+                      strokeDasharray="125.6"
+                      strokeDashoffset={125.6 * (1 - Math.min(station.pumpPressure, 220) / 220)}
+                      className="transition-all duration-700 ease-out"
+                    />
+                  </svg>
 
-              <div className="absolute bottom-0 flex flex-col items-center text-center -mb-1">
-                <span className="text-[20px] font-extrabold leading-none text-slate-900">
-                  {station.pumpPressure}
-                </span>
-                <span className="text-[9.5px] font-semibold text-slate-400 uppercase tracking-widest -mt-0.5">
-                  bar
-                </span>
+                  <div className="absolute bottom-0 flex flex-col items-center text-center -mb-1">
+                    <span className="text-[20px] font-extrabold leading-none text-slate-900">
+                      {station.pumpPressure}
+                    </span>
+                    <span className="text-[9.5px] font-semibold text-slate-400 uppercase tracking-widest -mt-0.5">
+                      bar
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between text-[10px] font-bold text-slate-400 pt-1 border-t border-slate-100">
+                  <span>0 bar</span>
+                  <span className="text-[#006c50] font-semibold">{Math.round((station.pumpPressure / 220) * 100)}% Max</span>
+                  <span>220 bar</span>
+                </div>
+              </>
+            ) : (
+              <div className="my-2 text-center flex flex-col items-center justify-center py-1">
+                <span className="material-symbols-outlined text-[22px] text-slate-400 mb-0.5">speed</span>
+                <p className="text-[11.5px] font-bold text-slate-700 leading-tight">No reports yet — be the first</p>
               </div>
-            </div>
-
-            <div className="flex items-center justify-between text-[10px] font-bold text-slate-400 pt-1 border-t border-slate-100">
-              <span>0 bar</span>
-              <span className="text-[#006c50] font-semibold">{Math.round((station.pumpPressure / 220) * 100)}% Max</span>
-              <span>220 bar</span>
-            </div>
+            )}
           </div>
         </div>
 
@@ -694,21 +740,37 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
               </button>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              {images.map((imgUrl, idx) => (
-                <div
-                  key={idx}
-                  onClick={() => setSelectedPhoto(imgUrl)}
-                  className="w-full h-36 rounded-xl overflow-hidden border border-[#dbe5de] shadow-xs cursor-pointer relative group bg-[#e6f0e9]"
+            {images.length > 0 ? (
+              <div className="grid grid-cols-2 gap-3">
+                {images.map((imgUrl, idx) => (
+                  <div
+                    key={idx}
+                    onClick={() => setSelectedPhoto(imgUrl)}
+                    className="w-full h-36 rounded-xl overflow-hidden border border-[#dbe5de] shadow-xs cursor-pointer relative group bg-[#e6f0e9]"
+                  >
+                    <img
+                      src={imgUrl}
+                      alt={`Station photo ${idx + 1}`}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="bg-white rounded-2xl p-6 text-center border border-slate-200/80 shadow-xs flex flex-col items-center gap-2">
+                <span className="material-symbols-outlined text-[36px] text-slate-400">photo_camera</span>
+                <h4 className="font-extrabold text-slate-900 text-[15px]">No Driver Photos Uploaded Yet</h4>
+                <p className="text-[12px] text-slate-500 font-medium max-w-xs">
+                  Only live camera photos taken at this station are displayed here.
+                </p>
+                <button
+                  onClick={() => onOpenReportModal(station)}
+                  className="mt-1 px-4 py-2 bg-[#006c50] hover:bg-[#004D40] text-white text-[12px] font-extrabold rounded-full shadow-md active:scale-95 transition-all"
                 >
-                  <img
-                    src={imgUrl}
-                    alt={`Station photo ${idx + 1}`}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                </div>
-              ))}
-            </div>
+                  Capture Live Photo
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>

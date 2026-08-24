@@ -176,7 +176,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       st.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
       st.state.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (st.operator && st.operator.toLowerCase().includes(searchQuery.toLowerCase()));
-    const matchesPressure = st.pumpPressure >= minPressure;
+    const matchesPressure = minPressure === 0 || (st.pumpPressure != null && st.pumpPressure >= minPressure);
     const matchesDistance = maxDistanceKm === 0 || getDistanceKm(st) <= maxDistanceKm;
     return matchesFilter && matchesCity && matchesSearch && matchesPressure && matchesDistance;
   });
@@ -243,7 +243,10 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       let colorClass = '#00c853';
       if (st.status === 'queue') colorClass = '#f59e0b';
       if (st.status === 'low') colorClass = '#fe9400';
-      if (st.status === 'out') colorClass = '#64748b';
+      if (st.status === 'out') colorClass = '#ef4444';
+      if (st.status === 'unknown') colorClass = '#94a3b8';
+
+      const pressureText = st.pumpPressure ? `${st.pumpPressure} bar` : (st.status === 'unknown' ? 'No reports' : 'CNG');
 
       const customIcon = L.divIcon({
         className: 'custom-leaflet-marker',
@@ -251,7 +254,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
           <div class="relative group cursor-pointer flex flex-col items-center">
             <div class="px-2 py-0.5 rounded-full text-[10px] font-black text-white shadow-md flex items-center gap-1 transition-transform transform ${isSelected ? 'scale-125' : ''}" style="background-color: ${colorClass};">
               <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
-              <span>${st.pumpPressure} bar</span>
+              <span>${pressureText}</span>
             </div>
             <div class="w-2.5 h-2.5 rotate-45 border-r border-b border-white -mt-1 shadow-xs" style="background-color: ${colorClass};"></div>
           </div>
@@ -367,31 +370,38 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       case 'full':
         return {
           barColor: 'bg-status-green',
-          badgeBg: 'bg-surface-container border-outline-variant text-on-surface-variant',
+          badgeBg: 'bg-emerald-50 border-emerald-200 text-[#006c50]',
           dotColor: 'bg-status-green',
           label: 'Full stock',
         };
       case 'queue':
         return {
-          barColor: 'bg-status-orange',
-          badgeBg: 'bg-surface-container border-outline-variant text-on-surface-variant',
-          dotColor: 'bg-status-orange',
+          barColor: 'bg-[#f59e0b]',
+          badgeBg: 'bg-amber-50 border-amber-200 text-amber-900',
+          dotColor: 'bg-[#f59e0b]',
           label: 'Queuing',
         };
       case 'low':
         return {
-          barColor: 'bg-status-orange',
-          badgeBg: 'bg-surface-container border-outline-variant text-on-surface-variant',
-          dotColor: 'bg-status-orange',
+          barColor: 'bg-[#fe9400]',
+          badgeBg: 'bg-orange-50 border-orange-200 text-orange-900',
+          dotColor: 'bg-[#fe9400]',
           label: 'Low pressure',
         };
       case 'out':
+        return {
+          barColor: 'bg-rose-500',
+          badgeBg: 'bg-rose-50 border-rose-200 text-rose-900',
+          dotColor: 'bg-rose-500',
+          label: 'Out of gas',
+        };
+      case 'unknown':
       default:
         return {
-          barColor: 'bg-outline',
-          badgeBg: 'bg-surface-container border-outline-variant text-on-surface-variant',
-          dotColor: 'bg-outline',
-          label: 'Out of gas',
+          barColor: 'bg-slate-400',
+          badgeBg: 'bg-slate-100 border-slate-200 text-slate-700',
+          dotColor: 'bg-slate-400',
+          label: 'No recent reports',
         };
     }
   };
@@ -586,7 +596,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                                   <span className="font-bold text-primary">{station.distance}</span>
                                   <span>•</span>
                                   <span className="font-medium">{station.statusLabel}</span>
-                                  {station.pumpPressure > 0 && (
+                                  {Boolean(station.pumpPressure && station.pumpPressure > 0) && (
                                     <>
                                       <span>•</span>
                                       <span className="font-semibold text-on-surface-variant">{station.pumpPressure} bar</span>
