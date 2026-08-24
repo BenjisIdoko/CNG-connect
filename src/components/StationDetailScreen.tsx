@@ -4,6 +4,7 @@ import { ASSETS } from '../data/mockData';
 import { openExternalMaps } from '../utils/navigationHelper';
 import { StationGroupInfoSheet } from './StationGroupInfoSheet';
 import { formatStationAge } from '../utils/timeUtils';
+import { openWhatsAppShare } from '../utils/shareMessageBuilder';
 
 interface StationDetailScreenProps {
   station: GasStation;
@@ -810,6 +811,17 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
               <span className="bg-emerald-100 text-[#006c50] text-[10.5px] font-bold px-2 py-0.5 rounded-full ml-0.5 shrink-0">
                 {station.distance}
               </span>
+            </button>
+            <button
+              onClick={() => openWhatsAppShare(station)}
+              aria-label="Share update on WhatsApp"
+              title="Share to WhatsApp"
+              className="px-3.5 h-12 bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold text-[13px] rounded-full flex items-center justify-center gap-1.5 shadow-md active:scale-[0.98] transition-all shrink-0"
+            >
+              <span className="material-symbols-outlined text-[18px] shrink-0">
+                share
+              </span>
+              <span className="whitespace-nowrap">Share</span>
             </button>
           </div>
 

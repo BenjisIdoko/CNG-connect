@@ -7,6 +7,7 @@ import { GasStation, StationStatus } from '../types';
 import { ASSETS } from '../data/mockData';
 import { Modal } from './common/Modal';
 import { formatStationAge } from '../utils/timeUtils';
+import { openWhatsAppShare } from '../utils/shareMessageBuilder';
 
 export type GpsStatus = 'active' | 'denied' | 'unavailable';
 
@@ -557,6 +558,19 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
+                                  openWhatsAppShare(station);
+                                }}
+                                aria-label={`Share ${station.name} on WhatsApp`}
+                                title="Share update on WhatsApp"
+                                className="w-8 h-8 rounded-full bg-emerald-50 text-[#25D366] hover:bg-emerald-100 flex items-center justify-center active:scale-95 transition-all"
+                              >
+                                <span className="material-symbols-outlined text-[16px]">
+                                  share
+                                </span>
+                              </button>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
                                   onNavigate(station);
                                 }}
                                 aria-label={`Navigate to ${station.name}`}
@@ -643,17 +657,29 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                                 <span>•</span>
                                 <span>{st.distance}</span>
                               </div>
-
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  onNavigate(st);
-                                }}
-                                className="px-2.5 py-1 bg-status-green text-on-surface rounded-full text-[11px] font-bold shadow-xs active:scale-95 transition-all flex items-center gap-1"
-                              >
-                                <span className="material-symbols-outlined text-[13px]">navigation</span>
-                                <span>Nav</span>
-                              </button>
+                              <div className="flex items-center gap-1">
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    openWhatsAppShare(st);
+                                  }}
+                                  aria-label={`Share ${st.name} on WhatsApp`}
+                                  title="Share to WhatsApp"
+                                  className="w-6 h-6 rounded-full bg-emerald-50 text-[#25D366] hover:bg-emerald-100 flex items-center justify-center active:scale-95 transition-all"
+                                >
+                                  <span className="material-symbols-outlined text-[13px]">share</span>
+                                </button>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    onNavigate(st);
+                                  }}
+                                  className="px-2.5 py-1 bg-status-green text-on-surface rounded-full text-[11px] font-bold shadow-xs active:scale-95 transition-all flex items-center gap-1"
+                                >
+                                  <span className="material-symbols-outlined text-[13px]">navigation</span>
+                                  <span>Nav</span>
+                                </button>
+                              </div>
                             </div>
                           </div>
                         ))}
