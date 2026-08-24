@@ -8,12 +8,27 @@ export function buildStationShareMessage(station: GasStation): string {
   const status = station.statusLabel || 'Unknown status';
   const latestReport = station.reports?.[0];
   const waitMinutes = latestReport?.waitMinutes;
-
-  const waitPart = waitMinutes && waitMinutes > 0 ? `, ${waitMinutes}min wait` : '';
-  const pressurePart = station.pumpPressure && station.pumpPressure > 0 ? `, ${station.pumpPressure} bar` : '';
   const shareUrl = buildStationShareUrl(station.id);
 
-  return `⛽ ${station.name} (${station.city}) — ${status}${waitPart}${pressurePart} via CNG-Connect. Check live status: ${shareUrl}`;
+  const lines: string[] = [
+    `⛽ *CNG Station Alert*`,
+    `📍 *${station.name}* (${station.city})`,
+    `📊 Status: *${status}*`,
+  ];
+
+  if (waitMinutes && waitMinutes > 0) {
+    lines.push(`⏱️ Est. Wait: *${waitMinutes} mins*`);
+  } else if (station.busyEstimate) {
+    lines.push(`⏱️ Queue: *${station.busyEstimate}*`);
+  }
+
+  if (station.pumpPressure && station.pumpPressure > 0) {
+    lines.push(`⚡ Pump Pressure: *${station.pumpPressure} bar*`);
+  }
+
+  lines.push(`\n📲 Check live driver updates on CNG-Connect:\n${shareUrl}`);
+
+  return lines.join('\n');
 }
 
 export function openWhatsAppShare(station: GasStation): void {

@@ -295,11 +295,20 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
               </span>
             </div>
 
-            {/* Time / Distance Info */}
+            {/* Time / Distance Info & Share Status Button */}
             <div className="flex items-center gap-2 text-[12px] font-medium text-slate-500 ml-auto">
               <span className={`flex items-center gap-1 font-bold ${station.status === 'unknown' ? 'text-slate-400' : 'text-[#006c50]'}`}>
                 {formatStationAge(station)}
               </span>
+              <button
+                onClick={() => openWhatsAppShare(station)}
+                aria-label="Share station status on WhatsApp"
+                title="Share live status to WhatsApp"
+                className="bg-[#25D366]/10 hover:bg-[#25D366]/20 border border-[#25D366]/40 text-[#1ebd59] rounded-full px-2.5 py-1 flex items-center gap-1 text-[11px] font-bold transition-all active:scale-95 ml-1"
+              >
+                <span className="material-symbols-outlined text-[14px]">share</span>
+                <span>Share</span>
+              </button>
             </div>
           </div>
         </div>

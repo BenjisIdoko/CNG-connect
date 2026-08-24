@@ -42,10 +42,11 @@ describe('shareMessageBuilder', () => {
 
   it('builds a full WhatsApp share message with name, status, wait time, pressure, and URL', () => {
     const message = buildStationShareMessage(sampleStation);
-    expect(message).toContain('⛽ NIPCO CNG Station (Abuja FCT)');
-    expect(message).toContain('Full stock');
-    expect(message).toContain('10min wait');
-    expect(message).toContain('215 bar');
+    expect(message).toContain('⛽ *CNG Station Alert*');
+    expect(message).toContain('📍 *NIPCO CNG Station* (Abuja FCT)');
+    expect(message).toContain('📊 Status: *Full stock*');
+    expect(message).toContain('⏱️ Est. Wait: *10 mins*');
+    expect(message).toContain('⚡ Pump Pressure: *215 bar*');
     expect(message).toContain('https://cng-connect.vercel.app?station=nipc-001');
   });
 
@@ -56,8 +57,9 @@ describe('shareMessageBuilder', () => {
       reports: [],
     };
     const message = buildStationShareMessage(minimalStation);
-    expect(message).toBe(
-      '⛽ NIPCO CNG Station (Abuja FCT) — Full stock via CNG-Connect. Check live status: https://cng-connect.vercel.app?station=nipc-001'
-    );
+    expect(message).toContain('⛽ *CNG Station Alert*');
+    expect(message).toContain('📊 Status: *Full stock*');
+    expect(message).not.toContain('⚡ Pump Pressure');
+    expect(message).toContain('https://cng-connect.vercel.app?station=nipc-001');
   });
 });
