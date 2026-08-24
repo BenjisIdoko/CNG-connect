@@ -8,9 +8,9 @@
 [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4.1-38B2AC.svg?logo=tailwind-css)](https://tailwindcss.com/)
 [![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL%20%26%20Realtime-emerald.svg?logo=supabase)](https://supabase.com/)
 [![Vercel](https://img.shields.io/badge/Vercel-Serverless-black.svg?logo=vercel)](https://vercel.com/)
-[![Tests](https://img.shields.io/badge/Tests-39%2F39%20Passed-success.svg)](https://vitest.dev/)
+[![Tests](https://img.shields.io/badge/Tests-45%2F45%20Passed-success.svg)](https://vitest.dev/)
 
-**CNG-Connect** is a high-performance web and mobile web application built for Nigerian commercial and private drivers transitioning to Compressed Natural Gas (CNG). Developed to support the Presidential CNG Initiative (Pi-CNG), the platform provides real-time CNG station tracking, crowdsourced pump pressure reporting (up to 220 bar), directory of 451 accredited Pi-CNG conversion workshops, an interactive fuel savings & payback ROI calculator, and an AI-powered driver assistant.
+**CNG-Connect** is a high-performance web application built for Nigerian commercial (Bolt, Uber, inDrive) and private drivers transitioning to Compressed Natural Gas (CNG). Developed in support of the Presidential CNG Initiative (Pi-CNG), the platform provides real-time CNG station tracking, crowdsourced pump status and pressure reporting (up to 220 bar), directory of 451 accredited Pi-CNG conversion workshops, an interactive fuel savings & payback ROI calculator, and an AI-powered driver assistant.
 
 ---
 
@@ -22,27 +22,47 @@
 - **Filter Controls**: Filter stations by pump pressure (0 to 220 bar), distance radius (5km to 50km), and live availability status (*Full Stock*, *Queuing*, *Low Pressure*, *Out of Gas*, *No Recent Reports*).
 - **One-Tap Native Navigation**: Deep-links directly to Google Maps, Apple Maps, or Waze (`https://www.google.com/maps/dir/?api=1&destination=LAT,LNG`).
 
-### 🛠️ 2. 451 Pi-CNG Accredited Conversion Centers
+### ⏱️ 2. Human-Readable Station Report Age Copy
+- **Age Transparency**: Displays human-readable age text everywhere stations appear (list cards, map drawers, photo carousels, and station details).
+- **Clear Copy**: Formats timestamps into unambiguous driver-friendly text:
+  - `"Updated Just now"`
+  - `"Updated 5 min ago"`
+  - `"Updated 2 hrs ago"`
+  - `"No recent report"` (when status is unknown or `lastUpdated` is missing/stale like *"Seeded from PCI"*).
+- **Trust-First UI**: Green status badges (*Full Stock*) are never rendered without visible report age text.
+
+### ⚡ 3. Fast 1-Tap Driver Status Reporting
+- **Driver-Centric UI**: Designed for fast operation by commercial and private Nigerian drivers (~28–70 years old).
+- **Large Full-Width Action Buttons**:
+  - 🟢 **Full stock (Fast pump)** (`bg-emerald-600`)
+  - 🟡 **Long queue / Queuing** (`bg-amber-500`)
+  - 🟠 **Low pressure** (`bg-orange-500`)
+  - 🔴 **Out of gas** (`bg-rose-600`)
+- **Optional Secondary Details**: Optional wait-time stepper, live camera photo capture (anti-fake verification), and driver notes are grouped into an expandable section (`+ Add details`), enabling single-tap submission.
+- **Instant Confirmation**: Submitting a report instantly updates local storage and displays a friendly confirmation toast: `"Thanks. Other drivers can see this."`
+
+### 🌐 4. Single Source of Truth Geolocation & Weak Network Resilience
+- **Unified Location Engine**: Unified GPS acquisition in `App.tsx` prevents duplicate position watches, minimizes battery drain, and maintains consistent distance & drive time math (`Math.round(distKm * 2.5 + 2) min drive`).
+- **Clear Permission State**: When GPS access is denied, displays a clear status notice: `"Turn on location to find nearby stations"`.
+- **Reliable Offline Fallback**: Detects weak network connectivity and displays a plain-language banner (`"No network. Showing last known stations."`), persisting cached stations in `localStorage` (`gasfinder_stations_v7`). Automatically refetches and syncs when back online.
+
+### 🛠️ 5. 451 Pi-CNG Accredited Conversion Centers
 - Searchable directory of 451 certified conversion centers across Nigeria.
 - Filter by LGA, State, or center code (e.g. `LA5137YGK`).
 - In-app conversion appointment booking modal for dual-fuel kit installation and cylinder safety testing.
 
-### 💰 3. Interactive Fuel Savings & Payback ROI Calculator
+### 💰 6. Interactive Fuel Savings & Payback ROI Calculator
 - **Real-Time Savings Simulator**: Calculate exact monthly and annual savings (₦) by adjusting daily driving distance (km/day), petrol vs. CNG prices, and vehicle mileage.
 - **Pi-CNG Grant vs. Private Kit**: Toggle between the free Presidential CNG Initiative commercial driver grant (₦0) and private conversion kits (₦750,000) to compute payback period in months.
 - **Environmental Impact**: Computes annual CO₂ emissions cut (tons/year).
 - Embedded directly into driver profiles and accessible via modal dialogs.
 
-### 📲 4. Serverless SMS OTP & Rate-Limited Security
+### 📲 7. Serverless SMS OTP & Rate-Limited Security
 - Serverless authentication powered by `/api/otp/send` and `/api/otp/verify`.
 - SMS OTP dispatches via Termii and Africa's Talking API gateways.
 - **Rate-Limiting & Cooldown**: Strict 60-second cooldown per phone number returning HTTP 429 (`Too Many Requests`) to prevent SMS credit depletion.
 
-### 🔔 5. Geofenced Proximity Alerts & Offline Resilience
-- **Automated Geofence Nudges**: Triggers location nudges when a driver arrives within 800m of a stale station needing a status report.
-- **Offline Caching & PWA**: Persists station data in `localStorage` (`gasfinder_stations_v7`) with automated offline banner detection (`!navigator.onLine`).
-
-### 💬 6. Driver Community & CNG-Connect AI Guide
+### 💬 8. Driver Community & CNG-Connect AI Guide
 - **Live Discussion Forum**: Category-filtered forum (*Maintenance*, *Parts*, *Reviews*, *Deals*, *Conversions*) with photo attachments and upvoting.
 - **CNG-Connect AI Guide**: Context-aware AI assistant tracking nationwide pump pressures, wait times, and station recommendations.
 
@@ -81,8 +101,9 @@ CNG-connect/
 │   │   │   ├── Modal.tsx       # Accessible Modal Primitive (z-[100])
 │   │   │   └── ImageWithFallback.tsx
 │   │   ├── MapScreen.tsx       # Leaflet Map & Clustered Stations
-│   │   ├── StationDetailScreen.tsx
-│   │   ├── ConversionCentersScreen.tsx
+│   │   ├── StationDetailScreen.tsx # Detailed station specs & live report timeline
+│   │   ├── ReportStatusModal.tsx   # Fast 1-Tap Driver Report Modal
+│   │   ├── ConversionCentersScreen.tsx # Accredited Workshop Directory
 │   │   ├── CngRoiCalculatorModal.tsx # Fuel Savings ROI Calculator
 │   │   ├── ProfileScreen.tsx   # Driver Profile & Editable Details
 │   │   ├── CommunityScreen.tsx # Driver Forum & Discussion Cards
@@ -96,11 +117,15 @@ CNG-connect/
 │   │   ├── pci-stations-seed.json
 │   │   └── pci-conversion-centers-seed.json
 │   ├── services/
-│   │   ├── apiService.ts       # Supabase Client & Realtime Sync
+│   │   ├── apiService.ts       # Supabase Client, Local Cache & Realtime Sync
 │   │   ├── otpService.ts       # Client OTP API Service
 │   │   └── supabaseClient.ts   # Supabase Client Initialization
+│   ├── utils/
+│   │   ├── timeUtils.ts        # Human-readable station age formatter
+│   │   ├── phoneValidator.ts   # Nigerian phone number validation helper
+│   │   └── permissionManager.ts# Presence & live update permission checks
 │   ├── types.ts                # TypeScript Interfaces & Models
-│   ├── App.tsx                 # Main Application Container
+│   ├── App.tsx                 # Main Application Container & GPS Watcher
 │   └── main.tsx                # Entrypoint & Context Provider Wrapping
 ├── index.html                  # HTML Shell
 ├── package.json
@@ -158,7 +183,7 @@ CNG-connect/
   ```bash
   npm test
   ```
-  *(Executes 39 Vitest unit tests across OTP services, proximity alert engine, permissions, and phone validation).*
+  *(Executes 45 Vitest unit tests across station age formatting, OTP services, proximity alert engine, permissions, and phone validation).*
 
 - **Run TypeScript Compiler Check**:
   ```bash
