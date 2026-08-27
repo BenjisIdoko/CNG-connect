@@ -28,6 +28,7 @@ interface StationContextType {
   handleToggleLikePost: (postId: string) => void;
   handleCreatePost: (newPost: CommunityPost) => void;
   handleOpenReportModal: (station: GasStation) => void;
+  handleUpdateStationLocation: (stationId: string, lat: number, lng: number) => Promise<void>;
 }
 
 const StationContext = createContext<StationContextType | undefined>(undefined);
@@ -175,6 +176,21 @@ export const StationProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setPosts((prev) => [newPost, ...prev]);
   };
 
+  const handleUpdateStationLocation = async (stationId: string, lat: number, lng: number) => {
+    const updated = await apiService.updateStationLocation(stationId, lat, lng);
+    if (updated) {
+      setStations((prev) =>
+        prev.map((st) => (st.id === stationId ? updated : st))
+      );
+      if (activeDetailStation?.id === stationId) {
+        setActiveDetailStation(updated);
+      }
+      if (selectedStation?.id === stationId) {
+        setSelectedStation(updated);
+      }
+    }
+  };
+
   return (
     <StationContext.Provider
       value={{
@@ -199,6 +215,7 @@ export const StationProvider: React.FC<{ children: React.ReactNode }> = ({ child
         handleToggleLikePost,
         handleCreatePost,
         handleOpenReportModal,
+        handleUpdateStationLocation,
       }}
     >
       {children}

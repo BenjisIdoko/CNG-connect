@@ -387,6 +387,20 @@ export const App: React.FC = () => {
     showToast('Comment posted to Station Group!');
   };
 
+  const handleUpdateLocation = async (stationId: string, lat: number, lng: number) => {
+    const updated = await apiService.updateStationLocation(stationId, lat, lng);
+    if (updated) {
+      setStations((prev) => prev.map((st) => (st.id === stationId ? updated : st)));
+      if (activeDetailStation?.id === stationId) {
+        setActiveDetailStation(updated);
+      }
+      if (selectedStation?.id === stationId) {
+        setSelectedStation(updated);
+      }
+      showToast('Station exact GPS location updated!');
+    }
+  };
+
   const handleNavigate = (station: GasStation) => {
     setNavigatingStation(station);
     showToast(`Navigation summary for ${station.name} (${station.distance})`);
@@ -537,6 +551,7 @@ export const App: React.FC = () => {
               onOpenReportModal={handleOpenReportModal}
               onNavigate={handleNavigate}
               onAddStationComment={handleAddStationComment}
+              onUpdateLocation={handleUpdateLocation}
             />
           ) : activeTab === 'map' ? (
             <MapScreen

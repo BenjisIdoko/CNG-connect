@@ -146,7 +146,7 @@ function extractCity(address: string, state: string): string {
   return state;
 }
 
-function getExactDistrictCoords(address: string, state: string, idx: number): { lat: number; lng: number } {
+function getExactDistrictCoords(address: string, state: string, idx: number): { lat: number; lng: number; isGpsConfirmed?: boolean } {
   const addr = address.toLowerCase();
 
   if (state === 'FCT Abuja') {
@@ -175,6 +175,7 @@ function getExactDistrictCoords(address: string, state: string, idx: number): { 
     if (addr.includes('ikorodu')) return { lat: 6.6189, lng: 3.5042 };
     if (addr.includes('idimu') || addr.includes('ikotun')) return { lat: 6.5512, lng: 3.2689 };
     if (addr.includes('agege') || addr.includes('ipaja')) return { lat: 6.6189, lng: 3.3215 };
+    if (addr.includes('ogudu')) return { lat: 6.5689, lng: 3.3912 };
   }
 
   if (state === 'Oyo') {
@@ -182,6 +183,50 @@ function getExactDistrictCoords(address: string, state: string, idx: number): { 
     if (addr.includes('dugbe')) return { lat: 7.3872, lng: 3.8891 };
     if (addr.includes('ring road') || addr.includes('challenge')) return { lat: 7.3562, lng: 3.8690 };
     if (addr.includes('bodija') || addr.includes('ajibode')) return { lat: 7.4215, lng: 3.8990 };
+  }
+
+  if (state === 'Edo') {
+    if (addr.includes('sapele') || addr.includes('pz junction')) return { lat: 6.3125, lng: 5.6189 };
+    if (addr.includes('sakponba') || addr.includes('egba')) return { lat: 6.3289, lng: 5.6412 };
+    if (addr.includes('ewu') || addr.includes('auchi')) return { lat: 6.7891, lng: 6.2189 };
+    if (addr.includes('uselu')) return { lat: 6.3689, lng: 5.6121 };
+    if (addr.includes('bypass')) return { lat: 6.3456, lng: 5.5890 };
+  }
+
+  if (state === 'Delta') {
+    if (addr.includes('effurun') || addr.includes('warri')) return { lat: 5.5544, lng: 5.7932 };
+    if (addr.includes('asaba')) return { lat: 6.1989, lng: 6.7218 };
+    if (addr.includes('agbor')) return { lat: 6.2512, lng: 6.1890 };
+  }
+
+  if (state === 'Rivers') {
+    if (addr.includes('oyigbo') || addr.includes('aba expressway')) return { lat: 4.8789, lng: 7.1512 };
+    if (addr.includes('trans-amadi')) return { lat: 4.8112, lng: 7.0345 };
+    if (addr.includes('ikwerre')) return { lat: 4.8412, lng: 6.9890 };
+  }
+
+  if (state === 'Kano') {
+    if (addr.includes('zaria road') || addr.includes('kabara')) return { lat: 11.9512, lng: 8.5412 };
+    if (addr.includes('buk road') || addr.includes('kamaras')) return { lat: 11.9890, lng: 8.4812 };
+    if (addr.includes('sharada')) return { lat: 11.9678, lng: 8.5123 };
+  }
+
+  if (state === 'Kaduna') {
+    if (addr.includes('kakau') || addr.includes('chikun')) return { lat: 10.4215, lng: 7.4389 };
+    if (addr.includes('rigachikun') || addr.includes('kaduna-zaria')) return { lat: 10.6212, lng: 7.4567 };
+    if (addr.includes('western bypass')) return { lat: 10.5189, lng: 7.4012 };
+  }
+
+  if (state === 'Kwara') {
+    if (addr.includes('asa dam')) return { lat: 8.4612, lng: 4.5312 };
+    if (addr.includes('post office') || addr.includes('soludero')) return { lat: 8.4890, lng: 4.5489 };
+    if (addr.includes('jebba')) return { lat: 8.5212, lng: 4.5612 };
+  }
+
+  if (state === 'Kogi') {
+    if (addr.includes('okene')) return { lat: 7.5512, lng: 6.2345 };
+    if (addr.includes('felele') || addr.includes('lokoja')) return { lat: 7.8123, lng: 6.7412 };
+    if (addr.includes('ajaokuta') || addr.includes('ohunene')) return { lat: 7.5689, lng: 6.6412 };
   }
 
   const baseGeo = CITY_COORDINATES[state] || { lat: 9.0765, lng: 7.4853 };

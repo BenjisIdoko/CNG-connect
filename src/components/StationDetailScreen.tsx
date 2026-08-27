@@ -5,6 +5,7 @@ import { openExternalMaps, openGoogleMapsPin } from '../utils/navigationHelper';
 import { StationGroupInfoSheet } from './StationGroupInfoSheet';
 import { formatStationAge } from '../utils/timeUtils';
 import { openWhatsAppShare } from '../utils/shareMessageBuilder';
+import { EditStationLocationModal } from './EditStationLocationModal';
 
 interface StationDetailScreenProps {
   station: GasStation;
@@ -14,6 +15,7 @@ interface StationDetailScreenProps {
   onNavigate: (station: GasStation) => void;
   onAddStationComment?: (stationId: string, commentText: string) => void;
   onAddPhoto?: () => void;
+  onUpdateLocation?: (stationId: string, lat: number, lng: number) => void;
   isPresenceActive?: boolean;
 }
 
@@ -24,8 +26,11 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
   onOpenReportModal,
   onNavigate,
   onAddStationComment,
+  onAddPhoto,
+  onUpdateLocation,
   isPresenceActive = true,
 }) => {
+  const [showEditLocationModal, setShowEditLocationModal] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
   const [reports, setReports] = useState(station.reports || []);
   const [comments, setComments] = useState<CommentItem[]>(
@@ -257,18 +262,31 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                 className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-micro font-bold border ${
                   station.locationPrecision === 'gps_confirmed'
                     ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
-                    : 'bg-slate-50 text-slate-700 border-slate-200'
+                    : 'bg-amber-50 text-amber-800 border-amber-300'
                 }`}
               >
                 <span className="material-symbols-outlined text-[14px]">
-                  {station.locationPrecision === 'gps_confirmed' ? 'my_location' : 'pin_drop'}
+                  {station.locationPrecision === 'gps_confirmed' ? 'my_location' : 'wrong_location'}
                 </span>
                 <span>
                   {station.locationPrecision === 'gps_confirmed'
                     ? 'Exact GPS Location Confirmed'
-                    : 'Geocoded Location'}
+                    : 'Approximate Geocoded Location'}
                 </span>
               </div>
+
+              {/* Fix / Update Location Pin Button */}
+              {onUpdateLocation && (
+                <button
+                  onClick={() => setShowEditLocationModal(true)}
+                  aria-label="Fix or Update Exact Location Pin"
+                  className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-100 hover:bg-emerald-200 text-primary rounded-full text-micro font-extrabold transition-all active:scale-95 border border-emerald-300 shadow-2xs"
+                  title="Update exact location pin or paste Google Maps link"
+                >
+                  <span className="material-symbols-outlined text-[14px]">edit_location</span>
+                  <span>{station.locationPrecision === 'gps_confirmed' ? 'Edit Pin' : 'Fix Exact Pin'}</span>
+                </button>
+              )}
 
               {/* Exact Coordinates Pin Link Button */}
               {station.lat && station.lng && (
@@ -917,6 +935,17 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
         isOpen={showInfoSheet}
         onClose={() => setShowInfoSheet(false)}
       />
+
+      {showEditLocationModal && onUpdateLocation && (
+        <EditStationLocationModal
+          station={station}
+          onClose={() => setShowEditLocationModal(false)}
+          onSaveLocation={(stId, lat, lng) => {
+            onUpdateLocation(stId, lat, lng);
+            setShowEditLocationModal(false);
+          }}
+        />
+      )}
     </div>
   );
 };

@@ -29,8 +29,8 @@ export function calculateVerificationMetadata(report: DriverReport): {
 }
 
 // LocalStorage Persistence Fallback Keys
-const STATIONS_STORAGE_KEY = 'gasfinder_stations_v8';
-const POSTS_STORAGE_KEY = 'gasfinder_posts_v8';
+const STATIONS_STORAGE_KEY = 'gasfinder_stations_v9';
+const POSTS_STORAGE_KEY = 'gasfinder_posts_v9';
 
 let memoryStore: Record<string, string> = {};
 
@@ -79,6 +79,7 @@ function purgeStaleLocalStorage() {
       'gasfinder_stations_v5',
       'gasfinder_stations_v6',
       'gasfinder_stations_v7',
+      'gasfinder_stations_v8',
       'gasfinder_posts_v1',
       'gasfinder_posts_v2',
       'gasfinder_posts_v3',
@@ -86,6 +87,7 @@ function purgeStaleLocalStorage() {
       'gasfinder_posts_v5',
       'gasfinder_posts_v6',
       'gasfinder_posts_v7',
+      'gasfinder_posts_v8',
     ];
     keysToRemove.forEach((k) => removeStorageItem(k));
   } catch {
@@ -613,5 +615,53 @@ export const apiService = {
         supabase.removeChannel(channel);
       }
     };
+  },
+
+  /**
+   * Updates and persists exact GPS location coordinates for a station.
+   */
+  async updateStationLocation(
+    stationId: string,
+    lat: number,
+    lng: number
+  ): Promise<GasStation | null> {
+    const stations = getLocalStations();
+    let updatedStation: GasStation | null = null;
+
+    const updatedStations = stations.map((st) => {
+      if (st.id === stationId) {
+        updatedStation = {
+          ...st,
+          lat,
+          lng,
+          locationPrecision: 'gps_confirmed' as const,
+          dataSource: 'Community GPS Confirmed Pin',
+          dataSourceDate: new Date().toISOString().split('T')[0],
+          verifiedByCommunity: true,
+        };
+        return updatedStation;
+      }
+      return st;
+    });
+
+    saveLocalStations(updatedStations);
+
+    if (isSupabaseConfigured && supabase) {
+      try {
+        await supabase
+          .from('gas_stations')
+          .update({
+            lat,
+            lng,
+            location_precision: 'gps_confirmed',
+            data_source: 'Community GPS Confirmed Pin',
+          })
+          .eq('id', stationId);
+      } catch (err) {
+        console.warn('Supabase location update fallback:', err);
+      }
+    }
+
+    return updatedStation;
   },
 };
