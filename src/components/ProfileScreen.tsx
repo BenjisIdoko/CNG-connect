@@ -86,7 +86,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
         </div>
       )}
 
-      <div className="max-w-xl mx-auto px-4 pt-4 flex flex-col gap-4">
+      <div className="max-w-3xl mx-auto px-4 md:px-6 pt-4 flex flex-col gap-4">
         {/* Profile Card */}
         <div className="bg-white rounded-3xl p-4 shadow-sm border border-outline-variant flex items-center justify-between">
           <div className="flex items-center gap-3.5 min-w-0 flex-1">

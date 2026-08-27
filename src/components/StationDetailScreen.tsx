@@ -219,7 +219,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
       </div>
 
       {/* Main Content Area */}
-      <div className="max-w-xl mx-auto px-4 md:px-6 pt-4 flex flex-col gap-4">
+      <div className="max-w-4xl mx-auto px-4 md:px-6 pt-4 flex flex-col gap-4">
         {/* Station Group Header & Title */}
         <div className="bg-white rounded-3xl p-5 border border-surface-container-highest shadow-xs flex flex-col gap-3">
           <div className="flex items-start justify-between gap-2">

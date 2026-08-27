@@ -15,6 +15,7 @@ import {
 import { ConversionCenter } from './types';
 import { Header } from './components/Header';
 import { BottomNav } from './components/BottomNav';
+import { Sidebar } from './components/common/Sidebar';
 import { MapScreen, GpsStatus } from './components/MapScreen';
 import { OnboardingModal } from './components/OnboardingModal';
 import { OnboardingScreen } from './components/OnboardingScreen';
@@ -499,6 +500,21 @@ export const App: React.FC = () => {
         />
       )}
 
+      {/* Desktop Persistent Left Sidebar (Visible at lg: 1024px and above) */}
+      {!activeChatPost && (
+        <Sidebar
+          activeTab={activeTab}
+          setActiveTab={(tab) => {
+            setActiveDetailStation(null);
+            setActiveDiscussionPost(null);
+            setActiveTab(tab);
+          }}
+          userProfile={userProfile}
+          onOpenAiAssistant={() => setIsAiModalOpen(true)}
+          onOpenRoiCalculator={() => setIsRoiModalOpen(true)}
+        />
+      )}
+
       {/* Main Top Header (hidden in chat mode as chat has its own custom bar) */}
       {!activeChatPost && (
         <Header
@@ -516,7 +532,7 @@ export const App: React.FC = () => {
       )}
 
       {/* Main Content Area */}
-      <main className="flex-1 overflow-y-auto relative pt-16 pb-24">
+      <main className="flex-1 overflow-y-auto relative pt-16 pb-24 lg:pl-64">
         {!isOnline && (
           <div className="fixed top-3 left-1/2 -translate-x-1/2 z-50 bg-[#004D40]/95 text-white text-[11.5px] font-extrabold px-4 py-1.5 rounded-full shadow-lg border border-emerald-400/40 backdrop-blur-md flex items-center gap-1.5 animate-pulse pointer-events-none">
             <span className="material-symbols-outlined text-[16px] text-amber-400">wifi_off</span>

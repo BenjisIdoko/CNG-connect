@@ -109,7 +109,7 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
       </div>
 
       {/* Main Content Container */}
-      <div className="max-w-2xl mx-auto px-4 -mt-4 relative z-20 space-y-4">
+      <div className="max-w-7xl mx-auto px-4 md:px-6 -mt-4 relative z-20 space-y-4">
         {/* Search Bar & Filter Controls */}
         <div className="bg-white rounded-3xl p-3.5 shadow-xl border border-slate-200/80 space-y-3">
           <div className="flex items-center bg-slate-100/90 rounded-full px-4 py-2.5 gap-2.5 focus-within:ring-2 focus-within:ring-emerald-500/30 transition-all">
@@ -138,8 +138,8 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
                 onClick={() => setSelectedState(st)}
                 className={`shrink-0 px-3.5 py-1.5 rounded-full text-[12px] font-semibold transition-all active:scale-95 ${
                   selectedState.toLowerCase() === st.toLowerCase()
-                    ? 'bg-deep-teal text-white shadow-sm'
-                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200/60'
+                    ? 'bg-primary text-white shadow-sm'
+                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                 }`}
               >
                 {st === 'all' ? 'All States' : st}
@@ -156,7 +156,7 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
             <button
               onClick={() => setOnlyAccredited(!onlyAccredited)}
               className={`w-11 h-6 rounded-full transition-colors relative p-0.5 ${
-                onlyAccredited ? 'bg-live-pulse' : 'bg-slate-300'
+                onlyAccredited ? 'bg-emerald-600' : 'bg-slate-300'
               }`}
             >
               <div
@@ -179,7 +179,7 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
         </div>
 
         {/* Centers Cards List */}
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredCenters.length === 0 ? (
             <div className="bg-white rounded-3xl p-8 text-center border border-slate-200 shadow-sm">
               <span className="material-symbols-outlined text-[44px] text-slate-300 mb-2">

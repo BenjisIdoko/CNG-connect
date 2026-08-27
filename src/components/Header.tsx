@@ -23,8 +23,8 @@ export const Header: React.FC<HeaderProps> = ({
   rightAction
 }) => {
   return (
-    <header className="fixed top-0 w-full z-50 bg-white/95 backdrop-blur-xl border-b border-outline-variant/80 shadow-[0_1px_6px_rgba(0,0,0,0.03)]">
-      <div className="h-16 px-4 md:px-6 max-w-xl mx-auto flex items-center justify-between pt-safe">
+    <header className="fixed top-0 w-full z-50 bg-white/95 backdrop-blur-xl border-b border-outline-variant/80 shadow-[0_1px_6px_rgba(0,0,0,0.03)] lg:pl-64">
+      <div className="h-16 px-4 md:px-8 max-w-7xl mx-auto flex items-center justify-between pt-safe">
         <div className="flex items-center gap-2 min-w-0 flex-1 pr-2">
           {showBack ? (
             <div className="flex items-center gap-2 min-w-0 flex-1">

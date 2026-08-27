@@ -57,7 +57,7 @@ export const DiscussionScreen: React.FC<DiscussionScreenProps> = ({
   return (
     <div className="min-h-screen bg-surface text-on-surface pb-32">
       {/* Post Content */}
-      <div className="max-w-xl mx-auto px-4 md:px-6 pt-4">
+      <div className="max-w-3xl mx-auto px-4 md:px-6 pt-4">
         <div className="bg-white rounded-3xl p-5 shadow-xs border border-surface-container-highest flex flex-col gap-4">
           {/* Author Row */}
           <div className="flex items-center gap-3">

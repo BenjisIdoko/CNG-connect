@@ -381,9 +381,9 @@ export const MapScreen: React.FC<MapScreenProps> = ({
     (minPressure > 0 ? 1 : 0);
 
   return (
-    <div className="relative w-full h-[calc(100vh-4rem)] overflow-hidden bg-surface-container-low">
-      {/* Leaflet Map Container */}
-      <div ref={mapContainerRef} className="absolute inset-0 z-0" />
+    <div className="relative w-full h-[calc(100vh-4rem)] overflow-hidden bg-surface-container-low lg:flex lg:flex-row">
+      {/* Leaflet Map Container (Flex-1 on Desktop) */}
+      <div ref={mapContainerRef} className="absolute inset-0 z-0 lg:flex-1 lg:relative lg:h-full" />
 
       {/* Toast Notification */}
       {toastMessage && (
@@ -392,8 +392,8 @@ export const MapScreen: React.FC<MapScreenProps> = ({
         </div>
       )}
 
-      {/* Top Search & Controls Floating Container */}
-      <div className="relative z-30 p-4 max-w-xl mx-auto flex flex-col gap-2 pointer-events-auto">
+      {/* Mobile-Only Floating Search Bar Container (< lg:) */}
+      <div className="lg:hidden relative z-30 p-4 max-w-xl mx-auto flex flex-col gap-2 pointer-events-auto">
         {/* Floating Search Pill Bar */}
         <div className="flex items-center bg-white/95 backdrop-blur-xl rounded-full shadow-[0_6px_24px_rgba(0,0,0,0.08)] border border-slate-200/80 p-2 pl-4 gap-2 transition-all focus-within:ring-2 focus-within:ring-emerald-500/30">
           <span className="material-symbols-outlined text-primary text-[20px] shrink-0">
@@ -496,8 +496,8 @@ export const MapScreen: React.FC<MapScreenProps> = ({
         </div>
       </div>
 
-          {/* Bottom Sheet: Nearby Petrol Stations Vertical Ranked List & Expanded Gallery */}
-      <div className="absolute bottom-0 left-0 right-0 z-30 max-w-xl mx-auto pointer-events-none">
+      {/* Mobile Bottom Sheet (< lg:) */}
+      <div className="lg:hidden absolute bottom-0 left-0 right-0 z-30 max-w-xl mx-auto pointer-events-none">
         <div
           className={`w-full bg-white rounded-t-[32px] shadow-[0_-8px_32px_rgba(0,0,0,0.14)] border-t border-outline-variant pointer-events-auto transition-all duration-300 flex flex-col overflow-hidden ${
             sheetMode === 'expanded'
@@ -760,6 +760,135 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                 </>
               )}
             </div>
+          )}
+        </div>
+      </div>
+
+      {/* Desktop Persistent Right-Hand Panel (lg: 1024px and above) */}
+      <div className="hidden lg:flex flex-col w-[380px] xl:w-[420px] bg-white border-l border-slate-200 h-full z-20 shadow-lg overflow-hidden shrink-0">
+        {/* Right Panel Header: Search & Filter */}
+        <div className="p-4 border-b border-slate-200/80 flex flex-col gap-3 bg-slate-50/50">
+          <div className="flex items-center justify-between">
+            <h3 className="font-extrabold text-[16px] text-slate-900 flex items-center gap-2">
+              <span className="material-symbols-outlined text-primary text-[20px]">explore</span>
+              <span>Stations & Chargers</span>
+            </h3>
+            <span className="text-[11px] font-bold text-primary bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+              {filteredStations.length} Results
+            </span>
+          </div>
+
+          {/* Desktop Search Input */}
+          <div className="flex items-center bg-white rounded-xl border border-slate-300 px-3 py-2 gap-2 shadow-2xs focus-within:ring-2 focus-within:ring-primary/20">
+            <span className="material-symbols-outlined text-slate-400 text-[18px]">search</span>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search station, city, state..."
+              className="flex-1 bg-transparent border-none outline-none text-[13px] font-medium text-slate-900 placeholder:text-slate-400"
+            />
+            {searchQuery && (
+              <button onClick={() => setSearchQuery('')} className="text-slate-400 hover:text-slate-600">
+                <span className="material-symbols-outlined text-[16px]">close</span>
+              </button>
+            )}
+          </div>
+
+          {/* Type Filter Segment Bar */}
+          <div className="grid grid-cols-3 gap-1 p-1 bg-slate-100 rounded-xl">
+            <button
+              onClick={() => setStationTypeFilter('all')}
+              className={`py-1.5 rounded-lg text-micro font-extrabold transition-all ${
+                stationTypeFilter === 'all' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              All
+            </button>
+            <button
+              onClick={() => setStationTypeFilter('cng')}
+              className={`py-1.5 rounded-lg text-micro font-extrabold transition-all flex items-center justify-center gap-1 ${
+                stationTypeFilter === 'cng' ? 'bg-emerald-600 text-white shadow-2xs' : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <span className="material-symbols-outlined text-[13px]">local_gas_station</span>
+              <span>CNG</span>
+            </button>
+            <button
+              onClick={() => setStationTypeFilter('ev_charging')}
+              className={`py-1.5 rounded-lg text-micro font-extrabold transition-all flex items-center justify-center gap-1 ${
+                stationTypeFilter === 'ev_charging' ? 'bg-sky-600 text-white shadow-2xs' : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <span className="material-symbols-outlined text-[13px]">bolt</span>
+              <span>⚡ EV</span>
+            </button>
+          </div>
+
+          <button
+            onClick={() => setIsSuggestModalOpen(true)}
+            className="w-full py-2 bg-primary hover:bg-deep-teal text-white rounded-xl text-micro font-extrabold shadow-sm active:scale-98 transition-all flex items-center justify-center gap-1.5"
+          >
+            <span className="material-symbols-outlined text-[16px]">add_location_alt</span>
+            <span>+ Suggest New Station</span>
+          </button>
+        </div>
+
+        {/* Desktop Station List Container */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-2.5">
+          {filteredStations.length === 0 ? (
+            <div className="p-8 text-center text-slate-500 font-medium text-[13px]">
+              No stations match your criteria.
+            </div>
+          ) : (
+            filteredStations.map((station) => {
+              const statusInfo = getStatusIndicator(station.status);
+              const isSelected = selectedStation?.id === station.id;
+
+              return (
+                <div
+                  key={`desktop-${station.id}`}
+                  onClick={() => onSelectStation(station)}
+                  className={`p-3.5 rounded-2xl border transition-all cursor-pointer ${
+                    isSelected
+                      ? 'bg-emerald-50/60 border-primary ring-2 ring-primary/20 shadow-sm'
+                      : 'bg-white border-slate-200 hover:border-slate-300'
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${statusInfo.dotColor}`} />
+                      <h4 className="font-extrabold text-[14px] text-slate-900 truncate">
+                        {station.name}
+                      </h4>
+                    </div>
+                    <span className="text-micro font-extrabold text-primary shrink-0">
+                      {station.distance}
+                    </span>
+                  </div>
+
+                  <p className="text-[12px] font-normal text-slate-500 truncate mt-1">
+                    {station.address}
+                  </p>
+
+                  <div className="flex items-center justify-between mt-2.5 pt-2 border-t border-slate-100">
+                    <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${statusInfo.badgeBg}`}>
+                      {station.statusLabel}
+                    </span>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onOpenStationDetails(station);
+                      }}
+                      className="text-micro font-extrabold text-primary hover:underline flex items-center gap-0.5"
+                    >
+                      <span>Group Chat & Specs</span>
+                      <span className="material-symbols-outlined text-[13px]">chevron_right</span>
+                    </button>
+                  </div>
+                </div>
+              );
+            })
           )}
         </div>
       </div>

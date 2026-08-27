@@ -121,7 +121,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
       )}
 
       {/* Sticky Top Bar: Main Segment Control + Search */}
-      <div className="sticky top-0 z-30 bg-surface/95 backdrop-blur-md py-2.5 px-4 md:px-6 border-b border-surface-container-highest/70 max-w-xl mx-auto flex flex-col gap-2">
+      <div className="sticky top-0 z-30 bg-surface/95 backdrop-blur-md py-2.5 px-4 md:px-6 border-b border-surface-container-highest/70 max-w-4xl mx-auto flex flex-col gap-2">
         {/* Main Section Tab Switcher */}
         <div className="flex bg-surface-container p-1 rounded-2xl border border-surface-container-highest">
           <button
@@ -195,7 +195,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
         </div>
       </div>
 
-      <div className="max-w-xl mx-auto px-4 md:px-6 pt-3">
+      <div className="max-w-4xl mx-auto px-4 md:px-6 pt-3">
         {/* MAIN TAB 1: Station Groups List & Scoping Notice */}
         {activeMainTab === 'station_groups' ? (
           <div className="flex flex-col gap-3">
@@ -245,7 +245,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
             </div>
 
             {/* Station Groups Cards Grid */}
-            <div className="flex flex-col gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               {filteredStations.length === 0 ? (
                 <EmptyState
                   title="No Station Groups Found"
