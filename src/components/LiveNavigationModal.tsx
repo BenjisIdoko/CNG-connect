@@ -1,6 +1,6 @@
 import React from 'react';
 import { GasStation } from '../types';
-import { openExternalMaps } from '../utils/navigationHelper';
+import { openExternalMaps, openGoogleMapsPin } from '../utils/navigationHelper';
 import { Modal } from './common/Modal';
 
 interface LiveNavigationModalProps {
@@ -14,6 +14,11 @@ export const LiveNavigationModal: React.FC<LiveNavigationModalProps> = ({
 }) => {
   const handleLaunchMaps = () => {
     openExternalMaps(station);
+    onClose();
+  };
+
+  const handleLaunchPin = () => {
+    openGoogleMapsPin(station);
     onClose();
   };
 
@@ -51,15 +56,29 @@ export const LiveNavigationModal: React.FC<LiveNavigationModalProps> = ({
               </span>
               <span>{station.address}</span>
             </p>
+
+            {station.lat && station.lng && (
+              <p className="text-[11.5px] text-emerald-300 font-medium mt-1 flex items-center gap-1">
+                <span className="material-symbols-outlined text-[14px]">
+                  {station.locationPrecision === 'gps_confirmed' ? 'my_location' : 'pin_drop'}
+                </span>
+                <span>
+                  Coordinates: {station.lat.toFixed(6)}, {station.lng.toFixed(6)}
+                  {station.locationPrecision === 'gps_confirmed' ? ' (GPS Confirmed Exact)' : ''}
+                </span>
+              </p>
+            )}
           </div>
 
           <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-white/10">
             <span className="bg-status-green/20 text-status-green text-[11.5px] font-semibold px-3 py-1 rounded-full border border-status-green/30">
-              {station.statusLabel} • {station.pumpPressure} bar
+              {station.statusLabel} {station.pumpPressure ? `• ${station.pumpPressure} bar` : ''}
             </span>
-            <span className="bg-white/10 text-white text-[11.5px] font-medium px-3 py-1 rounded-full">
-              ₦{station.cngPrice}/kg
-            </span>
+            {station.cngPrice && (
+              <span className="bg-white/10 text-white text-[11.5px] font-medium px-3 py-1 rounded-full">
+                ₦{station.cngPrice}/kg
+              </span>
+            )}
           </div>
         </div>
 
@@ -87,16 +106,24 @@ export const LiveNavigationModal: React.FC<LiveNavigationModalProps> = ({
         {/* External Navigation Launchers */}
         <div className="flex flex-col gap-2.5 pt-1">
           <button
-            onClick={handleLaunchMaps}
-            className="w-full py-4 bg-status-green hover:opacity-95 text-on-surface font-bold text-[15px] rounded-full shadow-lg flex items-center justify-center gap-2.5 active:scale-[0.98] transition-all"
+            onClick={handleLaunchPin}
+            className="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-[14.5px] rounded-full shadow-lg flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
           >
-            <span className="material-symbols-outlined text-[22px] shrink-0">map</span>
-            <span className="whitespace-nowrap">Open in Maps</span>
+            <span className="material-symbols-outlined text-[20px] shrink-0">pin_drop</span>
+            <span>Open Location Pin on Google Maps</span>
+          </button>
+
+          <button
+            onClick={handleLaunchMaps}
+            className="w-full py-3.5 bg-status-green hover:opacity-95 text-on-surface font-bold text-[14.5px] rounded-full shadow-lg flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
+          >
+            <span className="material-symbols-outlined text-[20px] shrink-0">turn_right</span>
+            <span>Turn-by-Turn Navigation</span>
           </button>
 
           <button
             onClick={onClose}
-            className="w-full py-3 bg-white/10 hover:bg-white/15 text-slate-300 font-bold text-[13.5px] rounded-full active:scale-[0.98] transition-all"
+            className="w-full py-2.5 bg-white/10 hover:bg-white/15 text-slate-300 font-bold text-[13px] rounded-full active:scale-[0.98] transition-all"
           >
             Close Summary
           </button>

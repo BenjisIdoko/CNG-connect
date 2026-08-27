@@ -96,7 +96,7 @@ const RAW_PCI_STATIONS = [
   { sn:25, region:'North-Central', state:'FCT Abuja',  company:'Portland Gas Ltd', address:'Obafemi Awolowo Way, Utako District, Abuja' },
   { sn:26, region:'North-Central', state:'FCT Abuja',  company:'Rolling Energy', address:'Kubwa Expressway Junction, Abuja' },
   { sn:27, region:'North-Central', state:'Kogi',       company:'Greenville LNG', address:'Okene Junction, Lokoja, Kogi State' },
-  { sn:28, region:'North-Central', state:'FCT Abuja',  company:'ASAD Energy Fleet', address:'Garki Zone 5, Abuja' },
+  { sn:28, region:'North-Central', state:'FCT Abuja',  company:'ASAD Energy Fleet Ltd', address:'Bida-Abuja Rd, Jiwa, Federal Capital Territory 901101, Nigeria' },
   { sn:29, region:'North-Central', state:'Kwara',      company:'Bovas and Company Ltd', address:'Asa Dam Road, Ilorin, Kwara State' },
   { sn:30, region:'North-Central', state:'Kwara',      company:'Greenville LNG', address:'Ilorin-Jebba Road, Ilorin, Kwara State' },
 
@@ -138,6 +138,7 @@ const CITY_COORDINATES: Record<string, { lat: number; lng: number }> = {
 };
 
 function extractCity(address: string, state: string): string {
+  if (address.includes('Jiwa')) return 'Jiwa';
   const parts = address.split(',').map((s) => s.trim());
   if (parts.length >= 2) {
     return parts[parts.length - 2] || state;
@@ -149,6 +150,7 @@ function getExactDistrictCoords(address: string, state: string, idx: number): { 
   const addr = address.toLowerCase();
 
   if (state === 'FCT Abuja') {
+    if (addr.includes('jiwa') || addr.includes('bida-abuja') || addr.includes('asad energy fleet')) return { lat: 9.101597, lng: 7.243265, isGpsConfirmed: true };
     if (addr.includes('dutse') || addr.includes('bwari')) return { lat: 9.1672, lng: 7.4128 };
     if (addr.includes('kubwa')) return { lat: 9.1538, lng: 7.3375 };
     if (addr.includes('dei-dei') || addr.includes('deidei')) return { lat: 9.1235, lng: 7.2789 };
@@ -219,9 +221,9 @@ export function generateSeedDataset() {
       activePresenceCount: undefined,
       stationComments: [],
       stationNotice: `Official ${raw.company} refuelling hub in ${raw.state}. Update gas availability and report live pump pressures here!`,
-      locationPrecision: 'geocoded',
-      dataSource: 'pci.gov.ng',
-      dataSourceDate: '2026-08-20',
+      locationPrecision: (coords as any).isGpsConfirmed ? ('gps_confirmed' as const) : ('geocoded' as const),
+      dataSource: (coords as any).isGpsConfirmed ? 'Community GPS Confirmed' : 'pci.gov.ng',
+      dataSourceDate: (coords as any).isGpsConfirmed ? '2026-08-27' : '2026-08-20',
       createdBy: null,
     };
   });

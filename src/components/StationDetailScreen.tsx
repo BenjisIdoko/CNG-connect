@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { GasStation, CommentItem, UserProfile } from '../types';
 import { ASSETS } from '../data/mockData';
-import { openExternalMaps } from '../utils/navigationHelper';
+import { openExternalMaps, openGoogleMapsPin } from '../utils/navigationHelper';
 import { StationGroupInfoSheet } from './StationGroupInfoSheet';
 import { formatStationAge } from '../utils/timeUtils';
 import { openWhatsAppShare } from '../utils/shareMessageBuilder';
@@ -243,12 +243,48 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
             </div>
           </div>
 
-          <p className="text-body font-normal text-slate-600 flex items-center gap-1.5">
-            <span className="material-symbols-outlined text-slate-400 text-[18px]">
-              location_on
-            </span>
-            <span>{station.address}</span>
-          </p>
+          <div className="flex flex-col gap-2">
+            <p className="text-body font-normal text-slate-600 flex items-start gap-1.5">
+              <span className="material-symbols-outlined text-emerald-600 text-[18px] shrink-0 mt-0.5">
+                location_on
+              </span>
+              <span>{station.address}</span>
+            </p>
+
+            <div className="flex flex-wrap items-center gap-2 pt-1">
+              {/* Location Precision Badge */}
+              <div
+                className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-micro font-bold border ${
+                  station.locationPrecision === 'gps_confirmed'
+                    ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                    : 'bg-slate-50 text-slate-700 border-slate-200'
+                }`}
+              >
+                <span className="material-symbols-outlined text-[14px]">
+                  {station.locationPrecision === 'gps_confirmed' ? 'my_location' : 'pin_drop'}
+                </span>
+                <span>
+                  {station.locationPrecision === 'gps_confirmed'
+                    ? 'Exact GPS Location Confirmed'
+                    : 'Geocoded Location'}
+                </span>
+              </div>
+
+              {/* Exact Coordinates Pin Link Button */}
+              {station.lat && station.lng && (
+                <button
+                  onClick={() => openGoogleMapsPin(station)}
+                  aria-label="Open Google Maps Location Pin"
+                  className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-full text-micro font-bold transition-all active:scale-95 shadow-2xs"
+                  title="View exact location pin on Google Maps"
+                >
+                  <span className="material-symbols-outlined text-[15px] text-blue-600">map</span>
+                  <span>[{station.lat.toFixed(6)}, {station.lng.toFixed(6)}]</span>
+                  <span className="material-symbols-outlined text-[13px]">open_in_new</span>
+                </button>
+              )}
+            </div>
+          </div>
 
           {/* Live Status & Specs Summary */}
           <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-surface-container-highest/70">
