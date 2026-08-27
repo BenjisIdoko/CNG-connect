@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import * as PopoverPrimitive from '@radix-ui/react-popover';
 import { UserProfile } from '../types';
 import { ASSETS } from '../data/mockData';
 import { Modal } from './common/Modal';
@@ -102,10 +103,49 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
               <p className="text-caption text-on-surface-variant font-normal mt-0.5 truncate">
                 {user.email || user.phone || 'driver@cngconnect.ng'}
               </p>
-              <div className="flex items-center gap-1.5 mt-1 text-micro font-semibold text-primary">
-                <span className="material-symbols-outlined text-[14px]">directions_car</span>
-                <span className="truncate">{user.vehicle || 'Toyota Corolla 1.8L (CNG)'}</span>
-              </div>
+              <PopoverPrimitive.Root>
+                <PopoverPrimitive.Trigger className="flex items-center gap-1.5 mt-1 text-micro font-semibold text-primary hover:bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 transition-all cursor-pointer text-left">
+                  <span className="material-symbols-outlined text-[14px]">directions_car</span>
+                  <span className="truncate max-w-[160px] sm:max-w-[220px]">{user.vehicle || 'Toyota Corolla 1.8L (CNG)'}</span>
+                  <span className="material-symbols-outlined text-[14px]">unfold_more</span>
+                </PopoverPrimitive.Trigger>
+
+                <PopoverPrimitive.Portal>
+                  <PopoverPrimitive.Content
+                    sideOffset={5}
+                    className="z-[150] w-64 bg-white rounded-2xl p-3 shadow-xl border border-slate-200 flex flex-col gap-1.5"
+                  >
+                    <span className="text-micro font-bold text-slate-400 uppercase tracking-wider px-2">
+                      Switch Active Vehicle
+                    </span>
+                    {[
+                      'Toyota Corolla 1.8L (Dual Fuel CNG)',
+                      'Hyundai Accent 1.6L (CNG Kit)',
+                      'Qoray E-Trike (100% EV)',
+                    ].map((v) => (
+                      <button
+                        key={v}
+                        onClick={() => {
+                          if (onUpdateProfile) {
+                            onUpdateProfile({ vehicle: v });
+                            showToast(`Active vehicle switched to ${v}`);
+                          }
+                        }}
+                        className={`w-full text-left px-2.5 py-1.5 rounded-xl text-[12px] font-bold transition-all flex items-center justify-between ${
+                          user.vehicle === v
+                            ? 'bg-emerald-50 text-primary border border-emerald-200'
+                            : 'text-slate-700 hover:bg-slate-100'
+                        }`}
+                      >
+                        <span className="truncate">{v}</span>
+                        {user.vehicle === v && (
+                          <span className="material-symbols-outlined text-[14px] text-primary">check</span>
+                        )}
+                      </button>
+                    ))}
+                  </PopoverPrimitive.Content>
+                </PopoverPrimitive.Portal>
+              </PopoverPrimitive.Root>
             </div>
           </div>
 

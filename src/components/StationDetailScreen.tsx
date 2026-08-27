@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import * as TabsPrimitive from '@radix-ui/react-tabs';
 import { GasStation, CommentItem, UserProfile } from '../types';
 import { ASSETS } from '../data/mockData';
 import { openExternalMaps, openGoogleMapsPin } from '../utils/navigationHelper';
@@ -583,60 +584,49 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
           </div>
         )}
 
-        {/* Tab Switcher: Group Feed vs Verified Reports vs Photos */}
-        <div className="flex bg-surface-container p-1 rounded-2xl border border-surface-container-highest">
-          <button
-            onClick={() => setActiveTab('feed')}
-            className={`flex-1 py-2.5 rounded-xl text-caption font-bold transition-all text-center ${
-              activeTab === 'feed'
-                ? 'bg-white text-primary shadow-xs font-bold'
-                : 'text-slate-500 hover:text-slate-900'
-            }`}
-          >
-            <span className="whitespace-nowrap">Group Chat ({comments.length})</span>
-          </button>
+        {/* Radix Accessible 3-Way Tabs Switcher */}
+        <TabsPrimitive.Root value={activeTab} onValueChange={(val) => setActiveTab(val as 'feed' | 'reports' | 'photos')} className="w-full">
+          <TabsPrimitive.List className="flex bg-surface-container p-1 rounded-2xl border border-surface-container-highest">
+            <TabsPrimitive.Trigger
+              value="feed"
+              className="flex-1 py-2.5 rounded-xl text-caption font-bold transition-all text-center data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-xs text-slate-500 hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/20"
+            >
+              <span className="whitespace-nowrap">Group Chat ({comments.length})</span>
+            </TabsPrimitive.Trigger>
 
-          <button
-            onClick={() => setActiveTab('reports')}
-            className={`flex-1 py-2.5 rounded-xl text-caption font-bold transition-all text-center ${
-              activeTab === 'reports'
-                ? 'bg-white text-primary shadow-xs font-bold'
-                : 'text-slate-500 hover:text-slate-900'
-            }`}
-          >
-            <span className="whitespace-nowrap">Driver Reports ({reports.length})</span>
-          </button>
+            <TabsPrimitive.Trigger
+              value="reports"
+              className="flex-1 py-2.5 rounded-xl text-caption font-bold transition-all text-center data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-xs text-slate-500 hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/20"
+            >
+              <span className="whitespace-nowrap">Driver Reports ({reports.length})</span>
+            </TabsPrimitive.Trigger>
 
-          <button
-            onClick={() => setActiveTab('photos')}
-            className={`flex-1 py-2.5 rounded-xl text-caption font-bold transition-all text-center ${
-              activeTab === 'photos'
-                ? 'bg-white text-primary shadow-xs font-bold'
-                : 'text-slate-500 hover:text-slate-900'
-            }`}
-          >
-            <span className="whitespace-nowrap">Photos ({images.length})</span>
-          </button>
-        </div>
+            <TabsPrimitive.Trigger
+              value="photos"
+              className="flex-1 py-2.5 rounded-xl text-caption font-bold transition-all text-center data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-xs text-slate-500 hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/20"
+            >
+              <span className="whitespace-nowrap">Photos ({images.length})</span>
+            </TabsPrimitive.Trigger>
+          </TabsPrimitive.List>
 
-        {/* TAB CONTENT 1: Station Group Chat Feed & Discussion */}
-        {activeTab === 'feed' && (
-          <div className="flex flex-col gap-3">
-            <div className="flex items-center justify-between px-1">
-              <h2 className="text-body-lg font-bold text-slate-900 flex items-center gap-2">
-                <span className="material-symbols-outlined text-primary text-[20px]">
-                  chat_bubble
-                </span>
-                <span>Group Discussion Feed</span>
-              </h2>
-              <span className="text-micro font-semibold text-primary bg-emerald-100 px-2.5 py-0.5 rounded-full">
-                Open Group Chat
-              </span>
-            </div>
-
-            {/* Comments List */}
+          {/* TAB CONTENT 1: Station Group Chat Feed & Discussion */}
+          <TabsPrimitive.Content value="feed" className="mt-3 outline-none">
             <div className="flex flex-col gap-3">
-              {comments.map((comment) => (
+              <div className="flex items-center justify-between px-1">
+                <h2 className="text-body-lg font-bold text-slate-900 flex items-center gap-2">
+                  <span className="material-symbols-outlined text-primary text-[20px]">
+                    chat_bubble
+                  </span>
+                  <span>Group Discussion Feed</span>
+                </h2>
+                <span className="text-micro font-semibold text-primary bg-emerald-100 px-2.5 py-0.5 rounded-full">
+                  Open Group Chat
+                </span>
+              </div>
+
+              {/* Comments List */}
+              <div className="flex flex-col gap-3">
+                {comments.map((comment) => (
                   <div
                     key={comment.id}
                     className="bg-white rounded-2xl p-4 border border-surface-container-highest shadow-xs flex flex-col gap-2"
@@ -699,217 +689,218 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                   </div>
                 ))}
               </div>
-          </div>
-        )}
-
-        {/* TAB CONTENT 2: Driver Status Reports */}
-        {activeTab === 'reports' && (
-          <div className="flex flex-col gap-3">
-            <div className="flex items-center justify-between px-1">
-              <h2 className="text-[17px] font-bold text-on-surface flex items-center gap-2">
-                <span className="material-symbols-outlined text-primary text-[20px]">
-                  verified_user
-                </span>
-                <span>Verified Driver Status Reports ({reports.length})</span>
-              </h2>
             </div>
+          </TabsPrimitive.Content>
 
+          {/* TAB CONTENT 2: Driver Status Reports */}
+          <TabsPrimitive.Content value="reports" className="mt-3 outline-none">
             <div className="flex flex-col gap-3">
-              {reports.map((report) => {
-                const freshness = getFreshnessBadgeInfo(report.timestamp);
-                return (
-                  <div
-                    key={report.id}
-                    className="bg-white rounded-2xl p-4 border border-surface-container-highest shadow-xs flex flex-col gap-2"
-                  >
-                    <div className="flex justify-between items-start gap-2">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        {report.authorAvatar ? (
-                          <img
-                            src={report.authorAvatar}
-                            alt={report.author}
-                            className="w-10 h-10 rounded-full object-cover border border-surface-container-highest shrink-0"
-                          />
+              <div className="flex items-center justify-between px-1">
+                <h2 className="text-[17px] font-bold text-on-surface flex items-center gap-2">
+                  <span className="material-symbols-outlined text-primary text-[20px]">
+                    verified_user
+                  </span>
+                  <span>Verified Driver Status Reports ({reports.length})</span>
+                </h2>
+              </div>
+
+              <div className="flex flex-col gap-3">
+                {reports.map((report) => {
+                  const freshness = getFreshnessBadgeInfo(report.timestamp);
+                  return (
+                    <div
+                      key={report.id}
+                      className="bg-white rounded-2xl p-4 border border-surface-container-highest shadow-xs flex flex-col gap-2"
+                    >
+                      <div className="flex justify-between items-start gap-2">
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          {report.authorAvatar ? (
+                            <img
+                              src={report.authorAvatar}
+                              alt={report.author}
+                              className="w-10 h-10 rounded-full object-cover border border-surface-container-highest shrink-0"
+                            />
+                          ) : (
+                            <div className="w-10 h-10 rounded-full bg-secondary-container/20 text-secondary font-bold flex items-center justify-center text-[16px] shrink-0">
+                              {report.author.charAt(0)}
+                            </div>
+                          )}
+
+                          <div className="min-w-0">
+                            <div className="text-[14px] font-bold text-on-surface truncate">
+                              {report.author}
+                            </div>
+                            <div className="flex items-center gap-1.5 mt-0.5">
+                              <span className="inline-flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-surface-container text-on-surface-variant border border-outline-variant whitespace-nowrap">
+                                <span className={`w-1.5 h-1.5 rounded-full ${freshness.dotColor}`} />
+                                <span>{freshness.label}</span>
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {report.verified && report.isPhotoVerified ? (
+                          <div className="bg-emerald-100 border border-emerald-300 text-primary px-2.5 py-1 rounded-full text-[10.5px] font-semibold flex items-center gap-1 shadow-2xs shrink-0 whitespace-nowrap">
+                            <span
+                              className="material-symbols-outlined text-[14px]"
+                              style={{ fontVariationSettings: "'FILL' 1" }}
+                            >
+                              verified
+                            </span>
+                            <span>Photo Verified</span>
+                          </div>
                         ) : (
-                          <div className="w-10 h-10 rounded-full bg-secondary-container/20 text-secondary font-bold flex items-center justify-center text-[16px] shrink-0">
-                            {report.author.charAt(0)}
+                          <div className="bg-amber-100 border border-amber-300/80 text-amber-900 px-2.5 py-1 rounded-full text-[10.5px] font-semibold flex items-center gap-1 shadow-2xs shrink-0 whitespace-nowrap">
+                            <span className="material-symbols-outlined text-[14px]">
+                              gavel
+                            </span>
+                            <span>Unverified</span>
                           </div>
                         )}
-
-                        <div className="min-w-0">
-                          <div className="text-[14px] font-bold text-on-surface truncate">
-                            {report.author}
-                          </div>
-                          <div className="flex items-center gap-1.5 mt-0.5">
-                            <span className="inline-flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-surface-container text-on-surface-variant border border-outline-variant whitespace-nowrap">
-                              <span className={`w-1.5 h-1.5 rounded-full ${freshness.dotColor}`} />
-                              <span>{freshness.label}</span>
-                            </span>
-                          </div>
-                        </div>
                       </div>
 
-                      {report.verified && report.isPhotoVerified ? (
-                        <div className="bg-emerald-100 border border-emerald-300 text-primary px-2.5 py-1 rounded-full text-[10.5px] font-semibold flex items-center gap-1 shadow-2xs shrink-0 whitespace-nowrap">
-                          <span
-                            className="material-symbols-outlined text-[14px]"
-                            style={{ fontVariationSettings: "'FILL' 1" }}
-                          >
-                            verified
-                          </span>
-                          <span>Photo Verified</span>
-                        </div>
-                      ) : (
-                        <div className="bg-amber-100 border border-amber-300/80 text-amber-900 px-2.5 py-1 rounded-full text-[10.5px] font-semibold flex items-center gap-1 shadow-2xs shrink-0 whitespace-nowrap">
-                          <span className="material-symbols-outlined text-[14px]">
-                            gavel
-                          </span>
-                          <span>Unverified</span>
-                        </div>
-                      )}
-                    </div>
-
-                  <div className="flex items-center gap-2">
-                    <div
-                      className={`w-2.5 h-2.5 rounded-full ${
-                        report.status === 'full'
-                          ? 'bg-primary'
-                          : report.status === 'low'
-                          ? 'bg-secondary-container'
-                          : report.status === 'queue'
-                          ? 'bg-electric-amber'
-                          : 'bg-error'
-                      }`}
-                    />
-                    <span className="text-[13.5px] font-bold text-on-surface">
-                      {report.statusLabel}{' '}
-                      {report.waitMinutes ? `(${report.waitMinutes}m wait)` : ''}
-                    </span>
-                  </div>
-
-                  {report.comment && (
-                    <p className="text-[14px] font-normal text-on-surface-variant leading-relaxed">
-                      {report.comment}
-                    </p>
-                  )}
-
-                  {!report.verified && (
-                    <div className="bg-amber-50 border border-amber-200 text-amber-800 rounded-xl p-2 text-[11.5px] font-normal flex items-center gap-1.5 mt-0.5">
-                      <span className="material-symbols-outlined text-[15px] text-amber-700">info</span>
-                      <span>Unverified update: No live photo attached to confirm this report.</span>
-                    </div>
-                  )}
-
-                  {report.photo && (
-                    <div
-                      onClick={() => setSelectedPhoto(report.photo!)}
-                      className="w-32 h-24 rounded-lg overflow-hidden border border-surface-container-highest mt-1 cursor-pointer"
-                    >
-                      <img
-                        src={report.photo}
-                        alt="Report snapshot"
-                        className="w-full h-full object-cover"
+                    <div className="flex items-center gap-2">
+                      <div
+                        className={`w-2.5 h-2.5 rounded-full ${
+                          report.status === 'full'
+                            ? 'bg-primary'
+                            : report.status === 'low'
+                            ? 'bg-secondary-container'
+                            : report.status === 'queue'
+                            ? 'bg-electric-amber'
+                            : 'bg-error'
+                        }`}
                       />
+                      <span className="text-[13.5px] font-bold text-on-surface">
+                        {report.statusLabel}{' '}
+                        {report.waitMinutes ? `(${report.waitMinutes}m wait)` : ''}
+                      </span>
                     </div>
-                  )}
 
-                  {/* Actions (Like / Dislike) */}
-                  <div className="flex items-center gap-3 pt-2 border-t border-surface-container-highest/50 mt-1">
-                    <button
-                      onClick={() => handleVote(report.id, 'up')}
-                      className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[13px] font-semibold transition-all ${
-                        report.userVoted === 'up'
-                          ? 'bg-primary text-white'
-                          : 'bg-surface text-on-surface-variant hover:bg-surface-container'
-                      }`}
-                    >
-                      <span
-                        className="material-symbols-outlined text-[16px]"
-                        style={{
-                          fontVariationSettings:
-                            report.userVoted === 'up' ? "'FILL' 1" : "'FILL' 0",
-                        }}
+                    {report.comment && (
+                      <p className="text-[14px] font-normal text-on-surface-variant leading-relaxed">
+                        {report.comment}
+                      </p>
+                    )}
+
+                    {!report.verified && (
+                      <div className="bg-amber-50 border border-amber-200 text-amber-800 rounded-xl p-2 text-[11.5px] font-normal flex items-center gap-1.5 mt-0.5">
+                        <span className="material-symbols-outlined text-[15px] text-amber-700">info</span>
+                        <span>Unverified update: No live photo attached to confirm this report.</span>
+                      </div>
+                    )}
+
+                    {report.photo && (
+                      <div
+                        onClick={() => setSelectedPhoto(report.photo!)}
+                        className="w-32 h-24 rounded-lg overflow-hidden border border-surface-container-highest mt-1 cursor-pointer"
                       >
-                        thumb_up
-                      </span>
-                      <span>{report.likes}</span>
-                    </button>
+                        <img
+                          src={report.photo}
+                          alt="Report snapshot"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    )}
 
-                    <button
-                      onClick={() => handleVote(report.id, 'down')}
-                      className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[13px] font-semibold transition-all ${
-                        report.userVoted === 'down'
-                          ? 'bg-error text-white'
-                          : 'bg-surface text-on-surface-variant hover:bg-surface-container'
-                      }`}
-                    >
-                      <span
-                        className="material-symbols-outlined text-[16px]"
-                        style={{
-                          fontVariationSettings:
-                            report.userVoted === 'down' ? "'FILL' 1" : "'FILL' 0",
-                        }}
+                    {/* Actions (Like / Dislike) */}
+                    <div className="flex items-center gap-3 pt-2 border-t border-surface-container-highest/50 mt-1">
+                      <button
+                        onClick={() => handleVote(report.id, 'up')}
+                        className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[13px] font-semibold transition-all ${
+                          report.userVoted === 'up'
+                            ? 'bg-primary text-white'
+                            : 'bg-surface text-on-surface-variant hover:bg-surface-container'
+                        }`}
                       >
-                        thumb_down
-                      </span>
-                      {report.dislikes ? <span>{report.dislikes}</span> : null}
-                    </button>
-                  </div>
-                </div>
-              )})}
-            </div>
-          </div>
-        )}
+                        <span
+                          className="material-symbols-outlined text-[16px]"
+                          style={{
+                            fontVariationSettings:
+                              report.userVoted === 'up' ? "'FILL' 1" : "'FILL' 0",
+                          }}
+                        >
+                          thumb_up
+                        </span>
+                        <span>{report.likes}</span>
+                      </button>
 
-        {/* TAB CONTENT 3: Station Photos Gallery */}
-        {activeTab === 'photos' && (
-          <div className="flex flex-col gap-3">
-            <div className="flex justify-between items-center px-1">
-              <h2 className="text-[17px] font-bold text-on-surface">
-                Station &amp; Pump Photos ({images.length})
-              </h2>
-              <button
-                onClick={() => onOpenReportModal(station)}
-                className="text-[12.5px] font-semibold text-primary flex items-center gap-1 hover:underline"
-              >
-                <span className="material-symbols-outlined text-[16px]">add_a_photo</span>
-                <span>Add Photo</span>
-              </button>
-            </div>
-
-            {images.length > 0 ? (
-              <div className="grid grid-cols-2 gap-3">
-                {images.map((imgUrl, idx) => (
-                  <div
-                    key={idx}
-                    onClick={() => setSelectedPhoto(imgUrl)}
-                    className="w-full h-36 rounded-xl overflow-hidden border border-surface-container-highest shadow-xs cursor-pointer relative group bg-surface-container"
-                  >
-                    <img
-                      src={imgUrl}
-                      alt={`Station photo ${idx + 1}`}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
+                      <button
+                        onClick={() => handleVote(report.id, 'down')}
+                        className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[13px] font-semibold transition-all ${
+                          report.userVoted === 'down'
+                            ? 'bg-error text-white'
+                            : 'bg-surface text-on-surface-variant hover:bg-surface-container'
+                        }`}
+                      >
+                        <span
+                          className="material-symbols-outlined text-[16px]"
+                          style={{
+                            fontVariationSettings:
+                              report.userVoted === 'down' ? "'FILL' 1" : "'FILL' 0",
+                          }}
+                        >
+                          thumb_down
+                        </span>
+                        {report.dislikes ? <span>{report.dislikes}</span> : null}
+                      </button>
+                    </div>
                   </div>
-                ))}
+                )})}
               </div>
-            ) : (
-              <div className="bg-white rounded-2xl p-6 text-center border border-slate-200/80 shadow-xs flex flex-col items-center gap-2">
-                <span className="material-symbols-outlined text-[36px] text-slate-400">photo_camera</span>
-                <h4 className="font-extrabold text-slate-900 text-[15px]">No Driver Photos Uploaded Yet</h4>
-                <p className="text-[12px] text-slate-500 font-medium max-w-xs">
-                  Only live camera photos taken at this station are displayed here.
-                </p>
+            </div>
+          </TabsPrimitive.Content>
+
+          {/* TAB CONTENT 3: Station Photos Gallery */}
+          <TabsPrimitive.Content value="photos" className="mt-3 outline-none">
+            <div className="flex flex-col gap-3">
+              <div className="flex justify-between items-center px-1">
+                <h2 className="text-[17px] font-bold text-on-surface">
+                  Station &amp; Pump Photos ({images.length})
+                </h2>
                 <button
                   onClick={() => onOpenReportModal(station)}
-                  className="mt-1 px-4 py-2 bg-primary hover:bg-deep-teal text-white text-[12px] font-extrabold rounded-full shadow-md active:scale-95 transition-all"
+                  className="text-[12.5px] font-semibold text-primary flex items-center gap-1 hover:underline"
                 >
-                  Capture Live Photo
+                  <span className="material-symbols-outlined text-[16px]">add_a_photo</span>
+                  <span>Add Photo</span>
                 </button>
               </div>
-            )}
-          </div>
-        )}
+
+              {images.length > 0 ? (
+                <div className="grid grid-cols-2 gap-3">
+                  {images.map((imgUrl, idx) => (
+                    <div
+                      key={idx}
+                      onClick={() => setSelectedPhoto(imgUrl)}
+                      className="w-full h-36 rounded-xl overflow-hidden border border-surface-container-highest shadow-xs cursor-pointer relative group bg-surface-container"
+                    >
+                      <img
+                        src={imgUrl}
+                        alt={`Station photo ${idx + 1}`}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="bg-white rounded-2xl p-6 text-center border border-slate-200/80 shadow-xs flex flex-col items-center gap-2">
+                  <span className="material-symbols-outlined text-[36px] text-slate-400">photo_camera</span>
+                  <h4 className="font-extrabold text-slate-900 text-[15px]">No Driver Photos Uploaded Yet</h4>
+                  <p className="text-[12px] text-slate-500 font-medium max-w-xs">
+                    Only live camera photos taken at this station are displayed here.
+                  </p>
+                  <button
+                    onClick={() => onOpenReportModal(station)}
+                    className="mt-1 px-4 py-2 bg-primary hover:bg-deep-teal text-white text-[12px] font-extrabold rounded-full shadow-md active:scale-95 transition-all"
+                  >
+                    Capture Live Photo
+                  </button>
+                </div>
+              )}
+            </div>
+          </TabsPrimitive.Content>
+        </TabsPrimitive.Root>
       </div>
 
       {/* Sticky Bottom Action & Group Comment Input Bar */}
