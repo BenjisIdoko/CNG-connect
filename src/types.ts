@@ -59,7 +59,7 @@ export interface GasStation {
   activePresenceCount?: number;
   stationComments?: CommentItem[];
   stationNotice?: string;
-  locationPrecision?: 'geocoded' | 'gps_confirmed';
+  locationPrecision?: 'geocoded' | 'gps_confirmed' | 'source_exact';
   dataSource?: string;
   dataSourceDate?: string;
   createdBy?: string | null;

@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>National Network Map | Pi-CNG &amp; EV Presidential Initiative</title>
+  <meta name="description" content="An interactive map of every Pi-CNG & EV certified conversion centre and CNG refuelling station across Nigeria — explore the nationwide clean mobility network in one view."/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:site_name" content="Pi-CNG &amp; EV: Presidential Initiative"/>
+  <meta property="og:title" content="National Network Map: Pi-CNG &amp; EV"/>
+  <meta property="og:description" content="Explore Nigeria's nationwide network of CNG conversion centres and refuelling stations on one interactive map."/>
+  <meta property="og:url" content="https://pci.gov.ng/network-map.html"/>
+  <meta property="og:image" content="https://pci.gov.ng/images/rolling1.jpg"/>
+  <link rel="canonical" href="https://pci.gov.ng/network-map.html"/>
+  <link rel="icon" href="images/favicon.png" type="image/png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"/>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    /* ── Kind tabs (segmented control) ───────────────────────────── */
+    .nm-tabs {
+      display: inline-flex; align-self: center;
+      background: var(--offwhite2); border-radius: 999px; padding: 4px; gap: 2px;
+      flex-shrink: 0;
+      max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .nm-tabs::-webkit-scrollbar { display: none; }
+    .nm-tab {
+      border: none; background: none; cursor: pointer;
+      font-family: var(--font-ui); font-size: 0.82rem; font-weight: 700;
+      color: var(--muted); padding: 9px 16px; border-radius: 999px;
+      transition: background 0.2s, color 0.2s; white-space: nowrap;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .nm-tab:hover { color: var(--text); }
+    .nm-tab.active { background: var(--green); color: white; box-shadow: 0 4px 14px rgba(0,102,51,0.3); }
+    .nm-tab-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .nm-tab-dot-centres { background: #00e676; }
+    .nm-tab-dot-stations { background: #f5a623; }
+    .nm-tab.active .nm-tab-dot { background: white; }
+    .nm-tab-count { opacity: 0.75; font-weight: 600; }
+
+    /* ── Kind badges on cards / popups ───────────────────────────── */
+    .nm-kind-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 9px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase;
+      padding: 3px 9px; border-radius: 20px; margin-bottom: 10px;
+    }
+    .nm-kind-badge .dot { width: 6px; height: 6px; border-radius: 50%; }
+    .nm-kind-centre  { background: rgba(0,102,51,0.1); color: #006633; }
+    .nm-kind-centre .dot { background: #00994d; }
+    .nm-kind-station { background: rgba(245,166,35,0.14); color: #b5860f; }
+    .nm-kind-station .dot { background: #c9820a; }
+    .nm-approx-tag { font-size: 10px; font-style: italic; color: #b5860f; margin-top: 8px; }
+
+    /* ── Map column ───────────────────────────────────────────────── */
+    .nm-map-embed { height: 640px; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); box-shadow: 0 4px 24px rgba(0,0,0,0.06); position: relative; }
+    .nm-map-embed .leaflet-container { background: var(--offwhite); }
+    .nm-map-attrib {
+      position: absolute; bottom: 6px; right: 8px; z-index: 500;
+      font-size: 9px; color: rgba(0,0,0,0.4); font-family: var(--font-ui);
+      background: rgba(255,255,255,0.75); padding: 2px 6px; border-radius: 4px;
+    }
+    .nm-map-loading {
+      position: absolute; inset: 0; z-index: 400; background: var(--offwhite);
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* Popups */
+    .leaflet-popup-content-wrapper { border-radius: 10px; box-shadow: 0 8px 32px rgba(0,0,0,0.18); font-family: 'Plus Jakarta Sans', sans-serif; }
+    .leaflet-popup-content { margin: 14px 18px; min-width: 180px; }
+    .popup-name { font-weight: 700; font-size: 0.88rem; color: #060f08; margin-bottom: 5px; line-height: 1.35; }
+    .popup-detail { font-size: 0.76rem; color: #5d7a68; margin-bottom: 3px; }
+    .popup-status { display: inline-block; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 20px; margin-top: 6px; }
+    .popup-active { background: rgba(0,102,51,0.1); color: #006633; }
+    .popup-inactive { background: rgba(0,0,0,0.06); color: #5d7a68; }
+
+    .marker-cluster-c { background-color: rgba(0,102,51,0.25); }
+    .marker-cluster-c div { background-color: rgba(0,102,51,0.75); color: white; font-weight: 700; font-size: 12px; }
+    .marker-cluster-s { background-color: rgba(245,166,35,0.28); }
+    .marker-cluster-s div { background-color: rgba(197,130,10,0.85); color: white; font-weight: 700; font-size: 12px; }
+
+    .nm-card { cursor: pointer; }
+    .nm-card.nm-card-flash { animation: nmFlash 1s ease; }
+    @keyframes nmFlash {
+      0%   { box-shadow: 0 0 0 2px var(--electric), 0 12px 36px rgba(0,102,51,0.1); }
+      100% { box-shadow: 0 1px 3px rgba(0,0,0,0); }
+    }
+
+    /* ── Full network overview map ───────────────────────────────── */
+    .nm-overview-wrap {
+      position: relative; height: 600px;
+      border-radius: var(--radius); overflow: hidden;
+      border: 1px solid var(--border); box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+    }
+    .nm-overview-map { position: absolute; inset: 0; background: var(--offwhite); }
+    .nm-overview-loading {
+      position: absolute; inset: 0; z-index: 400; background: var(--offwhite);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .nm-overview-legend {
+      display: flex; gap: 28px; margin-top: 18px;
+      font-family: var(--font-ui); font-size: 0.85rem; font-weight: 700; color: var(--text);
+    }
+    .nm-overview-legend span { display: inline-flex; align-items: center; gap: 8px; }
+
+    @media (max-width: 768px) {
+      .cc-toolbar { flex-direction: column; align-items: stretch; }
+      .nm-tabs { align-self: stretch; justify-content: flex-start; }
+      .nm-map-embed { height: 380px; }
+      .nm-overview-wrap { height: 400px; }
+    }
+  </style>
+</head>
+<body data-page="network-map">
+<div id="nav-placeholder"></div>
+
+<!-- PAGE HERO -->
+<section class="page-hero" style="min-height:40vh;padding-bottom:48px;">
+  <div class="page-hero-bg" style="background-image:url('images/rolling1.jpg')"></div>
+  <div class="page-hero-ov"></div>
+  <div class="page-hero-top"></div>
+  <div class="page-hero-content">
+    <p class="t-eyebrow t-eyebrow-light">National Network</p>
+    <h1 class="page-hero-title">One Map. Every<br><em>Centre &amp; Station.</em></h1>
+    <p class="page-hero-sub">Every Pi-CNG certified conversion centre and CNG refuelling station in Nigeria, in one searchable directory and map. Switch views, filter by state, and click any result to jump straight to it.</p>
+  </div>
+</section>
+
+<!-- MAIN CONTENT -->
+<div x-data="nmApp()" x-init="init()">
+<section class="sec">
+  <div class="wrap">
+
+    <!-- Toolbar -->
+    <div class="cc-toolbar reveal">
+      <div class="nm-tabs" role="tablist" aria-label="Filter by type">
+        <button class="nm-tab" :class="{active: kind === 'all'}" @click="setKind('all')">
+          All <span class="nm-tab-count" x-text="'(' + baseFiltered.length + ')'"></span>
+        </button>
+        <button class="nm-tab" :class="{active: kind === 'centres'}" @click="setKind('centres')">
+          <span class="nm-tab-dot nm-tab-dot-centres"></span> Conversion Centres <span class="nm-tab-count" x-text="'(' + centresCount + ')'"></span>
+        </button>
+        <button class="nm-tab" :class="{active: kind === 'stations'}" @click="setKind('stations')">
+          <span class="nm-tab-dot nm-tab-dot-stations"></span> Refuelling Stations <span class="nm-tab-count" x-text="'(' + stationsCount + ')'"></span>
+        </button>
+      </div>
+      <div class="cc-search-wrap">
+        <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input
+          class="cc-search" type="text" placeholder="Search by name, company or address…"
+          x-model="searchInput" @input="onFilterChange()" aria-label="Search the network"
+        />
+      </div>
+      <select class="cc-select" x-model="selectedState" @change="onFilterChange()" aria-label="Filter by state">
+        <option value="">All States</option>
+        <template x-for="s in availableStates" :key="s">
+          <option :value="s" x-text="s"></option>
+        </template>
+      </select>
+      <div class="cc-result-count" x-show="!loading"><strong x-text="filteredTotal"></strong> result<span x-show="filteredTotal !== 1">s</span></div>
+      <button
+        x-show="searchInput || selectedState"
+        @click="clearFilters()"
+        style="font-size:0.8rem;color:var(--muted);font-weight:600;background:none;border:1px solid var(--border);border-radius:var(--radius);padding:8px 14px;cursor:pointer;white-space:nowrap;"
+      >Clear ✕</button>
+    </div>
+
+    <!-- Split layout: cards + map -->
+    <div class="cc-main-layout">
+
+      <!-- LEFT: cards + pagination -->
+      <div class="cc-cards-col">
+
+        <div class="cc-loading" x-show="loading" x-transition>
+          <div class="cc-spinner"></div>
+          <p style="font-size:0.9rem;color:var(--muted);">Loading the national network…</p>
+        </div>
+
+        <div class="cc-empty" x-show="!loading && pagedItems.length === 0" x-transition>
+          <svg viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <h4>No Locations Found</h4>
+          <p>Try a different search term or <button style="color:var(--green);font-weight:700;background:none;border:none;cursor:pointer;" @click="clearFilters()">clear filters</button>.</p>
+        </div>
+
+        <div class="cc-grid" x-show="!loading && pagedItems.length > 0">
+          <template x-for="item in pagedItems" :key="item.uid">
+            <div class="cc-card nm-card" :id="'card-' + item.uid" @click="flyToItem(item)">
+              <div>
+                <span class="nm-kind-badge" :class="item.kind === 'centre' ? 'nm-kind-centre' : 'nm-kind-station'">
+                  <span class="dot"></span>
+                  <span x-text="item.kind === 'centre' ? 'Conversion Centre' : 'Refuelling Station'"></span>
+                </span>
+              </div>
+              <div class="cc-card-header">
+                <div class="cc-card-name" x-text="item.name"></div>
+                <div class="cc-status" x-show="item.kind === 'centre'" :class="item.status ? 'cc-status-active' : 'cc-status-inactive'" x-text="item.status ? 'Active' : 'Registered'"></div>
+              </div>
+              <div class="cc-card-detail">
+                <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <div class="cc-card-detail-text" x-text="item.address"></div>
+              </div>
+              <div class="cc-card-detail">
+                <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                <div class="cc-card-detail-text"><span x-text="item.state"></span> &bull; <span x-text="item.sub"></span></div>
+              </div>
+              <div class="nm-approx-tag" x-show="item.approx">Map position approximate</div>
+            </div>
+          </template>
+        </div>
+
+        <!-- Pagination -->
+        <div class="cc-pagination" x-show="!loading && totalPages > 1">
+          <button class="cc-page-btn" :disabled="page === 1" @click="goPage(page - 1)">
+            <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <template x-for="p in visiblePages" :key="p">
+            <span>
+              <span class="cc-page-info" x-show="p === '...'">…</span>
+              <button class="cc-page-btn" x-show="p !== '...'" :class="{ active: p === page }" @click="goPage(p)" x-text="p"></button>
+            </span>
+          </template>
+          <button class="cc-page-btn" :disabled="page === totalPages" @click="goPage(page + 1)">
+            <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+          <span class="cc-page-info">Page <strong x-text="page"></strong> / <strong x-text="totalPages"></strong></span>
+        </div>
+
+      </div><!-- /cc-cards-col -->
+
+      <!-- RIGHT: sticky map -->
+      <div class="cc-map-col">
+        <div class="nm-map-embed">
+          <div class="nm-map-loading" x-show="loading" x-transition>
+            <div class="cc-spinner"></div>
+          </div>
+          <div id="nm-map" style="position:absolute;inset:0;"></div>
+          <div class="nm-map-attrib">Tiles &copy; Esri</div>
+        </div>
+        <p class="cc-map-note">Click any card or marker for details · Pins marked "approximate" are placed at the nearest known town or district.</p>
+      </div>
+
+    </div><!-- /cc-main-layout -->
+
+  </div>
+</section>
+
+<!-- FULL NETWORK OVERVIEW -->
+<section class="sec-sm" style="padding-top:0;">
+  <div class="wrap">
+    <div class="reveal" style="margin-bottom:24px;">
+      <p class="t-eyebrow">Full Picture</p>
+      <h2 class="t-display">The Entire Network<br><em>At a Glance</em></h2>
+      <p style="color:var(--muted);max-width:600px;margin-top:10px;">Every conversion centre and refuelling station, unfiltered, on one map — zoomed out to show the complete national build-out.</p>
+    </div>
+    <div class="nm-overview-wrap reveal">
+      <div class="nm-overview-loading" x-show="loading" x-transition>
+        <div class="cc-spinner"></div>
+      </div>
+      <div id="nm-overview-map" class="nm-overview-map"></div>
+      <div class="nm-map-attrib">Tiles &copy; Esri</div>
+    </div>
+    <div class="nm-overview-legend">
+      <span><span class="nm-tab-dot nm-tab-dot-centres"></span> Conversion Centres</span>
+      <span><span class="nm-tab-dot nm-tab-dot-stations"></span> Refuelling Stations</span>
+    </div>
+  </div>
+</section>
+</div><!-- /x-data nmApp -->
+
+<!-- CTA -->
+<section class="dark-band">
+  <div class="wrap">
+    <div class="reveal">
+      <p class="t-eyebrow t-eyebrow-light" style="justify-content:center;">Explore the Network</p>
+      <h2 class="t-display t-display-light">Find a Centre or<br><em>Station Near You</em></h2>
+      <p>Browse the full searchable directories, or reach out if you'd like to become a certified partner and get added to the map.</p>
+      <div class="btn-row" style="justify-content:center;">
+        <a href="conversion-centers.html" class="btn btn-electric btn-arrow">Conversion Centres</a>
+        <a href="refuelling-stations.html" class="btn btn-outline-white">Refuelling Stations</a>
+        <a href="contact.html" class="btn btn-outline-white">Partner With Us</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div id="footer-placeholder"></div>
+
+<!-- Alpine.js -->
+<script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+<!-- Leaflet -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+<script src="geo-data.js"></script>
+<script src="stations-data.js"></script>
+
+<script>
+var CC_API   = 'https://pcngi.com.ng/api/v1/conversion-centers';
+var CC_KEY   = 'ZDY1MWU5MjY0MmJjMWNkNGIyNWVlMTQ0NDQ3YjNjOTA';
+var PER_PAGE = 24;
+
+/* Loose bounding box around Nigeria — filters out (0,0) placeholder
+   coordinates and other bad data the live API occasionally returns */
+function isValidNGCoord(lat, lng) {
+  return !isNaN(lat) && !isNaN(lng) && lat >= 3.5 && lat <= 14.5 && lng >= 2 && lng <= 15.5;
+}
+
+function normStateName(s) {
+  if (!s) return '';
+  var t = String(s).trim();
+  var low = t.toLowerCase();
+  if (low === 'fct' || low === 'federal capital territory' ||
+      low.startsWith('fct ') || low.includes('federal capital territory')) {
+    return 'FCT Abuja';
+  }
+  return t;
+}
+
+/* Conversion centres that come back from the API without usable lat/lng
+   get the same treatment as refuelling stations: match known place-name
+   keywords in the address/LGA text, falling back to the state capital. */
+function geocodeCentreFallback(c) {
+  var text = (c.address || '') + ' ' + (c.lga || '');
+  for (var i = 0; i < AREA_COORDS.length; i++) {
+    if (AREA_COORDS[i].re.test(text)) return AREA_COORDS[i].ll;
+  }
+  var base = STATE_COORDS[normStateName(c.state)] || STATE_COORDS['FCT Abuja'];
+  return geoJitter('centre|' + c.id + '|' + text, base[0], base[1]);
+}
+
+function escHtml(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function approxNoteHtml(approx) {
+  return approx ? '<div style="font-size:10px;font-style:italic;color:#b5860f;margin-top:6px;">Location approximate</div>' : '';
+}
+
+/* Esri's ArcGIS Online "Light Gray Canvas" basemap — free, no API key,
+   and built for production embedding (unlike OSM's own tile server,
+   which explicitly disallows this kind of use and will rate-limit or
+   block it). Two stacked layers: base fill + labels/roads reference. */
+function addBasemap(map) {
+  var opts = { maxZoom: 18, maxNativeZoom: 16, attribution: '&copy; Esri &mdash; Esri, DeLorme, NAVTEQ' };
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', opts).addTo(map);
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}', opts).addTo(map);
+}
+
+function greenIcon() {
+  return L.divIcon({
+    className: '',
+    html: '<div style="width:12px;height:12px;background:#00e676;border-radius:50%;border:2px solid rgba(0,102,51,0.9);box-shadow:0 0 5px rgba(0,230,118,0.55);"></div>',
+    iconSize: [12, 12], iconAnchor: [6, 6]
+  });
+}
+function goldIcon() {
+  return L.divIcon({
+    className: '',
+    html: '<div style="width:12px;height:12px;background:#f5a623;border-radius:50%;border:2px solid rgba(197,130,10,0.95);box-shadow:0 0 5px rgba(245,166,35,0.6);"></div>',
+    iconSize: [12, 12], iconAnchor: [6, 6]
+  });
+}
+function clusterIcon(cls) {
+  return function(cluster) {
+    var count = cluster.getChildCount();
+    var size = count < 10 ? 'small' : count < 50 ? 'medium' : 'large';
+    return L.divIcon({
+      html: '<div><span>' + count + '</span></div>',
+      className: 'marker-cluster ' + cls + ' marker-cluster-' + size,
+      iconSize: L.point(40, 40)
+    });
+  };
+}
+
+document.addEventListener('alpine:init', function () {
+  Alpine.data('nmApp', function () {
+    return {
+      allCentres: [],
+      allStationsGeo: [],
+      kind: 'all',
+      searchInput: '',
+      selectedState: '',
+      availableStates: [],
+      page: 1,
+      loading: true,
+      _map: null,
+      _centreCluster: null,
+      _stationCluster: null,
+      _markerIndex: {},
+      filtered: [],
+      baseFiltered: [],
+      centresCount: 0,
+      stationsCount: 0,
+      pagedItems: [],
+
+      get filteredTotal() { return this.filtered.length; },
+      get totalPages() { return Math.max(1, Math.ceil(this.filtered.length / PER_PAGE)); },
+      get visiblePages() {
+        var t = this.totalPages, c = this.page, pages = [];
+        if (t <= 7) { for (var i = 1; i <= t; i++) pages.push(i); }
+        else {
+          pages.push(1);
+          if (c > 3) pages.push('...');
+          for (var j = Math.max(2, c - 1); j <= Math.min(t - 1, c + 1); j++) pages.push(j);
+          if (c < t - 2) pages.push('...');
+          pages.push(t);
+        }
+        return pages;
+      },
+
+      async init() {
+        this.loading = true;
+
+        /* Stations are local — geocode immediately */
+        this.allStationsGeo = (typeof RS_STATIONS !== 'undefined' ? RS_STATIONS : []).map(function(s) {
+          var ll = geocodeStation(s);
+          return {
+            uid: 's-' + s.region + '-' + s.sn + '-' + s.company,
+            kind: 'station',
+            name: s.company, address: s.address, state: normStateName(s.state), sub: s.region,
+            status: null, lat: ll[0], lng: ll[1], approx: true, raw: s
+          };
+        });
+
+        this.$nextTick(function() { this._initMap(); }.bind(this));
+
+        /* Conversion centres come from the live API — paginate through it */
+        try {
+          var first = await this._fetchCCPage(1);
+          var lastPage = (first.meta && first.meta.lastPage) ? first.meta.lastPage : 1;
+          var raw = first.data || [];
+          if (lastPage > 1) {
+            var tasks = [];
+            for (var p = 2; p <= lastPage; p++) tasks.push(this._fetchCCPage(p));
+            var results = await Promise.all(tasks);
+            results.forEach(function(r) { raw = raw.concat(r.data || []); });
+          }
+          this.allCentres = raw.map(function(c) {
+            var lat = parseFloat(c.latitude), lng = parseFloat(c.longitude);
+            var approx = false;
+            if (!isValidNGCoord(lat, lng)) {
+              var ll = geocodeCentreFallback(c);
+              lat = ll[0]; lng = ll[1];
+              approx = true;
+            }
+            return {
+              uid: 'c-' + c.id, kind: 'centre',
+              name: c.name, address: c.address, state: normStateName(c.state), sub: c.lga,
+              status: !!c.status, lat: lat, lng: lng, approx: approx, raw: c
+            };
+          });
+        } catch (e) {
+          console.warn('[network-map] conversion centres unavailable', e);
+          this.allCentres = [];
+        }
+
+        var stSet = new Set();
+        this.allCentres.forEach(function(c) { if (c.state) stSet.add(c.state); });
+        this.allStationsGeo.forEach(function(s) { if (s.state) stSet.add(s.state); });
+        this.availableStates = Array.from(stSet).sort();
+
+        this.loading = false;
+        this.onFilterChange();
+        this.$nextTick(function() { this._initOverviewMap(); }.bind(this));
+      },
+
+      _fetchCCPage(page) {
+        return fetch(CC_API + '?limit=50&page=' + page, { headers: { 'x-api-key': CC_KEY } })
+          .then(function(r) { if (!r.ok) throw new Error('API ' + r.status); return r.json(); });
+      },
+
+      setKind(k) { this.kind = k; this.page = 1; this.onFilterChange(); },
+
+      onFilterChange() {
+        var term = this.searchInput.trim().toLowerCase();
+        var state = this.selectedState;
+        var kind = this.kind;
+
+        var all = this.allCentres.concat(this.allStationsGeo);
+        this.baseFiltered = all.filter(function(item) {
+          if (state && item.state !== state) return false;
+          if (term) {
+            var hay = ((item.name||'') + ' ' + (item.address||'') + ' ' + (item.state||'') + ' ' + (item.sub||'')).toLowerCase();
+            if (hay.indexOf(term) === -1) return false;
+          }
+          return true;
+        });
+        this.centresCount  = this.baseFiltered.filter(function(i) { return i.kind === 'centre'; }).length;
+        this.stationsCount = this.baseFiltered.filter(function(i) { return i.kind === 'station'; }).length;
+
+        this.filtered = this.baseFiltered.filter(function(item) {
+          if (kind === 'centres' && item.kind !== 'centre') return false;
+          if (kind === 'stations' && item.kind !== 'station') return false;
+          return true;
+        });
+
+        this.page = 1;
+        this._updatePage();
+        this._renderMarkers();
+
+        if (term || state) {
+          var bounds = this.filtered.map(function(i) { return [i.lat, i.lng]; });
+          if (bounds.length === 1 && this._map) {
+            var soloZoom = this.filtered[0].approx ? 13 : 16;
+            this._map.setView(bounds[0], soloZoom, { animate: true });
+          } else if (bounds.length && this._map) {
+            var maxZ = bounds.length <= 5 ? 16 : bounds.length <= 20 ? 14 : 12;
+            this._map.fitBounds(bounds, { padding: [50, 50], maxZoom: maxZ });
+          }
+        } else if (this._map) {
+          this._map.setView([9.08, 8.68], 6);
+        }
+      },
+
+      clearFilters() {
+        this.searchInput = '';
+        this.selectedState = '';
+        this.onFilterChange();
+      },
+
+      goPage(p) {
+        if (p < 1 || p > this.totalPages) return;
+        this.page = p;
+        this._updatePage();
+        var tb = document.querySelector('.cc-toolbar');
+        if (tb) tb.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      },
+
+      _updatePage() {
+        var s = (this.page - 1) * PER_PAGE;
+        this.pagedItems = this.filtered.slice(s, s + PER_PAGE);
+      },
+
+      /* ── Leaflet map ─────────────────────────────────────────────── */
+      _initMap() {
+        var el = document.getElementById('nm-map');
+        if (!el || this._map) return;
+
+        this._map = L.map('nm-map', {
+          center: [9.08, 8.68], zoom: 6,
+          zoomControl: true, scrollWheelZoom: false, attributionControl: false
+        });
+        addBasemap(this._map);
+
+        this._centreCluster  = L.markerClusterGroup({ showCoverageOnHover: false, maxClusterRadius: 46, iconCreateFunction: clusterIcon('marker-cluster-c') });
+        this._stationCluster = L.markerClusterGroup({ showCoverageOnHover: false, maxClusterRadius: 46, iconCreateFunction: clusterIcon('marker-cluster-s') });
+        this._map.addLayer(this._centreCluster);
+        this._map.addLayer(this._stationCluster);
+
+        this._renderMarkers();
+      },
+
+      _renderMarkers() {
+        if (!this._centreCluster || !this._stationCluster) return;
+        this._centreCluster.clearLayers();
+        this._stationCluster.clearLayers();
+        this._markerIndex = {};
+
+        var self = this;
+        var gIcon = greenIcon(), yIcon = goldIcon();
+
+        this.filtered.forEach(function(item) {
+          if (item.kind === 'centre') {
+            var status = item.status
+              ? '<span class="popup-status popup-active">Active</span>'
+              : '<span class="popup-status popup-inactive">Registered</span>';
+            var m = L.marker([item.lat, item.lng], { icon: gIcon }).bindPopup(
+              '<div class="popup-name">' + escHtml(item.name || '—') + '</div>' +
+              '<div class="popup-detail">📍 ' + escHtml(item.address || '—') + '</div>' +
+              '<div class="popup-detail">🗺 ' + escHtml(item.state || '') + ' · ' + escHtml(item.sub || '') + '</div>' +
+              status + approxNoteHtml(item.approx), { maxWidth: 260 }
+            );
+            m.addTo(self._centreCluster);
+            self._markerIndex[item.uid] = { marker: m, cluster: self._centreCluster };
+          } else {
+            var m2 = L.marker([item.lat, item.lng], { icon: yIcon }).bindPopup(
+              '<div class="popup-name">' + escHtml(item.name || '—') + '</div>' +
+              '<div class="popup-detail">📍 ' + escHtml(item.address || '—') + '</div>' +
+              '<div class="popup-detail">🗺 ' + escHtml(item.state || '') + ' · ' + escHtml(item.sub || '') + '</div>' +
+              approxNoteHtml(item.approx), { maxWidth: 260 }
+            );
+            m2.addTo(self._stationCluster);
+            self._markerIndex[item.uid] = { marker: m2, cluster: self._stationCluster };
+          }
+        });
+      },
+
+      /* Card click → reveal the marker (even inside a cluster) and open its popup */
+      flyToItem(item) {
+        if (!this._map) return;
+        var entry = this._markerIndex[item.uid];
+
+        var cardEl = document.getElementById('card-' + item.uid);
+        if (cardEl) {
+          cardEl.classList.remove('nm-card-flash');
+          void cardEl.offsetWidth;
+          cardEl.classList.add('nm-card-flash');
+        }
+
+        /* Approximate pins are placed at the nearest known town, not the
+           real spot — zooming to street level would show empty tiles and
+           imply false precision, so stop at a town-level zoom instead. */
+        var targetZoom = item.approx ? 13 : 16;
+
+        if (!entry) { this._map.setView([item.lat, item.lng], targetZoom, { animate: true }); return; }
+
+        var map = this._map;
+        if (typeof entry.cluster.zoomToShowLayer === 'function') {
+          entry.cluster.zoomToShowLayer(entry.marker, function() {
+            map.setView(entry.marker.getLatLng(), targetZoom, { animate: true });
+            entry.marker.openPopup();
+          });
+        } else {
+          map.setView([item.lat, item.lng], targetZoom, { animate: true });
+          entry.marker.openPopup();
+        }
+      },
+
+      /* ── Full network overview map — always shows everything, unfiltered ── */
+      _initOverviewMap() {
+        var el = document.getElementById('nm-overview-map');
+        if (!el || this._overviewMap) return;
+
+        this._overviewMap = L.map('nm-overview-map', {
+          center: [9.08, 8.68], zoom: 6,
+          zoomControl: true, scrollWheelZoom: false, attributionControl: false
+        });
+        addBasemap(this._overviewMap);
+
+        var centreCluster  = L.markerClusterGroup({ showCoverageOnHover: false, maxClusterRadius: 46, iconCreateFunction: clusterIcon('marker-cluster-c') });
+        var stationCluster = L.markerClusterGroup({ showCoverageOnHover: false, maxClusterRadius: 46, iconCreateFunction: clusterIcon('marker-cluster-s') });
+        var gIcon = greenIcon(), yIcon = goldIcon();
+        var bounds = [];
+
+        this.allCentres.forEach(function(c) {
+          var status = c.status
+            ? '<span class="popup-status popup-active">Active</span>'
+            : '<span class="popup-status popup-inactive">Registered</span>';
+          L.marker([c.lat, c.lng], { icon: gIcon }).bindPopup(
+            '<div class="popup-name">' + escHtml(c.name || '—') + '</div>' +
+            '<div class="popup-detail">📍 ' + escHtml(c.address || '—') + '</div>' +
+            '<div class="popup-detail">🗺 ' + escHtml(c.state || '') + ' · ' + escHtml(c.sub || '') + '</div>' +
+            status + approxNoteHtml(c.approx), { maxWidth: 260 }
+          ).addTo(centreCluster);
+          bounds.push([c.lat, c.lng]);
+        });
+        this.allStationsGeo.forEach(function(s) {
+          L.marker([s.lat, s.lng], { icon: yIcon }).bindPopup(
+            '<div class="popup-name">' + escHtml(s.name || '—') + '</div>' +
+            '<div class="popup-detail">📍 ' + escHtml(s.address || '—') + '</div>' +
+            '<div class="popup-detail">🗺 ' + escHtml(s.state || '') + ' · ' + escHtml(s.sub || '') + '</div>' +
+            approxNoteHtml(s.approx), { maxWidth: 260 }
+          ).addTo(stationCluster);
+          bounds.push([s.lat, s.lng]);
+        });
+
+        this._overviewMap.addLayer(centreCluster);
+        this._overviewMap.addLayer(stationCluster);
+        if (bounds.length) this._overviewMap.fitBounds(bounds, { padding: [24, 24] });
+      }
+    };
+  });
+});
+</script>
+<script src="shared.js"></script>
+</body>
+</html>

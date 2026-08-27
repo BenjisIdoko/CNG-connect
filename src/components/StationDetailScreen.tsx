@@ -260,16 +260,22 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
               {/* Location Precision Badge */}
               <div
                 className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-micro font-bold border ${
-                  station.locationPrecision === 'gps_confirmed'
+                  station.locationPrecision === 'source_exact' || station.locationPrecision === 'gps_confirmed'
                     ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
                     : 'bg-amber-50 text-amber-800 border-amber-300'
                 }`}
               >
                 <span className="material-symbols-outlined text-[14px]">
-                  {station.locationPrecision === 'gps_confirmed' ? 'my_location' : 'wrong_location'}
+                  {station.locationPrecision === 'source_exact'
+                    ? 'verified'
+                    : station.locationPrecision === 'gps_confirmed'
+                    ? 'my_location'
+                    : 'wrong_location'}
                 </span>
                 <span>
-                  {station.locationPrecision === 'gps_confirmed'
+                  {station.locationPrecision === 'source_exact'
+                    ? 'Verified Source Coordinates'
+                    : station.locationPrecision === 'gps_confirmed'
                     ? 'Exact GPS Location Confirmed'
                     : 'Approximate Geocoded Location'}
                 </span>

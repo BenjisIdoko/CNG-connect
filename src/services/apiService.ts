@@ -29,8 +29,8 @@ export function calculateVerificationMetadata(report: DriverReport): {
 }
 
 // LocalStorage Persistence Fallback Keys
-const STATIONS_STORAGE_KEY = 'gasfinder_stations_v9';
-const POSTS_STORAGE_KEY = 'gasfinder_posts_v9';
+const STATIONS_STORAGE_KEY = 'gasfinder_stations_v10';
+const POSTS_STORAGE_KEY = 'gasfinder_posts_v10';
 
 let memoryStore: Record<string, string> = {};
 
@@ -80,6 +80,7 @@ function purgeStaleLocalStorage() {
       'gasfinder_stations_v6',
       'gasfinder_stations_v7',
       'gasfinder_stations_v8',
+      'gasfinder_stations_v9',
       'gasfinder_posts_v1',
       'gasfinder_posts_v2',
       'gasfinder_posts_v3',
@@ -88,6 +89,7 @@ function purgeStaleLocalStorage() {
       'gasfinder_posts_v6',
       'gasfinder_posts_v7',
       'gasfinder_posts_v8',
+      'gasfinder_posts_v9',
     ];
     keysToRemove.forEach((k) => removeStorageItem(k));
   } catch {
