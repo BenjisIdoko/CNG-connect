@@ -3,9 +3,10 @@ import L from 'leaflet';
 import 'leaflet.markercluster/dist/MarkerCluster.css';
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 import 'leaflet.markercluster';
-import { GasStation, StationStatus } from '../types';
+import { GasStation, StationStatus, StationSuggestion } from '../types';
 import { ASSETS } from '../data/mockData';
 import { Modal } from './common/Modal';
+import { SuggestStationModal } from './SuggestStationModal';
 import { formatStationAge } from '../utils/timeUtils';
 import { openWhatsAppShare } from '../utils/shareMessageBuilder';
 
@@ -20,6 +21,7 @@ interface MapScreenProps {
   gpsStatus?: GpsStatus;
   userGps?: { lat: number; lng: number } | null;
   onGpsStatusChange?: (status: GpsStatus, coords?: { lat: number; lng: number }) => void;
+  onSuggestStation?: (suggestion: Omit<StationSuggestion, 'id' | 'createdAt' | 'status'>) => void;
 }
 
 export const MapScreen: React.FC<MapScreenProps> = ({
@@ -31,11 +33,14 @@ export const MapScreen: React.FC<MapScreenProps> = ({
   gpsStatus: propGpsStatus,
   userGps: propUserGps,
   onGpsStatusChange,
+  onSuggestStation,
 }) => {
   const [activeFilter, setActiveFilter] = useState<string>('all');
+  const [stationTypeFilter, setStationTypeFilter] = useState<'all' | 'cng' | 'ev_charging'>('all');
   const [activeCity, setActiveCity] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+  const [isSuggestModalOpen, setIsSuggestModalOpen] = useState(false);
   const [showPiCngInfo, setShowPiCngInfo] = useState(false);
   const [minPressure, setMinPressure] = useState<number>(0);
   const [maxDistanceKm, setMaxDistanceKm] = useState<number>(0); // 0 = any distance
@@ -132,6 +137,8 @@ export const MapScreen: React.FC<MapScreenProps> = ({
   };
 
   const filteredStations = stations.filter((st) => {
+    const matchesStationType =
+      stationTypeFilter === 'all' || (st.stationType || 'cng') === stationTypeFilter;
     const matchesFilter = activeFilter === 'all' || st.status === activeFilter;
     const matchesCity =
       activeCity === 'all' ||
@@ -142,10 +149,11 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       st.address.toLowerCase().includes(searchQuery.toLowerCase()) ||
       st.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
       st.state.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (st.operator && st.operator.toLowerCase().includes(searchQuery.toLowerCase()));
+      (st.operator && st.operator.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (st.network && st.network.toLowerCase().includes(searchQuery.toLowerCase()));
     const matchesPressure = minPressure === 0 || (st.pumpPressure != null && st.pumpPressure >= minPressure);
     const matchesDistance = maxDistanceKm === 0 || getDistanceKm(st) <= maxDistanceKm;
-    return matchesFilter && matchesCity && matchesSearch && matchesPressure && matchesDistance;
+    return matchesStationType && matchesFilter && matchesCity && matchesSearch && matchesPressure && matchesDistance;
   });
 
   useEffect(() => {
@@ -219,28 +227,44 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       const lat = st.lat || 9.0765;
       const lng = st.lng || 7.4853;
       const isSelected = selectedStation?.id === st.id;
+      const isEv = st.stationType === 'ev_charging';
 
       let colorClass = '#00c853';
-      if (st.status === 'queue') colorClass = '#f59e0b';
-      if (st.status === 'low') colorClass = '#fe9400';
-      if (st.status === 'out') colorClass = '#ef4444';
-      if (st.status === 'unknown') colorClass = '#94a3b8';
+      let iconSymbol = 'local_gas_station';
 
-      const pressureText = st.pumpPressure ? `${st.pumpPressure} bar` : (st.status === 'unknown' ? 'No reports' : 'CNG');
+      if (isEv) {
+        // Visually distinct Cyan/Sky Blue color family for EV stations
+        colorClass = '#0284c7'; // Available Sky Blue
+        if (st.status === 'queue') colorClass = '#0891b2'; // Busy Cyan
+        if (st.status === 'low') colorClass = '#0369a1'; // Full Dark Cyan
+        if (st.status === 'out') colorClass = '#475569'; // Out of Service Slate
+        if (st.status === 'unknown') colorClass = '#64748b';
+        iconSymbol = 'bolt';
+      } else {
+        if (st.status === 'queue') colorClass = '#f59e0b';
+        if (st.status === 'low') colorClass = '#fe9400';
+        if (st.status === 'out') colorClass = '#ef4444';
+        if (st.status === 'unknown') colorClass = '#94a3b8';
+      }
+
+      const displayText = isEv
+        ? (st.chargingSpeedKw ? `${st.chargingSpeedKw}kW` : 'EV')
+        : (st.pumpPressure ? `${st.pumpPressure} bar` : (st.status === 'unknown' ? 'No reports' : 'CNG'));
 
       const customIcon = L.divIcon({
         className: 'custom-leaflet-marker',
         html: `
           <div class="relative group cursor-pointer flex flex-col items-center">
-            <div class="px-2 py-0.5 rounded-full text-[10px] font-black text-white shadow-md flex items-center gap-1 transition-transform transform ${isSelected ? 'scale-125' : ''}" style="background-color: ${colorClass};">
+            <div class="px-2 py-0.5 rounded-full text-[10px] font-black text-white shadow-md flex items-center gap-1 transition-transform transform ${isSelected ? 'scale-125 ring-2 ring-white' : ''}" style="background-color: ${colorClass};">
               <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
-              <span>${pressureText}</span>
+              <span class="material-symbols-outlined text-[12px]">${iconSymbol}</span>
+              <span>${displayText}</span>
             </div>
             <div class="w-2.5 h-2.5 rotate-45 border-r border-b border-white -mt-1 shadow-xs" style="background-color: ${colorClass};"></div>
           </div>
         `,
-        iconSize: [60, 30],
-        iconAnchor: [30, 30],
+        iconSize: [70, 30],
+        iconAnchor: [35, 30],
       });
 
       const marker = L.marker([lat, lng], { icon: customIcon });
@@ -422,6 +446,53 @@ export const MapScreen: React.FC<MapScreenProps> = ({
               </span>
             </button>
           </div>
+        </div>
+
+        {/* Station Type Filter Pills & Suggest Station Action Button */}
+        <div className="flex items-center gap-1.5 overflow-x-auto hide-scrollbar pt-0.5">
+          <button
+            onClick={() => setStationTypeFilter('all')}
+            className={`px-3.5 py-1.5 rounded-full text-micro font-extrabold transition-all shadow-xs flex items-center gap-1 shrink-0 ${
+              stationTypeFilter === 'all'
+                ? 'bg-slate-900 text-white ring-2 ring-slate-900/20'
+                : 'bg-white/95 backdrop-blur-md text-slate-700 hover:bg-white border border-slate-200'
+            }`}
+          >
+            <span>All Stations</span>
+          </button>
+
+          <button
+            onClick={() => setStationTypeFilter('cng')}
+            className={`px-3.5 py-1.5 rounded-full text-micro font-extrabold transition-all shadow-xs flex items-center gap-1 shrink-0 ${
+              stationTypeFilter === 'cng'
+                ? 'bg-emerald-600 text-white ring-2 ring-emerald-600/30'
+                : 'bg-white/95 backdrop-blur-md text-emerald-800 hover:bg-white border border-emerald-200'
+            }`}
+          >
+            <span className="material-symbols-outlined text-[14px]">local_gas_station</span>
+            <span>CNG Refuelling</span>
+          </button>
+
+          <button
+            onClick={() => setStationTypeFilter('ev_charging')}
+            className={`px-3.5 py-1.5 rounded-full text-micro font-extrabold transition-all shadow-xs flex items-center gap-1 shrink-0 ${
+              stationTypeFilter === 'ev_charging'
+                ? 'bg-sky-600 text-white ring-2 ring-sky-600/30'
+                : 'bg-white/95 backdrop-blur-md text-sky-900 hover:bg-white border border-sky-200'
+            }`}
+          >
+            <span className="material-symbols-outlined text-[14px]">bolt</span>
+            <span>⚡ EV Charging</span>
+          </button>
+
+          <button
+            onClick={() => setIsSuggestModalOpen(true)}
+            className="ml-auto px-3.5 py-1.5 rounded-full bg-primary/95 hover:bg-primary text-white text-micro font-extrabold shadow-md flex items-center gap-1 shrink-0 active:scale-95 transition-all"
+            title="Suggest a new CNG or EV station"
+          >
+            <span className="material-symbols-outlined text-[14px]">add_location_alt</span>
+            <span>+ Suggest Station</span>
+          </button>
         </div>
       </div>
 
@@ -799,6 +870,18 @@ export const MapScreen: React.FC<MapScreenProps> = ({
           </div>
         </div>
       </Modal>
+
+      {/* Suggest Station Modal */}
+      <SuggestStationModal
+        isOpen={isSuggestModalOpen}
+        onClose={() => setIsSuggestModalOpen(false)}
+        onSuggestStation={(suggestion) => {
+          if (onSuggestStation) {
+            onSuggestStation(suggestion);
+          }
+          showToast('Station suggestion submitted for verification!');
+        }}
+      />
     </div>
   );
 };

@@ -55,6 +55,12 @@ export interface GasStation {
   lng: number; // Real GPS longitude
   images: string[];
   reports: DriverReport[];
+  stationType?: 'cng' | 'ev_charging'; // Default is 'cng'
+  connectorTypes?: string[]; // e.g. ['CCS2', 'Type 2 AC']
+  chargingSpeedKw?: number; // e.g. 120 (kW)
+  pricePerKwh?: number; // e.g. 180 (NGN / kWh)
+  totalPorts?: number; // e.g. 4
+  network?: string; // e.g. Qoray Mobility, SAGLEV, NNPC / Shafa
   stationMedia?: StationMedia[];
   activePresenceCount?: number;
   stationComments?: CommentItem[];
@@ -63,6 +69,21 @@ export interface GasStation {
   dataSource?: string;
   dataSourceDate?: string;
   createdBy?: string | null;
+}
+
+export interface StationSuggestion {
+  id: string;
+  name: string;
+  address: string;
+  stationType: 'cng' | 'ev_charging';
+  city: string;
+  state: string;
+  operator?: string;
+  notes?: string;
+  photo?: string;
+  status: 'pending' | 'approved' | 'rejected';
+  createdAt: string;
+  submittedBy?: string;
 }
 
 export interface CommentItem {

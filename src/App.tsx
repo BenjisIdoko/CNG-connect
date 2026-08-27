@@ -566,6 +566,10 @@ export const App: React.FC = () => {
                 setGpsStatus(status);
                 if (coords) setUserCoords(coords);
               }}
+              onSuggestStation={async (s) => {
+                await apiService.addStationSuggestion(s);
+                showToast('Station suggestion submitted!');
+              }}
             />
           ) : activeTab === 'conversions' ? (
             <ConversionCentersScreen

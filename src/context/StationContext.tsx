@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { GasStation, DriverReport, StationStatus, CommunityPost } from '../types';
+import { GasStation, DriverReport, StationStatus, CommunityPost, StationSuggestion } from '../types';
 import { INITIAL_STATIONS, INITIAL_POSTS } from '../data/mockData';
 import { apiService } from '../services/apiService';
 import { useAuth } from './AuthContext';
@@ -29,6 +29,7 @@ interface StationContextType {
   handleCreatePost: (newPost: CommunityPost) => void;
   handleOpenReportModal: (station: GasStation) => void;
   handleUpdateStationLocation: (stationId: string, lat: number, lng: number) => Promise<void>;
+  handleSuggestStation: (suggestion: Omit<StationSuggestion, 'id' | 'createdAt' | 'status'>) => Promise<void>;
 }
 
 const StationContext = createContext<StationContextType | undefined>(undefined);
@@ -191,6 +192,10 @@ export const StationProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   };
 
+  const handleSuggestStation = async (suggestion: Omit<StationSuggestion, 'id' | 'createdAt' | 'status'>) => {
+    await apiService.addStationSuggestion(suggestion);
+  };
+
   return (
     <StationContext.Provider
       value={{
@@ -216,6 +221,7 @@ export const StationProvider: React.FC<{ children: React.ReactNode }> = ({ child
         handleCreatePost,
         handleOpenReportModal,
         handleUpdateStationLocation,
+        handleSuggestStation,
       }}
     >
       {children}

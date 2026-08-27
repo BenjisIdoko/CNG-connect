@@ -1,5 +1,6 @@
 import { GasStation, CommunityPost, ChatMessage, UserProfile, ConversionCenter } from '../types';
 import pciStationsSeed from './pci-stations-seed.json';
+import evStationsSeed from './ev-stations-seed.json';
 import pciConversionCentersSeed from './pci-conversion-centers-seed.json';
 
 export const ASSETS = {
@@ -66,10 +67,12 @@ export function deduplicateStations(stationsList: GasStation[]): GasStation[] {
 }
 
 export const INITIAL_STATIONS: GasStation[] = deduplicateStations([
-  ...(pciStationsSeed as GasStation[]),
+  ...(evStationsSeed as GasStation[]),
+  ...(pciStationsSeed as GasStation[]).map((s) => ({ ...s, stationType: (s.stationType || 'cng') as 'cng' })),
   // ABUJA FCT (CNG Official Network)
   {
     id: 'total-cng-wuse2',
+    stationType: 'cng',
     name: 'Total CNG - Wuse 2',
     address: 'Aminu Kano Crescent, Wuse 2, Abuja',
     city: 'Wuse 2',

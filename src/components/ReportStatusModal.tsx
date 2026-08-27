@@ -83,13 +83,23 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
     }
     setFormError(null);
 
-    const statusLabels: Record<StationStatus, string> = {
-      full: 'Reported Full stock',
-      low: 'Reported Low pressure',
-      queue: 'Reported Queuing',
-      out: 'Reported Out of gas',
-      unknown: 'No recent reports',
-    };
+    const isEv = station.stationType === 'ev_charging';
+
+    const statusLabels: Record<StationStatus, string> = isEv
+      ? {
+          full: 'Reported Available',
+          low: 'Reported Busy',
+          queue: 'Reported Full (All Ports Occupied)',
+          out: 'Reported Out of Service',
+          unknown: 'No recent reports',
+        }
+      : {
+          full: 'Reported Full stock',
+          low: 'Reported Low pressure',
+          queue: 'Reported Queuing',
+          out: 'Reported Out of gas',
+          unknown: 'No recent reports',
+        };
 
     const isPhotoVerified = Boolean(attachedPhoto);
     // Register the photo hash only NOW (at publish time), not at capture time.
@@ -122,7 +132,7 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
   };
 
   return (
-    <Modal isOpen={true} onClose={onClose} title="Report CNG Station Status" className="bg-surface border-surface-container-highest max-h-[90vh] overflow-y-auto">
+    <Modal isOpen={true} onClose={onClose} title={station.stationType === 'ev_charging' ? "Report EV Charging Hub Status" : "Report CNG Station Status"} className="bg-surface border-surface-container-highest max-h-[90vh] overflow-y-auto">
       <div className="relative w-full max-w-lg bg-surface rounded-t-3xl sm:rounded-3xl shadow-2xl z-10 max-h-[90vh] overflow-y-auto border border-surface-container-highest pb-safe">
         {/* Drag Handle */}
         <div className="flex justify-center pt-3 pb-2 touch-none">
@@ -134,7 +144,9 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
           <div className="flex justify-between items-start mb-3">
             <div>
               <div className="flex items-center gap-1.5 text-[11px] font-semibold text-primary uppercase tracking-wider mb-0.5">
-                <span className="material-symbols-outlined text-[15px]">groups</span>
+                <span className="material-symbols-outlined text-[15px]">
+                  {station.stationType === 'ev_charging' ? 'ev_charger' : 'groups'}
+                </span>
                 <span>{station.name} Group Feed</span>
                 <button
                   type="button"
@@ -147,7 +159,7 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
                 </button>
               </div>
               <h2 className="text-[19px] font-bold text-on-surface leading-snug">
-                Update Gas Availability
+                {station.stationType === 'ev_charging' ? 'Update Charger Availability' : 'Update Gas Availability'}
               </h2>
             </div>
             <button
@@ -162,7 +174,7 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             {/* Primary Action Screen: 4 Large Full-Width Status Buttons */}
             <div className="flex flex-col gap-2.5">
-              {/* Full Stock */}
+              {/* Available / Full Stock */}
               <button
                 type="button"
                 onClick={() => setSelectedStatus('full')}
@@ -174,16 +186,18 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
               >
                 <div className="flex items-center gap-3">
                   <span className="material-symbols-outlined text-[26px]" style={{ fontVariationSettings: "'FILL' 1" }}>
-                    local_gas_station
+                    {station.stationType === 'ev_charging' ? 'ev_charger' : 'local_gas_station'}
                   </span>
-                  <span className="text-[16px] font-extrabold">Full stock (Fast pump)</span>
+                  <span className="text-[16px] font-extrabold">
+                    {station.stationType === 'ev_charging' ? 'Available (Fast Chargers Free)' : 'Full stock (Fast pump)'}
+                  </span>
                 </div>
                 {selectedStatus === 'full' && (
                   <span className="material-symbols-outlined text-[22px] text-white">check_circle</span>
                 )}
               </button>
 
-              {/* Long Queue / Queuing */}
+              {/* Busy / Queuing */}
               <button
                 type="button"
                 onClick={() => setSelectedStatus('queue')}
@@ -195,16 +209,18 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
               >
                 <div className="flex items-center gap-3">
                   <span className="material-symbols-outlined text-[26px]" style={{ fontVariationSettings: "'FILL' 1" }}>
-                    schedule
+                    {station.stationType === 'ev_charging' ? 'charging_station' : 'schedule'}
                   </span>
-                  <span className="text-[16px] font-extrabold">Long queue / Queuing</span>
+                  <span className="text-[16px] font-extrabold">
+                    {station.stationType === 'ev_charging' ? 'Busy (Partially Occupied)' : 'Long queue / Queuing'}
+                  </span>
                 </div>
                 {selectedStatus === 'queue' && (
                   <span className="material-symbols-outlined text-[22px] text-white">check_circle</span>
                 )}
               </button>
 
-              {/* Low Pressure */}
+              {/* All Ports Occupied / Low Pressure */}
               <button
                 type="button"
                 onClick={() => setSelectedStatus('low')}
@@ -216,16 +232,18 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
               >
                 <div className="flex items-center gap-3">
                   <span className="material-symbols-outlined text-[26px]" style={{ fontVariationSettings: "'FILL' 1" }}>
-                    battery_3_bar
+                    {station.stationType === 'ev_charging' ? 'electric_car' : 'battery_3_bar'}
                   </span>
-                  <span className="text-[16px] font-extrabold">Low pressure</span>
+                  <span className="text-[16px] font-extrabold">
+                    {station.stationType === 'ev_charging' ? 'Full (All Ports Occupied)' : 'Low pressure'}
+                  </span>
                 </div>
                 {selectedStatus === 'low' && (
                   <span className="material-symbols-outlined text-[22px] text-white">check_circle</span>
                 )}
               </button>
 
-              {/* Out of Gas */}
+              {/* Out of Service / Out of Gas */}
               <button
                 type="button"
                 onClick={() => setSelectedStatus('out')}
@@ -237,9 +255,11 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
               >
                 <div className="flex items-center gap-3">
                   <span className="material-symbols-outlined text-[26px]" style={{ fontVariationSettings: "'FILL' 1" }}>
-                    not_interested
+                    {station.stationType === 'ev_charging' ? 'power_off' : 'not_interested'}
                   </span>
-                  <span className="text-[16px] font-extrabold">Out of gas</span>
+                  <span className="text-[16px] font-extrabold">
+                    {station.stationType === 'ev_charging' ? 'Out of Service / Offline' : 'Out of gas'}
+                  </span>
                 </div>
                 {selectedStatus === 'out' && (
                   <span className="material-symbols-outlined text-[22px] text-white">check_circle</span>

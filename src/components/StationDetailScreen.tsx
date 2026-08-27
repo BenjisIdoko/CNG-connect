@@ -400,113 +400,188 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
           </div>
         )}
 
-        {/* Price & Pump Pressure Bento Cards */}
-        <div className="grid grid-cols-2 gap-3">
-          <div className="bg-white rounded-2xl p-4 border border-surface-container-highest shadow-xs flex flex-col justify-between">
-            <span className="text-micro font-bold text-slate-400 uppercase tracking-wider">
-              CNG Price
-            </span>
-            <div className="flex items-baseline gap-1 my-1">
-              {station.cngPrice ? (
-                <>
-                  <span className="text-display font-bold text-deep-teal">
-                    ₦{station.cngPrice}
-                  </span>
-                  <span className="text-body font-normal text-slate-400">/kg</span>
-                </>
-              ) : (
-                <span className="text-title font-bold text-slate-400">
-                  Unreported
+        {/* Conditional Specs: EV Charging Fields vs CNG Fields */}
+        {station.stationType === 'ev_charging' ? (
+          <div className="flex flex-col gap-3">
+            <div className="grid grid-cols-2 gap-3">
+              {/* EV Rate Bento Card */}
+              <div className="bg-white rounded-2xl p-4 border border-surface-container-highest shadow-xs flex flex-col justify-between">
+                <span className="text-micro font-bold text-slate-400 uppercase tracking-wider">
+                  EV Charging Rate
                 </span>
-              )}
-            </div>
-            <span className="text-micro font-semibold text-primary flex items-center gap-1">
-              <span>{station.cngPrice ? (station.priceTrend === 'stable' ? 'Official Rate' : 'Updated') : 'No price reports yet'}</span>
-            </span>
-          </div>
-
-          {/* Interactive 220-Bar SVG Pump Pressure Arc Gauge Bento Card */}
-          <div className="bg-white rounded-2xl p-4 border border-surface-container-highest shadow-xs flex flex-col justify-between relative overflow-hidden group">
-            <div className="flex justify-between items-center">
-              <span className="text-micro font-bold text-slate-400 uppercase tracking-wider">
-                Pump Pressure
-              </span>
-              <span
-                className={`text-micro font-semibold px-2 py-0.5 rounded-full border ${
-                  !station.pumpPressure
-                    ? 'bg-slate-100 text-slate-600 border-slate-200'
-                    : station.pumpPressure >= 180
-                    ? 'bg-emerald-50 text-primary border-emerald-200'
-                    : station.pumpPressure >= 130
-                    ? 'bg-amber-50 text-amber-900 border-amber-200'
-                    : 'bg-rose-50 text-rose-900 border-rose-200'
-                }`}
-              >
-                {!station.pumpPressure
-                  ? 'No data'
-                  : station.pumpPressure >= 180
-                  ? 'Optimal'
-                  : station.pumpPressure >= 130
-                  ? 'Moderate'
-                  : 'Low'}
-              </span>
-            </div>
-
-            {station.pumpPressure ? (
-              <>
-                <div className="relative flex flex-col items-center justify-center my-0.5">
-                  <svg viewBox="0 0 100 55" className="w-28 h-16 transform transition-transform group-hover:scale-105">
-                    {/* Background Track Arc */}
-                    <path
-                      d="M 10 50 A 40 40 0 0 1 90 50"
-                      fill="none"
-                      stroke="var(--color-surface-container)"
-                      strokeWidth="9"
-                      strokeLinecap="round"
-                    />
-                    {/* Gauge Colored Arc */}
-                    <path
-                      d="M 10 50 A 40 40 0 0 1 90 50"
-                      fill="none"
-                      stroke={
-                        station.pumpPressure >= 180
-                          ? 'var(--color-live-pulse)'
-                          : station.pumpPressure >= 130
-                          ? 'var(--color-secondary-container)'
-                          : 'var(--color-error)'
-                      }
-                      strokeWidth="9"
-                      strokeLinecap="round"
-                      strokeDasharray="125.6"
-                      strokeDashoffset={125.6 * (1 - Math.min(station.pumpPressure, 220) / 220)}
-                      className="transition-all duration-700 ease-out"
-                    />
-                  </svg>
-
-                  <div className="absolute bottom-0 flex flex-col items-center text-center -mb-1">
-                    <span className="text-heading font-extrabold leading-none text-slate-900">
-                      {station.pumpPressure}
+                <div className="flex items-baseline gap-1 my-1">
+                  {station.pricePerKwh ? (
+                    <>
+                      <span className="text-display font-bold text-sky-700">
+                        ₦{station.pricePerKwh}
+                      </span>
+                      <span className="text-body font-normal text-slate-400">/kWh</span>
+                    </>
+                  ) : (
+                    <span className="text-title font-bold text-slate-400">
+                      Standard Rate
                     </span>
-                    <span className="text-micro font-semibold text-slate-400 uppercase tracking-widest -mt-0.5">
-                      bar
-                    </span>
-                  </div>
+                  )}
                 </div>
+                <span className="text-micro font-bold text-sky-600 flex items-center gap-1">
+                  <span className="material-symbols-outlined text-[13px]">hub</span>
+                  <span>{station.network || 'EV Network'}</span>
+                </span>
+              </div>
 
-                <div className="flex items-center justify-between text-micro font-bold text-slate-400 pt-1 border-t border-slate-100">
-                  <span>0 bar</span>
-                  <span className="text-primary font-semibold">{Math.round((station.pumpPressure / 220) * 100)}% Max</span>
-                  <span>220 bar</span>
+              {/* Charging Power & Ports Card */}
+              <div className="bg-white rounded-2xl p-4 border border-surface-container-highest shadow-xs flex flex-col justify-between">
+                <div className="flex justify-between items-center">
+                  <span className="text-micro font-bold text-slate-400 uppercase tracking-wider">
+                    Charging Power
+                  </span>
+                  <span className="text-micro font-extrabold px-2 py-0.5 rounded-full bg-sky-50 text-sky-700 border border-sky-200">
+                    {station.chargingSpeedKw && station.chargingSpeedKw >= 100 ? 'Supercharger' : 'Fast DC'}
+                  </span>
                 </div>
-              </>
-            ) : (
-              <div className="my-2 text-center flex flex-col items-center justify-center py-1">
-                <span className="material-symbols-outlined text-[22px] text-slate-400 mb-0.5">speed</span>
-                <p className="text-micro font-bold text-slate-700 leading-tight">No reports yet — be the first</p>
+                <div className="flex items-baseline gap-1 my-1">
+                  <span className="text-display font-bold text-sky-900">
+                    {station.chargingSpeedKw || 120}
+                  </span>
+                  <span className="text-body font-bold text-sky-700">kW</span>
+                </div>
+                <span className="text-micro font-bold text-slate-500 flex items-center gap-1">
+                  <span className="material-symbols-outlined text-[13px]">power</span>
+                  <span>{station.totalPorts ? `${station.totalPorts} Charging Ports` : 'Multi-Port Station'}</span>
+                </span>
+              </div>
+            </div>
+
+            {/* EV Connector Types */}
+            {station.connectorTypes && station.connectorTypes.length > 0 && (
+              <div className="bg-sky-50/60 rounded-2xl p-3.5 border border-sky-100 flex flex-col gap-1.5">
+                <span className="text-micro font-extrabold text-sky-900 uppercase tracking-wider flex items-center gap-1">
+                  <span className="material-symbols-outlined text-[14px]">electrical_services</span>
+                  <span>Available Plug Connectors</span>
+                </span>
+                <div className="flex flex-wrap gap-1.5 mt-0.5">
+                  {station.connectorTypes.map((type, i) => (
+                    <span
+                      key={i}
+                      className="px-2.5 py-1 bg-white border border-sky-200 text-sky-900 rounded-full text-caption font-extrabold shadow-2xs flex items-center gap-1"
+                    >
+                      <span className="material-symbols-outlined text-[13px] text-sky-600">bolt</span>
+                      {type}
+                    </span>
+                  ))}
+                </div>
               </div>
             )}
           </div>
-        </div>
+        ) : (
+          /* Price & Pump Pressure Bento Cards */
+          <div className="grid grid-cols-2 gap-3">
+            <div className="bg-white rounded-2xl p-4 border border-surface-container-highest shadow-xs flex flex-col justify-between">
+              <span className="text-micro font-bold text-slate-400 uppercase tracking-wider">
+                CNG Price
+              </span>
+              <div className="flex items-baseline gap-1 my-1">
+                {station.cngPrice ? (
+                  <>
+                    <span className="text-display font-bold text-deep-teal">
+                      ₦{station.cngPrice}
+                    </span>
+                    <span className="text-body font-normal text-slate-400">/kg</span>
+                  </>
+                ) : (
+                  <span className="text-title font-bold text-slate-400">
+                    Unreported
+                  </span>
+                )}
+              </div>
+              <span className="text-micro font-semibold text-primary flex items-center gap-1">
+                <span>{station.cngPrice ? (station.priceTrend === 'stable' ? 'Official Rate' : 'Updated') : 'No price reports yet'}</span>
+              </span>
+            </div>
+
+            {/* Interactive 220-Bar SVG Pump Pressure Arc Gauge Bento Card */}
+            <div className="bg-white rounded-2xl p-4 border border-surface-container-highest shadow-xs flex flex-col justify-between relative overflow-hidden group">
+              <div className="flex justify-between items-center">
+                <span className="text-micro font-bold text-slate-400 uppercase tracking-wider">
+                  Pump Pressure
+                </span>
+                <span
+                  className={`text-micro font-semibold px-2 py-0.5 rounded-full border ${
+                    !station.pumpPressure
+                      ? 'bg-slate-100 text-slate-600 border-slate-200'
+                      : station.pumpPressure >= 180
+                      ? 'bg-emerald-50 text-primary border-emerald-200'
+                      : station.pumpPressure >= 130
+                      ? 'bg-amber-50 text-amber-900 border-amber-200'
+                      : 'bg-rose-50 text-rose-900 border-rose-200'
+                  }`}
+                >
+                  {!station.pumpPressure
+                    ? 'No data'
+                    : station.pumpPressure >= 180
+                    ? 'Optimal'
+                    : station.pumpPressure >= 130
+                    ? 'Moderate'
+                    : 'Low'}
+                </span>
+              </div>
+
+              {station.pumpPressure ? (
+                <>
+                  <div className="relative flex flex-col items-center justify-center my-0.5">
+                    <svg viewBox="0 0 100 55" className="w-28 h-16 transform transition-transform group-hover:scale-105">
+                      {/* Background Track Arc */}
+                      <path
+                        d="M 10 50 A 40 40 0 0 1 90 50"
+                        fill="none"
+                        stroke="var(--color-surface-container)"
+                        strokeWidth="9"
+                        strokeLinecap="round"
+                      />
+                      {/* Gauge Colored Arc */}
+                      <path
+                        d="M 10 50 A 40 40 0 0 1 90 50"
+                        fill="none"
+                        stroke={
+                          station.pumpPressure >= 180
+                            ? '#006633'
+                            : station.pumpPressure >= 130
+                            ? '#f5a623'
+                            : '#d32f2f'
+                        }
+                        strokeWidth="9"
+                        strokeLinecap="round"
+                        strokeDasharray="126"
+                        strokeDashoffset={126 - (126 * Math.min(station.pumpPressure, 220)) / 220}
+                        className="transition-all duration-1000 ease-out"
+                      />
+                    </svg>
+
+                    <div className="absolute inset-0 flex flex-col items-center justify-end pb-1">
+                      <span className="text-[20px] font-extrabold text-on-surface leading-none tracking-tight">
+                        {station.pumpPressure}
+                      </span>
+                      <span className="text-micro font-semibold text-slate-400 uppercase tracking-widest -mt-0.5">
+                        bar
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between text-micro font-bold text-slate-400 pt-1 border-t border-slate-100">
+                    <span>0 bar</span>
+                    <span className="text-primary font-semibold">{Math.round((station.pumpPressure / 220) * 100)}% Max</span>
+                    <span>220 bar</span>
+                  </div>
+                </>
+              ) : (
+                <div className="my-2 text-center flex flex-col items-center justify-center py-1">
+                  <span className="material-symbols-outlined text-[22px] text-slate-400 mb-0.5">speed</span>
+                  <p className="text-micro font-bold text-slate-700 leading-tight">No reports yet — be the first</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Tab Switcher: Group Feed vs Verified Reports vs Photos */}
         <div className="flex bg-surface-container p-1 rounded-2xl border border-surface-container-highest">

@@ -1,4 +1,4 @@
-import { GasStation, DriverReport, CommunityPost, StationStatus, VerificationLevel, StationMedia } from '../types';
+import { GasStation, DriverReport, CommunityPost, StationStatus, VerificationLevel, StationMedia, StationSuggestion } from '../types';
 import { INITIAL_STATIONS, INITIAL_POSTS, deduplicateStations } from '../data/mockData';
 import { supabase, isSupabaseConfigured } from './supabaseClient';
 import { checkNotificationPermission } from '../utils/permissionManager';
@@ -665,5 +665,34 @@ export const apiService = {
     }
 
     return updatedStation;
+  },
+
+  /**
+   * Submits a user suggestion for a new CNG or EV station.
+   */
+  async addStationSuggestion(
+    suggestion: Omit<StationSuggestion, 'id' | 'createdAt' | 'status'>
+  ): Promise<StationSuggestion> {
+    const suggestionsKey = 'gasfinder_suggestions_v1';
+    let existing: StationSuggestion[] = [];
+    const raw = getStorageItem(suggestionsKey);
+    if (raw) {
+      try {
+        existing = JSON.parse(raw);
+      } catch {
+        existing = [];
+      }
+    }
+
+    const newSuggestion: StationSuggestion = {
+      id: `suggestion-${Date.now()}`,
+      ...suggestion,
+      status: 'pending',
+      createdAt: new Date().toISOString(),
+    };
+
+    existing.unshift(newSuggestion);
+    setStorageItem(suggestionsKey, JSON.stringify(existing));
+    return newSuggestion;
   },
 };
