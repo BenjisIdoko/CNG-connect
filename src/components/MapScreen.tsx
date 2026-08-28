@@ -241,9 +241,9 @@ export const MapScreen: React.FC<MapScreenProps> = ({
         if (st.status === 'unknown') colorClass = '#64748b';
         iconSymbol = 'bolt';
       } else {
-        if (st.status === 'queue') colorClass = '#f59e0b';
-        if (st.status === 'low') colorClass = '#fe9400';
-        if (st.status === 'out') colorClass = '#ef4444';
+        if (st.status === 'queue') colorClass = '#FF6D00';
+        if (st.status === 'low') colorClass = '#FF6D00';
+        if (st.status === 'out') colorClass = '#FF3D00';
         if (st.status === 'unknown') colorClass = '#94a3b8';
       }
 
@@ -344,23 +344,23 @@ export const MapScreen: React.FC<MapScreenProps> = ({
         };
       case 'queue':
         return {
-          barColor: 'bg-electric-amber',
+          barColor: 'bg-status-orange',
           badgeBg: 'bg-amber-50 border-amber-200 text-amber-900',
-          dotColor: 'bg-electric-amber',
+          dotColor: 'bg-status-orange',
           label: 'Queuing',
         };
       case 'low':
         return {
-          barColor: 'bg-secondary-container',
+          barColor: 'bg-status-orange',
           badgeBg: 'bg-orange-50 border-orange-200 text-orange-900',
-          dotColor: 'bg-secondary-container',
+          dotColor: 'bg-status-orange',
           label: 'Low pressure',
         };
       case 'out':
         return {
-          barColor: 'bg-rose-500',
+          barColor: 'bg-status-red',
           badgeBg: 'bg-rose-50 border-rose-200 text-rose-900',
-          dotColor: 'bg-rose-500',
+          dotColor: 'bg-status-red',
           label: 'Out of gas',
         };
       case 'unknown':

@@ -462,7 +462,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
 
           <button
             onClick={onSignOut || onOpenOnboarding}
-            className="w-full py-3 px-4 bg-status-orange-container hover:opacity-90 text-secondary font-semibold text-body rounded-2xl border border-secondary/30 flex items-center justify-center gap-2 active:scale-98 transition-all min-h-[44px]"
+            className="w-full py-3 px-4 bg-secondary-container/20 hover:bg-secondary-container/30 text-secondary font-semibold text-body rounded-2xl border border-secondary/30 flex items-center justify-center gap-2 active:scale-98 transition-all min-h-[44px]"
           >
             <span className="material-symbols-outlined text-secondary text-[20px] shrink-0">
               logout

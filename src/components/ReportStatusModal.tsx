@@ -180,8 +180,8 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
                 onClick={() => setSelectedStatus('full')}
                 className={`w-full min-h-[58px] py-3.5 px-4 rounded-2xl flex items-center justify-between border-2 transition-all active:scale-[0.98] ${
                   selectedStatus === 'full'
-                    ? 'bg-emerald-600 border-emerald-700 text-white shadow-md ring-4 ring-emerald-600/30'
-                    : 'bg-emerald-50 border-emerald-200 text-emerald-900 hover:bg-emerald-100'
+                    ? 'bg-status-green border-status-green text-white shadow-md ring-4 ring-status-green/30'
+                    : 'bg-status-green-container border-emerald-200 text-emerald-900 hover:bg-emerald-100'
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -203,8 +203,8 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
                 onClick={() => setSelectedStatus('queue')}
                 className={`w-full min-h-[58px] py-3.5 px-4 rounded-2xl flex items-center justify-between border-2 transition-all active:scale-[0.98] ${
                   selectedStatus === 'queue'
-                    ? 'bg-amber-500 border-amber-600 text-white shadow-md ring-4 ring-amber-500/30'
-                    : 'bg-amber-50 border-amber-200 text-amber-950 hover:bg-amber-100'
+                    ? 'bg-status-orange border-status-orange text-white shadow-md ring-4 ring-status-orange/30'
+                    : 'bg-status-orange-container border-amber-200 text-amber-950 hover:bg-amber-100'
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -226,8 +226,8 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
                 onClick={() => setSelectedStatus('low')}
                 className={`w-full min-h-[58px] py-3.5 px-4 rounded-2xl flex items-center justify-between border-2 transition-all active:scale-[0.98] ${
                   selectedStatus === 'low'
-                    ? 'bg-orange-500 border-orange-600 text-white shadow-md ring-4 ring-orange-500/30'
-                    : 'bg-orange-50 border-orange-200 text-orange-950 hover:bg-orange-100'
+                    ? 'bg-status-orange border-status-orange text-white shadow-md ring-4 ring-status-orange/30'
+                    : 'bg-status-orange-container border-orange-200 text-orange-950 hover:bg-orange-100'
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -249,8 +249,8 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
                 onClick={() => setSelectedStatus('out')}
                 className={`w-full min-h-[58px] py-3.5 px-4 rounded-2xl flex items-center justify-between border-2 transition-all active:scale-[0.98] ${
                   selectedStatus === 'out'
-                    ? 'bg-rose-600 border-rose-700 text-white shadow-md ring-4 ring-rose-600/30'
-                    : 'bg-rose-50 border-rose-200 text-rose-950 hover:bg-rose-100'
+                    ? 'bg-status-red border-status-red text-white shadow-md ring-4 ring-status-red/30'
+                    : 'bg-status-red-container border-rose-200 text-rose-950 hover:bg-rose-100'
                 }`}
               >
                 <div className="flex items-center gap-3">

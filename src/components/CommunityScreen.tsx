@@ -222,10 +222,10 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
             <div className="flex overflow-x-auto gap-1.5 pb-1 hide-scrollbar">
               {[
                 { id: 'all', label: 'All Statuses' },
-                { id: 'full', label: 'Full Stock', dotColor: 'bg-live-pulse' },
-                { id: 'queue', label: 'Queuing', dotColor: 'bg-amber-500' },
-                { id: 'low', label: 'Low Pressure', dotColor: 'bg-secondary-container' },
-                { id: 'out', label: 'Out of Gas', dotColor: 'bg-slate-400' },
+                { id: 'full', label: 'Full Stock', dotColor: 'bg-status-green' },
+                { id: 'queue', label: 'Queuing', dotColor: 'bg-status-orange' },
+                { id: 'low', label: 'Low Pressure', dotColor: 'bg-status-orange' },
+                { id: 'out', label: 'Out of Gas', dotColor: 'bg-status-red' },
               ].map((st) => (
                 <button
                   key={st.id}
@@ -298,12 +298,12 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                         <span
                           className={`w-1.5 h-1.5 rounded-full ${
                             st.status === 'full'
-                              ? 'bg-live-pulse'
+                              ? 'bg-status-green'
                               : st.status === 'queue'
-                              ? 'bg-amber-500'
+                              ? 'bg-status-orange'
                               : st.status === 'low'
-                              ? 'bg-secondary-container'
-                              : 'bg-slate-400'
+                              ? 'bg-status-orange'
+                              : 'bg-status-red'
                           }`}
                         />
                         <span className="whitespace-nowrap">{st.statusLabel}</span>

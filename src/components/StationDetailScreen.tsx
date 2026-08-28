@@ -51,6 +51,35 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
   const [activeTab, setActiveTab] = useState<'feed' | 'reports' | 'photos'>('feed');
   const [isPresenceActiveState, setIsPresenceActiveState] = useState<boolean>(isPresenceActive);
   const [showInfoSheet, setShowInfoSheet] = useState(false);
+  const [showFullTitle, setShowFullTitle] = useState(false);
+
+  const getFormattedStatusPillText = (st: GasStation): string => {
+    const isEv = st.stationType === 'ev_charging';
+    let baseLabel = '';
+    if (st.status === 'full') {
+      baseLabel = 'Available';
+    } else if (st.status === 'queue') {
+      baseLabel = 'Queuing';
+    } else if (st.status === 'low') {
+      baseLabel = isEv ? 'Low availability' : 'Low pressure';
+    } else if (st.status === 'out') {
+      baseLabel = isEv ? 'Out of service' : 'Out of gas';
+    } else {
+      const raw = st.statusLabel ? st.statusLabel.replace(/\s*\([^)]*\)/g, '').trim() : 'Unknown';
+      baseLabel = raw.charAt(0).toUpperCase() + raw.slice(1).toLowerCase();
+    }
+
+    if (st.busyEstimate) {
+      let detail = st.busyEstimate;
+      detail = detail.replace(/\(?(\d+)\/(\d+)\s*ports\s*free\)?/i, '$1 of $2 ports free');
+      detail = detail.replace(/^\((.*)\)$/, '$1').trim();
+      if (detail) {
+        return `${baseLabel} · ${detail}`;
+      }
+    }
+
+    return baseLabel;
+  };
 
   useEffect(() => {
     setReports(station.reports || []);
@@ -223,86 +252,92 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
       <div className="max-w-4xl mx-auto px-4 md:px-6 pt-4 flex flex-col gap-4">
         {/* Redesigned Station Group Header Card with Top Hero Photo */}
         <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
-          {/* Top Hero Photo Area */}
+          {/* Top Hero Photo Area with Consolidated Overlay Bar */}
           <div className="relative h-44 sm:h-52 w-full bg-slate-900 overflow-hidden">
             <img
               src={images?.[0] || ASSETS.stationWide}
               alt={station.name}
               className="w-full h-full object-cover opacity-90"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/25 to-transparent flex items-end justify-between p-4 sm:p-5">
-              <div className="flex items-center gap-2">
-                <span className="bg-black/60 backdrop-blur-md text-white text-caption font-extrabold px-3 py-1.5 rounded-full flex items-center gap-1.5 border border-white/20">
-                  <span className="material-symbols-outlined text-[16px] text-status-green">near_me</span>
-                  <span>{station.distance} • {station.driveTime}</span>
-                </span>
-                <span className="bg-emerald-700/90 backdrop-blur-md text-white text-micro font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
-                  {station.stationType === 'ev_charging' ? '⚡ EV Hub' : '⛽ CNG Station'}
-                </span>
-              </div>
-
-              {station.lat && station.lng && (
-                <button
-                  onClick={() => openGoogleMapsPin(station)}
-                  className="bg-white/95 hover:bg-white text-slate-900 text-caption font-extrabold px-3 py-1.5 rounded-full shadow-md transition-all active:scale-95 flex items-center gap-1.5"
-                  title="Open in Google Maps"
-                >
-                  <span className="material-symbols-outlined text-[16px] text-blue-600">map</span>
-                  <span>Map Pin</span>
-                  <span className="material-symbols-outlined text-[14px]">open_in_new</span>
-                </button>
-              )}
+            <div className="absolute bottom-0 inset-x-0 bg-black/55 backdrop-blur-sm px-4 py-2.5 flex items-center justify-between text-white text-caption font-semibold">
+              <span>{station.distance} · {station.driveTime}</span>
+              <span>{station.stationType === 'ev_charging' ? 'EV hub' : 'CNG station'}</span>
             </div>
           </div>
 
           {/* Card Body */}
-          <div className="p-5 flex flex-col gap-3.5">
-            {/* Group Label & Title */}
-            <div className="flex flex-col gap-1">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="bg-emerald-100 text-primary text-micro font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1 border border-emerald-200">
-                    <span className="material-symbols-outlined text-[13px]">groups</span>
-                    <span>Station Group</span>
-                  </span>
-                  <button
-                    onClick={() => setShowInfoSheet(true)}
-                    className="w-6 h-6 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-all shrink-0"
-                    title="Station Group Guidelines"
-                  >
-                    <span className="material-symbols-outlined text-[15px]">info</span>
-                  </button>
-                </div>
-
-                <div className="flex items-center gap-1.5 text-caption font-bold text-slate-500">
-                  <span className={`w-2 h-2 rounded-full ${presenceCount > 0 ? 'bg-live-pulse animate-pulse' : 'bg-slate-300'}`} />
-                  <span>{presenceCount > 0 ? `${presenceCount} Drivers Here Now` : 'Community Station'}</span>
-                </div>
-              </div>
-
-              <h1 className="text-[20px] sm:text-[22px] font-extrabold text-slate-900 tracking-tight leading-snug mt-1">
-                {station.name}
-              </h1>
-            </div>
-
-            {/* Plain Factual Info Row: Address */}
-            <p className="text-[13.5px] font-normal text-slate-600 flex items-start gap-1.5">
-              <span className="material-symbols-outlined text-primary text-[18px] shrink-0 mt-0.5">
-                location_on
-              </span>
-              <span>{station.address}</span>
-            </p>
-
-            {/* Precision Status Warning vs Action Button Row */}
-            <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-100">
-              {/* Location Precision Status Badge */}
-              <div
-                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-micro font-bold border ${
-                  station.locationPrecision === 'source_exact' || station.locationPrecision === 'gps_confirmed'
-                    ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
-                    : 'bg-amber-50 text-amber-800 border-amber-200'
+          <div className="p-5 flex flex-col gap-3">
+            {/* Title (One line, truncated, font-bold/700, tap to toggle full name) */}
+            <div>
+              <h1
+                onClick={() => setShowFullTitle(!showFullTitle)}
+                title={station.name}
+                className={`text-[20px] sm:text-[22px] font-bold text-slate-900 tracking-tight leading-snug cursor-pointer ${
+                  showFullTitle ? '' : 'truncate'
                 }`}
               >
+                {station.name}
+              </h1>
+
+              {/* Quiet Metadata Line (Category + Address + Info Icon) */}
+              <p className="text-caption font-normal text-on-surface-variant flex items-center gap-1.5 mt-1 min-w-0">
+                <span className="truncate">
+                  {station.verifiedByCommunity ? 'Community station' : 'Station group'} · {station.address}
+                </span>
+                <button
+                  onClick={() => setShowInfoSheet(true)}
+                  className="inline-flex items-center text-on-surface-variant/70 hover:text-on-surface-variant shrink-0"
+                  title="Station Group Guidelines"
+                >
+                  <span className="material-symbols-outlined text-[16px]">info</span>
+                </button>
+              </p>
+            </div>
+
+            {/* Consolidated Live Status Row */}
+            <div className="pt-2 flex flex-wrap items-center justify-between gap-2">
+              {station.status === 'unknown' ? (
+                <div className="flex items-center gap-2 text-[12.5px] font-medium text-on-surface-variant bg-surface-container/50 px-3.5 py-2.5 rounded-2xl border border-surface-container-highest">
+                  <span className="material-symbols-outlined text-slate-400 text-[18px]">schedule</span>
+                  <span>No driver status reports yet. Be the first to report stock &amp; queue below!</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  {/* Dominant Status Pill: Solid bg-primary ONLY when available */}
+                  <div
+                    className={`rounded-full px-3.5 py-1.5 flex items-center gap-1.5 shadow-2xs ${
+                      station.status === 'full'
+                        ? 'bg-primary text-white font-semibold'
+                        : station.status === 'low' || station.status === 'queue'
+                        ? 'bg-status-orange text-white font-semibold'
+                        : 'bg-status-red text-white font-semibold'
+                    }`}
+                  >
+                    <span className="material-symbols-outlined text-[16px]">
+                      {station.status === 'full'
+                        ? 'check_circle'
+                        : station.status === 'queue'
+                        ? 'schedule'
+                        : station.status === 'low'
+                        ? 'battery_3_bar'
+                        : 'not_interested'}
+                    </span>
+                    <span className="text-caption font-semibold">
+                      {getFormattedStatusPillText(station)}
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              <span className="text-caption font-medium text-on-surface-variant">
+                {formatStationAge(station)}
+              </span>
+            </div>
+
+            {/* Secondary Actions Row (Divider + Demoted Plain Text Actions) */}
+            <div className="pt-2.5 mt-1 border-t border-surface-container-highest flex flex-wrap items-center justify-between gap-3 text-micro text-on-surface-variant">
+              {/* Location Precision Status Text */}
+              <div className="flex items-center gap-1 font-medium">
                 <span className="material-symbols-outlined text-[14px]">
                   {station.locationPrecision === 'source_exact'
                     ? 'verified'
@@ -312,68 +347,39 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                 </span>
                 <span>
                   {station.locationPrecision === 'source_exact'
-                    ? 'Verified Source Coordinates'
+                    ? 'Verified coordinates'
                     : station.locationPrecision === 'gps_confirmed'
-                    ? 'Exact GPS Pin Confirmed'
-                    : 'Approximate Geocoded Location'}
+                    ? 'Exact GPS pin confirmed'
+                    : 'Approximate geocoded location'}
                 </span>
               </div>
 
-              {/* Fix Exact Pin Action Button (Outlined Action Button, visually distinct from status badge) */}
-              {onUpdateLocation && (
-                <button
-                  onClick={() => setShowEditLocationModal(true)}
-                  className="px-3 py-1 bg-white hover:bg-emerald-50 text-primary border-2 border-primary rounded-xl text-micro font-extrabold transition-all active:scale-95 flex items-center gap-1 shadow-2xs"
-                  title="Update exact location pin or paste Google Maps link"
-                >
-                  <span className="material-symbols-outlined text-[15px]">edit_location</span>
-                  <span>{station.locationPrecision === 'gps_confirmed' ? 'Edit Pin' : 'Fix Exact Pin'}</span>
-                </button>
-              )}
-            </div>
+              <div className="flex items-center gap-3">
+                {/* Fix Exact Pin Action */}
+                {onUpdateLocation && (
+                  <button
+                    onClick={() => setShowEditLocationModal(true)}
+                    className="font-medium text-on-surface-variant hover:text-on-surface underline flex items-center gap-1 transition-colors"
+                    title="Update exact location pin"
+                  >
+                    <span className="material-symbols-outlined text-[14px]">edit_location</span>
+                    <span>{station.locationPrecision === 'gps_confirmed' ? 'Edit pin' : 'Fix exact pin'}</span>
+                  </button>
+                )}
 
-            {/* Consolidated Live Status Row or Single Empty State Row */}
-            <div className="pt-3 border-t border-slate-100">
-              {station.status === 'unknown' ? (
-                <div className="flex items-center gap-2 text-[12.5px] font-medium text-slate-500 bg-slate-50 px-3.5 py-2.5 rounded-2xl border border-slate-200/80">
-                  <span className="material-symbols-outlined text-slate-400 text-[18px]">schedule</span>
-                  <span>No driver status reports yet. Be the first to report stock &amp; queue below!</span>
-                </div>
-              ) : (
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div className="flex items-center gap-2">
-                    {/* Genuine Status Pill */}
-                    <div
-                      className={`rounded-full px-3 py-1 flex items-center gap-1.5 shadow-2xs ${
-                        station.status === 'full'
-                          ? 'bg-status-green text-white font-bold'
-                          : station.status === 'low'
-                          ? 'bg-secondary-container text-white font-bold'
-                          : station.status === 'queue'
-                          ? 'bg-electric-amber text-on-surface font-bold'
-                          : 'bg-error text-white font-bold'
-                      }`}
-                    >
-                      <span className="material-symbols-outlined text-[15px]">
-                        {station.status === 'full' ? 'check_circle' : station.status === 'queue' ? 'schedule' : station.status === 'low' ? 'battery_3_bar' : 'not_interested'}
-                      </span>
-                      <span className="text-micro uppercase font-extrabold tracking-wider">
-                        {station.statusLabel}
-                      </span>
-                    </div>
-
-                    {station.busyEstimate && (
-                      <span className="text-micro font-bold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-full border border-slate-200">
-                        {station.busyEstimate}
-                      </span>
-                    )}
-                  </div>
-
-                  <span className="text-caption font-bold text-primary">
-                    {formatStationAge(station)}
-                  </span>
-                </div>
-              )}
+                {/* Map Pin External Link Action */}
+                {station.lat && station.lng && (
+                  <button
+                    onClick={() => openGoogleMapsPin(station)}
+                    className="font-medium text-on-surface-variant hover:text-on-surface underline flex items-center gap-1 transition-colors"
+                    title="Open in Google Maps"
+                  >
+                    <span className="material-symbols-outlined text-[14px]">map</span>
+                    <span>Map pin</span>
+                    <span className="material-symbols-outlined text-[12px]">open_in_new</span>
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -522,10 +528,10 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                         fill="none"
                         stroke={
                           station.pumpPressure >= 180
-                            ? '#006633'
+                            ? '#00E676'
                             : station.pumpPressure >= 130
-                            ? '#f5a623'
-                            : '#d32f2f'
+                            ? '#FF6D00'
+                            : '#FF3D00'
                         }
                         strokeWidth="9"
                         strokeLinecap="round"
@@ -740,12 +746,12 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                       <div
                         className={`w-2.5 h-2.5 rounded-full ${
                           report.status === 'full'
-                            ? 'bg-primary'
+                            ? 'bg-status-green'
                             : report.status === 'low'
-                            ? 'bg-secondary-container'
+                            ? 'bg-status-orange'
                             : report.status === 'queue'
-                            ? 'bg-electric-amber'
-                            : 'bg-error'
+                            ? 'bg-status-orange'
+                            : 'bg-status-red'
                         }`}
                       />
                       <span className="text-[13.5px] font-bold text-on-surface">
