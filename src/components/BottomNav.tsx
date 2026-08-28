@@ -14,7 +14,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
   unreadNotifications = 0,
 }) => {
   return (
-    <nav className="lg:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-[370px] bg-white/95 backdrop-blur-2xl rounded-full p-1.5 px-3 shadow-[0_12px_36px_rgba(0,0,0,0.15)] border border-slate-200/80 flex items-center justify-between font-['Plus_Jakarta_Sans',sans-serif]">
+    <nav className="lg:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-[370px] frosted-glass-nav rounded-full p-1.5 px-3 shadow-[0_12px_36px_rgba(0,0,0,0.15)] border border-slate-200/80 flex items-center justify-between font-['Plus_Jakarta_Sans',sans-serif]">
       {/* Map Tab */}
       <button
         onClick={() => onTabChange('map')}

@@ -130,3 +130,16 @@
 .pt-safe {
   padding-top: max(env(safe-area-inset-top, 0px), 12px);
 }
+
+.frosted-glass-nav {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .frosted-glass-nav {
+    background: rgba(255, 255, 255, 0.96);
+  }
+}
+

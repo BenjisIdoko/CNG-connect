@@ -280,18 +280,39 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
               </h1>
 
               {/* Quiet Metadata Line (Category + Address + Info Icon) */}
-              <p className="text-caption font-normal text-on-surface-variant flex items-center gap-1.5 mt-1 min-w-0">
-                <span className="truncate">
-                  {station.verifiedByCommunity ? 'Community station' : 'Station group'} · {station.address}
-                </span>
-                <button
-                  onClick={() => setShowInfoSheet(true)}
-                  className="inline-flex items-center text-on-surface-variant/70 hover:text-on-surface-variant shrink-0"
-                  title="Station Group Guidelines"
-                >
-                  <span className="material-symbols-outlined text-[16px]">info</span>
-                </button>
-              </p>
+              <div className="flex flex-col gap-0.5 mt-1">
+                <p className="text-caption font-normal text-on-surface-variant flex items-center gap-1.5 min-w-0">
+                  <span className="material-symbols-outlined text-primary text-[16px] shrink-0">location_on</span>
+                  <span className="truncate">
+                    {station.verifiedByCommunity ? 'Community station' : 'Station group'} · {station.address}
+                  </span>
+                  <button
+                    onClick={() => setShowInfoSheet(true)}
+                    className="inline-flex items-center text-on-surface-variant/70 hover:text-on-surface-variant shrink-0"
+                    title="Station Group Guidelines"
+                  >
+                    <span className="material-symbols-outlined text-[16px]">info</span>
+                  </button>
+                </p>
+
+                {/* Approximate location caveat (quiet inline text, indented under address text) */}
+                {station.locationPrecision !== 'source_exact' && station.locationPrecision !== 'gps_confirmed' && (
+                  <p className="text-micro font-medium text-status-orange pl-[22px] leading-tight">
+                    <span>Approximate location</span>
+                    {onUpdateLocation && (
+                      <>
+                        <span> · </span>
+                        <button
+                          onClick={() => setShowEditLocationModal(true)}
+                          className="text-primary underline hover:opacity-85 font-medium transition-opacity"
+                        >
+                          Fix pin
+                        </button>
+                      </>
+                    )}
+                  </p>
+                )}
+              </div>
             </div>
 
             {/* Consolidated Live Status Row */}
@@ -334,53 +355,20 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
               </span>
             </div>
 
-            {/* Secondary Actions Row (Divider + Demoted Plain Text Actions) */}
-            <div className="pt-2.5 mt-1 border-t border-surface-container-highest flex flex-wrap items-center justify-between gap-3 text-micro text-on-surface-variant">
-              {/* Location Precision Status Text */}
-              <div className="flex items-center gap-1 font-medium">
-                <span className="material-symbols-outlined text-[14px]">
-                  {station.locationPrecision === 'source_exact'
-                    ? 'verified'
-                    : station.locationPrecision === 'gps_confirmed'
-                    ? 'my_location'
-                    : 'warning'}
-                </span>
-                <span>
-                  {station.locationPrecision === 'source_exact'
-                    ? 'Verified coordinates'
-                    : station.locationPrecision === 'gps_confirmed'
-                    ? 'Exact GPS pin confirmed'
-                    : 'Approximate geocoded location'}
-                </span>
+            {/* Secondary Actions Row (External Map Pin link if present) */}
+            {station.lat && station.lng && (
+              <div className="pt-2.5 mt-1 border-t border-surface-container-highest flex items-center justify-end text-micro text-on-surface-variant">
+                <button
+                  onClick={() => openGoogleMapsPin(station)}
+                  className="font-medium text-on-surface-variant hover:text-on-surface underline flex items-center gap-1 transition-colors"
+                  title="Open in Google Maps"
+                >
+                  <span className="material-symbols-outlined text-[14px]">map</span>
+                  <span>Map pin</span>
+                  <span className="material-symbols-outlined text-[12px]">open_in_new</span>
+                </button>
               </div>
-
-              <div className="flex items-center gap-3">
-                {/* Fix Exact Pin Action */}
-                {onUpdateLocation && (
-                  <button
-                    onClick={() => setShowEditLocationModal(true)}
-                    className="font-medium text-on-surface-variant hover:text-on-surface underline flex items-center gap-1 transition-colors"
-                    title="Update exact location pin"
-                  >
-                    <span className="material-symbols-outlined text-[14px]">edit_location</span>
-                    <span>{station.locationPrecision === 'gps_confirmed' ? 'Edit pin' : 'Fix exact pin'}</span>
-                  </button>
-                )}
-
-                {/* Map Pin External Link Action */}
-                {station.lat && station.lng && (
-                  <button
-                    onClick={() => openGoogleMapsPin(station)}
-                    className="font-medium text-on-surface-variant hover:text-on-surface underline flex items-center gap-1 transition-colors"
-                    title="Open in Google Maps"
-                  >
-                    <span className="material-symbols-outlined text-[14px]">map</span>
-                    <span>Map pin</span>
-                    <span className="material-symbols-outlined text-[12px]">open_in_new</span>
-                  </button>
-                )}
-              </div>
-            </div>
+            )}
           </div>
         </div>
 
