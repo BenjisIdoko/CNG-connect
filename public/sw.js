@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cng-connect-v4';
+const CACHE_NAME = 'cng-connect-v5';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -22,8 +22,8 @@ self.addEventListener('activate', (event) => {
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((name) => {
-          if (name !== CACHE_NAME && name !== 'cng-map-tiles') {
-            console.log('[SW] Purging stale cache:', name);
+          if (name !== CACHE_NAME && name !== 'cng-osm-tiles-v2') {
+            console.log('[SW] Purging stale map cache:', name);
             return caches.delete(name);
           }
           return null;
@@ -37,20 +37,18 @@ self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
   const url = new URL(event.request.url);
 
-  // Leaflet Tile Cache (Cache First with fallback)
-  if (url.hostname.includes('cartocdn.com') || url.hostname.includes('leaflet')) {
+  // OpenStreetMap Tile Cache (Network First with fallback to cache)
+  if (url.hostname.includes('tile.openstreetmap.org')) {
     event.respondWith(
-      caches.open('cng-map-tiles').then((cache) => {
-        return cache.match(event.request).then((response) => {
-          if (response) return response;
-          return fetch(event.request).then((networkResponse) => {
-            if (networkResponse && networkResponse.status === 200) {
-              cache.put(event.request, networkResponse.clone());
-            }
-            return networkResponse;
-          });
-        });
-      })
+      fetch(event.request)
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const responseClone = networkResponse.clone();
+            caches.open('cng-osm-tiles-v2').then((cache) => cache.put(event.request, responseClone));
+          }
+          return networkResponse;
+        })
+        .catch(() => caches.match(event.request))
     );
     return;
   }

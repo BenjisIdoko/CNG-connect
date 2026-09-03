@@ -128,6 +128,18 @@ export const App: React.FC = () => {
 
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
+
+    // Purge stale Carto tile caches from browser CacheStorage
+    if (typeof window !== 'undefined' && 'caches' in window) {
+      caches.keys().then((names) => {
+        names.forEach((name) => {
+          if (name === 'cng-map-tiles' || name.includes('carto')) {
+            caches.delete(name).catch(() => {});
+          }
+        });
+      }).catch(() => {});
+    }
+
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);

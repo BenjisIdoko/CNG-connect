@@ -144,10 +144,10 @@ export default defineConfig(() => {
           globPatterns: ['**/*.{js,css,html,ico,png,svg,json,woff,woff2}'],
           runtimeCaching: [
             {
-              urlPattern: /^https:\/\/(.*\.cartocdn\.com|.*\.tile\.openstreetmap\.org|unpkg\.com\/leaflet.*)\/.*/i,
-              handler: 'CacheFirst',
+              urlPattern: /^https:\/\/(.*\.tile\.openstreetmap\.org|unpkg\.com\/leaflet.*)\/.*/i,
+              handler: 'StaleWhileRevalidate',
               options: {
-                cacheName: 'cng-map-tiles',
+                cacheName: 'cng-osm-tiles-v2',
                 expiration: {
                   maxEntries: 500,
                   maxAgeSeconds: 60 * 60 * 24 * 30
