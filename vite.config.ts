@@ -1,5 +1,6 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
+import { VitePWA } from 'vite-plugin-pwa';
 import path from 'path';
 import { defineConfig, Plugin } from 'vite';
 import { GoogleGenAI } from '@google/genai';
@@ -102,7 +103,95 @@ function apiOtpPlugin(): Plugin {
 
 export default defineConfig(() => {
   return {
-    plugins: [react(), tailwindcss(), apiChatPlugin(), apiOtpPlugin()],
+    plugins: [
+      react(),
+      tailwindcss(),
+      VitePWA({
+        registerType: 'autoUpdate',
+        includeAssets: ['favicon.svg', 'pwa-icon.svg', 'apple-touch-icon.png', 'maskable-icon-512.png'],
+        manifest: {
+          name: 'CNG-Connect Nigeria - Driver Platform & Live Station Locator',
+          short_name: 'CNG-Connect',
+          description: 'Live CNG fuel station status finder, queue tracker, pump pressure tracker, and driver community for real-time station availability in Nigeria.',
+          theme_color: '#004D40',
+          background_color: '#f2fcf5',
+          display: 'standalone',
+          orientation: 'portrait-primary',
+          scope: '/',
+          start_url: '/',
+          icons: [
+            {
+              src: '/pwa-192x192.png',
+              sizes: '192x192',
+              type: 'image/png',
+              purpose: 'any'
+            },
+            {
+              src: '/pwa-512x512.png',
+              sizes: '512x512',
+              type: 'image/png',
+              purpose: 'any'
+            },
+            {
+              src: '/maskable-icon-512.png',
+              sizes: '512x512',
+              type: 'image/png',
+              purpose: 'maskable'
+            }
+          ]
+        },
+        workbox: {
+          globPatterns: ['**/*.{js,css,html,ico,png,svg,json,woff,woff2}'],
+          runtimeCaching: [
+            {
+              urlPattern: /^https:\/\/(.*\.cartocdn\.com|.*\.tile\.openstreetmap\.org|unpkg\.com\/leaflet.*)\/.*/i,
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'cng-map-tiles',
+                expiration: {
+                  maxEntries: 500,
+                  maxAgeSeconds: 60 * 60 * 24 * 30
+                },
+                cacheableResponse: {
+                  statuses: [0, 200]
+                }
+              }
+            },
+            {
+              urlPattern: /^https:\/\/fonts\.(googleapis|gstatic)\.com\/.*/i,
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'cng-google-fonts',
+                expiration: {
+                  maxEntries: 30,
+                  maxAgeSeconds: 60 * 60 * 24 * 365
+                },
+                cacheableResponse: {
+                  statuses: [0, 200]
+                }
+              }
+            },
+            {
+              urlPattern: /^https:\/\/.*\.supabase\.co\/.*/i,
+              handler: 'NetworkFirst',
+              options: {
+                cacheName: 'cng-supabase-api',
+                networkTimeoutSeconds: 3,
+                expiration: {
+                  maxEntries: 100,
+                  maxAgeSeconds: 60 * 60 * 24 * 7
+                },
+                cacheableResponse: {
+                  statuses: [0, 200]
+                }
+              }
+            }
+          ]
+        }
+      }),
+      apiChatPlugin(),
+      apiOtpPlugin()
+    ],
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),

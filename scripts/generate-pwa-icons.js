@@ -1,0 +1,69 @@
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import sharp from 'sharp';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const publicDir = path.resolve(__dirname, '../public');
+
+const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" rx="96" fill="#004D40"/>
+  <rect x="24" y="24" width="464" height="464" rx="80" fill="none" stroke="#00FFC2" stroke-width="8" stroke-opacity="0.3"/>
+  <g transform="translate(116, 96) scale(1.1)">
+    <!-- Main Pump Body -->
+    <rect x="40" y="80" width="160" height="220" rx="16" fill="#00FFC2"/>
+    <rect x="56" y="96" width="128" height="60" rx="8" fill="#004D40"/>
+    <text x="120" y="138" fill="#00FFC2" font-family="system-ui, sans-serif" font-size="28" font-weight="900" text-anchor="middle">CNG</text>
+
+    <!-- Pump Buttons & Gauge -->
+    <circle cx="80" cy="184" r="10" fill="#004D40"/>
+    <circle cx="120" cy="184" r="10" fill="#004D40"/>
+    <circle cx="160" cy="184" r="10" fill="#004D40"/>
+
+    <rect x="60" y="210" width="120" height="70" rx="8" fill="#00352C"/>
+    <path d="M 75 260 L 95 230 L 120 245 L 145 225 L 165 260" fill="none" stroke="#00FFC2" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Pump Hose & Nozzle -->
+    <path d="M 200 130 C 240 130, 250 200, 240 260 C 235 280, 220 290, 200 290" fill="none" stroke="#00FFC2" stroke-width="14" stroke-linecap="round"/>
+    <path d="M 200 270 L 200 310 L 180 310 L 180 290 Z" fill="#00FFC2"/>
+    
+    <!-- Base Platform -->
+    <rect x="20" y="300" width="220" height="20" rx="6" fill="#00FFC2"/>
+  </g>
+</svg>`;
+
+const svgBuffer = Buffer.from(svgContent);
+
+async function generateIcons() {
+  fs.writeFileSync(path.join(publicDir, 'pwa-icon.svg'), svgContent);
+  fs.writeFileSync(path.join(publicDir, 'favicon.svg'), svgContent);
+
+  // 192x192 PNG
+  await sharp(svgBuffer)
+    .resize(192, 192)
+    .png()
+    .toFile(path.join(publicDir, 'pwa-192x192.png'));
+
+  // 512x512 PNG
+  await sharp(svgBuffer)
+    .resize(512, 512)
+    .png()
+    .toFile(path.join(publicDir, 'pwa-512x512.png'));
+
+  // Apple Touch Icon 180x180
+  await sharp(svgBuffer)
+    .resize(180, 180)
+    .png()
+    .toFile(path.join(publicDir, 'apple-touch-icon.png'));
+
+  // Maskable Icon 512x512
+  await sharp(svgBuffer)
+    .resize(512, 512)
+    .png()
+    .toFile(path.join(publicDir, 'maskable-icon-512.png'));
+
+  console.log('Successfully generated all PWA PNG and SVG icons in public/!');
+}
+
+generateIcons().catch(console.error);

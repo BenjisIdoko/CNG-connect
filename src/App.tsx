@@ -22,6 +22,7 @@ import { OnboardingScreen } from './components/OnboardingScreen';
 import { ProximityAlertBanner } from './components/ProximityAlertBanner';
 import { SignUpScreen } from './components/SignUpScreen';
 import { SplashScreen } from './components/SplashScreen';
+import { PwaUpdateToast } from './components/PwaUpdateToast';
 
 // Code-split secondary screens & modals with React.lazy
 const StationDetailScreen = lazy(() =>
@@ -747,6 +748,9 @@ export const App: React.FC = () => {
           }}
         />
       )}
+
+      {/* PWA Service Worker Update & Offline Notification Toast */}
+      <PwaUpdateToast />
     </div>
   );
 };
