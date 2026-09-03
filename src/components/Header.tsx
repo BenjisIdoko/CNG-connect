@@ -8,6 +8,8 @@ interface HeaderProps {
   onAvatarClick?: () => void;
   onOpenAiAssistant?: () => void;
   onOpenRoiCalculator?: () => void;
+  onTogglePushNotifications?: () => void;
+  isPushGranted?: boolean;
   userAvatar?: string;
   rightAction?: React.ReactNode;
 }
@@ -19,6 +21,8 @@ export const Header: React.FC<HeaderProps> = ({
   onAvatarClick,
   onOpenAiAssistant,
   onOpenRoiCalculator,
+  onTogglePushNotifications,
+  isPushGranted = false,
   userAvatar = ASSETS.userAvatar,
   rightAction
 }) => {
@@ -57,12 +61,28 @@ export const Header: React.FC<HeaderProps> = ({
           rightAction
         ) : (
           <div className="flex items-center gap-2">
+            {onTogglePushNotifications && (
+              <button
+                onClick={onTogglePushNotifications}
+                aria-label={isPushGranted ? 'Push Notifications Active' : 'Enable Push Notifications'}
+                title={isPushGranted ? 'Push Notifications Active for Favorite & Nearby Stations' : 'Enable Web Push Notifications'}
+                className={`w-10 h-10 rounded-full flex items-center justify-center border shadow-2xs active:scale-95 transition-all shrink-0 cursor-pointer ${
+                  isPushGranted
+                    ? 'bg-emerald-100 text-emerald-700 border-emerald-300'
+                    : 'bg-slate-100 hover:bg-slate-200 text-slate-600 border-slate-200'
+                }`}
+              >
+                <span className="material-symbols-outlined text-[18px]">
+                  {isPushGranted ? 'notifications_active' : 'notifications'}
+                </span>
+              </button>
+            )}
             {onOpenAiAssistant && (
               <button
                 onClick={onOpenAiAssistant}
                 aria-label="Open AI Assistant"
                 title="AI Assistant Guide"
-                className="w-10 h-10 rounded-full bg-emerald-50 hover:bg-emerald-100 text-primary border border-emerald-200/80 flex items-center justify-center shadow-2xs active:scale-95 transition-all shrink-0"
+                className="w-10 h-10 rounded-full bg-emerald-50 hover:bg-emerald-100 text-primary border border-emerald-200/80 flex items-center justify-center shadow-2xs active:scale-95 transition-all shrink-0 cursor-pointer"
               >
                 <span className="material-symbols-outlined text-[18px] text-primary">
                   auto_awesome
@@ -72,7 +92,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               onClick={onAvatarClick}
               aria-label="Open profile"
-              className="w-11 h-11 rounded-full object-cover p-0.5 border-2 border-primary/30 hover:border-primary transition-all active:scale-95 focus:outline-none"
+              className="w-11 h-11 rounded-full object-cover p-0.5 border-2 border-primary/30 hover:border-primary transition-all active:scale-95 focus:outline-none cursor-pointer"
             >
               <img
                 src={userAvatar}

@@ -18,6 +18,8 @@ interface StationDetailScreenProps {
   onAddPhoto?: () => void;
   onUpdateLocation?: (stationId: string, lat: number, lng: number) => void;
   isPresenceActive?: boolean;
+  isFavorite?: boolean;
+  onToggleFavorite?: (stationId: string) => void;
 }
 
 export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
@@ -30,6 +32,8 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
   onAddPhoto,
   onUpdateLocation,
   isPresenceActive = true,
+  isFavorite = false,
+  onToggleFavorite,
 }) => {
   const [showEditLocationModal, setShowEditLocationModal] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
@@ -239,9 +243,24 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
           </div>
 
           <button
+            onClick={() => onToggleFavorite?.(station.id)}
+            aria-label={isFavorite ? 'Remove from favorite stations' : 'Add to favorite stations'}
+            title={isFavorite ? 'Favorite station (Alerts enabled)' : 'Add to favorite stations for push alerts'}
+            className={`w-11 h-11 rounded-full flex items-center justify-center active:scale-95 transition-all shrink-0 cursor-pointer ${
+              isFavorite
+                ? 'bg-rose-100 text-rose-600 border border-rose-200 shadow-xs'
+                : 'bg-slate-100 hover:bg-slate-200 text-slate-600'
+            }`}
+          >
+            <span className={`material-symbols-outlined text-[20px] ${isFavorite ? 'text-rose-600' : ''}`}>
+              {isFavorite ? 'favorite' : 'favorite_border'}
+            </span>
+          </button>
+
+          <button
             onClick={handleShareStation}
             aria-label="Share Station Group"
-            className="w-11 h-11 rounded-full bg-slate-100 hover:bg-slate-200 text-primary flex items-center justify-center active:scale-95 transition-all shrink-0"
+            className="w-11 h-11 rounded-full bg-slate-100 hover:bg-slate-200 text-primary flex items-center justify-center active:scale-95 transition-all shrink-0 cursor-pointer"
           >
             <span className="material-symbols-outlined text-[18px]">share</span>
           </button>

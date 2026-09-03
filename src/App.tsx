@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback, lazy, Suspense } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef, lazy, Suspense } from 'react';
 import {
   GasStation,
   CommunityPost,
@@ -68,6 +68,12 @@ import {
   getDistanceInKm,
   isSameState,
 } from './utils/proximityAlertEngine';
+import {
+  detectStatusTransition,
+  checkShouldNotifyDriver,
+  sendStationPushAlert,
+  requestNotificationPermission,
+} from './utils/pushNotificationEngine';
 import { apiService } from './services/apiService';
 
 export const App: React.FC = () => {
@@ -130,6 +136,28 @@ export const App: React.FC = () => {
   const [selectedStation, setSelectedStation] = useState<GasStation>(INITIAL_STATIONS[0]);
   const [posts, setPosts] = useState<CommunityPost[]>(INITIAL_POSTS);
 
+  // Favorite Stations Persistence
+  const [favoriteStationIds, setFavoriteStationIds] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem('gasfinder_favorite_stations');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const toggleFavoriteStation = useCallback((stationId: string) => {
+    setFavoriteStationIds((prev) => {
+      const updated = prev.includes(stationId)
+        ? prev.filter((id) => id !== stationId)
+        : [...prev, stationId];
+      try {
+        localStorage.setItem('gasfinder_favorite_stations', JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+  }, []);
+
   const [userProfile, setUserProfile] = useState<UserProfile>(() => {
     try {
       const saved = localStorage.getItem('gasfinder_user');
@@ -138,6 +166,57 @@ export const App: React.FC = () => {
       return INITIAL_USER;
     }
   });
+
+  // Push notification permission state & toggle handler
+  const [isPushGranted, setIsPushGranted] = useState<boolean>(() => {
+    return typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted';
+  });
+
+  const handleTogglePushNotifications = useCallback(async () => {
+    const permission = await requestNotificationPermission();
+    if (permission === 'granted') {
+      setIsPushGranted(true);
+      showToast('🔔 Push alerts active for favorite & nearby stations!');
+    } else if (permission === 'denied') {
+      setIsPushGranted(false);
+      showToast('⚠️ Push notification permission blocked in browser settings.');
+    }
+  }, []);
+
+  const [userCoords, setUserCoords] = useState<{ lat: number; lng: number } | null>(() => {
+    try {
+      const saved = localStorage.getItem('gasfinder_user_coords');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  // Previous Station Status Map Ref for push notification transitions
+  const prevStationStatusMapRef = useRef<Map<string, StationStatus>>(new Map());
+
+  // Helper function to update stations and evaluate status transition push alerts
+  const updateStationsWithAlerts = useCallback((newStations: GasStation[]) => {
+    newStations.forEach((st) => {
+      const prevStatus = prevStationStatusMapRef.current.get(st.id);
+      if (prevStatus && prevStatus !== st.status) {
+        const transition = detectStatusTransition(prevStatus, st.status);
+        if (transition) {
+          const evalResult = checkShouldNotifyDriver(st, userProfile, userCoords, favoriteStationIds);
+          if (evalResult.notify) {
+            sendStationPushAlert(st, transition, evalResult.distanceKm);
+            if (transition === 'recovered') {
+              showToast(`🟢 Pump Online: ${st.name} is back at Full Stock!`);
+            } else {
+              showToast(`🔴 Alert: ${st.name} reported Out of Gas / Low Pressure!`);
+            }
+          }
+        }
+      }
+      prevStationStatusMapRef.current.set(st.id, st.status);
+    });
+    setStations(newStations);
+  }, [userProfile, userCoords, favoriteStationIds]);
 
   // State-Level Scoping: Driver sees stations in their current/registered state
   const scopedStations = useMemo(() => {
@@ -151,6 +230,7 @@ export const App: React.FC = () => {
     let isMounted = true;
     apiService.fetchStations().then((data) => {
       if (isMounted && data.length > 0) {
+        data.forEach((st) => prevStationStatusMapRef.current.set(st.id, st.status));
         setStations(data);
         setSelectedStation(data[0]);
       }
@@ -174,15 +254,6 @@ export const App: React.FC = () => {
       console.error('Failed to save user profile to localStorage', e);
     }
   }, [userProfile]);
-
-  const [userCoords, setUserCoords] = useState<{ lat: number; lng: number } | null>(() => {
-    try {
-      const saved = localStorage.getItem('gasfinder_user_coords');
-      return saved ? JSON.parse(saved) : null;
-    } catch {
-      return null;
-    }
-  });
 
   // Single Source of Truth: Geolocation Watch & Distance Updates
   useEffect(() => {
@@ -332,7 +403,7 @@ export const App: React.FC = () => {
     let newTotalPoints = 0;
 
     const updatedStations = await apiService.submitReport(reportingStation.id, newReport, newStatus);
-    setStations(updatedStations);
+    updateStationsWithAlerts(updatedStations);
 
     const activeSt = updatedStations.find((s) => s.id === reportingStation.id);
     if (activeSt) {
@@ -524,6 +595,8 @@ export const App: React.FC = () => {
           onBack={onHeaderBack}
           onOpenAiAssistant={() => setIsAiModalOpen(true)}
           onOpenRoiCalculator={() => setIsRoiModalOpen(true)}
+          onTogglePushNotifications={handleTogglePushNotifications}
+          isPushGranted={isPushGranted}
           onAvatarClick={() => {
             setActiveDetailStation(null);
             setActiveDiscussionPost(null);
@@ -564,6 +637,8 @@ export const App: React.FC = () => {
             <StationDetailScreen
               station={activeDetailStation}
               user={userProfile}
+              isFavorite={favoriteStationIds.includes(activeDetailStation.id)}
+              onToggleFavorite={toggleFavoriteStation}
               onBack={() => setActiveDetailStation(null)}
               onOpenReportModal={handleOpenReportModal}
               onNavigate={handleNavigate}
