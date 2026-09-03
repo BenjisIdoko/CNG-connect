@@ -3,6 +3,8 @@ import * as PopoverPrimitive from '@radix-ui/react-popover';
 import { UserProfile } from '../types';
 import { ASSETS } from '../data/mockData';
 import { Modal } from './common/Modal';
+import { getDriverTier, DRIVER_TIERS } from '../utils/reputationEngine';
+import { Award, ShieldCheck, Zap, Trophy, ChevronRight } from 'lucide-react';
 
 interface ProfileScreenProps {
   user: UserProfile;
@@ -215,6 +217,76 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
             </div>
           </div>
         </div>
+
+        {/* Driver Reputation & Badges Card */}
+        {(() => {
+          const tierProgress = getDriverTier(user.communityPoints ?? 450);
+          return (
+            <div className="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm flex flex-col gap-3.5">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Trophy className="w-5 h-5 text-amber-500" />
+                  <h3 className="font-extrabold text-slate-900 text-sm tracking-tight">
+                    Driver Level & Reputation Badges
+                  </h3>
+                </div>
+                <div className={`px-3 py-1 rounded-full border ${tierProgress.currentTier.badgeBg} ${tierProgress.currentTier.badgeColor} ${tierProgress.currentTier.badgeBorder} flex items-center gap-1.5 font-black text-xs shadow-2xs`}>
+                  <span>{tierProgress.currentTier.badgeIcon}</span>
+                  <span>{tierProgress.currentTier.title}</span>
+                </div>
+              </div>
+
+              {/* Level Progress Bar */}
+              {tierProgress.nextTier ? (
+                <div className="flex flex-col gap-1.5 bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
+                  <div className="flex items-center justify-between text-xs font-bold text-slate-700">
+                    <span>Progress to {tierProgress.nextTier.badgeIcon} {tierProgress.nextTier.title}</span>
+                    <span className="text-primary font-extrabold">{tierProgress.progressPercent}%</span>
+                  </div>
+                  <div className="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
+                    <div
+                      className="bg-[#004D40] h-full rounded-full transition-all duration-500"
+                      style={{ width: `${tierProgress.progressPercent}%` }}
+                    />
+                  </div>
+                  <p className="text-[11px] text-slate-500 font-medium mt-0.5">
+                    Need <strong className="text-slate-900 font-bold">{tierProgress.pointsForNextTier} pts</strong> to unlock <span className="font-semibold text-slate-800">{tierProgress.nextTier.title}</span> perks!
+                  </p>
+                </div>
+              ) : (
+                <div className="bg-amber-50 border border-amber-200 p-3 rounded-2xl text-xs text-amber-900 font-semibold flex items-center gap-2">
+                  <span className="text-lg">👑</span>
+                  <span>Maximum Tier Unlocked! You are a legendary CNG station finder across Nigeria.</span>
+                </div>
+              )}
+
+              {/* Badges Grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 pt-1">
+                {DRIVER_TIERS.map((t) => {
+                  const isUnlocked = (user.communityPoints ?? 450) >= t.minPoints;
+                  return (
+                    <div
+                      key={t.id}
+                      className={`p-2.5 rounded-2xl border flex flex-col items-center text-center transition-all ${
+                        isUnlocked
+                          ? `${t.badgeBg} ${t.badgeBorder} shadow-2xs`
+                          : 'bg-slate-50 border-slate-200 opacity-50 grayscale'
+                      }`}
+                    >
+                      <span className="text-2xl mb-1">{t.badgeIcon}</span>
+                      <span className={`text-[11px] font-extrabold leading-tight ${isUnlocked ? 'text-slate-900' : 'text-slate-500'}`}>
+                        {t.title}
+                      </span>
+                      <span className="text-[10px] text-slate-500 mt-1 font-semibold">
+                        {t.minPoints}+ pts
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })()}
 
         {/* Embedded Interactive CNG ROI & Savings Calculator Card */}
         <div className="bg-gradient-to-br from-deep-teal via-primary to-emerald-950 rounded-3xl p-5 text-white shadow-lg border border-emerald-500/20 space-y-4">

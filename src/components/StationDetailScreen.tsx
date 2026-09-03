@@ -717,8 +717,14 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                           )}
 
                           <div className="min-w-0">
-                            <div className="text-[14px] font-bold text-on-surface truncate">
-                              {report.author}
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <span className="text-[14px] font-bold text-on-surface truncate">
+                                {report.author}
+                              </span>
+                              <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 text-[10px] font-extrabold flex items-center gap-0.5 shrink-0">
+                                <span>🥇</span>
+                                <span>Verified Reporter</span>
+                              </span>
                             </div>
                             <div className="flex items-center gap-1.5 mt-0.5">
                               <span className="inline-flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-surface-container text-on-surface-variant border border-outline-variant whitespace-nowrap">

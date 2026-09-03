@@ -74,6 +74,8 @@ import {
   sendStationPushAlert,
   requestNotificationPermission,
 } from './utils/pushNotificationEngine';
+import { getDriverTier, DriverTier } from './utils/reputationEngine';
+import { ReputationLevelModal } from './components/ReputationLevelModal';
 import { apiService } from './services/apiService';
 
 export const App: React.FC = () => {
@@ -96,6 +98,7 @@ export const App: React.FC = () => {
   const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
   const [isAiModalOpen, setIsAiModalOpen] = useState(false);
   const [isRoiModalOpen, setIsRoiModalOpen] = useState(false);
+  const [unlockedTierModal, setUnlockedTierModal] = useState<DriverTier | null>(null);
   const [proximityAlertStation, setProximityAlertStation] = useState<GasStation | null>(null);
   const [globalToast, setGlobalToast] = useState<string | null>(null);
   const [gpsStatus, setGpsStatus] = useState<GpsStatus>('unavailable');
@@ -422,8 +425,15 @@ export const App: React.FC = () => {
       userProfile.state || 'Abuja FCT'
     );
 
+    const oldPoints = userProfile.communityPoints || 0;
+    const oldTier = getDriverTier(oldPoints).currentTier;
+
     setUserProfile((prev) => {
       newTotalPoints = (prev.communityPoints || 0) + pointsAwarded;
+      const newTier = getDriverTier(newTotalPoints).currentTier;
+      if (newTier.id !== oldTier.id) {
+        setUnlockedTierModal(newTier);
+      }
       return {
         ...prev,
         reportsCount: prev.reportsCount + 1,
@@ -431,7 +441,7 @@ export const App: React.FC = () => {
       };
     });
 
-    showToast('Thanks. Other drivers can see this.');
+    showToast(`Thanks! +${pointsAwarded} reputation points earned.`);
   };
 
   const handleAddStationComment = (stationId: string, commentText: string) => {
@@ -820,6 +830,21 @@ export const App: React.FC = () => {
             setActiveDiscussionPost(null);
             setActiveChatPost(null);
             setActiveTab(tab);
+          }}
+        />
+      )}
+
+      {/* Driver Reputation Level-Up Celebration Modal */}
+      {unlockedTierModal && (
+        <ReputationLevelModal
+          isOpen={Boolean(unlockedTierModal)}
+          tier={unlockedTierModal}
+          totalPoints={userProfile.communityPoints || 0}
+          onClose={() => setUnlockedTierModal(null)}
+          onOpenProfile={() => {
+            setActiveDetailStation(null);
+            setActiveDiscussionPost(null);
+            setActiveTab('profile');
           }}
         />
       )}

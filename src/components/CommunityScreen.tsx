@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { CommunityPost, GasStation } from '../types';
 import { StationGroupInfoSheet } from './StationGroupInfoSheet';
 import { EmptyState } from './common/EmptyState';
+import { MOCK_LEADERBOARD_DRIVERS } from '../utils/reputationEngine';
 
 interface CommunityScreenProps {
   posts: CommunityPost[];
@@ -26,7 +27,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
   onToggleLikePost,
   onOpenConversions,
 }) => {
-  const [activeMainTab, setActiveMainTab] = useState<'station_groups' | 'general'>('station_groups');
+  const [activeMainTab, setActiveMainTab] = useState<'station_groups' | 'general' | 'leaderboard'>('station_groups');
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   // Local like-state overlay keyed by post id; the post list itself stays in
@@ -144,6 +145,17 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
             }`}
           >
             <span className="whitespace-nowrap">General Hub</span>
+          </button>
+
+          <button
+            onClick={() => setActiveMainTab('leaderboard')}
+            className={`flex-1 py-2.5 rounded-xl text-body font-bold transition-all text-center flex items-center justify-center gap-1 ${
+              activeMainTab === 'leaderboard'
+                ? 'bg-[#004D40] text-[#00FFC2] shadow-xs'
+                : 'text-on-surface-variant hover:text-on-surface'
+            }`}
+          >
+            <span>🏆 Legends</span>
           </button>
         </div>
 
@@ -337,7 +349,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
               )}
             </div>
           </div>
-        ) : (
+        ) : activeMainTab === 'general' ? (
           /* MAIN TAB 2: General Community Hub (Maintenance, Parts, Deals, Conversions) */
           <div className="flex flex-col gap-4">
             {/* Hub Categories Grid */}
@@ -635,7 +647,83 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
               )}
             </div>
           </div>
-        )}
+        ) : activeMainTab === 'leaderboard' ? (
+          /* MAIN TAB 3: Top Gas Finder Legends Leaderboard */
+          <div className="flex flex-col gap-4">
+            {/* Header Banner */}
+            <div className="bg-gradient-to-r from-[#004D40] via-primary to-emerald-950 rounded-3xl p-5 text-white shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border border-emerald-500/20">
+              <div>
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#00FFC2]/20 text-[#00FFC2] border border-[#00FFC2]/30 text-xs font-extrabold mb-2">
+                  <span>🏆 Nationwide Driver Leaderboard</span>
+                </div>
+                <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight">
+                  Gas Finder Legends of Nigeria
+                </h2>
+                <p className="text-xs text-emerald-100/90 mt-1 max-w-xl leading-relaxed">
+                  Top drivers earning reputation points & badges by reporting real-time pump pressures, queue wait times, and station stock status.
+                </p>
+              </div>
+            </div>
+
+            {/* Leaderboard Cards */}
+            <div className="flex flex-col gap-2.5">
+              {MOCK_LEADERBOARD_DRIVERS.map((driver) => (
+                <div
+                  key={driver.id}
+                  className="bg-white rounded-3xl p-4 shadow-sm border border-slate-200/80 flex items-center justify-between gap-3 hover:border-emerald-500/40 transition-all"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    {/* Rank Badge */}
+                    <div
+                      className={`w-9 h-9 rounded-2xl flex items-center justify-center font-extrabold text-xs shrink-0 ${
+                        driver.rank === 1
+                          ? 'bg-amber-100 text-amber-900 border border-amber-300'
+                          : driver.rank === 2
+                          ? 'bg-slate-200 text-slate-800 border border-slate-300'
+                          : driver.rank === 3
+                          ? 'bg-amber-800/10 text-amber-900 border border-amber-800/20'
+                          : 'bg-slate-100 text-slate-600 border border-slate-200'
+                      }`}
+                    >
+                      #{driver.rank}
+                    </div>
+
+                    {/* Avatar & Info */}
+                    <img
+                      src={driver.avatar}
+                      alt={driver.name}
+                      className="w-12 h-12 rounded-full object-cover border-2 border-primary/30 shrink-0"
+                    />
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-extrabold text-slate-900 text-sm truncate">
+                          {driver.name}
+                        </h3>
+                        <span className="text-[10.5px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200 shrink-0">
+                          {driver.state}
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-500 font-medium truncate mt-0.5">
+                        {driver.vehicle}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Points & Tier Badge */}
+                  <div className="flex flex-col items-end shrink-0">
+                    <div className={`px-2.5 py-1 rounded-full border ${driver.tier.badgeBg} ${driver.tier.badgeColor} ${driver.tier.badgeBorder} flex items-center gap-1 font-extrabold text-[11px] shadow-2xs`}>
+                      <span>{driver.tier.badgeIcon}</span>
+                      <span className="hidden sm:inline">{driver.tier.title}</span>
+                    </div>
+                    <span className="text-xs font-black text-primary mt-1">
+                      {driver.points} pts <span className="text-[10px] text-slate-400 font-medium">({driver.reportsCount} reports)</span>
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : null}
       </div>
 
       {/* Floating Action Button (+) */}
