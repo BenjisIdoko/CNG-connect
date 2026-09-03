@@ -67,7 +67,7 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
 
   const handleOpenDirections = (center: ConversionCenter) => {
     const daddr = center.lat && center.lng ? `${center.lat},${center.lng}` : encodeURIComponent(center.address);
-    window.open(`https://www.google.com/maps/dir/?api=1&destination=${daddr}`, '_blank');
+    window.open(`https://www.google.com/maps/dir//${daddr}`, '_blank');
   };
 
   return (

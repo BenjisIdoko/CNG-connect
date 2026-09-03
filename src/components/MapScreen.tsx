@@ -1,9 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import 'leaflet.markercluster/dist/MarkerCluster.css';
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 import 'leaflet.markercluster';
 import { GasStation, StationStatus, StationSuggestion } from '../types';
+
+// Configure Leaflet default marker assets for Vite
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+});
 import { ASSETS } from '../data/mockData';
 import { Modal } from './common/Modal';
 import { SuggestStationModal } from './SuggestStationModal';
@@ -191,22 +200,11 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       attributionControl: false,
     });
 
-    const primaryTileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+    // Standard OpenStreetMap public tile server (100% free, no API key required)
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
-      subdomains: 'abcd',
-      attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
-    });
-
-    primaryTileLayer.on('tileerror', () => {
-      if (!map.hasLayer(primaryTileLayer)) return;
-      map.removeLayer(primaryTileLayer);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; OpenStreetMap contributors',
-      }).addTo(map);
-    });
-
-    primaryTileLayer.addTo(map);
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    }).addTo(map);
 
     const clusterGroup = (L as any).markerClusterGroup({
       showCoverageOnHover: false,
