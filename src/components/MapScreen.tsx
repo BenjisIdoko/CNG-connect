@@ -191,10 +191,22 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       attributionControl: false,
     });
 
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+    const primaryTileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
       maxZoom: 19,
       subdomains: 'abcd',
-    }).addTo(map);
+      attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+    });
+
+    primaryTileLayer.on('tileerror', () => {
+      if (!map.hasLayer(primaryTileLayer)) return;
+      map.removeLayer(primaryTileLayer);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap contributors',
+      }).addTo(map);
+    });
+
+    primaryTileLayer.addTo(map);
 
     const clusterGroup = (L as any).markerClusterGroup({
       showCoverageOnHover: false,

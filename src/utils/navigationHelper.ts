@@ -16,7 +16,7 @@ export function getNavigationDirectionsUrl(lat: number, lng: number): string {
 
   return isIOS
     ? `https://maps.apple.com/?daddr=${lat},${lng}&dirflg=d`
-    : `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=driving`;
+    : `https://www.google.com/maps/dir//${lat},${lng}`;
 }
 
 /**
