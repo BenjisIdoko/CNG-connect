@@ -1,55 +1,32 @@
 import React, { useState } from 'react';
-import { CommunityPost, CommentItem, UserProfile } from '../types';
-import { ASSETS } from '../data/mockData';
+import { CommunityPost } from '../types';
 
 interface DiscussionScreenProps {
   post: CommunityPost;
-  user?: UserProfile;
   onBack: () => void;
+  onAddComment: (postId: string, commentText: string) => void;
+  onToggleLike: (postId: string) => void;
 }
 
 export const DiscussionScreen: React.FC<DiscussionScreenProps> = ({
   post,
-  user,
   onBack,
+  onAddComment,
+  onToggleLike,
 }) => {
-  const [comments, setComments] = useState<CommentItem[]>(post.comments);
   const [newCommentText, setNewCommentText] = useState('');
-  const [likesCount, setLikesCount] = useState(post.likes);
-  const [isLiked, setIsLiked] = useState(post.isLiked || false);
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
 
-  React.useEffect(() => {
-    setComments(post.comments || []);
-    setLikesCount(post.likes || 0);
-    setIsLiked(Boolean(post.isLiked));
-  }, [post]);
-
-  const handleToggleLike = () => {
-    if (isLiked) {
-      setLikesCount((c) => c - 1);
-      setIsLiked(false);
-    } else {
-      setLikesCount((c) => c + 1);
-      setIsLiked(true);
-    }
-  };
+  const comments = post.comments || [];
+  const isLiked = Boolean(post.isLiked);
+  const likesCount = post.likes || 0;
 
   const handleAddComment = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newCommentText.trim()) return;
+    const trimmed = newCommentText.trim();
+    if (!trimmed) return;
 
-    const newComment: CommentItem = {
-      id: `comment-${Date.now()}`,
-      author: 'Tunde Adebayo',
-      authorAvatar: ASSETS.userAvatar,
-      timeAgo: 'Just now',
-      content: replyingTo
-        ? `@${replyingTo} ${newCommentText.trim()}`
-        : newCommentText.trim(),
-    };
-
-    setComments((prev) => [...prev, newComment]);
+    onAddComment(post.id, replyingTo ? `@${replyingTo} ${trimmed}` : trimmed);
     setNewCommentText('');
     setReplyingTo(null);
   };
@@ -130,7 +107,7 @@ export const DiscussionScreen: React.FC<DiscussionScreenProps> = ({
           <div className="flex items-center justify-between border-t border-surface-container-highest/70 pt-3 mt-1">
             <div className="flex gap-4">
               <button
-                onClick={handleToggleLike}
+                onClick={() => onToggleLike(post.id)}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-body font-medium transition-all active:scale-95 ${
                   isLiked
                     ? 'bg-primary text-white'

@@ -18,9 +18,63 @@ function sendJsonResponse(res: any, statusCode: number, data: any) {
   });
 }
 
+function isValidEmail(email: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+/**
+ * Dev-mode OTP bypass. Requires an EXPLICIT opt-in (ALLOW_DEV_OTP=true) and is
+ * hard-disabled on Vercel's production environment regardless of that flag —
+ * this is a security boundary, so it must fail closed, never fail open. An
+ * earlier version of this endpoint enabled the bypass by default whenever no
+ * SMS provider key was configured, which meant every phone number on the live
+ * site could be "verified" with a universal code. Do not reintroduce that.
+ */
+function isDevModeAllowed(): boolean {
+  const isProdEnv = process.env.VERCEL_ENV === 'production';
+  return process.env.ALLOW_DEV_OTP === 'true' && !isProdEnv;
+}
+
+async function sendVerificationEmail(email: string, code: string): Promise<{ ok: boolean; error?: string }> {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    return { ok: false, error: 'Email delivery is not configured on the server (RESEND_API_KEY missing).' };
+  }
+
+  try {
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: process.env.RESEND_FROM_ADDRESS || 'CNG-Connect <onboarding@resend.dev>',
+        to: [email],
+        subject: `${code} is your CNG-Connect verification code`,
+        html: `<div style="font-family:sans-serif;max-width:420px;margin:0 auto">
+          <h2 style="color:#004D40">CNG-Connect</h2>
+          <p>Your verification code is:</p>
+          <p style="font-size:32px;font-weight:800;letter-spacing:6px;color:#004D40">${code}</p>
+          <p style="color:#666;font-size:13px">This code expires in 5 minutes. If you didn't request this, you can ignore this email.</p>
+        </div>`,
+      }),
+    });
+
+    if (!res.ok) {
+      const errText = await res.text();
+      console.error('Resend email dispatch error:', res.status, errText);
+      return { ok: false, error: 'Failed to send verification email. Please try again.' };
+    }
+    return { ok: true };
+  } catch (err) {
+    console.error('Resend email dispatch exception:', err);
+    return { ok: false, error: 'Failed to send verification email. Please try again.' };
+  }
+}
+
 export default async function handler(req: any, res: any) {
   try {
-    // CORS & Method Check
     if (req.method === 'OPTIONS') {
       return sendJsonResponse(res, 200, {});
     }
@@ -31,98 +85,58 @@ export default async function handler(req: any, res: any) {
 
     let body = req.body;
     if (typeof body === 'string') {
-      try { body = JSON.parse(body); } catch {}
+      try { body = JSON.parse(body); } catch { /* leave body as-is; validated below */ }
     }
 
-    const { phone } = body || {};
-    if (!phone) {
-      return sendJsonResponse(res, 400, { error: 'Phone number is required.' });
+    const email = String(body?.email || '').trim().toLowerCase();
+    if (!email || !isValidEmail(email)) {
+      return sendJsonResponse(res, 400, { error: 'A valid email address is required.' });
     }
-
-    // Normalize phone number (e.g. +2348031234567)
-    const cleanedDigits = phone.replace(/\D/g, '');
-    let normalizedPhone = cleanedDigits;
-    if (normalizedPhone.startsWith('0')) {
-      normalizedPhone = '234' + normalizedPhone.slice(1);
-    }
-    if (!normalizedPhone.startsWith('234')) {
-      normalizedPhone = '234' + normalizedPhone;
-    }
-    normalizedPhone = '+' + normalizedPhone;
 
     const now = Date.now();
-    const existing = await getOtpSession(normalizedPhone);
+    const existing = await getOtpSession(email);
 
-    // 1. Rate Limiting Check: 60-Second Cooldown between SMS dispatches
+    // Rate limit: 60-second cooldown between sends per identifier
     if (existing && now - existing.lastSentAt < 60000) {
       const secondsLeft = Math.ceil((60000 - (now - existing.lastSentAt)) / 1000);
       return sendJsonResponse(res, 429, {
-        error: `Rate limit exceeded. Please wait ${secondsLeft} seconds before requesting a new code.`,
+        error: `Please wait ${secondsLeft} seconds before requesting a new code.`,
         secondsLeft,
       });
     }
 
-    // Dev-Mode Check: automatically active when no SMS provider key is configured
-    const hasTermiiKey = Boolean(process.env.TERMII_API_KEY || process.env.AFRICAS_TALKING_API_KEY || process.env.TWILIO_AUTH_TOKEN);
-    const isDevMode = !hasTermiiKey || process.env.DEV_MODE === 'true' || process.env.VITE_DEV_MODE === 'true';
-
-    // Generate 6-Digit OTP Code
-    const generatedOtp = isDevMode ? '123456' : Math.floor(100000 + Math.random() * 900000).toString();
+    const devMode = isDevModeAllowed();
+    const generatedOtp = devMode ? '123456' : Math.floor(100000 + Math.random() * 900000).toString();
     const expiresAt = now + 5 * 60 * 1000; // 5-minute expiry
 
-    // Save challenge in persistent session store
-    await saveOtpSession(normalizedPhone, {
+    await saveOtpSession(email, {
+      channel: 'email',
       code: generatedOtp,
       expiresAt,
       lastSentAt: now,
     });
 
-    if (isDevMode) {
-      console.log(`DEV MODE: would send OTP code ${generatedOtp} to ${normalizedPhone}`);
-    } else {
-      // Dispatch real SMS if Termii API Key exists on server
-      if (process.env.TERMII_API_KEY) {
-        const termiiRes = await fetch('https://api.ng.termii.com/api/sms/send', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            to: normalizedPhone.replace('+', ''),
-            from: process.env.TERMII_SENDER_ID || 'CNGConnect',
-            sms: `Your CNG-Connect verification code is ${generatedOtp}. Valid for 5 minutes.`,
-            type: 'plain',
-            channel: 'generic',
-            api_key: process.env.TERMII_API_KEY,
-          }),
-        });
-        if (!termiiRes.ok) {
-          console.error('Termii SMS Dispatch error:', await termiiRes.text());
-        }
-      } else if (process.env.AFRICAS_TALKING_API_KEY) {
-        const atRes = await fetch('https://api.africastalking.com/version1/messaging', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            apiKey: process.env.AFRICAS_TALKING_API_KEY,
-          },
-          body: new URLSearchParams({
-            username: process.env.AFRICAS_TALKING_USERNAME || 'sandbox',
-            to: normalizedPhone,
-            message: `Your CNG-Connect verification code is ${generatedOtp}. Valid for 5 minutes.`,
-          }),
-        });
-        if (!atRes.ok) {
-          console.error("Africa's Talking SMS error:", await atRes.text());
-        }
-      }
+    if (devMode) {
+      console.log(`DEV MODE (ALLOW_DEV_OTP=true, non-production): would email OTP ${generatedOtp} to ${email}`);
+      return sendJsonResponse(res, 200, {
+        success: true,
+        message: `DEV MODE: use code ${generatedOtp} (no email was actually sent)`,
+        devCode: generatedOtp,
+        isDevMode: true,
+        cooldownSeconds: 60,
+        expiresAt,
+      });
+    }
+
+    const dispatch = await sendVerificationEmail(email, generatedOtp);
+    if (!dispatch.ok) {
+      return sendJsonResponse(res, 500, { error: dispatch.error });
     }
 
     return sendJsonResponse(res, 200, {
       success: true,
-      message: isDevMode
-        ? `DEV MODE: would send OTP to ${normalizedPhone} (Use code: ${generatedOtp})`
-        : `SMS verification code sent to ${normalizedPhone}`,
-      devCode: isDevMode ? generatedOtp : undefined,
-      isDevMode,
+      message: `Verification code sent to ${email}.`,
+      isDevMode: false,
       cooldownSeconds: 60,
       expiresAt,
     });

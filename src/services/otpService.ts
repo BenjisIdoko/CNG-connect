@@ -15,15 +15,18 @@ export interface VerifyOtpResponse {
 
 export const otpService = {
   /**
-   * Request serverless SMS OTP code send for a given phone number.
-   * Calls /api/otp/send.
+   * Request a serverless email verification code for the given address.
+   * Calls /api/otp/send. Email was chosen over SMS because there is no
+   * genuinely free SMS gateway that delivers to Nigerian numbers at any
+   * real volume — every provider (Termii, Africa's Talking, Twilio) charges
+   * per message in production.
    */
-  async sendOtp(phone: string): Promise<SendOtpResponse> {
+  async sendOtp(email: string): Promise<SendOtpResponse> {
     try {
       const response = await fetch('/api/otp/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone }),
+        body: JSON.stringify({ email }),
       });
 
       let data: any = {};
@@ -48,7 +51,7 @@ export const otpService = {
 
       return {
         success: true,
-        message: data.message || 'SMS code dispatched.',
+        message: data.message || 'Verification code sent.',
         devCode: data.devCode,
         cooldownSeconds: data.cooldownSeconds || 60,
         expiresAt: data.expiresAt,
@@ -63,15 +66,15 @@ export const otpService = {
   },
 
   /**
-   * Verify entered 6-digit OTP code against serverless verification endpoint.
+   * Verify entered 6-digit code against the serverless verification endpoint.
    * Calls /api/otp/verify.
    */
-  async verifyOtp(phone: string, code: string): Promise<VerifyOtpResponse> {
+  async verifyOtp(email: string, code: string): Promise<VerifyOtpResponse> {
     try {
       const response = await fetch('/api/otp/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone, code }),
+        body: JSON.stringify({ email, code }),
       });
 
       let data: any = {};

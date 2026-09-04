@@ -253,7 +253,8 @@ export const App: React.FC = () => {
       }
     });
 
-    apiService.fetchPosts().then((data) => {
+    const mountUserKey = userProfile.email || userProfile.phone || 'default_driver';
+    apiService.fetchPosts(mountUserKey).then((data) => {
       if (isMounted && data.length > 0) {
         setPosts(data);
       }
@@ -483,21 +484,19 @@ export const App: React.FC = () => {
     showToast(`Thanks! +${pointsAwarded} reputation points earned.`);
   };
 
-  const handleAddStationComment = (stationId: string, commentText: string) => {
+  const handleAddStationComment = async (stationId: string, commentText: string) => {
+    // Optimistic local update so the comment appears instantly.
+    const newComment = {
+      id: `st-c-${Date.now()}`,
+      author: userProfile.name,
+      authorAvatar: userProfile.avatar,
+      timeAgo: 'Just now',
+      content: commentText,
+    };
     setStations((prev) =>
       prev.map((st) => {
         if (st.id === stationId) {
-          const newComment = {
-            id: `st-c-${Date.now()}`,
-            author: userProfile.name,
-            authorAvatar: userProfile.avatar,
-            timeAgo: 'Just now',
-            content: commentText,
-          };
-          const updated = {
-            ...st,
-            stationComments: [newComment, ...(st.stationComments || [])],
-          };
+          const updated = { ...st, stationComments: [newComment, ...(st.stationComments || [])] };
           if (activeDetailStation?.id === stationId) {
             setActiveDetailStation(updated);
           }
@@ -507,6 +506,19 @@ export const App: React.FC = () => {
       })
     );
     showToast('Comment posted to Station Group!');
+
+    // Sync to backend (Supabase station_comments table) when configured;
+    // reconcile local state with the authoritative merged result.
+    const updatedStations = await apiService.addStationComment(stationId, {
+      author: userProfile.name,
+      authorAvatar: userProfile.avatar,
+      content: commentText,
+    });
+    setStations(updatedStations);
+    const syncedStation = updatedStations.find((s) => s.id === stationId);
+    if (syncedStation && activeDetailStation?.id === stationId) {
+      setActiveDetailStation(syncedStation);
+    }
   };
 
   const handleUpdateLocation = async (stationId: string, lat: number, lng: number) => {
@@ -534,20 +546,71 @@ export const App: React.FC = () => {
     showToast('Post published to CNG-Connect Community!');
   };
 
-  const handleToggleLikePost = (postId: string) => {
+  const handleToggleLikePost = async (postId: string) => {
+    // Optimistic flip so the tap feels instant.
     setPosts((prevPosts) =>
       prevPosts.map((p) => {
         if (p.id === postId) {
           const isLiked = !p.isLiked;
-          return {
-            ...p,
-            isLiked,
-            likes: isLiked ? p.likes + 1 : Math.max(0, p.likes - 1),
-          };
+          const updated = { ...p, isLiked, likes: isLiked ? p.likes + 1 : Math.max(0, p.likes - 1) };
+          if (activeDiscussionPost?.id === postId) {
+            setActiveDiscussionPost(updated);
+          }
+          return updated;
         }
         return p;
       })
     );
+
+    const userKey = userProfile.email || userProfile.phone || 'default_driver';
+    const result = await apiService.togglePostLike(postId, userKey);
+    // No backend configured: the optimistic toggle above is the final state.
+    if (!result) return;
+
+    setPosts((prevPosts) =>
+      prevPosts.map((p) => {
+        if (p.id !== postId) return p;
+        const reconciled = { ...p, isLiked: result.liked, likes: result.likeCount };
+        if (activeDiscussionPost?.id === postId) {
+          setActiveDiscussionPost(reconciled);
+        }
+        return reconciled;
+      })
+    );
+  };
+
+  const handleAddPostComment = async (postId: string, commentText: string) => {
+    const newComment = {
+      id: `post-c-${Date.now()}`,
+      author: userProfile.name,
+      authorAvatar: userProfile.avatar,
+      timeAgo: 'Just now',
+      content: commentText,
+    };
+    setPosts((prev) =>
+      prev.map((p) => {
+        if (p.id === postId) {
+          const updated = { ...p, comments: [...(p.comments || []), newComment], repliesCount: (p.repliesCount || 0) + 1 };
+          if (activeDiscussionPost?.id === postId) {
+            setActiveDiscussionPost(updated);
+          }
+          return updated;
+        }
+        return p;
+      })
+    );
+
+    const userKey = userProfile.email || userProfile.phone || 'default_driver';
+    const updatedPosts = await apiService.addPostComment(
+      postId,
+      { author: userProfile.name, authorAvatar: userProfile.avatar, content: commentText },
+      userKey
+    );
+    setPosts(updatedPosts);
+    const syncedPost = updatedPosts.find((p) => p.id === postId);
+    if (syncedPost && activeDiscussionPost?.id === postId) {
+      setActiveDiscussionPost(syncedPost);
+    }
   };
 
   const handleAuthSuccess = (newUserProfile: UserProfile) => {
@@ -681,6 +744,8 @@ export const App: React.FC = () => {
             <DiscussionScreen
               post={activeDiscussionPost}
               onBack={() => setActiveDiscussionPost(null)}
+              onAddComment={handleAddPostComment}
+              onToggleLike={handleToggleLikePost}
             />
           ) : activeDetailStation ? (
             <StationDetailScreen

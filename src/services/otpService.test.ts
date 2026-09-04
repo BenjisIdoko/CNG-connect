@@ -7,19 +7,19 @@ describe('Client OTP Service (otpService)', () => {
       ok: true,
       json: async () => ({
         success: true,
-        message: 'SMS code sent',
+        message: 'Verification code sent.',
         devCode: '123456',
         cooldownSeconds: 60,
       }),
     });
     vi.stubGlobal('fetch', mockFetch);
 
-    const res = await otpService.sendOtp('08031234567');
+    const res = await otpService.sendOtp('driver@example.com');
     expect(res.success).toBe(true);
     expect(res.devCode).toBe('123456');
     expect(mockFetch).toHaveBeenCalledWith(
       '/api/otp/send',
-      expect.objectContaining({ method: 'POST' })
+      expect.objectContaining({ method: 'POST', body: JSON.stringify({ email: 'driver@example.com' }) })
     );
 
     vi.unstubAllGlobals();
@@ -29,12 +29,12 @@ describe('Client OTP Service (otpService)', () => {
     const mockFetch = vi.fn().mockResolvedValue({
       ok: false,
       json: async () => ({
-        error: 'Please wait 60 seconds before requesting another SMS code.',
+        error: 'Please wait 60 seconds before requesting a new code.',
       }),
     });
     vi.stubGlobal('fetch', mockFetch);
 
-    const res = await otpService.sendOtp('08031234567');
+    const res = await otpService.sendOtp('driver@example.com');
     expect(res.success).toBe(false);
     expect(res.error).toContain('wait 60 seconds');
 
@@ -51,11 +51,11 @@ describe('Client OTP Service (otpService)', () => {
     });
     vi.stubGlobal('fetch', mockFetch);
 
-    const res = await otpService.verifyOtp('08031234567', '123456');
+    const res = await otpService.verifyOtp('driver@example.com', '123456');
     expect(res.verified).toBe(true);
     expect(mockFetch).toHaveBeenCalledWith(
       '/api/otp/verify',
-      expect.objectContaining({ method: 'POST' })
+      expect.objectContaining({ method: 'POST', body: JSON.stringify({ email: 'driver@example.com', code: '123456' }) })
     );
 
     vi.unstubAllGlobals();
@@ -66,14 +66,14 @@ describe('Client OTP Service (otpService)', () => {
       ok: false,
       json: async () => ({
         verified: false,
-        error: 'Invalid or expired OTP code.',
+        error: 'Incorrect verification code.',
       }),
     });
     vi.stubGlobal('fetch', mockFetch);
 
-    const res = await otpService.verifyOtp('08031234567', '999999');
+    const res = await otpService.verifyOtp('driver@example.com', '999999');
     expect(res.verified).toBe(false);
-    expect(res.error).toContain('Invalid or expired');
+    expect(res.error).toContain('Incorrect verification code');
 
     vi.unstubAllGlobals();
   });

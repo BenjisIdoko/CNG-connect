@@ -1,7 +1,8 @@
-import { GasStation, DriverReport, CommunityPost, StationStatus, VerificationLevel, StationMedia, StationSuggestion } from '../types';
+import { GasStation, DriverReport, CommunityPost, StationStatus, VerificationLevel, StationMedia, StationSuggestion, CommentItem } from '../types';
 import { INITIAL_STATIONS, INITIAL_POSTS, deduplicateStations } from '../data/mockData';
 import { supabase, isSupabaseConfigured } from './supabaseClient';
 import { checkNotificationPermission } from '../utils/permissionManager';
+import { formatRelativeTime } from '../utils/timeUtils';
 
 // Helper: Calculate verification level and weight according to schema rules
 export function calculateVerificationMetadata(report: DriverReport): {
@@ -163,6 +164,11 @@ export const apiService = {
           .from('station_media')
           .select('*');
 
+        const { data: commentsData } = await supabase
+          .from('station_comments')
+          .select('*')
+          .order('created_at', { ascending: false });
+
         // Map Supabase snake_case records to frontend GasStation objects
         const stations: GasStation[] = stationsData.map((s: any) => {
           const stationReports: DriverReport[] = (reportsData || [])
@@ -200,6 +206,16 @@ export const apiService = {
               perceptualHash: m.perceptual_hash,
             }));
 
+          const stationComments: CommentItem[] = (commentsData || [])
+            .filter((c: any) => c.station_id === s.id)
+            .map((c: any) => ({
+              id: c.id,
+              author: c.author,
+              authorAvatar: c.author_avatar,
+              timeAgo: formatRelativeTime(c.created_at),
+              content: c.content,
+            }));
+
           return {
             id: s.id,
             name: s.name,
@@ -225,8 +241,12 @@ export const apiService = {
             reports: stationReports,
             stationMedia: stationMedia,
             activePresenceCount: s.active_presence_count ?? 0,
-            stationComments: s.station_comments || [],
+            stationComments,
             stationNotice: s.station_notice,
+            locationPrecision: s.location_precision,
+            area: s.area,
+            accuracyRadiusM: s.accuracy_radius_m,
+            needsPinReview: s.needs_pin_review ?? false,
           };
         });
 
@@ -393,9 +413,11 @@ export const apiService = {
   },
 
   /**
-   * Fetch all community posts.
+   * Fetch all community posts. Pass the current driver's userKey to also
+   * resolve which posts they've personally liked (post_likes is the source
+   * of truth for that; community_posts.likes is just the cached count).
    */
-  async fetchPosts(): Promise<CommunityPost[]> {
+  async fetchPosts(userKey?: string): Promise<CommunityPost[]> {
     if (isSupabaseConfigured && supabase) {
       try {
         const { data, error } = await supabase
@@ -407,24 +429,51 @@ export const apiService = {
           return getLocalPosts();
         }
 
-        return data.map((p: any) => ({
-          id: p.id,
-          author: p.author,
-          authorAvatar: p.author_avatar,
-          verified: p.verified,
-          timeAgo: p.time_ago,
-          category: p.category,
-          categoryLabel: p.category_label,
-          title: p.title,
-          content: p.content,
-          image: p.image,
-          likes: p.likes || 1,
-          repliesCount: p.replies_count || 0,
-          comments: p.comments || [],
-          isListing: p.is_listing,
-          price: p.price,
-          carDetails: p.car_details,
-        }));
+        const { data: commentsData } = await supabase
+          .from('post_comments')
+          .select('*')
+          .order('created_at', { ascending: true });
+
+        let likedPostIds = new Set<string>();
+        if (userKey) {
+          const { data: likesData } = await supabase
+            .from('post_likes')
+            .select('post_id')
+            .eq('user_key', userKey);
+          likedPostIds = new Set((likesData || []).map((l: any) => l.post_id));
+        }
+
+        return data.map((p: any) => {
+          const postComments: CommentItem[] = (commentsData || [])
+            .filter((c: any) => c.post_id === p.id)
+            .map((c: any) => ({
+              id: c.id,
+              author: c.author,
+              authorAvatar: c.author_avatar,
+              timeAgo: formatRelativeTime(c.created_at),
+              content: c.content,
+            }));
+
+          return {
+            id: p.id,
+            author: p.author,
+            authorAvatar: p.author_avatar,
+            verified: p.verified,
+            timeAgo: p.time_ago,
+            category: p.category,
+            categoryLabel: p.category_label,
+            title: p.title,
+            content: p.content,
+            image: p.image,
+            likes: p.likes || 0,
+            isLiked: likedPostIds.has(p.id),
+            repliesCount: postComments.length || p.replies_count || 0,
+            comments: postComments,
+            isListing: p.is_listing,
+            price: p.price,
+            carDetails: p.car_details,
+          };
+        });
       } catch {
         return getLocalPosts();
       }
@@ -484,12 +533,20 @@ export const apiService = {
 
     if (isSupabaseConfigured && supabase) {
       try {
-        const { error: pingError } = await supabase.from('station_presence').upsert({
-          station_id: stationId,
-          user_key: userKey,
-          last_ping_at: nowIso,
-          expires_at: expiresAt,
-        });
+        // onConflict must target the table's real UNIQUE constraint
+        // (station_id, user_key) — the primary key is a separate uuid `id`
+        // column, so without this every repeat ping for the same driver at
+        // the same station would try to INSERT a new row and fail the
+        // UNIQUE(station_id, user_key) constraint instead of updating it.
+        const { error: pingError } = await supabase.from('station_presence').upsert(
+          {
+            station_id: stationId,
+            user_key: userKey,
+            last_ping_at: nowIso,
+            expires_at: expiresAt,
+          },
+          { onConflict: 'station_id,user_key' }
+        );
         if (pingError) {
           console.error('Supabase station_presence upsert failed:', pingError.message);
         }
@@ -637,6 +694,8 @@ export const apiService = {
           lat,
           lng,
           locationPrecision: 'gps_confirmed' as const,
+          accuracyRadiusM: 20,
+          needsPinReview: false,
           dataSource: 'Community GPS Confirmed Pin',
           dataSourceDate: new Date().toISOString().split('T')[0],
           verifiedByCommunity: true,
@@ -650,15 +709,17 @@ export const apiService = {
 
     if (isSupabaseConfigured && supabase) {
       try {
-        await supabase
-          .from('gas_stations')
-          .update({
-            lat,
-            lng,
-            location_precision: 'gps_confirmed',
-            data_source: 'Community GPS Confirmed Pin',
-          })
-          .eq('id', stationId);
+        // Anon clients have no direct UPDATE grant on `stations` (see RLS in
+        // supabase/schema.sql) — pin corrections go through this
+        // SECURITY DEFINER function, which can only touch location columns.
+        const { error } = await supabase.rpc('update_station_pin', {
+          p_station_id: stationId,
+          p_lat: lat,
+          p_lng: lng,
+        });
+        if (error) {
+          console.error('Supabase update_station_pin rpc failed:', error.message);
+        }
       } catch (err) {
         console.warn('Supabase location update fallback:', err);
       }
@@ -673,6 +734,38 @@ export const apiService = {
   async addStationSuggestion(
     suggestion: Omit<StationSuggestion, 'id' | 'createdAt' | 'status'>
   ): Promise<StationSuggestion> {
+    const newSuggestion: StationSuggestion = {
+      id: `suggestion-${Date.now()}`,
+      ...suggestion,
+      status: 'pending',
+      createdAt: new Date().toISOString(),
+    };
+
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { error } = await supabase.from('station_suggestions').insert({
+          id: newSuggestion.id,
+          name: newSuggestion.name,
+          address: newSuggestion.address,
+          station_type: newSuggestion.stationType,
+          city: newSuggestion.city,
+          state: newSuggestion.state,
+          operator: newSuggestion.operator,
+          notes: newSuggestion.notes,
+          photo: newSuggestion.photo,
+          status: newSuggestion.status,
+          submitted_by: newSuggestion.submittedBy,
+        });
+        if (error) {
+          console.error('Supabase station_suggestions insert failed:', error.message);
+        }
+      } catch (err) {
+        console.error('API Service addStationSuggestion Supabase exception, using local fallback:', err);
+      }
+    }
+
+    // Always keep a local copy too, so a driver can see their own pending
+    // suggestions even before a backend reviewer approves them.
     const suggestionsKey = 'gasfinder_suggestions_v1';
     let existing: StationSuggestion[] = [];
     const raw = getStorageItem(suggestionsKey);
@@ -683,16 +776,135 @@ export const apiService = {
         existing = [];
       }
     }
-
-    const newSuggestion: StationSuggestion = {
-      id: `suggestion-${Date.now()}`,
-      ...suggestion,
-      status: 'pending',
-      createdAt: new Date().toISOString(),
-    };
-
     existing.unshift(newSuggestion);
     setStorageItem(suggestionsKey, JSON.stringify(existing));
+
     return newSuggestion;
+  },
+
+  /**
+   * Adds a comment to a station's group discussion thread.
+   */
+  async addStationComment(
+    stationId: string,
+    comment: { author: string; authorAvatar: string; content: string }
+  ): Promise<GasStation[]> {
+    const newComment: CommentItem = {
+      id: `st-c-${Date.now()}`,
+      author: comment.author,
+      authorAvatar: comment.authorAvatar,
+      timeAgo: 'Just now',
+      content: comment.content,
+    };
+
+    const currentStations = getLocalStations();
+    const updatedLocalStations = currentStations.map((st) =>
+      st.id === stationId
+        ? { ...st, stationComments: [newComment, ...(st.stationComments || [])] }
+        : st
+    );
+    saveLocalStations(updatedLocalStations);
+
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { error } = await supabase.from('station_comments').insert({
+          id: newComment.id,
+          station_id: stationId,
+          author: comment.author,
+          author_avatar: comment.authorAvatar,
+          content: comment.content,
+        });
+        if (error) {
+          console.error('Supabase station_comments insert failed:', error.message);
+        } else {
+          const freshStations = await this.fetchStations();
+          if (freshStations && freshStations.length > 0) {
+            saveLocalStations(freshStations);
+            return freshStations;
+          }
+        }
+      } catch (err) {
+        console.error('API Service addStationComment Supabase exception, using local cache:', err);
+      }
+    }
+
+    return updatedLocalStations;
+  },
+
+  /**
+   * Adds a comment to a community post's discussion thread.
+   */
+  async addPostComment(
+    postId: string,
+    comment: { author: string; authorAvatar: string; content: string },
+    userKey?: string
+  ): Promise<CommunityPost[]> {
+    const newComment: CommentItem = {
+      id: `post-c-${Date.now()}`,
+      author: comment.author,
+      authorAvatar: comment.authorAvatar,
+      timeAgo: 'Just now',
+      content: comment.content,
+    };
+
+    const currentPosts = getLocalPosts();
+    const updatedLocalPosts = currentPosts.map((p) =>
+      p.id === postId
+        ? { ...p, comments: [...(p.comments || []), newComment], repliesCount: (p.repliesCount || 0) + 1 }
+        : p
+    );
+    saveLocalPosts(updatedLocalPosts);
+
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { error } = await supabase.from('post_comments').insert({
+          id: newComment.id,
+          post_id: postId,
+          author: comment.author,
+          author_avatar: comment.authorAvatar,
+          content: comment.content,
+        });
+        if (error) {
+          console.error('Supabase post_comments insert failed:', error.message);
+        } else {
+          const freshPosts = await this.fetchPosts(userKey);
+          if (freshPosts && freshPosts.length > 0) {
+            saveLocalPosts(freshPosts);
+            return freshPosts;
+          }
+        }
+      } catch (err) {
+        console.error('API Service addPostComment Supabase exception, using local cache:', err);
+      }
+    }
+
+    return updatedLocalPosts;
+  },
+
+  /**
+   * Toggles a driver's like on a community post. Backed by a SECURITY
+   * DEFINER RPC so the (post_id, user_key) pair can only be toggled by
+   * itself — a client can't fabricate someone else's like or inflate the
+   * count directly.
+   */
+  async togglePostLike(postId: string, userKey: string): Promise<{ liked: boolean; likeCount: number } | null> {
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { data, error } = await supabase
+          .rpc('toggle_post_like', { p_post_id: postId, p_user_key: userKey })
+          .single();
+        if (error) {
+          console.error('Supabase toggle_post_like rpc failed:', error.message);
+          return null;
+        }
+        return data ? { liked: Boolean((data as any).liked), likeCount: Number((data as any).like_count) } : null;
+      } catch (err) {
+        console.error('API Service togglePostLike Supabase exception:', err);
+        return null;
+      }
+    }
+
+    // No backend configured: caller falls back to its own optimistic toggle.
+    return null;
   },
 };

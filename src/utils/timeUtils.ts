@@ -54,3 +54,24 @@ export function formatStationAge(station?: GasStation | null): string {
 
   return 'No recent report';
 }
+
+/**
+ * Generic "time ago" copy for a timestamp (e.g. a comment's created_at),
+ * independent of station status. Used wherever we need to turn a Supabase
+ * `created_at` into driver-facing copy like "5 min ago".
+ */
+export function formatRelativeTime(isoString: string): string {
+  const parsed = new Date(isoString);
+  if (isNaN(parsed.getTime())) return 'Just now';
+
+  const diffMs = Math.max(0, Date.now() - parsed.getTime());
+  const diffMins = Math.floor(diffMs / (1000 * 60));
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+  if (diffMins < 1) return 'Just now';
+  if (diffMins < 60) return `${diffMins} min ago`;
+  if (diffHours < 24) return `${diffHours} hr${diffHours > 1 ? 's' : ''} ago`;
+  if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+  return parsed.toLocaleDateString('en-NG', { day: 'numeric', month: 'short' });
+}

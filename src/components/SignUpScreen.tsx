@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { UserProfile } from '../types';
 import { ASSETS } from '../data/mockData';
 import { validatePhoneNumber } from '../utils/phoneValidator';
+import { validateEmail } from '../utils/emailValidator';
 import { otpService } from '../services/otpService';
 
 interface SignUpScreenProps {
@@ -26,6 +27,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [phoneError, setPhoneError] = useState<string | null>(null);
+  const [emailError, setEmailError] = useState<string | null>(null);
   const [isSendingOtp, setIsSendingOtp] = useState(false);
 
   // Step 2 OTP Verification State
@@ -65,7 +67,10 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
     return () => clearInterval(expiryTimer);
   }, [step, expiryCountdown]);
 
-  // Step 1: Validate Phone Format & Call Serverless /api/otp/send
+  // Step 1: Validate phone format (contact info only) + email format, then
+  // send the verification code to the driver's email — SMS OTP has no free
+  // tier that delivers reliably to Nigerian numbers at any real volume, so
+  // email is the verification channel (see src/services/otpService.ts).
   const handleStep1Submit = async () => {
     const phoneValidation = validatePhoneNumber(phone);
     if (!phoneValidation.isValid) {
@@ -73,14 +78,21 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
       return;
     }
 
+    const emailValidation = validateEmail(email);
+    if (!emailValidation.isValid) {
+      setEmailError(emailValidation.error || 'Please enter a valid email address.');
+      return;
+    }
+
     setPhoneError(null);
+    setEmailError(null);
     setIsSendingOtp(true);
 
-    const res = await otpService.sendOtp(phoneValidation.normalized || phone);
+    const res = await otpService.sendOtp(emailValidation.normalized || email);
     setIsSendingOtp(false);
 
     if (!res.success) {
-      setPhoneError(res.error || 'Failed to send SMS verification code.');
+      setEmailError(res.error || 'Failed to send verification email.');
       return;
     }
 
@@ -92,7 +104,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
     setExpiryCountdown(300); // 5 minutes
     setUserOtpInput('');
     setOtpError(null);
-    setOtpNotice(res.message || 'SMS verification code dispatched!');
+    setOtpNotice(res.message || 'Verification code sent!');
     setStep(2);
   };
 
@@ -104,21 +116,21 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
     }
 
     if (expiryCountdown <= 0) {
-      setOtpError('OTP code has expired (5 minute limit). Tap "Resend Code" to get a new code.');
+      setOtpError('Verification code has expired (5 minute limit). Tap "Resend Code" to get a new code.');
       return;
     }
 
     setIsVerifyingOtp(true);
     setOtpError(null);
 
-    const phoneValidation = validatePhoneNumber(phone);
-    const targetPhone = phoneValidation.normalized || phone;
+    const emailValidation = validateEmail(email);
+    const targetEmail = emailValidation.normalized || email;
 
-    const res = await otpService.verifyOtp(targetPhone, userOtpInput.trim());
+    const res = await otpService.verifyOtp(targetEmail, userOtpInput.trim());
     setIsVerifyingOtp(false);
 
     if (!res.verified) {
-      setOtpError(res.error || 'Verification failed. Please check your OTP code.');
+      setOtpError(res.error || 'Verification failed. Please check your code.');
       return;
     }
 
@@ -130,15 +142,15 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
   const handleResendOtp = async () => {
     if (resendCooldown > 0) return;
 
-    const phoneValidation = validatePhoneNumber(phone);
-    const targetPhone = phoneValidation.normalized || phone;
+    const emailValidation = validateEmail(email);
+    const targetEmail = emailValidation.normalized || email;
 
     setIsSendingOtp(true);
-    const res = await otpService.sendOtp(targetPhone);
+    const res = await otpService.sendOtp(targetEmail);
     setIsSendingOtp(false);
 
     if (!res.success) {
-      setOtpError(res.error || 'Failed to resend SMS code.');
+      setOtpError(res.error || 'Failed to resend verification code.');
       return;
     }
 
@@ -150,7 +162,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
     setExpiryCountdown(300); // Reset 5 min timer
     setUserOtpInput('');
     setOtpError(null);
-    setOtpNotice(`New SMS code sent! ${res.devCode ? `(Dev Code: ${res.devCode})` : ''}`);
+    setOtpNotice(`New code sent! ${res.devCode ? `(Dev Code: ${res.devCode})` : ''}`);
     setTimeout(() => setOtpNotice(null), 4000);
   };
 
@@ -162,7 +174,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
     const newUser: UserProfile = {
       name: fullName.trim() || 'CNG Driver',
       phone: formattedPhone,
-      email: email.trim() || 'driver@gasfinder.ng',
+      email: email.trim().toLowerCase(),
       avatar: ASSETS.userAvatar,
       vehicle: `${vehicleYear} ${vehicleMake} (${cngStatus === 'installed' ? `CNG ${tankSize}` : 'Petrol'})`,
       cngInstalledDate: cngStatus === 'installed' ? 'Recently Installed' : 'Planning',
@@ -224,7 +236,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
               {step === 1
                 ? 'Create Driver Account'
                 : step === 2
-                ? 'SMS OTP Verification'
+                ? 'Email Verification'
                 : 'Vehicle & CNG Details'}
             </h1>
           </div>
@@ -271,7 +283,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
                 </div>
               </div>
 
-              {/* Phone Number with Format Validation */}
+              {/* Phone Number with Format Validation (contact info — not the verification channel) */}
               <div>
                 <label className="block text-[12.5px] font-semibold text-on-surface-variant mb-1">
                   Phone Number (Nigerian Format: 0 + 10 digits or +234)
@@ -302,24 +314,36 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
                 )}
               </div>
 
-              {/* Email Address */}
+              {/* Email Address — this is where we send your verification code */}
               <div>
                 <label className="block text-[12.5px] font-semibold text-on-surface-variant mb-1">
-                  Email Address
+                  Email Address (we'll send your verification code here)
                 </label>
-                <div className="flex items-center bg-surface border border-outline-variant rounded-2xl px-3.5 h-12 focus-within:ring-2 focus-within:ring-primary/30 focus-within:border-primary transition-all">
+                <div className={`flex items-center bg-surface border rounded-2xl px-3.5 h-12 transition-all ${
+                  emailError ? 'border-status-red ring-2 ring-status-red/20' : 'border-outline-variant focus-within:ring-2 focus-within:ring-primary/30 focus-within:border-primary'
+                }`}>
                   <span className="material-symbols-outlined text-outline text-[20px] mr-2">
                     mail
                   </span>
                   <input
                     type="email"
                     required
+                    autoComplete="email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      if (emailError) setEmailError(null);
+                    }}
                     placeholder="tunde.drives@gmail.com"
                     className="flex-1 bg-transparent text-[14.5px] font-medium text-on-surface outline-none"
                   />
                 </div>
+                {emailError && (
+                  <p className="text-[11.5px] font-medium text-status-red mt-1 flex items-center gap-1">
+                    <span className="material-symbols-outlined text-[14px]">error</span>
+                    <span>{emailError}</span>
+                  </p>
+                )}
               </div>
 
               {/* Primary Operating City */}
@@ -374,12 +398,12 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
 
           {step === 2 && (
             <div className="flex flex-col gap-4 py-2">
-              {/* SMS Code Banner Callout */}
+              {/* Email Code Banner Callout */}
               <div className="bg-surface-container border border-outline-variant rounded-2xl p-4 flex flex-col gap-1.5">
                 <div className="flex items-center justify-between">
                   <span className="text-[12px] font-black uppercase text-primary tracking-wider flex items-center gap-1">
-                    <span className="material-symbols-outlined text-[16px]">sms</span>
-                    Serverless SMS OTP Verification
+                    <span className="material-symbols-outlined text-[16px]">mail</span>
+                    Email Verification
                   </span>
                   {devCode && (
                     <span className="bg-primary text-status-green text-[10.5px] font-black px-2.5 py-0.5 rounded-full border border-status-green/40">
@@ -388,7 +412,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
                   )}
                 </div>
                 <p className="text-[13px] text-on-surface-variant font-medium leading-relaxed">
-                  We triggered a 6-digit verification code to <strong>{phone}</strong> via serverless function.
+                  We sent a 6-digit verification code to <strong>{email}</strong>.
                 </p>
                 <div className="flex items-center justify-between text-[11.5px] font-bold text-primary pt-1">
                   <span>Code expires in: <strong className="text-status-red">{formatExpiryMinutes(expiryCountdown)}</strong></span>
@@ -439,7 +463,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
 
               {/* Rate-Limited Resend Action (60s Cooldown) */}
               <div className="flex items-center justify-between text-[12.5px] pt-1">
-                <span className="text-outline font-medium">Didn't receive SMS?</span>
+                <span className="text-outline font-medium">Didn't receive the email?</span>
                 <button
                   type="button"
                   onClick={handleResendOtp}
@@ -590,7 +614,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
               {isSendingOtp || isVerifyingOtp ? (
                 <div className="flex items-center gap-2">
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  <span>{isSendingOtp ? 'Sending SMS OTP...' : 'Verifying Code...'}</span>
+                  <span>{isSendingOtp ? 'Sending code...' : 'Verifying Code...'}</span>
                 </div>
               ) : (
                 <>
