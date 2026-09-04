@@ -13,6 +13,7 @@ import { Modal } from './common/Modal';
 import { SuggestStationModal } from './SuggestStationModal';
 import { formatStationAge } from '../utils/timeUtils';
 import { openWhatsAppShare } from '../utils/shareMessageBuilder';
+import { getPinConfidence, getAccuracyRadiusM } from '../utils/locationPrecision';
 
 // Bundle Leaflet's default marker assets through Vite so the map works offline
 // and never depends on a third-party CDN at runtime.
@@ -75,6 +76,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
   const markersLayerRef = useRef<L.LayerGroup | null>(null);
+  const accuracyCircleRef = useRef<L.Circle | null>(null);
   const initialFitRef = useRef(false);
   const userSelectedRef = useRef(false);
 
@@ -265,16 +267,27 @@ export const MapScreen: React.FC<MapScreenProps> = ({
         ? (st.chargingSpeedKw ? `${st.chargingSpeedKw}kW` : 'EV')
         : (st.pumpPressure ? `${st.pumpPressure} bar` : (st.status === 'unknown' ? 'No reports' : 'CNG'));
 
+      // Precision tier drives the pin's visual confidence: a real geocoding pass
+      // (scripts/geocode-stations.ts) now tells us how much to trust each pin —
+      // don't draw a guessed city-center pin the same way as a GPS-confirmed one.
+      const confidence = getPinConfidence(st.locationPrecision);
+      const isApprox = confidence !== 'confident';
+      const pillBorder = confidence === 'wide' ? 'border-2 border-dashed border-white/90' : confidence === 'moderate' ? 'border border-dashed border-white/80' : '';
+      const pillOpacity = confidence === 'wide' ? 'opacity-80' : confidence === 'moderate' ? 'opacity-90' : '';
+      const pointerShape = isApprox
+        ? `<div class="w-2.5 h-2.5 rotate-45 border-2 border-white -mt-1 shadow-xs" style="background-color: transparent; border-color: ${colorClass};"></div>`
+        : `<div class="w-2.5 h-2.5 rotate-45 border-r border-b border-white -mt-1 shadow-xs" style="background-color: ${colorClass};"></div>`;
+
       const customIcon = L.divIcon({
         className: 'custom-leaflet-marker',
         html: `
           <div class="relative group cursor-pointer flex flex-col items-center">
-            <div class="px-2 py-0.5 rounded-full text-[10px] font-black text-white shadow-md flex items-center gap-1 transition-transform transform ${isSelected ? 'scale-125 ring-2 ring-white' : ''}" style="background-color: ${colorClass};">
+            <div class="px-2 py-0.5 rounded-full text-[10px] font-black text-white shadow-md flex items-center gap-1 transition-transform transform ${pillBorder} ${pillOpacity} ${isSelected ? 'scale-125 ring-2 ring-white' : ''}" style="background-color: ${colorClass};" title="${isApprox ? 'Approximate location' : ''}">
               <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
               <span class="material-symbols-outlined text-[12px]">${iconSymbol}</span>
-              <span>${displayText}</span>
+              <span>${isApprox ? '~' : ''}${displayText}</span>
             </div>
-            <div class="w-2.5 h-2.5 rotate-45 border-r border-b border-white -mt-1 shadow-xs" style="background-color: ${colorClass};"></div>
+            ${pointerShape}
           </div>
         `,
         iconSize: [70, 30],
@@ -308,6 +321,42 @@ export const MapScreen: React.FC<MapScreenProps> = ({
     if (userSelectedRef.current && selectedStation.lat && selectedStation.lng) {
       mapInstanceRef.current.panTo([selectedStation.lat, selectedStation.lng], { animate: true });
     }
+  }, [selectedStation]);
+
+  // Accuracy-radius circle: only for the selected pin, and only when its
+  // precision tier isn't confident — showing this for all ~90 stations at
+  // once would just be map clutter, but for the one the driver is looking at
+  // it honestly communicates "the pump could be anywhere in this circle".
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map) return;
+
+    if (accuracyCircleRef.current) {
+      map.removeLayer(accuracyCircleRef.current);
+      accuracyCircleRef.current = null;
+    }
+
+    if (!selectedStation || !selectedStation.lat || !selectedStation.lng) return;
+    if (getPinConfidence(selectedStation.locationPrecision) === 'confident') return;
+
+    const circle = L.circle([selectedStation.lat, selectedStation.lng], {
+      radius: getAccuracyRadiusM(selectedStation),
+      color: '#FF6D00',
+      weight: 1.5,
+      dashArray: '6 6',
+      fillColor: '#FF6D00',
+      fillOpacity: 0.08,
+      interactive: false,
+    });
+    circle.addTo(map);
+    accuracyCircleRef.current = circle;
+
+    return () => {
+      if (accuracyCircleRef.current) {
+        map.removeLayer(accuracyCircleRef.current);
+        accuracyCircleRef.current = null;
+      }
+    };
   }, [selectedStation]);
 
   useEffect(() => {
