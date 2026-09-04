@@ -65,7 +65,13 @@ export interface GasStation {
   activePresenceCount?: number;
   stationComments?: CommentItem[];
   stationNotice?: string;
-  locationPrecision?: 'geocoded' | 'gps_confirmed' | 'source_exact';
+  // 'geocoded' is a legacy tier from before the real Nominatim geocoding pass;
+  // rooftop/street/area/city are honest confidence tiers from that pass, and
+  // 'unlocated' means no usable geocode was found (existing pin is a guess).
+  locationPrecision?: 'source_exact' | 'gps_confirmed' | 'rooftop' | 'street' | 'area' | 'city' | 'geocoded' | 'unlocated';
+  accuracyRadiusM?: number; // Approximate pin uncertainty radius in meters, derived from locationPrecision
+  area?: string; // Neighbourhood/landmark within the city (distinct from `city`)
+  needsPinReview?: boolean; // Flagged by the geocoder as unresolved or colliding with another station's pin
   dataSource?: string;
   dataSourceDate?: string;
   createdBy?: string | null;

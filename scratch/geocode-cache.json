@@ -1,0 +1,3021 @@
+{
+  "ku plaza, benin sapele rd, opposite pz junction, benin city, nigeria": {
+    "query": "KU Plaza, Benin Sapele Rd, Opposite PZ Junction, Benin City, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:33:52.720Z"
+  },
+  "opposite pz junction, benin city, edo, nigeria": {
+    "query": "Opposite PZ Junction, Benin City, Edo, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:33:54.315Z"
+  },
+  "benin city, edo, nigeria": {
+    "query": "Benin City, Edo, Nigeria",
+    "result": {
+      "place_id": 40092414,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "node",
+      "osm_id": 2149000430,
+      "lat": "6.3330586",
+      "lon": "5.6221058",
+      "category": "place",
+      "type": "city",
+      "place_rank": 16,
+      "importance": 0.5201029825481385,
+      "addresstype": "city",
+      "name": "Benin City",
+      "display_name": "Benin City, Oredo, Edo, 300241, Nigeria",
+      "address": {
+        "city": "Benin City",
+        "county": "Oredo",
+        "state": "Edo",
+        "ISO3166-2-lvl4": "NG-ED",
+        "postcode": "300241",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "6.1730586",
+        "6.4930586",
+        "5.4621058",
+        "5.7821058"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:33:55.755Z"
+  },
+  "east circular 2nd road, avbiama, benin city, nigeria": {
+    "query": "East Circular 2nd Road, Avbiama, Benin City, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:33:57.085Z"
+  },
+  "avbiama, benin city, edo, nigeria": {
+    "query": "Avbiama, Benin City, Edo, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:33:58.456Z"
+  },
+  "canaan st, textile mill road, benin city, nigeria": {
+    "query": "Canaan St, Textile Mill Road, Benin City, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:33:59.910Z"
+  },
+  "textile mill road, benin city, edo, nigeria": {
+    "query": "Textile Mill Road, Benin City, Edo, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:34:01.567Z"
+  },
+  "urualla st, agbor road, benin city, nigeria": {
+    "query": "Urualla St, Agbor Road, Benin City, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:34:02.954Z"
+  },
+  "agbor road, benin city, edo, nigeria": {
+    "query": "Agbor Road, Benin City, Edo, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:34:04.398Z"
+  },
+  "uselu, lagos road, benin city, nigeria": {
+    "query": "Uselu, Lagos Road, Benin City, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:34:05.707Z"
+  },
+  "lagos road, benin city, edo, nigeria": {
+    "query": "Lagos Road, Benin City, Edo, Nigeria",
+    "result": {
+      "place_id": 40351086,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "way",
+      "osm_id": 499710975,
+      "lat": "6.3532492",
+      "lon": "5.6274512",
+      "category": "highway",
+      "type": "secondary",
+      "place_rank": 26,
+      "importance": 0.053389131761654045,
+      "addresstype": "road",
+      "name": "New Lagos Road",
+      "display_name": "New Lagos Road, Benin City, Oredo, Edo, 300001, Nigeria",
+      "address": {
+        "road": "New Lagos Road",
+        "city": "Benin City",
+        "county": "Oredo",
+        "state": "Edo",
+        "ISO3166-2-lvl4": "NG-ED",
+        "postcode": "300001",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "6.3444049",
+        "6.3620035",
+        "5.6184070",
+        "5.6363989"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:34:07.586Z"
+  },
+  "km 7 benin auchi rd, adjacent zafike hotel, eyaen, benin city, nigeria": {
+    "query": "Km 7 Benin Auchi Rd, Adjacent Zafike Hotel, Eyaen, Benin City, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:34:09.072Z"
+  },
+  "eyaen, benin city, edo, nigeria": {
+    "query": "Eyaen, Benin City, Edo, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:34:10.915Z"
+  },
+  "lagos road, oluku, benin city, nigeria": {
+    "query": "Lagos Road, Oluku, Benin City, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:34:14.138Z"
+  },
+  "oluku, benin city, edo, nigeria": {
+    "query": "Oluku, Benin City, Edo, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:34:15.695Z"
+  },
+  "benin city bypass, uwusan, nigeria": {
+    "query": "Benin City Bypass, Uwusan, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:34:17.153Z"
+  },
+  "benin city bypass, uwusan, edo, nigeria": {
+    "query": "Benin City Bypass, Uwusan, Edo, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:34:19.619Z"
+  },
+  "uwusan, edo, nigeria": {
+    "query": "Uwusan, Edo, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:34:21.049Z"
+  },
+  "edo, nigeria": {
+    "query": "Edo, Nigeria",
+    "result": {
+      "place_id": 40362805,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "relation",
+      "osm_id": 3717119,
+      "lat": "6.6076575",
+      "lon": "5.9722713",
+      "category": "boundary",
+      "type": "administrative",
+      "place_rank": 8,
+      "importance": 0.5250577510836556,
+      "addresstype": "state",
+      "name": "Edo",
+      "display_name": "Edo, Nigeria",
+      "address": {
+        "state": "Edo",
+        "ISO3166-2-lvl4": "NG-ED",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "5.7463870",
+        "7.5914168",
+        "5.0084708",
+        "6.7157688"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:34:22.362Z"
+  },
+  "warri-sapele rd, okolovu, nigeria": {
+    "query": "Warri-Sapele Rd, Okolovu, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:36:02.162Z"
+  },
+  "warri-sapele rd, okolovu, delta, nigeria": {
+    "query": "Warri-Sapele Rd, Okolovu, Delta, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:36:03.754Z"
+  },
+  "okolovu, delta, nigeria": {
+    "query": "Okolovu, Delta, Nigeria",
+    "result": {
+      "place_id": 41113290,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "node",
+      "osm_id": 501483460,
+      "lat": "5.7147600",
+      "lon": "5.7572654",
+      "category": "place",
+      "type": "village",
+      "place_rank": 19,
+      "importance": 0.14670416800183103,
+      "addresstype": "village",
+      "name": "Okolovu",
+      "display_name": "Okolovu, Okpe, Delta, Nigeria",
+      "address": {
+        "village": "Okolovu",
+        "county": "Okpe",
+        "state": "Delta",
+        "ISO3166-2-lvl4": "NG-DE",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "5.6947600",
+        "5.7347600",
+        "5.7372654",
+        "5.7772654"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:36:05.267Z"
+  },
+  "summit road, asaba, nigeria": {
+    "query": "Summit Road, Asaba, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:36:06.837Z"
+  },
+  "summit road, asaba, delta, nigeria": {
+    "query": "Summit Road, Asaba, Delta, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:36:08.779Z"
+  },
+  "asaba, delta, nigeria": {
+    "query": "Asaba, Delta, Nigeria",
+    "result": {
+      "place_id": 40492820,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "node",
+      "osm_id": 501540929,
+      "lat": "6.1858825",
+      "lon": "6.7297071",
+      "category": "place",
+      "type": "city",
+      "place_rank": 16,
+      "importance": 0.47535728878741756,
+      "addresstype": "city",
+      "name": "Asaba",
+      "display_name": "Asaba, Oshimili South, Delta, Nigeria",
+      "address": {
+        "city": "Asaba",
+        "county": "Oshimili South",
+        "state": "Delta",
+        "ISO3166-2-lvl4": "NG-DE",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "6.0258825",
+        "6.3458825",
+        "6.5697071",
+        "6.8897071"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:36:10.314Z"
+  },
+  "nigercat junction, along npa road, warri, nigeria": {
+    "query": "Nigercat Junction, Along NPA Road, Warri, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:36:12.153Z"
+  },
+  "along npa road, warri, delta, nigeria": {
+    "query": "Along NPA Road, Warri, Delta, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:36:13.664Z"
+  },
+  "warri, delta, nigeria": {
+    "query": "Warri, Delta, Nigeria",
+    "result": {
+      "place_id": 40734030,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "node",
+      "osm_id": 9702599529,
+      "lat": "5.5186186",
+      "lon": "5.7480196",
+      "category": "place",
+      "type": "city",
+      "place_rank": 16,
+      "importance": 0.4677875818079836,
+      "addresstype": "city",
+      "name": "Warri",
+      "display_name": "Warri, Warri South, Delta, 332232, Nigeria",
+      "address": {
+        "city": "Warri",
+        "village": "Warri South",
+        "state": "Delta",
+        "ISO3166-2-lvl4": "NG-DE",
+        "postcode": "332232",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "5.3586186",
+        "5.6786186",
+        "5.5880196",
+        "5.9080196"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:36:15.192Z"
+  },
+  "38 km 16, rumuji, port harcourt, nigeria": {
+    "query": "38 Km 16, Rumuji, Port Harcourt, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:36:16.686Z"
+  },
+  "rumuji, port harcourt, rivers, nigeria": {
+    "query": "Rumuji, Port Harcourt, Rivers, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:36:18.185Z"
+  },
+  "port harcourt, rivers, nigeria": {
+    "query": "Port Harcourt, Rivers, Nigeria",
+    "result": {
+      "place_id": 40681814,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "relation",
+      "osm_id": 3720765,
+      "lat": "4.7676576",
+      "lon": "7.0188527",
+      "category": "boundary",
+      "type": "administrative",
+      "place_rank": 12,
+      "importance": 0.540882422393292,
+      "addresstype": "city",
+      "name": "Port-Harcourt",
+      "display_name": "Port-Harcourt, Rivers, Nigeria",
+      "address": {
+        "city": "Port-Harcourt",
+        "state": "Rivers",
+        "ISO3166-2-lvl4": "NG-RI",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "4.7131690",
+        "4.8240652",
+        "6.9403250",
+        "7.0781333"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:36:20.281Z"
+  },
+  "eleme road, akpajo, port harcourt, nigeria": {
+    "query": "Eleme Road, Akpajo, Port Harcourt, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:36:21.831Z"
+  },
+  "akpajo, port harcourt, rivers, nigeria": {
+    "query": "Akpajo, Port Harcourt, Rivers, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:36:23.361Z"
+  },
+  "benin-lagos expressway, obayantor, edo state, nigeria": {
+    "query": "Benin-Lagos Expressway, Obayantor, Edo State, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:36:24.860Z"
+  },
+  "obayantor, edo state, edo, nigeria": {
+    "query": "Obayantor, Edo State, Edo, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:36:26.367Z"
+  },
+  "edo state, edo, nigeria": {
+    "query": "Edo State, Edo, Nigeria",
+    "result": {
+      "place_id": 40105527,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "way",
+      "osm_id": 206092396,
+      "lat": "6.2948423",
+      "lon": "5.5931684",
+      "category": "highway",
+      "type": "residential",
+      "place_rank": 26,
+      "importance": 0.053389131761654045,
+      "addresstype": "road",
+      "name": "Nigeria Prisons Barracks Road",
+      "display_name": "Nigeria Prisons Barracks Road, Oko, Oredo, Edo, 300252, Nigeria",
+      "address": {
+        "road": "Nigeria Prisons Barracks Road",
+        "village": "Oko",
+        "county": "Oredo",
+        "state": "Edo",
+        "ISO3166-2-lvl4": "NG-ED",
+        "postcode": "300252",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "6.2935150",
+        "6.2961716",
+        "5.5915053",
+        "5.5948331"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:36:27.903Z"
+  },
+  "lekki-epe expressway, sangontedo, eti-osa lga, lagos, ibeju-lekki, nigeria": {
+    "query": "Lekki-Epe Expressway, Sangontedo, Eti-Osa LGA, Lagos, Ibeju-Lekki, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:36:29.317Z"
+  },
+  "lagos, ibeju-lekki, lagos, nigeria": {
+    "query": "Lagos, Ibeju-Lekki, Lagos, Nigeria",
+    "result": {
+      "place_id": 40883383,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "way",
+      "osm_id": 785409183,
+      "lat": "6.4627501",
+      "lon": "3.8499852",
+      "category": "landuse",
+      "type": "residential",
+      "place_rank": 24,
+      "importance": 0.08004000076295106,
+      "addresstype": "residential",
+      "name": "Amen Estate, Ibeju-Lekki, Lagos",
+      "display_name": "Amen Estate, Ibeju-Lekki, Lagos, Ibeju Lekki, Lagos, Nigeria",
+      "address": {
+        "residential": "Amen Estate, Ibeju-Lekki, Lagos",
+        "county": "Ibeju Lekki",
+        "state": "Lagos",
+        "ISO3166-2-lvl4": "NG-LA",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "6.4581913",
+        "6.4675301",
+        "3.8477898",
+        "3.8528752"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:36:31.277Z"
+  },
+  "lateef-jakande road, agidingbi, ikeja, lagos, nigeria": {
+    "query": "Lateef-Jakande Road, Agidingbi, Ikeja, Lagos, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:36:32.680Z"
+  },
+  "ikeja, lagos, lagos, nigeria": {
+    "query": "Ikeja, Lagos, Lagos, Nigeria",
+    "result": {
+      "place_id": 40661802,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "relation",
+      "osm_id": 3718193,
+      "lat": "6.5974727",
+      "lon": "3.3432815",
+      "category": "boundary",
+      "type": "administrative",
+      "place_rank": 12,
+      "importance": 0.44312150952092727,
+      "addresstype": "city",
+      "name": "Ikeja",
+      "display_name": "Ikeja, Lagos, Nigeria",
+      "address": {
+        "city": "Ikeja",
+        "state": "Lagos",
+        "ISO3166-2-lvl4": "NG-LA",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "6.5509516",
+        "6.6587736",
+        "3.3101247",
+        "3.3831906"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:36:34.098Z"
+  },
+  "mobil service station, mobil road, apapa, lagos, nigeria": {
+    "query": "Mobil Service Station, Mobil Road, Apapa, Lagos, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:36:35.995Z"
+  },
+  "apapa, lagos, lagos, nigeria": {
+    "query": "Apapa, Lagos, Lagos, Nigeria",
+    "result": {
+      "place_id": 41026594,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "relation",
+      "osm_id": 3718187,
+      "lat": "6.4451870",
+      "lon": "3.3683732",
+      "category": "boundary",
+      "type": "administrative",
+      "place_rank": 12,
+      "importance": 0.39589062692589233,
+      "addresstype": "county",
+      "name": "Apapa",
+      "display_name": "Apapa, Lagos, Nigeria",
+      "address": {
+        "county": "Apapa",
+        "state": "Lagos",
+        "ISO3166-2-lvl4": "NG-LA",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "6.4100747",
+        "6.4792528",
+        "3.3313413",
+        "3.3998804"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:36:37.537Z"
+  },
+  "mobil service station, challenge, mushin, 279 agege motor road, challenge bus stop, agege, lagos, nigeria": {
+    "query": "Mobil Service Station, Challenge, Mushin, 279 Agege Motor Road, Challenge Bus Stop, Agege, Lagos, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:36:39.342Z"
+  },
+  "agege, lagos, lagos, nigeria": {
+    "query": "Agege, Lagos, Lagos, Nigeria",
+    "result": {
+      "place_id": 41096888,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "relation",
+      "osm_id": 3718183,
+      "lat": "6.6252516",
+      "lon": "3.3112096",
+      "category": "boundary",
+      "type": "administrative",
+      "place_rank": 12,
+      "importance": 0.38135438604633176,
+      "addresstype": "county",
+      "name": "Agege",
+      "display_name": "Agege, Lagos, Nigeria",
+      "address": {
+        "county": "Agege",
+        "state": "Lagos",
+        "ISO3166-2-lvl4": "NG-LA",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "6.6018494",
+        "6.6483984",
+        "3.2981745",
+        "3.3371505"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:36:40.874Z"
+  },
+  "tollgate ibadan mobil service station, along lagos/ibadan expressway, tollgate, ibadan, oyo, nigeria": {
+    "query": "Tollgate Ibadan Mobil Service Station, Along Lagos/Ibadan Expressway, Tollgate, Ibadan, Oyo, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:36:42.428Z"
+  },
+  "ibadan, oyo, oyo, nigeria": {
+    "query": "Ibadan, Oyo, Oyo, Nigeria",
+    "result": {
+      "place_id": 41063268,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "node",
+      "osm_id": 27565066,
+      "lat": "7.3783681",
+      "lon": "3.8972331",
+      "category": "place",
+      "type": "city",
+      "place_rank": 16,
+      "importance": 0.541958819039375,
+      "addresstype": "city",
+      "name": "Ìbàdàn",
+      "display_name": "Ìbàdàn, Ibadan South West, Oyo, 234102, Nigeria",
+      "address": {
+        "city": "Ìbàdàn",
+        "county": "Ibadan South West",
+        "state": "Oyo",
+        "ISO3166-2-lvl4": "NG-OY",
+        "postcode": "234102",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "7.2183681",
+        "7.5383681",
+        "3.7372331",
+        "4.0572331"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:36:44.040Z"
+  },
+  "along marina, marina, lagos (marina), nigeria": {
+    "query": "Along Marina, Marina, Lagos (Marina), Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:36:45.580Z"
+  },
+  "marina, lagos (marina), lagos, nigeria": {
+    "query": "Marina, Lagos (Marina), Lagos, Nigeria",
+    "result": {
+      "place_id": 41017305,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "node",
+      "osm_id": 10776098576,
+      "lat": "6.4461596",
+      "lon": "3.3950293",
+      "category": "railway",
+      "type": "station",
+      "place_rank": 30,
+      "importance": 0.00006974059662771065,
+      "addresstype": "railway",
+      "name": "Marina",
+      "display_name": "Marina, New Marina Road, Lagos, Lagos Island, Lagos, 100242, Nigeria",
+      "address": {
+        "railway": "Marina",
+        "road": "New Marina Road",
+        "city": "Lagos",
+        "county": "Lagos Island",
+        "state": "Lagos",
+        "ISO3166-2-lvl4": "NG-LA",
+        "postcode": "100242",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "6.4411596",
+        "6.4511596",
+        "3.3900293",
+        "3.4000293"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:36:47.161Z"
+  },
+  "along ago palace way, off ago palace roundabout, lagos (amuwo odofin ss), nigeria": {
+    "query": "Along Ago Palace Way, Off Ago Palace Roundabout, Lagos (Amuwo Odofin SS), Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:36:48.750Z"
+  },
+  "off ago palace roundabout, lagos (amuwo odofin ss), lagos, nigeria": {
+    "query": "Off Ago Palace Roundabout, Lagos (Amuwo Odofin SS), Lagos, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:36:50.271Z"
+  },
+  "lagos (amuwo odofin ss), lagos, nigeria": {
+    "query": "Lagos (Amuwo Odofin SS), Lagos, Nigeria",
+    "result": {
+      "place_id": 40593392,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "way",
+      "osm_id": 785033125,
+      "lat": "6.4595559",
+      "lon": "3.3032723",
+      "category": "highway",
+      "type": "primary",
+      "place_rank": 26,
+      "importance": 0.053403073929961055,
+      "addresstype": "road",
+      "name": "Lagos-Badagry Expressway",
+      "display_name": "Lagos-Badagry Expressway, Kirikiri, Amuwo Odofin, Lagos, 102102, Nigeria",
+      "address": {
+        "road": "Lagos-Badagry Expressway",
+        "suburb": "Kirikiri",
+        "county": "Amuwo Odofin",
+        "state": "Lagos",
+        "ISO3166-2-lvl4": "NG-LA",
+        "postcode": "102102",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "6.4595539",
+        "6.4595619",
+        "3.3025989",
+        "3.3039457"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:36:51.828Z"
+  },
+  "along agege bypass, idimuangoro, lagos (agege bypass ss), nigeria": {
+    "query": "Along Agege Bypass, Idimuangoro, Lagos (Agege Bypass SS), Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:36:53.302Z"
+  },
+  "idimuangoro, lagos (agege bypass ss), lagos, nigeria": {
+    "query": "Idimuangoro, Lagos (Agege Bypass SS), Lagos, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:36:55.629Z"
+  },
+  "lagos (agege bypass ss), lagos, nigeria": {
+    "query": "Lagos (Agege Bypass SS), Lagos, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:36:57.775Z"
+  },
+  "lagos, nigeria": {
+    "query": "Lagos, Nigeria",
+    "result": {
+      "place_id": 417533118,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "node",
+      "osm_id": 27565124,
+      "lat": "6.4550575",
+      "lon": "3.3941795",
+      "category": "place",
+      "type": "city",
+      "place_rank": 16,
+      "importance": 0.6540811438950576,
+      "addresstype": "city",
+      "name": "Lagos",
+      "display_name": "Lagos, Lagos Island, Lagos, 100242, Nigeria",
+      "address": {
+        "city": "Lagos",
+        "county": "Lagos Island",
+        "state": "Lagos",
+        "ISO3166-2-lvl4": "NG-LA",
+        "postcode": "100242",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "6.2950575",
+        "6.6150575",
+        "3.2341795",
+        "3.5541795"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:36:59.451Z"
+  },
+  "no 1 ojota interchange terminal, bayo shodipo, ojota, lagos, nigeria": {
+    "query": "No 1 Ojota Interchange Terminal, Bayo Shodipo, Ojota, Lagos, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:37:01.010Z"
+  },
+  "ojota, lagos, lagos, nigeria": {
+    "query": "Ojota, Lagos, Lagos, Nigeria",
+    "result": {
+      "place_id": 41125026,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "way",
+      "osm_id": 1420862254,
+      "lat": "6.5813956",
+      "lon": "3.3690907",
+      "category": "highway",
+      "type": "primary",
+      "place_rank": 26,
+      "importance": 0.053403073929961055,
+      "addresstype": "road",
+      "name": "Maryland-Opebi-Ojota Link Bridge",
+      "display_name": "Maryland-Opebi-Ojota Link Bridge, Oregun, Onigbongbo, Ikeja, Lagos, 100212, Nigeria",
+      "address": {
+        "road": "Maryland-Opebi-Ojota Link Bridge",
+        "suburb": "Oregun",
+        "village": "Onigbongbo",
+        "city": "Ikeja",
+        "state": "Lagos",
+        "ISO3166-2-lvl4": "NG-LA",
+        "postcode": "100212",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "6.5797928",
+        "6.5831323",
+        "3.3668465",
+        "3.3714349"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:37:02.943Z"
+  },
+  "government transport pool, beside auditor general office, alagbaka, akure, ondo state, nigeria": {
+    "query": "Government Transport Pool, Beside Auditor General Office, Alagbaka, Akure, Ondo State, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:37:04.530Z"
+  },
+  "akure, ondo state, ondo, nigeria": {
+    "query": "Akure, Ondo State, Ondo, Nigeria",
+    "result": {
+      "place_id": 40067076,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "node",
+      "osm_id": 501540926,
+      "lat": "7.2525595",
+      "lon": "5.1932647",
+      "category": "place",
+      "type": "city",
+      "place_rank": 16,
+      "importance": 0.44771027162293786,
+      "addresstype": "city",
+      "name": "Akure",
+      "display_name": "Akure, Akure South, Ondo, 340021, Nigeria",
+      "address": {
+        "city": "Akure",
+        "county": "Akure South",
+        "state": "Ondo",
+        "ISO3166-2-lvl4": "NG-ON",
+        "postcode": "340021",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "7.0925595",
+        "7.4125595",
+        "5.0332647",
+        "5.3532647"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:37:06.035Z"
+  },
+  "km 5, itokin road, itamope village, ikorodu, lagos state, nigeria": {
+    "query": "Km 5, Itokin Road, Itamope Village, Ikorodu, Lagos State, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:37:07.556Z"
+  },
+  "ikorodu, lagos state, lagos, nigeria": {
+    "query": "Ikorodu, Lagos State, Lagos, Nigeria",
+    "result": {
+      "place_id": 41025481,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "relation",
+      "osm_id": 3718194,
+      "lat": "6.6191233",
+      "lon": "3.5041271",
+      "category": "boundary",
+      "type": "administrative",
+      "place_rank": 12,
+      "importance": 0.38135438604633176,
+      "addresstype": "city",
+      "name": "Ìkòròdú",
+      "display_name": "Ìkòròdú, Lagos, Nigeria",
+      "address": {
+        "city": "Ìkòròdú",
+        "state": "Lagos",
+        "ISO3166-2-lvl4": "NG-LA",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "6.5243659",
+        "6.6854755",
+        "3.4343681",
+        "3.7046592"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:37:09.502Z"
+  },
+  "fola agoro, shomolu lga, lagos (fola agoro ss), nigeria": {
+    "query": "Fola Agoro, Shomolu LGA, Lagos (Fola Agoro SS), Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:37:10.984Z"
+  },
+  "lagos, lagos (fola agoro ss), lagos, nigeria": {
+    "query": "Lagos, Lagos (Fola Agoro SS), Lagos, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:37:12.530Z"
+  },
+  "lagos (fola agoro ss), lagos, nigeria": {
+    "query": "Lagos (Fola Agoro SS), Lagos, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:37:14.145Z"
+  },
+  "along lagos epe expressway, lagos (lawoke ss), nigeria": {
+    "query": "Along Lagos Epe Expressway, Lagos (Lawoke SS), Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:37:15.545Z"
+  },
+  "along lagos epe expressway, lagos (lawoke ss), lagos, nigeria": {
+    "query": "Along Lagos Epe Expressway, Lagos (Lawoke SS), Lagos, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:37:17.036Z"
+  },
+  "lagos (lawoke ss), lagos, nigeria": {
+    "query": "Lagos (Lawoke SS), Lagos, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:37:18.875Z"
+  },
+  "queen elizabeth, agodi, ibadan, nigeria": {
+    "query": "Queen Elizabeth, Agodi, Ibadan, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:37:21.434Z"
+  },
+  "agodi, ibadan, oyo, nigeria": {
+    "query": "Agodi, Ibadan, Oyo, Nigeria",
+    "result": {
+      "place_id": 41400323,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "way",
+      "osm_id": 607335222,
+      "lat": "7.3977091",
+      "lon": "3.9218427",
+      "category": "water",
+      "type": "reservoir",
+      "place_rank": 20,
+      "importance": 0.13339260471503775,
+      "addresstype": "reservoir",
+      "name": "Agodi gate water corporation",
+      "display_name": "Agodi gate water corporation, Ìbàdàn, Ibadan North East, Oyo, Nigeria",
+      "address": {
+        "reservoir": "Agodi gate water corporation",
+        "city": "Ìbàdàn",
+        "county": "Ibadan North East",
+        "state": "Oyo",
+        "ISO3166-2-lvl4": "NG-OY",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "7.3974692",
+        "7.3979489",
+        "3.9216008",
+        "3.9220846"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:37:22.870Z"
+  },
+  "sango-otta, near lagos toll gate, nigeria": {
+    "query": "Sango-Otta, Near Lagos Toll Gate, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:37:24.303Z"
+  },
+  "sango-otta, near lagos toll gate, ogun, nigeria": {
+    "query": "Sango-Otta, Near Lagos Toll Gate, Ogun, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:37:25.819Z"
+  },
+  "near lagos toll gate, ogun, nigeria": {
+    "query": "Near Lagos Toll Gate, Ogun, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:37:27.349Z"
+  },
+  "ogun, nigeria": {
+    "query": "Ogun, Nigeria",
+    "result": {
+      "place_id": 41244841,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "relation",
+      "osm_id": 3718463,
+      "lat": "6.9788582",
+      "lon": "3.4389293",
+      "category": "boundary",
+      "type": "administrative",
+      "place_rank": 8,
+      "importance": 0.5230849954770176,
+      "addresstype": "state",
+      "name": "Ogun",
+      "display_name": "Ogun, Nigeria",
+      "address": {
+        "state": "Ogun",
+        "ISO3166-2-lvl4": "NG-OG",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "6.2763436",
+        "7.9528565",
+        "2.6905199",
+        "4.6095858"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:37:28.922Z"
+  },
+  "along ikorodu-sagamu road, ikorodu (odogunyan ss), nigeria": {
+    "query": "Along Ikorodu-Sagamu Road, Ikorodu (Odogunyan SS), Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:37:30.480Z"
+  },
+  "along ikorodu-sagamu road, ikorodu (odogunyan ss), lagos, nigeria": {
+    "query": "Along Ikorodu-Sagamu Road, Ikorodu (Odogunyan SS), Lagos, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:37:31.962Z"
+  },
+  "ikorodu (odogunyan ss), lagos, nigeria": {
+    "query": "Ikorodu (Odogunyan SS), Lagos, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:37:33.428Z"
+  },
+  "block m, plot 23, isolo industrial area, ilasamaja, lagos, nigeria": {
+    "query": "Block M, Plot 23, Isolo Industrial Area, Ilasamaja, Lagos, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:37:35.056Z"
+  },
+  "ilasamaja, lagos, lagos, nigeria": {
+    "query": "Ilasamaja, Lagos, Lagos, Nigeria",
+    "result": {
+      "place_id": 427179627,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "node",
+      "osm_id": 14136619314,
+      "lat": "6.5204650",
+      "lon": "3.3357171",
+      "category": "place",
+      "type": "suburb",
+      "place_rank": 19,
+      "importance": 0.14673640726329437,
+      "addresstype": "suburb",
+      "name": "Ilasamaja",
+      "display_name": "Ilasamaja, Mushin, Lagos, 100263, Nigeria",
+      "address": {
+        "suburb": "Ilasamaja",
+        "county": "Mushin",
+        "state": "Lagos",
+        "ISO3166-2-lvl4": "NG-LA",
+        "postcode": "100263",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "6.5004650",
+        "6.5404650",
+        "3.3157171",
+        "3.3557171"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:37:36.600Z"
+  },
+  "atakobo, sagamu-ore expressway, ogbere 101241, ogun state, nigeria": {
+    "query": "Atakobo, Sagamu-Ore Expressway, Ogbere 101241, Ogun State, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:37:38.442Z"
+  },
+  "ogbere 101241, ogun state, ogun, nigeria": {
+    "query": "Ogbere 101241, Ogun State, Ogun, Nigeria",
+    "result": {
+      "place_id": 40064843,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "node",
+      "osm_id": 501507940,
+      "lat": "6.7392880",
+      "lon": "4.1610127",
+      "category": "place",
+      "type": "town",
+      "place_rank": 18,
+      "importance": 0.16004000076295108,
+      "addresstype": "town",
+      "name": "Ogbere",
+      "display_name": "Ogbere, Ijebu East, Ogun, Nigeria",
+      "address": {
+        "town": "Ogbere",
+        "county": "Ijebu East",
+        "state": "Ogun",
+        "ISO3166-2-lvl4": "NG-OG",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "6.6992880",
+        "6.7792880",
+        "4.1210127",
+        "4.2010127"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:37:39.963Z"
+  },
+  "kopbape road junction, kuto, ogun, nigeria": {
+    "query": "Kopbape Road Junction, Kuto, Ogun, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:37:41.788Z"
+  },
+  "kuto, ogun, ogun, nigeria": {
+    "query": "Kuto, Ogun, Ogun, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:37:43.319Z"
+  },
+  "opposite mfm prayer city, lagos-ibadan expressway, ibafo, ogun state, nigeria": {
+    "query": "Opposite MFM Prayer City, Lagos-Ibadan Expressway, Ibafo, Ogun State, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:37:45.259Z"
+  },
+  "ibafo, ogun state, ogun, nigeria": {
+    "query": "Ibafo, Ogun State, Ogun, Nigeria",
+    "result": {
+      "place_id": 427014812,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "node",
+      "osm_id": 501330754,
+      "lat": "6.7424415",
+      "lon": "3.4218740",
+      "category": "place",
+      "type": "suburb",
+      "place_rank": 19,
+      "importance": 0.14670416800183103,
+      "addresstype": "suburb",
+      "name": "Ibafo",
+      "display_name": "Ibafo, Magado, Obafemi Owode, Ogun, 110105, Nigeria",
+      "address": {
+        "suburb": "Ibafo",
+        "village": "Magado",
+        "county": "Obafemi Owode",
+        "state": "Ogun",
+        "ISO3166-2-lvl4": "NG-OG",
+        "postcode": "110105",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "6.7224415",
+        "6.7624415",
+        "3.4018740",
+        "3.4418740"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:37:46.676Z"
+  },
+  "bovas ajibode retail outlet, along u.i ojoo road, ajibode junction, ibadan, nigeria": {
+    "query": "Bovas Ajibode Retail Outlet, Along U.I Ojoo Road, Ajibode Junction, Ibadan, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:37:48.235Z"
+  },
+  "ajibode junction, ibadan, oyo, nigeria": {
+    "query": "Ajibode Junction, Ibadan, Oyo, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:37:49.659Z"
+  },
+  "ibadan, oyo, nigeria": {
+    "query": "Ibadan, Oyo, Nigeria",
+    "result": {
+      "place_id": 40716518,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "node",
+      "osm_id": 27565066,
+      "lat": "7.3783681",
+      "lon": "3.8972331",
+      "category": "place",
+      "type": "city",
+      "place_rank": 16,
+      "importance": 0.541958819039375,
+      "addresstype": "city",
+      "name": "Ìbàdàn",
+      "display_name": "Ìbàdàn, Ibadan South West, Oyo, 234102, Nigeria",
+      "address": {
+        "city": "Ìbàdàn",
+        "county": "Ibadan South West",
+        "state": "Oyo",
+        "ISO3166-2-lvl4": "NG-OY",
+        "postcode": "234102",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "7.2183681",
+        "7.5383681",
+        "3.7372331",
+        "4.0572331"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:37:51.098Z"
+  },
+  "airport junction, alakia, ibadan, nigeria": {
+    "query": "Airport Junction, Alakia, Ibadan, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:37:52.520Z"
+  },
+  "alakia, ibadan, oyo, nigeria": {
+    "query": "Alakia, Ibadan, Oyo, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:37:54.069Z"
+  },
+  "km 46, lagos-ibadan expressway, by redemption camp, ogun state, nigeria": {
+    "query": "Km 46, Lagos-Ibadan Expressway, By Redemption Camp, Ogun State, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:37:56.120Z"
+  },
+  "by redemption camp, ogun state, ogun, nigeria": {
+    "query": "By Redemption Camp, Ogun State, Ogun, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:37:57.690Z"
+  },
+  "ogun state, ogun, nigeria": {
+    "query": "Ogun State, Ogun, Nigeria",
+    "result": {
+      "place_id": 40543723,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "node",
+      "osm_id": 5667240621,
+      "lat": "6.5392481",
+      "lon": "3.0960375",
+      "category": "office",
+      "type": "company",
+      "place_rank": 30,
+      "importance": 0.000040000762951049326,
+      "addresstype": "office",
+      "name": "Hayat Kimya Nigeria Ltd.",
+      "display_name": "Hayat Kimya Nigeria Ltd., Ota-Agbara Road, Agbara, Ado Odo/Ota, Ogun, Nigeria",
+      "address": {
+        "office": "Hayat Kimya Nigeria Ltd.",
+        "road": "Ota-Agbara Road",
+        "town": "Agbara",
+        "county": "Ado Odo/Ota",
+        "state": "Ogun",
+        "ISO3166-2-lvl4": "NG-OG",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "6.5391981",
+        "6.5392981",
+        "3.0959875",
+        "3.0960875"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:37:59.262Z"
+  },
+  "sagamu ikorodu road, ogun state, nigeria": {
+    "query": "Sagamu Ikorodu Road, Ogun State, Nigeria",
+    "result": {
+      "place_id": 41183169,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "node",
+      "osm_id": 6093496659,
+      "lat": "6.7058511",
+      "lon": "3.5102654",
+      "category": "amenity",
+      "type": "bus_station",
+      "place_rank": 30,
+      "importance": 0.00004176165407792809,
+      "addresstype": "amenity",
+      "name": "Ogijo Bus Stop",
+      "display_name": "Ogijo Bus Stop, SAGAMU ROAD, Sagamu Road, Itamaga, Shagamu, Ogun, 121101, Nigeria",
+      "address": {
+        "amenity": "Ogijo Bus Stop",
+        "house_number": "SAGAMU ROAD",
+        "road": "Sagamu Road",
+        "village": "Itamaga",
+        "city": "Shagamu",
+        "state": "Ogun",
+        "ISO3166-2-lvl4": "NG-OG",
+        "postcode": "121101",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "6.7058011",
+        "6.7059011",
+        "3.5102154",
+        "3.5103154"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:38:00.779Z"
+  },
+  "bovas ado retail outlet, poly road, ado ekiti, ekiti, nigeria": {
+    "query": "Bovas Ado Retail Outlet, Poly Road, Ado Ekiti, Ekiti, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:38:02.273Z"
+  },
+  "ado ekiti, ekiti, ekiti, nigeria": {
+    "query": "Ado Ekiti, Ekiti, Ekiti, Nigeria",
+    "result": {
+      "place_id": 40508072,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "relation",
+      "osm_id": 3717155,
+      "lat": "7.6232482",
+      "lon": "5.2227400",
+      "category": "boundary",
+      "type": "administrative",
+      "place_rank": 12,
+      "importance": 0.4069980038678312,
+      "addresstype": "city",
+      "name": "Adó-Èkìtì",
+      "display_name": "Adó-Èkìtì, Ekiti, Nigeria",
+      "address": {
+        "city": "Adó-Èkìtì",
+        "state": "Ekiti",
+        "ISO3166-2-lvl4": "NG-EK",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "7.5372453",
+        "7.6742396",
+        "5.1064386",
+        "5.3992829"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:38:03.807Z"
+  },
+  "km 44, lekki epe express road, nigeria": {
+    "query": "Km 44, Lekki Epe Express Road, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:38:05.464Z"
+  },
+  "km 44, lekki epe express road, lagos, nigeria": {
+    "query": "Km 44, Lekki Epe Express Road, Lagos, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:38:07.628Z"
+  },
+  "lekki epe express road, lagos, nigeria": {
+    "query": "Lekki Epe Express Road, Lagos, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:38:09.184Z"
+  },
+  "ogudu road, ojota, nigeria": {
+    "query": "Ogudu Road, Ojota, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:38:10.639Z"
+  },
+  "ogudu road, ojota, lagos, nigeria": {
+    "query": "Ogudu Road, Ojota, Lagos, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:38:12.061Z"
+  },
+  "ojota, lagos, nigeria": {
+    "query": "Ojota, Lagos, Nigeria",
+    "result": {
+      "place_id": 40645730,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "way",
+      "osm_id": 1465194311,
+      "lat": "6.5825742",
+      "lon": "3.3752720",
+      "category": "highway",
+      "type": "primary",
+      "place_rank": 26,
+      "importance": 0.053403073929961055,
+      "addresstype": "road",
+      "name": "Maryland-Opebi-Ojota Link Bridge",
+      "display_name": "Maryland-Opebi-Ojota Link Bridge, Oregun, Onigbongbo, Ikeja, Lagos, 100212, Nigeria",
+      "address": {
+        "road": "Maryland-Opebi-Ojota Link Bridge",
+        "suburb": "Oregun",
+        "village": "Onigbongbo",
+        "city": "Ikeja",
+        "state": "Lagos",
+        "ISO3166-2-lvl4": "NG-LA",
+        "postcode": "100212",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "6.5820678",
+        "6.5830870",
+        "3.3750063",
+        "3.3755263"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:38:13.584Z"
+  },
+  "obafemi awolowo university, ile-ife, osun, nigeria": {
+    "query": "Obafemi Awolowo University, Ile-Ife, Osun, Nigeria",
+    "result": {
+      "place_id": 40061712,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "way",
+      "osm_id": 539337732,
+      "lat": "7.5176178",
+      "lon": "4.5380242",
+      "category": "highway",
+      "type": "residential",
+      "place_rank": 26,
+      "importance": 0.05338310902571142,
+      "addresstype": "road",
+      "name": "Obafemi Awolowo University Primary School",
+      "display_name": "Obafemi Awolowo University Primary School, Ifẹ̀, Ife Central, Osun, 220282, Nigeria",
+      "address": {
+        "road": "Obafemi Awolowo University Primary School",
+        "city": "Ifẹ̀",
+        "county": "Ife Central",
+        "state": "Osun",
+        "ISO3166-2-lvl4": "NG-OS",
+        "postcode": "220282",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "7.5169075",
+        "7.5182982",
+        "4.5377116",
+        "4.5386114"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:38:15.189Z"
+  },
+  "ilishan ii, ilishan-remo, nigeria": {
+    "query": "Ilishan II, Ilishan-Remo, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:38:16.727Z"
+  },
+  "ilishan ii, ilishan-remo, ogun, nigeria": {
+    "query": "Ilishan II, Ilishan-Remo, Ogun, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:38:18.587Z"
+  },
+  "ilishan-remo, ogun, nigeria": {
+    "query": "Ilishan-Remo, Ogun, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:38:21.134Z"
+  },
+  "oshodi integrated energy hub, apapa-oshodi expressway, lagos, nigeria": {
+    "query": "Oshodi Integrated Energy Hub, Apapa-Oshodi Expressway, Lagos, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:38:22.733Z"
+  },
+  "apapa-oshodi expressway, lagos, lagos, nigeria": {
+    "query": "Apapa-Oshodi Expressway, Lagos, Lagos, Nigeria",
+    "result": {
+      "place_id": 416001666,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "node",
+      "osm_id": 9153530716,
+      "lat": "6.4920874",
+      "lon": "3.3218553",
+      "category": "office",
+      "type": "company",
+      "place_rank": 30,
+      "importance": 0.00006974059662771065,
+      "addresstype": "office",
+      "name": "Castlat Nigeria Limited",
+      "display_name": "Castlat Nigeria Limited, Apapa-Oworonshoki Expressway, Amuwo Odofin, Lagos, 102102, Nigeria",
+      "address": {
+        "office": "Castlat Nigeria Limited",
+        "road": "Apapa-Oworonshoki Expressway",
+        "suburb": "Amuwo Odofin",
+        "county": "Amuwo Odofin",
+        "state": "Lagos",
+        "ISO3166-2-lvl4": "NG-LA",
+        "postcode": "102102",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "6.4920374",
+        "6.4921374",
+        "3.3218053",
+        "3.3219053"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:38:24.405Z"
+  },
+  "enugu-abakaliki expressway, enugu, nigeria": {
+    "query": "Enugu-Abakaliki Expressway, Enugu, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:38:26.350Z"
+  },
+  "enugu-abakaliki expressway, enugu, enugu, nigeria": {
+    "query": "Enugu-Abakaliki Expressway, Enugu, Enugu, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:38:27.860Z"
+  },
+  "enugu, nigeria": {
+    "query": "Enugu, Nigeria",
+    "result": {
+      "place_id": 40171057,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "relation",
+      "osm_id": 3717212,
+      "lat": "6.5536094",
+      "lon": "7.4143061",
+      "category": "boundary",
+      "type": "administrative",
+      "place_rank": 8,
+      "importance": 0.5045922483200158,
+      "addresstype": "state",
+      "name": "Enugu",
+      "display_name": "Enugu, Nigeria",
+      "address": {
+        "state": "Enugu",
+        "ISO3166-2-lvl4": "NG-EN",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "5.9246402",
+        "7.1036601",
+        "6.9316678",
+        "7.9033957"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:38:29.383Z"
+  },
+  "ugwu onyeama, enugu, nigeria": {
+    "query": "Ugwu Onyeama, Enugu, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:38:30.990Z"
+  },
+  "ugwu onyeama, enugu, enugu, nigeria": {
+    "query": "Ugwu Onyeama, Enugu, Enugu, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:38:32.421Z"
+  },
+  "university of owerri, nigeria": {
+    "query": "University of Owerri, Nigeria",
+    "result": {
+      "place_id": 40833022,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "node",
+      "osm_id": 11109037934,
+      "lat": "5.3842764",
+      "lon": "6.9912064",
+      "category": "amenity",
+      "type": "university",
+      "place_rank": 30,
+      "importance": 0.0000532516975661405,
+      "addresstype": "amenity",
+      "name": "DEPARTMENT OF ARCHITECTURE",
+      "display_name": "DEPARTMENT OF ARCHITECTURE, access road, Ihiagwa, Owerri West, Imo, Nigeria",
+      "address": {
+        "amenity": "DEPARTMENT OF ARCHITECTURE",
+        "road": "access road",
+        "town": "Ihiagwa",
+        "county": "Owerri West",
+        "state": "Imo",
+        "ISO3166-2-lvl4": "NG-IM",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "5.3842264",
+        "5.3843264",
+        "6.9911564",
+        "6.9912564"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:38:33.926Z"
+  },
+  "plot 17886, kakau village, chikun, kaduna state, nigeria": {
+    "query": "Plot 17886, Kakau Village, Chikun, Kaduna State, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:38:35.542Z"
+  },
+  "chikun, kaduna state, kaduna, nigeria": {
+    "query": "Chikun, Kaduna State, Kaduna, Nigeria",
+    "result": {
+      "place_id": 41273907,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "relation",
+      "osm_id": 3709355,
+      "lat": "10.4202275",
+      "lon": "7.3135795",
+      "category": "boundary",
+      "type": "administrative",
+      "place_rank": 12,
+      "importance": 0.3002719692158251,
+      "addresstype": "county",
+      "name": "Chikun",
+      "display_name": "Chikun, Kaduna, 800024, Nigeria",
+      "address": {
+        "county": "Chikun",
+        "state": "Kaduna",
+        "ISO3166-2-lvl4": "NG-KD",
+        "postcode": "800024",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "10.0265265",
+        "10.8121068",
+        "6.7197802",
+        "7.7308844"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:38:37.026Z"
+  },
+  "galaxy station, zaria road, kano, nigeria": {
+    "query": "Galaxy Station, Zaria Road, Kano, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:38:38.479Z"
+  },
+  "zaria road, kano, kano, nigeria": {
+    "query": "Zaria Road, Kano, Kano, Nigeria",
+    "result": {
+      "place_id": 41799044,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "way",
+      "osm_id": 161619558,
+      "lat": "11.9740339",
+      "lon": "8.5445312",
+      "category": "highway",
+      "type": "trunk",
+      "place_rank": 26,
+      "importance": 0.05337833447775994,
+      "addresstype": "road",
+      "name": "Zaria Road",
+      "display_name": "Zaria Road, Gyadi-Gyadin Arewa, Gyadi Gyadi Arewa, Tarauni, Kano, 700224, Nigeria",
+      "address": {
+        "road": "Zaria Road",
+        "village": "Gyadi-Gyadin Arewa",
+        "city": "Gyadi Gyadi Arewa",
+        "county": "Tarauni",
+        "state": "Kano",
+        "ISO3166-2-lvl4": "NG-KN",
+        "postcode": "700224",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "11.9694492",
+        "11.9790127",
+        "8.5403949",
+        "8.5490978"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:38:40.002Z"
+  },
+  "western bypass link road, old nipco station, kaduna, nigeria": {
+    "query": "Western Bypass Link Road, Old NIPCO Station, Kaduna, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:38:41.626Z"
+  },
+  "old nipco station, kaduna, kaduna, nigeria": {
+    "query": "Old NIPCO Station, Kaduna, Kaduna, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:38:43.457Z"
+  },
+  "kaduna, nigeria": {
+    "query": "Kaduna, Nigeria",
+    "result": {
+      "place_id": 41488052,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "relation",
+      "osm_id": 3709353,
+      "lat": "10.3825318",
+      "lon": "7.8533226",
+      "category": "boundary",
+      "type": "administrative",
+      "place_rank": 8,
+      "importance": 0.5263618328802072,
+      "addresstype": "state",
+      "name": "Kaduna",
+      "display_name": "Kaduna, Nigeria",
+      "address": {
+        "state": "Kaduna",
+        "ISO3166-2-lvl4": "NG-KD",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "9.0006409",
+        "11.5237694",
+        "6.0865312",
+        "8.8235216"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:38:45.031Z"
+  },
+  "abu gidado way, batagarawa, katsina, nigeria": {
+    "query": "Abu Gidado Way, Batagarawa, Katsina, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:38:46.465Z"
+  },
+  "batagarawa, katsina, katsina, nigeria": {
+    "query": "Batagarawa, Katsina, Katsina, Nigeria",
+    "result": {
+      "place_id": 41852396,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "relation",
+      "osm_id": 3711483,
+      "lat": "12.8677769",
+      "lon": "7.5314298",
+      "category": "boundary",
+      "type": "administrative",
+      "place_rank": 12,
+      "importance": 0.2917175836992075,
+      "addresstype": "county",
+      "name": "Batagarawa",
+      "display_name": "Batagarawa, Katsina, Nigeria",
+      "address": {
+        "county": "Batagarawa",
+        "state": "Katsina",
+        "ISO3166-2-lvl4": "NG-KT",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "12.6962509",
+        "13.0397199",
+        "7.4122000",
+        "7.7616880"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:38:48.060Z"
+  },
+  "western bypass road, sokoto, nigeria": {
+    "query": "Western Bypass Road, Sokoto, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:38:49.525Z"
+  },
+  "western bypass road, sokoto, sokoto, nigeria": {
+    "query": "Western Bypass Road, Sokoto, Sokoto, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:38:51.025Z"
+  },
+  "sokoto, nigeria": {
+    "query": "Sokoto, Nigeria",
+    "result": {
+      "place_id": 41857972,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "relation",
+      "osm_id": 3707368,
+      "lat": "13.0611195",
+      "lon": "5.3152203",
+      "category": "boundary",
+      "type": "administrative",
+      "place_rank": 8,
+      "importance": 0.5042371248065034,
+      "addresstype": "state",
+      "name": "Sokoto",
+      "display_name": "Sokoto, Nigeria",
+      "address": {
+        "state": "Sokoto",
+        "ISO3166-2-lvl4": "NG-SO",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "11.5303145",
+        "13.8856450",
+        "4.1407570",
+        "6.8201230"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:38:53.005Z"
+  },
+  "c27 sheikh nasiru kabara housing estate, zaria road, kano, nigeria": {
+    "query": "C27 Sheikh Nasiru Kabara Housing Estate, Zaria Road, Kano, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:38:54.569Z"
+  },
+  "marabar jos, kaduna, nigeria": {
+    "query": "Marabar Jos, Kaduna, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:38:56.089Z"
+  },
+  "marabar jos, kaduna, kaduna, nigeria": {
+    "query": "Marabar Jos, Kaduna, Kaduna, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:38:57.574Z"
+  },
+  "kano-zaria road, kano, nigeria": {
+    "query": "Kano-Zaria Road, Kano, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:38:59.002Z"
+  },
+  "kano-zaria road, kano, kano, nigeria": {
+    "query": "Kano-Zaria Road, Kano, Kano, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:39:00.543Z"
+  },
+  "kano, nigeria": {
+    "query": "Kano, Nigeria",
+    "result": {
+      "place_id": 42425196,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "node",
+      "osm_id": 501540880,
+      "lat": "11.9939978",
+      "lon": "8.5219738",
+      "category": "place",
+      "type": "city",
+      "place_rank": 16,
+      "importance": 0.5471828918465718,
+      "addresstype": "city",
+      "name": "Kano",
+      "display_name": "Kano, Yakasai, Kano Municipal, Kano, 700271, Nigeria",
+      "address": {
+        "city": "Kano",
+        "county": "Kano Municipal",
+        "state": "Kano",
+        "ISO3166-2-lvl4": "NG-KN",
+        "postcode": "700271",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "11.8339978",
+        "12.1539978",
+        "8.3619738",
+        "8.6819738"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:39:02.034Z"
+  },
+  "kamaras, buk road, kano, nigeria": {
+    "query": "Kamaras, BUK Road, Kano, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:39:03.555Z"
+  },
+  "buk road, kano, kano, nigeria": {
+    "query": "BUK Road, Kano, Kano, Nigeria",
+    "result": {
+      "place_id": 42433946,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "way",
+      "osm_id": 563046027,
+      "lat": "11.9813230",
+      "lon": "8.5204083",
+      "category": "highway",
+      "type": "primary",
+      "place_rank": 26,
+      "importance": 0.05337833447775994,
+      "addresstype": "road",
+      "name": "BUK Road",
+      "display_name": "BUK Road, Dan Agundi, Kano Municipal, Kano, 700271, Nigeria",
+      "address": {
+        "road": "BUK Road",
+        "suburb": "Dan Agundi",
+        "city": "Dan Agundi",
+        "county": "Kano Municipal",
+        "state": "Kano",
+        "ISO3166-2-lvl4": "NG-KN",
+        "postcode": "700271",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "11.9811478",
+        "11.9818038",
+        "8.5174600",
+        "8.5233510"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:39:04.974Z"
+  },
+  "sharada layin speaker, opp. shago tara, kano, nigeria": {
+    "query": "Sharada Layin Speaker, Opp. Shago Tara, Kano, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:39:06.486Z"
+  },
+  "opp. shago tara, kano, kano, nigeria": {
+    "query": "Opp. Shago Tara, Kano, Kano, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:39:08.073Z"
+  },
+  "dakatsalle hub station, zaria road, kano, nigeria": {
+    "query": "Dakatsalle Hub Station, Zaria Road, Kano, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:39:09.871Z"
+  },
+  "dealer 73, gosa, umaru musa yar'adua road, fct abuja, nigeria": {
+    "query": "Dealer 73, Gosa, Umaru Musa Yar'Adua Road, FCT Abuja, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:39:11.461Z"
+  },
+  "umaru musa yar'adua road, fct abuja, federal capital territory, nigeria": {
+    "query": "Umaru Musa Yar'Adua Road, FCT Abuja, Federal Capital Territory, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:39:12.979Z"
+  },
+  "fct abuja, federal capital territory, nigeria": {
+    "query": "FCT Abuja, Federal Capital Territory, Nigeria",
+    "result": {
+      "place_id": 41002013,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "way",
+      "osm_id": 564052815,
+      "lat": "9.0805107",
+      "lon": "7.4969005",
+      "category": "office",
+      "type": "diplomatic",
+      "place_rank": 30,
+      "importance": 0.40459685994744987,
+      "addresstype": "office",
+      "name": "Apostolic Nunciature",
+      "display_name": "Apostolic Nunciature, 541, Pope John Paul II Crescent, Maitama, Abuja, Municipal Area Council, Federal Capital Territory, 900271, Nigeria",
+      "address": {
+        "office": "Apostolic Nunciature",
+        "house_number": "541",
+        "road": "Pope John Paul II Crescent",
+        "suburb": "Maitama",
+        "city": "Abuja",
+        "county": "Municipal Area Council",
+        "state": "Federal Capital Territory",
+        "ISO3166-2-lvl4": "NG-FC",
+        "postcode": "900271",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "9.0798823",
+        "9.0813999",
+        "7.4961627",
+        "7.4973804"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:39:14.481Z"
+  },
+  "plot p58, cadastral zone 07-05, along kubwa expressway, kubwa, fct, abuja, nigeria": {
+    "query": "Plot P58, Cadastral Zone 07-05, Along Kubwa Expressway, Kubwa, FCT, Abuja, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:39:15.940Z"
+  },
+  "fct, abuja, federal capital territory, nigeria": {
+    "query": "FCT, Abuja, Federal Capital Territory, Nigeria",
+    "result": {
+      "place_id": 41460903,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "node",
+      "osm_id": 31203257,
+      "lat": "9.0643305",
+      "lon": "7.4892974",
+      "category": "place",
+      "type": "city",
+      "place_rank": 15,
+      "importance": 0.6152395067911506,
+      "addresstype": "city",
+      "name": "Abuja",
+      "display_name": "Abuja, Municipal Area Council, Federal Capital Territory, 223140, Nigeria",
+      "address": {
+        "city": "Abuja",
+        "county": "Municipal Area Council",
+        "state": "Federal Capital Territory",
+        "ISO3166-2-lvl4": "NG-FC",
+        "postcode": "223140",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "8.9043305",
+        "9.2243305",
+        "7.3292974",
+        "7.6492974"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:39:17.440Z"
+  },
+  "sector centre, prince & princess, abuja, nigeria": {
+    "query": "Sector Centre, Prince & Princess, Abuja, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:39:19.022Z"
+  },
+  "prince & princess, abuja, federal capital territory, nigeria": {
+    "query": "Prince & Princess, Abuja, Federal Capital Territory, Nigeria",
+    "result": {
+      "place_id": 423652321,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "node",
+      "osm_id": 14024356487,
+      "lat": "9.0091246",
+      "lon": "7.4595770",
+      "category": "highway",
+      "type": "bus_stop",
+      "place_rank": 30,
+      "importance": 0.00006618066681921137,
+      "addresstype": "highway",
+      "name": "Prince And Princess Estate Junction",
+      "display_name": "Prince And Princess Estate Junction, Oladipo Diya Road, Kaura, Abuja, Municipal Area Council, Federal Capital Territory, 900104, Nigeria",
+      "address": {
+        "highway": "Prince And Princess Estate Junction",
+        "road": "Oladipo Diya Road",
+        "suburb": "Kaura",
+        "city": "Abuja",
+        "county": "Municipal Area Council",
+        "state": "Federal Capital Territory",
+        "ISO3166-2-lvl4": "NG-FC",
+        "postcode": "900104",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "9.0090746",
+        "9.0091746",
+        "7.4595270",
+        "7.4596270"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:39:20.632Z"
+  },
+  "gaduwa, abuja, nigeria": {
+    "query": "Gaduwa, Abuja, Nigeria",
+    "result": {
+      "place_id": 423493903,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "node",
+      "osm_id": 14024364216,
+      "lat": "9.0045655",
+      "lon": "7.4657520",
+      "category": "highway",
+      "type": "bus_stop",
+      "place_rank": 30,
+      "importance": 0.00006618066681921137,
+      "addresstype": "highway",
+      "name": "Gaduwa Estate Bus Stop",
+      "display_name": "Gaduwa Estate Bus Stop, Oladipo Diya Road, Gudu, Abuja, Municipal Area Council, Federal Capital Territory, 900104, Nigeria",
+      "address": {
+        "highway": "Gaduwa Estate Bus Stop",
+        "road": "Oladipo Diya Road",
+        "suburb": "Gudu",
+        "city": "Abuja",
+        "county": "Municipal Area Council",
+        "state": "Federal Capital Territory",
+        "ISO3166-2-lvl4": "NG-FC",
+        "postcode": "900104",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "9.0045155",
+        "9.0046155",
+        "7.4657020",
+        "7.4658020"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:39:22.095Z"
+  },
+  "olusegun obasanjo way, zone 1, abuja, nigeria": {
+    "query": "Olusegun Obasanjo Way, Zone 1, Abuja, Nigeria",
+    "result": {
+      "place_id": 41309719,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "way",
+      "osm_id": 1288079222,
+      "lat": "9.0538805",
+      "lon": "7.4434168",
+      "category": "highway",
+      "type": "secondary",
+      "place_rank": 26,
+      "importance": 0.053399514000152554,
+      "addresstype": "road",
+      "name": "Olusegun Obasanjo Way",
+      "display_name": "Olusegun Obasanjo Way, Wuye, Abuja, Municipal Area Council, Federal Capital Territory, 240102, Nigeria",
+      "address": {
+        "road": "Olusegun Obasanjo Way",
+        "suburb": "Wuye",
+        "city": "Abuja",
+        "county": "Municipal Area Council",
+        "state": "Federal Capital Territory",
+        "ISO3166-2-lvl4": "NG-FC",
+        "postcode": "240102",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "9.0528863",
+        "9.0547516",
+        "7.4352792",
+        "7.4515006"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:39:24.038Z"
+  },
+  "dei-dei junction, abuja, nigeria": {
+    "query": "Dei-Dei Junction, Abuja, Nigeria",
+    "result": {
+      "place_id": 423652484,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "node",
+      "osm_id": 14024364250,
+      "lat": "9.1141743",
+      "lon": "7.2603636",
+      "category": "highway",
+      "type": "bus_stop",
+      "place_rank": 30,
+      "importance": 0.00003750133516437045,
+      "addresstype": "highway",
+      "name": "Dei Dei Junction",
+      "display_name": "Dei Dei Junction, Murtala Mohammed Expressway, Sabojibi, Municipal Area Council, Federal Capital Territory, Nigeria",
+      "address": {
+        "highway": "Dei Dei Junction",
+        "road": "Murtala Mohammed Expressway",
+        "village": "Sabojibi",
+        "county": "Municipal Area Council",
+        "state": "Federal Capital Territory",
+        "ISO3166-2-lvl4": "NG-FC",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "9.1141243",
+        "9.1142243",
+        "7.2603136",
+        "7.2604136"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:39:25.844Z"
+  },
+  "dutse-bwari road, abuja, nigeria": {
+    "query": "Dutse-Bwari Road, Abuja, Nigeria",
+    "result": {
+      "place_id": 423652305,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "node",
+      "osm_id": 14024356471,
+      "lat": "9.1685448",
+      "lon": "7.3858188",
+      "category": "highway",
+      "type": "bus_stop",
+      "place_rank": 30,
+      "importance": 0.00006618066681921137,
+      "addresstype": "highway",
+      "name": "Living Faith Church, Mai Suya Junction, New Jerusalem, Dutse Makaranta",
+      "display_name": "Living Faith Church, Mai Suya Junction, New Jerusalem, Dutse Makaranta, Obasanjo Road, Dam Camp, Bwari, Federal Capital Territory, 901101, Nigeria",
+      "address": {
+        "highway": "Living Faith Church, Mai Suya Junction, New Jerusalem, Dutse Makaranta",
+        "road": "Obasanjo Road",
+        "village": "Dam Camp",
+        "county": "Bwari",
+        "state": "Federal Capital Territory",
+        "ISO3166-2-lvl4": "NG-FC",
+        "postcode": "901101",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "9.1684948",
+        "9.1685948",
+        "7.3857688",
+        "7.3858688"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:39:27.994Z"
+  },
+  "okene-lokoja road, okene, kogi, nigeria": {
+    "query": "Okene-Lokoja Road, Okene, Kogi, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:39:29.933Z"
+  },
+  "okene, kogi, kogi, nigeria": {
+    "query": "Okene, Kogi, Kogi, Nigeria",
+    "result": {
+      "place_id": 40449232,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "relation",
+      "osm_id": 3717988,
+      "lat": "7.4610396",
+      "lon": "6.3988170",
+      "category": "boundary",
+      "type": "administrative",
+      "place_rank": 12,
+      "importance": 0.36391963791291315,
+      "addresstype": "county",
+      "name": "Okene",
+      "display_name": "Okene, Kogi, Nigeria",
+      "address": {
+        "county": "Okene",
+        "state": "Kogi",
+        "ISO3166-2-lvl4": "NG-KO",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "7.3419962",
+        "7.5777817",
+        "6.1335707",
+        "6.4906349"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:39:31.488Z"
+  },
+  "sabon pegi, shabi, lafia, nigeria": {
+    "query": "Sabon Pegi, Shabi, Lafia, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:39:32.983Z"
+  },
+  "shabi, lafia, nasarawa, nigeria": {
+    "query": "Shabi, Lafia, Nasarawa, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:39:34.525Z"
+  },
+  "lafia, nasarawa, nigeria": {
+    "query": "Lafia, Nasarawa, Nigeria",
+    "result": {
+      "place_id": 42064954,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "relation",
+      "osm_id": 3720503,
+      "lat": "8.4960459",
+      "lon": "8.5147636",
+      "category": "boundary",
+      "type": "administrative",
+      "place_rank": 12,
+      "importance": 0.4132399184526773,
+      "addresstype": "city",
+      "name": "Lafia",
+      "display_name": "Lafia, Nasarawa, Nigeria",
+      "address": {
+        "city": "Lafia",
+        "state": "Nasarawa",
+        "ISO3166-2-lvl4": "NG-NA",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "8.3951979",
+        "9.0270939",
+        "8.1740828",
+        "9.0734615"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:39:36.059Z"
+  },
+  "dangote cement, obajana, nigeria": {
+    "query": "Dangote Cement, Obajana, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:39:37.826Z"
+  },
+  "dangote cement, obajana, kogi, nigeria": {
+    "query": "Dangote Cement, Obajana, Kogi, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:39:39.277Z"
+  },
+  "obajana, kogi, nigeria": {
+    "query": "Obajana, Kogi, Nigeria",
+    "result": {
+      "place_id": 40538911,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "way",
+      "osm_id": 944919621,
+      "lat": "7.9218681",
+      "lon": "6.4300549",
+      "category": "landuse",
+      "type": "industrial",
+      "place_rank": 24,
+      "importance": 0.08004854428931102,
+      "addresstype": "industrial",
+      "name": "Dangote Obajana Cement",
+      "display_name": "Dangote Obajana Cement, Lokoja, Kogi, Nigeria",
+      "address": {
+        "industrial": "Dangote Obajana Cement",
+        "town": "Lokoja",
+        "state": "Kogi",
+        "ISO3166-2-lvl4": "NG-KO",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "7.9208836",
+        "7.9242546",
+        "6.4272047",
+        "6.4310121"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:39:40.784Z"
+  },
+  "post office terminal, sulu gambari road, soludero, ilorin, nigeria": {
+    "query": "Post Office Terminal, Sulu Gambari Road, Soludero, Ilorin, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:39:42.362Z"
+  },
+  "soludero, ilorin, kwara, nigeria": {
+    "query": "Soludero, Ilorin, Kwara, Nigeria",
+    "result": {
+      "place_id": 41151142,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "node",
+      "osm_id": 13047974726,
+      "lat": "8.4873690",
+      "lon": "4.5644774",
+      "category": "amenity",
+      "type": "bus_station",
+      "place_rank": 30,
+      "importance": 0.00005229800869759697,
+      "addresstype": "amenity",
+      "name": "Soludero Bus Terminal, Muritala Muhamed Way, Oko Erin, Nigeria",
+      "display_name": "Soludero Bus Terminal, Muritala Muhamed Way, Oko Erin, Nigeria, Sulu Gambari, 26 Ipaye Road, Gra, Ilorin 240101, Kwara, Nigeria, Ìlọrin, Ilorin East, Kwara, 240212, Nigeria",
+      "address": {
+        "amenity": "Soludero Bus Terminal, Muritala Muhamed Way, Oko Erin, Nigeria",
+        "road": "Sulu Gambari",
+        "quarter": "26 Ipaye Road, Gra, Ilorin 240101, Kwara, Nigeria",
+        "city": "Ìlọrin",
+        "county": "Ilorin East",
+        "state": "Kwara",
+        "ISO3166-2-lvl4": "NG-KW",
+        "postcode": "240212",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "8.4873190",
+        "8.4874190",
+        "4.5644274",
+        "4.5645274"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:39:43.803Z"
+  },
+  "ohunene, ajaokuta, kogi state, nigeria": {
+    "query": "Ohunene, Ajaokuta, Kogi State, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:39:45.292Z"
+  },
+  "ajaokuta, kogi state, kogi, nigeria": {
+    "query": "Ajaokuta, Kogi State, Kogi, Nigeria",
+    "result": {
+      "place_id": 40248954,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "relation",
+      "osm_id": 3717973,
+      "lat": "7.5639973",
+      "lon": "6.6291171",
+      "category": "boundary",
+      "type": "administrative",
+      "place_rank": 12,
+      "importance": 0.3113151607222326,
+      "addresstype": "town",
+      "name": "Ajaokuta",
+      "display_name": "Ajaokuta, Kogi, Nigeria",
+      "address": {
+        "town": "Ajaokuta",
+        "state": "Kogi",
+        "ISO3166-2-lvl4": "NG-KO",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "7.2195730",
+        "7.7864223",
+        "6.4088221",
+        "6.7552433"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:39:47.241Z"
+  },
+  "plot 196a, cadastral zone 04-07, lokoja-kaduna expressway, tungamaje, abuja, nigeria": {
+    "query": "Plot 196A, Cadastral Zone 04-07, Lokoja-Kaduna Expressway, Tungamaje, Abuja, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:39:48.648Z"
+  },
+  "tungamaje, abuja, federal capital territory, nigeria": {
+    "query": "Tungamaje, Abuja, Federal Capital Territory, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:39:50.130Z"
+  },
+  "abuja, federal capital territory, nigeria": {
+    "query": "Abuja, Federal Capital Territory, Nigeria",
+    "result": {
+      "place_id": 41460903,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "node",
+      "osm_id": 31203257,
+      "lat": "9.0643305",
+      "lon": "7.4892974",
+      "category": "place",
+      "type": "city",
+      "place_rank": 15,
+      "importance": 0.6152395067911506,
+      "addresstype": "city",
+      "name": "Abuja",
+      "display_name": "Abuja, Municipal Area Council, Federal Capital Territory, 223140, Nigeria",
+      "address": {
+        "city": "Abuja",
+        "county": "Municipal Area Council",
+        "state": "Federal Capital Territory",
+        "ISO3166-2-lvl4": "NG-FC",
+        "postcode": "223140",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "8.9043305",
+        "9.2243305",
+        "7.3292974",
+        "7.6492974"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:39:51.605Z"
+  },
+  "mobil station, madalla junction, madalla, abuja, fct, nigeria": {
+    "query": "Mobil Station, Madalla Junction, Madalla, Abuja, FCT, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:39:53.152Z"
+  },
+  "abuja, fct, federal capital territory, nigeria": {
+    "query": "Abuja, FCT, Federal Capital Territory, Nigeria",
+    "result": {
+      "place_id": 41460903,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "node",
+      "osm_id": 31203257,
+      "lat": "9.0643305",
+      "lon": "7.4892974",
+      "category": "place",
+      "type": "city",
+      "place_rank": 15,
+      "importance": 0.6152395067911506,
+      "addresstype": "city",
+      "name": "Abuja",
+      "display_name": "Abuja, Municipal Area Council, Federal Capital Territory, 223140, Nigeria",
+      "address": {
+        "city": "Abuja",
+        "county": "Municipal Area Council",
+        "state": "Federal Capital Territory",
+        "ISO3166-2-lvl4": "NG-FC",
+        "postcode": "223140",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "8.9043305",
+        "9.2243305",
+        "7.3292974",
+        "7.6492974"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:39:54.743Z"
+  },
+  "plot 2874, along lugbe airport road, abuja, nigeria": {
+    "query": "Plot 2874, Along Lugbe Airport Road, Abuja, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:39:56.399Z"
+  },
+  "along lugbe airport road, abuja, federal capital territory, nigeria": {
+    "query": "Along Lugbe Airport Road, Abuja, Federal Capital Territory, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:39:57.900Z"
+  },
+  "constitution ave, 1008 ali muhammad zarah st, cbd, abuja 900103, fct, nigeria": {
+    "query": "Constitution Ave, 1008 Ali Muhammad Zarah St, CBD, Abuja 900103, FCT, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:39:59.402Z"
+  },
+  "abuja 900103, fct, federal capital territory, nigeria": {
+    "query": "Abuja 900103, FCT, Federal Capital Territory, Nigeria",
+    "result": {
+      "place_id": 41460903,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "node",
+      "osm_id": 31203257,
+      "lat": "9.0643305",
+      "lon": "7.4892974",
+      "category": "place",
+      "type": "city",
+      "place_rank": 15,
+      "importance": 0.6152395067911506,
+      "addresstype": "city",
+      "name": "Abuja",
+      "display_name": "Abuja, Municipal Area Council, Federal Capital Territory, 223140, Nigeria",
+      "address": {
+        "city": "Abuja",
+        "county": "Municipal Area Council",
+        "state": "Federal Capital Territory",
+        "ISO3166-2-lvl4": "NG-FC",
+        "postcode": "223140",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "8.9043305",
+        "9.2243305",
+        "7.3292974",
+        "7.6492974"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:40:00.968Z"
+  },
+  "mobil station, plot no. mf 2854, cadastral zone 07-07, lugbe-1 extension, airport road, abuja, nigeria": {
+    "query": "Mobil Station, Plot No. MF 2854, Cadastral Zone 07-07, Lugbe-1 Extension, Airport Road, Abuja, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:40:02.571Z"
+  },
+  "airport road, abuja, federal capital territory, nigeria": {
+    "query": "Airport Road, Abuja, Federal Capital Territory, Nigeria",
+    "result": {
+      "place_id": 423277612,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "node",
+      "osm_id": 14024364111,
+      "lat": "8.9641887",
+      "lon": "7.3813365",
+      "category": "highway",
+      "type": "bus_stop",
+      "place_rank": 30,
+      "importance": 0.00006618066681921137,
+      "addresstype": "highway",
+      "name": "Engineer Abubakar Generator Makanek Lugbe Airport Road Fct Abuja Pesvileg Johnson",
+      "display_name": "Engineer Abubakar Generator Makanek Lugbe Airport Road Fct Abuja Pesvileg Johnson, FM Opurum Street, Abuja, Municipal Area Council, Federal Capital Territory, 900107, Nigeria",
+      "address": {
+        "highway": "Engineer Abubakar Generator Makanek Lugbe Airport Road Fct Abuja Pesvileg Johnson",
+        "road": "FM Opurum Street",
+        "city": "Abuja",
+        "county": "Municipal Area Council",
+        "state": "Federal Capital Territory",
+        "ISO3166-2-lvl4": "NG-FC",
+        "postcode": "900107",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "8.9641387",
+        "8.9642387",
+        "7.3812865",
+        "7.3813865"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:40:04.318Z"
+  },
+  "plot no. 274, cadastral zone b06, mabushi district, abuja, nigeria": {
+    "query": "Plot No. 274, Cadastral Zone B06, Mabushi District, Abuja, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:40:06.120Z"
+  },
+  "mabushi district, abuja, federal capital territory, nigeria": {
+    "query": "Mabushi District, Abuja, Federal Capital Territory, Nigeria",
+    "result": {
+      "place_id": 41411509,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "relation",
+      "osm_id": 12207342,
+      "lat": "9.0837669",
+      "lon": "7.4493904",
+      "category": "boundary",
+      "type": "administrative",
+      "place_rank": 14,
+      "importance": 0.21339951400015256,
+      "addresstype": "suburb",
+      "name": "Mabushi",
+      "display_name": "Mabushi, Abuja, Municipal Area Council, Federal Capital Territory, Nigeria",
+      "address": {
+        "suburb": "Mabushi",
+        "city": "Abuja",
+        "county": "Municipal Area Council",
+        "state": "Federal Capital Territory",
+        "ISO3166-2-lvl4": "NG-FC",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "9.0761231",
+        "9.0905479",
+        "7.4345657",
+        "7.4677822"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:40:08.093Z"
+  },
+  "plot 504, cadastral zone, opposite shoprite, umaru musa yaradua expressway, lugbe, fct abuja, nigeria": {
+    "query": "Plot 504, Cadastral Zone, Opposite Shoprite, Umaru Musa Yaradua Expressway, Lugbe, FCT Abuja, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:40:09.657Z"
+  },
+  "lugbe, fct abuja, federal capital territory, nigeria": {
+    "query": "Lugbe, FCT Abuja, Federal Capital Territory, Nigeria",
+    "result": {
+      "place_id": 381631652,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "node",
+      "osm_id": 4994567225,
+      "lat": "8.9910376",
+      "lon": "7.3574905",
+      "category": "place",
+      "type": "quarter",
+      "place_rank": 20,
+      "importance": 0.13339951400015257,
+      "addresstype": "quarter",
+      "name": "CBN Quaters Lugbe Phase 2",
+      "display_name": "CBN Quaters Lugbe Phase 2, Abuja, Municipal Area Council, Federal Capital Territory, Nigeria",
+      "address": {
+        "quarter": "CBN Quaters Lugbe Phase 2",
+        "city": "Abuja",
+        "county": "Municipal Area Council",
+        "state": "Federal Capital Territory",
+        "ISO3166-2-lvl4": "NG-FC",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "8.9810376",
+        "9.0010376",
+        "7.3474905",
+        "7.3674905"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:40:11.077Z"
+  },
+  "plot 8022, cadastral zone a05, along new karu-mararraba road, new karu, nasarawa, nigeria": {
+    "query": "Plot 8022, Cadastral Zone A05, Along New Karu-Mararraba Road, New Karu, Nasarawa, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:40:12.644Z"
+  },
+  "new karu, nasarawa, nasarawa, nigeria": {
+    "query": "New Karu, Nasarawa, Nasarawa, Nigeria",
+    "result": {
+      "place_id": 41473092,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "node",
+      "osm_id": 8117578417,
+      "lat": "9.0339989",
+      "lon": "7.6061197",
+      "category": "office",
+      "type": "government",
+      "place_rank": 30,
+      "importance": 0.00006618066681921137,
+      "addresstype": "office",
+      "name": "New-karu. Ku",
+      "display_name": "New-karu. Ku, Abuja-Keffi Expressway, Ado, Karu, Nasarawa, 961105, Nigeria",
+      "address": {
+        "office": "New-karu. Ku",
+        "road": "Abuja-Keffi Expressway",
+        "town": "Ado",
+        "county": "Karu",
+        "state": "Nasarawa",
+        "ISO3166-2-lvl4": "NG-NA",
+        "postcode": "961105",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "9.0339489",
+        "9.0340489",
+        "7.6060697",
+        "7.6061697"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:40:14.417Z"
+  },
+  "along western bypass, minna, niger, nigeria": {
+    "query": "Along Western Bypass, Minna, Niger, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:40:16.025Z"
+  },
+  "minna, niger, niger, nigeria": {
+    "query": "Minna, Niger, Niger, Nigeria",
+    "result": {
+      "place_id": 41386850,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "node",
+      "osm_id": 625740529,
+      "lat": "9.6187093",
+      "lon": "6.5475752",
+      "category": "place",
+      "type": "city",
+      "place_rank": 16,
+      "importance": 0.41395049179757576,
+      "addresstype": "city",
+      "name": "Minna",
+      "display_name": "Minna, Chanchaga, Niger, 920101, Nigeria",
+      "address": {
+        "city": "Minna",
+        "county": "Chanchaga",
+        "state": "Niger",
+        "ISO3166-2-lvl4": "NG-NI",
+        "postcode": "920101",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "9.4587093",
+        "9.7787093",
+        "6.3875752",
+        "6.7075752"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:40:17.579Z"
+  },
+  "university of abuja, km 23, airport road, abuja, nigeria": {
+    "query": "University of Abuja, Km 23, Airport Road, Abuja, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:40:20.127Z"
+  },
+  "aust retail outlet, along airport road, nigeria": {
+    "query": "AUST Retail Outlet, Along Airport Road, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:40:21.704Z"
+  },
+  "aust retail outlet, along airport road, federal capital territory, nigeria": {
+    "query": "AUST Retail Outlet, Along Airport Road, Federal Capital Territory, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:40:23.270Z"
+  },
+  "along airport road, federal capital territory, nigeria": {
+    "query": "Along Airport Road, Federal Capital Territory, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:40:24.866Z"
+  },
+  "federal capital territory, nigeria": {
+    "query": "Federal Capital Territory, Nigeria",
+    "result": {
+      "place_id": 41304953,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "relation",
+      "osm_id": 3717259,
+      "lat": "8.8311228",
+      "lon": "7.1724673",
+      "category": "boundary",
+      "type": "administrative",
+      "place_rank": 8,
+      "importance": 0.47224035214088883,
+      "addresstype": "state",
+      "name": "Federal Capital Territory",
+      "display_name": "Federal Capital Territory, Nigeria",
+      "address": {
+        "state": "Federal Capital Territory",
+        "ISO3166-2-lvl4": "NG-FC",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "8.4575500",
+        "9.4086850",
+        "6.7785225",
+        "7.7240805"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:40:26.421Z"
+  },
+  "adjacent nnpcl mega station, abuja-okene expressway, phase 3, felele, lokoja, kogi state, nigeria": {
+    "query": "Adjacent NNPCL Mega Station, Abuja-Okene Expressway, Phase 3, Felele, Lokoja, Kogi State, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:40:27.955Z"
+  },
+  "lokoja, kogi state, kogi, nigeria": {
+    "query": "Lokoja, Kogi State, Kogi, Nigeria",
+    "result": {
+      "place_id": 41357618,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "relation",
+      "osm_id": 3717983,
+      "lat": "7.8023550",
+      "lon": "6.7430327",
+      "category": "boundary",
+      "type": "administrative",
+      "place_rank": 12,
+      "importance": 0.42626276740710034,
+      "addresstype": "town",
+      "name": "Lokoja",
+      "display_name": "Lokoja, Kogi, 260101, Nigeria",
+      "address": {
+        "town": "Lokoja",
+        "state": "Kogi",
+        "ISO3166-2-lvl4": "NG-KO",
+        "postcode": "260101",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "7.7302985",
+        "8.7387915",
+        "6.1131248",
+        "6.7921481"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:40:29.457Z"
+  },
+  "kubwa-gwarimpa expressway, abuja, nigeria": {
+    "query": "Kubwa-Gwarimpa Expressway, Abuja, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:40:31.006Z"
+  },
+  "kubwa-gwarimpa expressway, abuja, federal capital territory, nigeria": {
+    "query": "Kubwa-Gwarimpa Expressway, Abuja, Federal Capital Territory, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:40:32.561Z"
+  },
+  "plot 1232, ameyo adadevoh way, opposite total filling station, jahi, nigeria": {
+    "query": "Plot 1232, Ameyo Adadevoh Way, Opposite Total Filling Station, Jahi, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:40:34.148Z"
+  },
+  "opposite total filling station, jahi, federal capital territory, nigeria": {
+    "query": "Opposite Total Filling Station, Jahi, Federal Capital Territory, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:40:36.097Z"
+  },
+  "jahi, federal capital territory, nigeria": {
+    "query": "Jahi, Federal Capital Territory, Nigeria",
+    "result": {
+      "place_id": 41683173,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "relation",
+      "osm_id": 12208724,
+      "lat": "9.1096209",
+      "lon": "7.4387542",
+      "category": "boundary",
+      "type": "administrative",
+      "place_rank": 14,
+      "importance": 0.21339951400015256,
+      "addresstype": "suburb",
+      "name": "Jahi",
+      "display_name": "Jahi, Municipal Area Council, Federal Capital Territory, Nigeria",
+      "address": {
+        "suburb": "Jahi",
+        "county": "Municipal Area Council",
+        "state": "Federal Capital Territory",
+        "ISO3166-2-lvl4": "NG-FC",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "9.0982530",
+        "9.1179896",
+        "7.4257063",
+        "7.4551128"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:40:37.619Z"
+  },
+  "odaki, koton karfe - lokoja expressway, nigeria": {
+    "query": "Odaki, Koton Karfe - Lokoja Expressway, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:40:39.163Z"
+  },
+  "odaki, koton karfe - lokoja expressway, kogi, nigeria": {
+    "query": "Odaki, Koton Karfe - Lokoja Expressway, Kogi, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:40:41.018Z"
+  },
+  "koton karfe - lokoja expressway, kogi, nigeria": {
+    "query": "Koton Karfe - Lokoja Expressway, Kogi, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:40:42.704Z"
+  },
+  "kogi, nigeria": {
+    "query": "Kogi, Nigeria",
+    "result": {
+      "place_id": 39997344,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "relation",
+      "osm_id": 3717971,
+      "lat": "7.7949602",
+      "lon": "6.6868669",
+      "category": "boundary",
+      "type": "administrative",
+      "place_rank": 8,
+      "importance": 0.5106756714099423,
+      "addresstype": "state",
+      "name": "Kogi",
+      "display_name": "Kogi, Nigeria",
+      "address": {
+        "state": "Kogi",
+        "ISO3166-2-lvl4": "NG-KO",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "6.5323563",
+        "8.7387915",
+        "5.3215027",
+        "7.8662610"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:40:44.278Z"
+  },
+  "yidi retail outlet, yidi road, ilorin, nigeria": {
+    "query": "Yidi Retail Outlet, Yidi Road, Ilorin, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:40:45.739Z"
+  },
+  "yidi road, ilorin, kwara, nigeria": {
+    "query": "Yidi Road, Ilorin, Kwara, Nigeria",
+    "result": {
+      "place_id": 41803686,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "way",
+      "osm_id": 584874981,
+      "lat": "8.4828507",
+      "lon": "4.5528780",
+      "category": "highway",
+      "type": "primary",
+      "place_rank": 26,
+      "importance": 0.05338563134203094,
+      "addresstype": "road",
+      "name": "Old Yidi Road",
+      "display_name": "Old Yidi Road, Ìlọrin, Ilorin East, Kwara, 240212, Nigeria",
+      "address": {
+        "road": "Old Yidi Road",
+        "city": "Ìlọrin",
+        "county": "Ilorin East",
+        "state": "Kwara",
+        "ISO3166-2-lvl4": "NG-KW",
+        "postcode": "240212",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "8.4827034",
+        "8.4829979",
+        "4.5527616",
+        "4.5529943"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:40:47.312Z"
+  },
+  "ogbomosho-jebba expressway, ilorin, nigeria": {
+    "query": "Ogbomosho-Jebba Expressway, Ilorin, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:40:49.237Z"
+  },
+  "ogbomosho-jebba expressway, ilorin, kwara, nigeria": {
+    "query": "Ogbomosho-Jebba Expressway, Ilorin, Kwara, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:40:50.724Z"
+  },
+  "ilorin, kwara, nigeria": {
+    "query": "Ilorin, Kwara, Nigeria",
+    "result": {
+      "place_id": 41381495,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "node",
+      "osm_id": 27565089,
+      "lat": "8.4963657",
+      "lon": "4.5480484",
+      "category": "place",
+      "type": "city",
+      "place_rank": 16,
+      "importance": 0.47136388581426264,
+      "addresstype": "city",
+      "name": "Ìlọrin",
+      "display_name": "Ìlọrin, Ilorin East, Kwara, 240212, Nigeria",
+      "address": {
+        "city": "Ìlọrin",
+        "county": "Ilorin East",
+        "state": "Kwara",
+        "ISO3166-2-lvl4": "NG-KW",
+        "postcode": "240212",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "8.3363657",
+        "8.6563657",
+        "4.3880484",
+        "4.7080484"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:40:52.364Z"
+  },
+  "plot 49 and 51, numan road, on adsyp2, jimeta, adamawa state, nigeria": {
+    "query": "Plot 49 and 51, Numan Road, on ADSYP2, Jimeta, Adamawa State, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:40:53.810Z"
+  },
+  "jimeta, adamawa state, adamawa, nigeria": {
+    "query": "Jimeta, Adamawa State, Adamawa, Nigeria",
+    "result": {
+      "place_id": 42924418,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "node",
+      "osm_id": 501473219,
+      "lat": "9.2780486",
+      "lon": "12.4528047",
+      "category": "place",
+      "type": "city",
+      "place_rank": 16,
+      "importance": 0.31977730603466514,
+      "addresstype": "city",
+      "name": "Jimeta",
+      "display_name": "Jimeta, Girei, Adamawa, 640221, Nigeria",
+      "address": {
+        "city": "Jimeta",
+        "county": "Girei",
+        "state": "Adamawa",
+        "ISO3166-2-lvl4": "NG-AD",
+        "postcode": "640221",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "9.1180486",
+        "9.4380486",
+        "12.2928047",
+        "12.6128047"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:40:55.309Z"
+  },
+  "a345, akko, gombe state, nigeria": {
+    "query": "A345, Akko, Gombe State, Nigeria",
+    "result": {
+      "place_id": 424238563,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "way",
+      "osm_id": 1547470289,
+      "lat": "10.2915736",
+      "lon": "11.0676026",
+      "category": "highway",
+      "type": "trunk",
+      "place_rank": 26,
+      "importance": 0.053370834668497714,
+      "addresstype": "road",
+      "name": "A345",
+      "display_name": "A345, Tumfure, Akko, Gombe, Nigeria",
+      "address": {
+        "road": "A345",
+        "village": "Tumfure",
+        "county": "Akko",
+        "state": "Gombe",
+        "ISO3166-2-lvl4": "NG-GO",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "10.2898361",
+        "10.2916379",
+        "11.0268736",
+        "11.1084115"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:40:56.862Z"
+  },
+  "maiduguri-damaturu road, near jewu/lamboa, borno, nigeria": {
+    "query": "Maiduguri-Damaturu Road, Near Jewu/Lamboa, Borno, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:40:58.397Z"
+  },
+  "near jewu/lamboa, borno, borno, nigeria": {
+    "query": "Near Jewu/Lamboa, Borno, Borno, Nigeria",
+    "result": null,
+    "fetchedAt": "2026-09-04T13:40:59.811Z"
+  },
+  "borno, nigeria": {
+    "query": "Borno, Nigeria",
+    "result": {
+      "place_id": 42201993,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "relation",
+      "osm_id": 3721167,
+      "lat": "12.1875392",
+      "lon": "13.3080034",
+      "category": "boundary",
+      "type": "administrative",
+      "place_rank": 8,
+      "importance": 0.5292803645572135,
+      "addresstype": "state",
+      "name": "Borno",
+      "display_name": "Borno, Nigeria",
+      "address": {
+        "state": "Borno",
+        "ISO3166-2-lvl4": "NG-BO",
+        "country": "Nigeria",
+        "country_code": "ng"
+      },
+      "boundingbox": [
+        "10.0221825",
+        "13.7214360",
+        "11.5293356",
+        "14.6780140"
+      ]
+    },
+    "fetchedAt": "2026-09-04T13:41:01.343Z"
+  }
+}

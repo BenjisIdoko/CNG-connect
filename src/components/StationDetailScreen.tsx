@@ -6,6 +6,7 @@ import { openExternalMaps, openGoogleMapsPin } from '../utils/navigationHelper';
 import { StationGroupInfoSheet } from './StationGroupInfoSheet';
 import { formatStationAge } from '../utils/timeUtils';
 import { openWhatsAppShare } from '../utils/shareMessageBuilder';
+import { describeLocationPrecision } from '../utils/locationPrecision';
 import { EditStationLocationModal } from './EditStationLocationModal';
 
 interface StationDetailScreenProps {
@@ -315,9 +316,9 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                 </p>
 
                 {/* Approximate location caveat (quiet inline text, indented under address text) */}
-                {station.locationPrecision !== 'source_exact' && station.locationPrecision !== 'gps_confirmed' && (
+                {describeLocationPrecision(station) && (
                   <p className="text-micro font-medium text-status-orange pl-[22px] leading-tight">
-                    <span>Approximate location</span>
+                    <span>{describeLocationPrecision(station)}</span>
                     {onUpdateLocation && (
                       <>
                         <span> · </span>
