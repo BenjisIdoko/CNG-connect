@@ -32,7 +32,7 @@ export function calculateVerificationMetadata(report: DriverReport): {
 const STATIONS_STORAGE_KEY = 'gasfinder_stations_v10';
 const POSTS_STORAGE_KEY = 'gasfinder_posts_v10';
 
-let memoryStore: Record<string, string> = {};
+const memoryStore: Record<string, string> = {};
 
 function getStorageItem(key: string): string | null {
   try {

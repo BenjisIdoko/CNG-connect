@@ -59,7 +59,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
 
   const getFormattedStatusPillText = (st: GasStation): string => {
     const isEv = st.stationType === 'ev_charging';
-    let baseLabel = '';
+    let baseLabel: string;
     if (st.status === 'full') {
       baseLabel = 'Available';
     } else if (st.status === 'queue') {

@@ -132,7 +132,7 @@ export function sendStationPushAlert(
 
   let title = '';
   let body = '';
-  let icon = '/pwa-192x192.png';
+  const icon = '/pwa-192x192.png';
 
   if (transitionType === 'recovered') {
     title = `🟢 Pump Online: ${station.name}`;

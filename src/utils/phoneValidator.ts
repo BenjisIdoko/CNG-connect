@@ -14,7 +14,7 @@ export function validatePhoneNumber(phoneRaw: string): { isValid: boolean; error
   }
 
   // Strip spaces, dashes, parentheses
-  const cleaned = phoneRaw.replace(/[\s\-\(\)]/g, '');
+  const cleaned = phoneRaw.replace(/[\s\-()]/g, '');
 
   // Check for non-digit characters (except optional leading +)
   if (!/^\+?\d+$/.test(cleaned)) {

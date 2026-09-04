@@ -168,7 +168,9 @@ export const App: React.FC = () => {
         : [...prev, stationId];
       try {
         localStorage.setItem('gasfinder_favorite_stations', JSON.stringify(updated));
-      } catch {}
+      } catch {
+        /* storage unavailable or quota exceeded — favourites stay in memory */
+      }
       return updated;
     });
   }, []);
