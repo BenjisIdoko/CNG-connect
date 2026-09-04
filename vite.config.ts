@@ -142,9 +142,11 @@ export default defineConfig(() => {
         },
         workbox: {
           globPatterns: ['**/*.{js,css,html,ico,png,svg,json,woff,woff2}'],
+          globIgnores: ['sw-custom.js'],
+          importScripts: ['sw-custom.js'],
           runtimeCaching: [
             {
-              urlPattern: /^https:\/\/(.*\.tile\.openstreetmap\.org|unpkg\.com\/leaflet.*)\/.*/i,
+              urlPattern: /^https:\/\/.*\.tile\.openstreetmap\.org\/.*/i,
               handler: 'StaleWhileRevalidate',
               options: {
                 cacheName: 'cng-osm-tiles-v2',

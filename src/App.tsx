@@ -264,6 +264,31 @@ export const App: React.FC = () => {
     };
   }, []);
 
+  // Deep link: open a station's detail view when arriving via ?stationId= / ?station=
+  // (e.g. a tapped push notification or a shared station link). Runs once a match loads.
+  const deepLinkHandledRef = useRef(false);
+  useEffect(() => {
+    if (deepLinkHandledRef.current) return;
+    const params = new URLSearchParams(window.location.search);
+    const deepLinkId = params.get('stationId') || params.get('station');
+    if (!deepLinkId) {
+      deepLinkHandledRef.current = true;
+      return;
+    }
+    const match = stations.find((s) => s.id === deepLinkId);
+    if (!match) return;
+
+    deepLinkHandledRef.current = true;
+    setActiveDetailStation(match);
+    setSelectedStation(match);
+
+    // Strip the param so a refresh doesn't reopen the sheet.
+    params.delete('stationId');
+    params.delete('station');
+    const qs = params.toString();
+    window.history.replaceState({}, '', `${window.location.pathname}${qs ? `?${qs}` : ''}`);
+  }, [stations]);
+
   useEffect(() => {
     try {
       localStorage.setItem('gasfinder_user', JSON.stringify(userProfile));

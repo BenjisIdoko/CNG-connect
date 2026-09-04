@@ -1,3 +1,12 @@
+/**
+ * Local station-status alerts.
+ *
+ * These are foreground/near-foreground notifications the app raises itself when a
+ * report changes a station's status while a tab (or the installed PWA) is running.
+ * There is no push subscription or server — true background Web Push would need
+ * `pushManager.subscribe()` + VAPID + a backend. The service worker's
+ * `notificationclick` handler (public/sw-custom.js) routes taps to the station.
+ */
 import { GasStation, StationStatus, UserProfile } from '../types';
 import { checkNotificationPermission } from './permissionManager';
 import { getDistanceInKm } from './proximityAlertEngine';
@@ -174,6 +183,9 @@ export function sendStationPushAlert(
 
     notification.onclick = () => {
       window.focus();
+      // No SW controlling this page (rare): reload onto the deep link so the
+      // ?stationId= handler in App picks it up.
+      window.location.assign(`/?stationId=${station.id}`);
       notification.close();
     };
 

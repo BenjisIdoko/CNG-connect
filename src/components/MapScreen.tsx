@@ -4,20 +4,24 @@ import 'leaflet/dist/leaflet.css';
 import 'leaflet.markercluster/dist/MarkerCluster.css';
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 import 'leaflet.markercluster';
+import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
+import markerIcon from 'leaflet/dist/images/marker-icon.png';
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 import { GasStation, StationStatus, StationSuggestion } from '../types';
-
-// Configure Leaflet default marker assets for Vite
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-});
 import { ASSETS } from '../data/mockData';
 import { Modal } from './common/Modal';
 import { SuggestStationModal } from './SuggestStationModal';
 import { formatStationAge } from '../utils/timeUtils';
 import { openWhatsAppShare } from '../utils/shareMessageBuilder';
+
+// Bundle Leaflet's default marker assets through Vite so the map works offline
+// and never depends on a third-party CDN at runtime.
+delete (L.Icon.Default.prototype as { _getIconUrl?: unknown })._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: markerIcon2x,
+  iconUrl: markerIcon,
+  shadowUrl: markerShadow,
+});
 
 export type GpsStatus = 'active' | 'denied' | 'unavailable';
 
