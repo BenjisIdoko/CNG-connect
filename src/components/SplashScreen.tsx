@@ -69,8 +69,8 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
           </span>
 
           <h1 className="text-[38px] sm:text-[42px] font-extrabold tracking-tight leading-[1.08] text-white">
-            Your ride, <br />
-            <span className="text-status-green">ready to go.</span>
+            Find CNG stations <br />
+            <span className="text-status-green">near you, instantly.</span>
           </h1>
 
           <p className="text-[14.5px] text-slate-300 font-normal leading-relaxed max-w-xs">
