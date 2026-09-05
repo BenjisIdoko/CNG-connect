@@ -75,8 +75,12 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
   };
 
   const handleStep2Submit = async () => {
-    if (userCodeInput.trim().length !== 6) {
-      setCodeError('Please enter the 6-digit code from your email.');
+    // Supabase's email OTP length is a project-level setting (6-10 digits,
+    // 6 by default) — don't hard-code an exact length here, or a project
+    // configured for e.g. 8 digits would have every code rejected client-side
+    // before it ever reached verifyOtp.
+    if (userCodeInput.trim().length < 6) {
+      setCodeError('Please enter the verification code from your email.');
       return;
     }
 
@@ -189,7 +193,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
           {step === 1 && (
             <>
               <p className="text-[13px] text-on-surface-variant font-medium leading-relaxed">
-                No password needed — we'll email you a 6-digit code. New here? The same code creates your account.
+                No password needed — we'll email you a verification code. New here? The same code creates your account.
               </p>
               <div>
                 <label className="block text-[12.5px] font-semibold text-on-surface-variant mb-1">
@@ -231,13 +235,13 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
                   Email Verification
                 </span>
                 <p className="text-[13px] text-on-surface-variant font-medium leading-relaxed">
-                  We sent a 6-digit code to <strong>{email}</strong>.
+                  We sent a verification code to <strong>{email}</strong>.
                 </p>
               </div>
 
               <div>
                 <label className="block text-[13px] font-bold text-on-surface-variant mb-1.5">
-                  Enter 6-Digit Code
+                  Enter Verification Code
                 </label>
                 <div className={`flex items-center bg-surface border rounded-2xl px-4 h-14 transition-all ${
                   codeError ? 'border-status-red ring-2 ring-status-red/20' : 'border-outline-variant focus-within:ring-2 focus-within:ring-primary/30 focus-within:border-primary'
@@ -247,7 +251,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
                     type="text"
                     inputMode="numeric"
                     autoComplete="one-time-code"
-                    maxLength={6}
+                    maxLength={10}
                     required
                     autoFocus
                     value={userCodeInput}

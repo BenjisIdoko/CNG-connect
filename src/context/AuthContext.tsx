@@ -112,13 +112,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [loadProfile]);
 
   /**
-   * Sends a 6-digit email OTP via Supabase Auth (shouldCreateUser: true means
+   * Sends a numeric email OTP via Supabase Auth (shouldCreateUser: true means
    * this single call handles both sign-up and sign-in — Supabase creates the
    * auth.users row on first verify if it doesn't already exist). Requires
    * custom SMTP configured in the Supabase dashboard (Resend) and the
    * "Magic Link" email template edited to include {{ .Token }} — see
    * README/setup notes. Without that, Supabase's default shared sender is
    * rate-limited to a handful of emails/hour and sends a link, not a code.
+   * OTP length is a Supabase project setting (6-10 digits, 6 by default) —
+   * the sign-in UI doesn't assume a fixed length, so this works either way.
    */
   const sendLoginCode = useCallback(async (email: string): Promise<AuthResult> => {
     if (!supabase) return { success: false, error: 'Backend not configured.' };
