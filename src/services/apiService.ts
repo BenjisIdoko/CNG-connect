@@ -888,16 +888,17 @@ export const apiService = {
   },
 
   /**
-   * Toggles a driver's like on a community post. Backed by a SECURITY
-   * DEFINER RPC so the (post_id, user_key) pair can only be toggled by
-   * itself — a client can't fabricate someone else's like or inflate the
-   * count directly.
+   * Toggles the signed-in driver's like on a community post. Backed by a
+   * SECURITY DEFINER RPC that derives identity from auth.uid() server-side
+   * (not a client-supplied parameter) — a client can't fabricate someone
+   * else's like or inflate the count directly. Requires a real session;
+   * returns null (caller falls back to its own optimistic toggle) otherwise.
    */
-  async togglePostLike(postId: string, userKey: string): Promise<{ liked: boolean; likeCount: number } | null> {
+  async togglePostLike(postId: string): Promise<{ liked: boolean; likeCount: number } | null> {
     if (isSupabaseConfigured && supabase) {
       try {
         const { data, error } = await supabase
-          .rpc('toggle_post_like', { p_post_id: postId, p_user_key: userKey })
+          .rpc('toggle_post_like', { p_post_id: postId })
           .single();
         if (error) {
           console.error('Supabase toggle_post_like rpc failed:', error.message);

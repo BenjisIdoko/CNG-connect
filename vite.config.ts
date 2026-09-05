@@ -4,8 +4,6 @@ import { VitePWA } from 'vite-plugin-pwa';
 import path from 'path';
 import { defineConfig, Plugin } from 'vite';
 import { GoogleGenAI } from '@google/genai';
-import otpSendHandler from './api/otp/send';
-import otpVerifyHandler from './api/otp/verify';
 
 function apiChatPlugin(): Plugin {
   return {
@@ -70,31 +68,6 @@ Give a friendly, concise, and helpful response. Mention specific stations, price
             res.setHeader('Content-Type', 'application/json');
             res.end(JSON.stringify({ error: error?.message || 'Server error' }));
           }
-        });
-      });
-    },
-  };
-}
-
-function apiOtpPlugin(): Plugin {
-  return {
-    name: 'api-otp-plugin',
-    configureServer(server) {
-      server.middlewares.use('/api/otp/send', async (req, res) => {
-        let bodyStr = '';
-        req.on('data', (chunk) => { bodyStr += chunk; });
-        req.on('end', async () => {
-          (req as any).body = bodyStr;
-          await otpSendHandler(req, res);
-        });
-      });
-
-      server.middlewares.use('/api/otp/verify', async (req, res) => {
-        let bodyStr = '';
-        req.on('data', (chunk) => { bodyStr += chunk; });
-        req.on('end', async () => {
-          (req as any).body = bodyStr;
-          await otpVerifyHandler(req, res);
         });
       });
     },
@@ -191,8 +164,7 @@ export default defineConfig(() => {
           ]
         }
       }),
-      apiChatPlugin(),
-      apiOtpPlugin()
+      apiChatPlugin()
     ],
     resolve: {
       alias: {

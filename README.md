@@ -57,10 +57,10 @@
 - **Environmental Impact**: Computes annual CO₂ emissions cut (tons/year).
 - Embedded directly into driver profiles and accessible via modal dialogs.
 
-### 📲 7. Serverless SMS OTP & Rate-Limited Security
-- Serverless authentication powered by `/api/otp/send` and `/api/otp/verify`.
-- SMS OTP dispatches via Termii and Africa's Talking API gateways.
-- **Rate-Limiting & Cooldown**: Strict 60-second cooldown per phone number returning HTTP 429 (`Too Many Requests`) to prevent SMS credit depletion.
+### 📲 7. Passwordless Email Sign-In
+- Real accounts via Supabase Auth's email-OTP flow (`signInWithOtp` / `verifyOtp`) — no password, no separate login/signup forms. The same email + 6-digit code either creates a new account or signs back into an existing one.
+- Browsing (map, stations, community feed) stays open to guests; writing (reports, comments, likes, station suggestions) requires a verified session, enforced by Postgres RLS, not just the UI.
+- A driver's profile (name, vehicle, reputation, points) lives in a `profiles` table keyed to their Supabase Auth user, so it's the same account across devices — not per-browser `localStorage`.
 
 ### 💬 8. Driver Community & CNG-Connect AI Guide
 - **Live Discussion Forum**: Category-filtered forum (*Maintenance*, *Parts*, *Reviews*, *Deals*, *Conversions*) with photo attachments and upvoting.
@@ -76,9 +76,9 @@
 | **Build Tool & Bundler** | Vite 6 |
 | **Styling & System UI** | TailwindCSS 4 + Vanilla CSS Design Tokens |
 | **Map Rendering** | Leaflet 1.9 + `leaflet.markercluster` |
-| **Database & Realtime Sync** | Supabase (PostgreSQL, Realtime Subscriptions, RLS) |
-| **Serverless API** | Vercel Serverless Functions (`/api/otp/*`, `/api/chat`) |
-| **State Management** | React Context (`AuthContext`, `StationContext`) |
+| **Database, Auth & Realtime Sync** | Supabase (PostgreSQL, Auth email-OTP, Realtime Subscriptions, RLS) |
+| **Serverless API** | Vercel Serverless Functions (`/api/chat`) |
+| **State Management** | React Context (`AuthContext`) |
 | **Test Runner** | Vitest 4 |
 
 ---
@@ -88,11 +88,7 @@
 ```
 CNG-connect/
 ├── api/                        # Vercel Serverless API Functions
-│   ├── chat.ts                 # Serverless Gemini AI endpoint
-│   ├── otp/
-│   │   ├── send.ts             # SMS OTP dispatch with 60s rate limiting
-│   │   ├── verify.ts           # OTP verification handler
-│   │   └── store.ts            # Persistent session store
+│   └── chat.ts                 # Serverless Gemini AI endpoint
 ├── scripts/
 │   └── seed-stations.ts        # Geocoding & seed generator script
 ├── src/
@@ -111,14 +107,12 @@ CNG-connect/
 │   │   ├── Header.tsx          # Top Bar Navigation
 │   │   └── BottomNav.tsx       # Floating Bottom Navigation Bar
 │   ├── context/                # React Context Providers
-│   │   ├── AuthContext.tsx     # Driver Auth State & Profile
-│   │   └── StationContext.tsx  # Live Stations & Supabase Realtime Sync
+│   │   └── AuthContext.tsx     # Supabase Auth session + driver profile
 │   ├── data/                   # Seed Data & Mock Sets
 │   │   ├── pci-stations-seed.json
 │   │   └── pci-conversion-centers-seed.json
 │   ├── services/
 │   │   ├── apiService.ts       # Supabase Client, Local Cache & Realtime Sync
-│   │   ├── otpService.ts       # Client OTP API Service
 │   │   └── supabaseClient.ts   # Supabase Client Initialization
 │   ├── utils/
 │   │   ├── timeUtils.ts        # Human-readable station age formatter
@@ -156,18 +150,16 @@ CNG-connect/
 3. **Configure Environment Variables**:
    Create a `.env` file in the root directory:
    ```env
-   # Supabase Credentials
+   # Supabase Credentials (also powers sign-in — see .env.example for the
+   # dashboard steps needed to make email-OTP delivery actually work:
+   # custom SMTP + editing the Magic Link template to send a code)
    VITE_SUPABASE_URL=https://your-supabase-project.supabase.co
    VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
-
-   # SMS OTP Provider Keys (Optional for serverless production SMS)
-   TERMII_API_KEY=your-termii-api-key
-   TERMII_SENDER_ID=CNGConnect
 
    # Gemini AI Key (Optional for AI Guide)
    GEMINI_API_KEY=your-gemini-api-key
    ```
-   *Note: If no SMS API key is provided, the backend automatically operates in Key-Gated Dev Mode returning test code `123456`.*
+   See `.env.example` for the full list and setup notes.
 
 4. **Start Local Development Server**:
    ```bash

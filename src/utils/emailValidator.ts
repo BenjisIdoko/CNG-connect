@@ -1,6 +1,6 @@
 /**
- * Validates an email address for CNG-Connect sign-up. Email is the primary
- * (and only free) verification channel — see src/services/otpService.ts.
+ * Validates an email address for CNG-Connect sign-in. Email is the identity
+ * for Supabase Auth's email-OTP sign-in — see src/context/AuthContext.tsx.
  */
 export function validateEmail(emailRaw: string): { isValid: boolean; error?: string; normalized?: string } {
   const trimmed = (emailRaw || '').trim();

@@ -258,40 +258,56 @@ CREATE TABLE IF NOT EXISTS station_suggestions (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- 11. OTP / VERIFICATION SESSIONS TABLE (server-side challenge store)
--- Accessed ONLY via the service-role key from serverless functions.
--- No anon/authenticated policies are created => blocked for all non-service clients.
--- `identifier` holds a normalized email address (default channel — free) or an
--- E.164 phone number (only used if you later configure a paid SMS provider).
-CREATE TABLE IF NOT EXISTS otp_sessions (
-    identifier TEXT PRIMARY KEY,
-    channel TEXT NOT NULL DEFAULT 'email' CHECK (channel IN ('email', 'sms')),
-    code TEXT NOT NULL,
-    expires_at BIGINT NOT NULL,
-    last_sent_at BIGINT NOT NULL,
-    created_at TIMESTAMPTZ DEFAULT NOW()
+-- 11. (removed) The hand-rolled otp_sessions table + api/otp/* serverless
+-- verification system has been replaced by Supabase Auth's own email-OTP
+-- sign-in (supabase.auth.signInWithOtp / verifyOtp) — see
+-- src/context/AuthContext.tsx. That system is no longer used by the app;
+-- drop its table.
+DROP TABLE IF EXISTS otp_sessions;
+
+-- 12. PROFILES TABLE — the durable, cross-device driver profile, one row per
+-- real Supabase Auth user (auth.users). Everything that used to live only in
+-- this browser's localStorage (name, vehicle, reputation, points, etc.) now
+-- lives here, keyed by the verified identity from email-OTP sign-in.
+CREATE TABLE IF NOT EXISTS profiles (
+    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    name TEXT NOT NULL DEFAULT '',
+    phone TEXT NOT NULL DEFAULT '',
+    email TEXT NOT NULL DEFAULT '',
+    avatar TEXT NOT NULL DEFAULT '',
+    vehicle TEXT NOT NULL DEFAULT '',
+    cng_installed_date TEXT NOT NULL DEFAULT '',
+    monthly_savings NUMERIC NOT NULL DEFAULT 0,
+    reports_count INTEGER NOT NULL DEFAULT 0,
+    reputation_score NUMERIC NOT NULL DEFAULT 5.0,
+    community_points INTEGER NOT NULL DEFAULT 0,
+    state TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
-DO $$
+-- Auto-create a (mostly empty) profile row the instant someone verifies an
+-- email-OTP for the first time. The client fills in the rest (name, vehicle,
+-- etc.) via the "complete your profile" step — see SignUpScreen.tsx. A
+-- profile with an empty `name` is exactly how the client knows a signed-in
+-- user is brand new and needs that step.
+CREATE OR REPLACE FUNCTION handle_new_auth_user()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
 BEGIN
-  -- Upgrade an older otp_sessions table (keyed by `phone`) in place.
-  IF EXISTS (
-    SELECT 1 FROM information_schema.columns
-    WHERE table_name = 'otp_sessions' AND column_name = 'phone'
-  ) AND NOT EXISTS (
-    SELECT 1 FROM information_schema.columns
-    WHERE table_name = 'otp_sessions' AND column_name = 'identifier'
-  ) THEN
-    ALTER TABLE otp_sessions RENAME COLUMN phone TO identifier;
-  END IF;
+  INSERT INTO profiles (id, email)
+  VALUES (NEW.id, COALESCE(NEW.email, ''))
+  ON CONFLICT (id) DO NOTHING;
+  RETURN NEW;
+END;
+$$;
 
-  IF NOT EXISTS (
-    SELECT 1 FROM information_schema.columns
-    WHERE table_name = 'otp_sessions' AND column_name = 'channel'
-  ) THEN
-    ALTER TABLE otp_sessions ADD COLUMN channel TEXT NOT NULL DEFAULT 'email' CHECK (channel IN ('email', 'sms'));
-  END IF;
-END $$;
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION handle_new_auth_user();
 
 -- INDEXES FOR FAST QUERYING
 CREATE INDEX IF NOT EXISTS idx_stations_status ON stations(status);
@@ -306,7 +322,6 @@ CREATE INDEX IF NOT EXISTS idx_station_comments_station_id ON station_comments(s
 CREATE INDEX IF NOT EXISTS idx_post_comments_post_id ON post_comments(post_id);
 CREATE INDEX IF NOT EXISTS idx_post_likes_post_id ON post_likes(post_id);
 CREATE INDEX IF NOT EXISTS idx_station_suggestions_status ON station_suggestions(status);
-CREATE INDEX IF NOT EXISTS idx_otp_sessions_expiry ON otp_sessions(expires_at);
 
 -- ROW LEVEL SECURITY (RLS) POLICIES
 ALTER TABLE stations ENABLE ROW LEVEL SECURITY;
@@ -319,7 +334,7 @@ ALTER TABLE station_comments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE post_comments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE post_likes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE station_suggestions ENABLE ROW LEVEL SECURITY;
-ALTER TABLE otp_sessions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 
 -- Public read access (anon key may read)
 DROP POLICY IF EXISTS "Allow public read stations" ON stations;
@@ -349,36 +364,113 @@ CREATE POLICY "Allow public read post_likes" ON post_likes FOR SELECT USING (tru
 DROP POLICY IF EXISTS "Allow public read station_suggestions" ON station_suggestions;
 CREATE POLICY "Allow public read station_suggestions" ON station_suggestions FOR SELECT USING (true);
 
--- Driver-generated content: anon INSERT allowed.
--- The app uses custom OTP verification (not Supabase Auth yet). When Supabase
--- Auth is wired in, tighten these to `TO authenticated`.
+-- Profiles are publicly readable (author name/avatar show up on public
+-- reports/posts/comments anyway) but only the owner can write their own row.
+DROP POLICY IF EXISTS "Allow public read profiles" ON profiles;
+CREATE POLICY "Allow public read profiles" ON profiles FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Allow self update profiles" ON profiles;
+CREATE POLICY "Allow self update profiles" ON profiles FOR UPDATE TO authenticated USING (auth.uid() = id) WITH CHECK (auth.uid() = id);
+
+-- Driver-generated content now requires a real signed-in session (email-OTP
+-- verified via Supabase Auth) — browsing/reading stays public, writing does
+-- not. `user_id` on each of these tables is never trusted from the client;
+-- a BEFORE INSERT trigger below stamps it from auth.uid() unconditionally,
+-- so a request can't claim to be written by someone else's account.
 DROP POLICY IF EXISTS "Allow insert station_reports" ON station_reports;
-CREATE POLICY "Allow insert station_reports" ON station_reports FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow insert station_reports" ON station_reports FOR INSERT TO authenticated WITH CHECK (true);
 
 DROP POLICY IF EXISTS "Allow insert station_media" ON station_media;
-CREATE POLICY "Allow insert station_media" ON station_media FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow insert station_media" ON station_media FOR INSERT TO authenticated WITH CHECK (true);
 
 DROP POLICY IF EXISTS "Allow insert station_presence" ON station_presence;
-CREATE POLICY "Allow insert station_presence" ON station_presence FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow insert station_presence" ON station_presence FOR INSERT TO authenticated WITH CHECK (true);
 
 DROP POLICY IF EXISTS "Allow update station_presence" ON station_presence;
-CREATE POLICY "Allow update station_presence" ON station_presence FOR UPDATE USING (true);
+CREATE POLICY "Allow update station_presence" ON station_presence FOR UPDATE TO authenticated USING (true);
 
 DROP POLICY IF EXISTS "Allow insert community_posts" ON community_posts;
-CREATE POLICY "Allow insert community_posts" ON community_posts FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow insert community_posts" ON community_posts FOR INSERT TO authenticated WITH CHECK (true);
 
 DROP POLICY IF EXISTS "Allow insert station_comments" ON station_comments;
-CREATE POLICY "Allow insert station_comments" ON station_comments FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow insert station_comments" ON station_comments FOR INSERT TO authenticated WITH CHECK (true);
 
 DROP POLICY IF EXISTS "Allow insert post_comments" ON post_comments;
-CREATE POLICY "Allow insert post_comments" ON post_comments FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow insert post_comments" ON post_comments FOR INSERT TO authenticated WITH CHECK (true);
 
 DROP POLICY IF EXISTS "Allow insert station_suggestions" ON station_suggestions;
-CREATE POLICY "Allow insert station_suggestions" ON station_suggestions FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow insert station_suggestions" ON station_suggestions FOR INSERT TO authenticated WITH CHECK (true);
 
--- post_likes has NO direct insert/delete policy for anon — toggling only
+-- post_likes has NO direct insert/delete policy at all — toggling only
 -- happens through the toggle_post_like() SECURITY DEFINER function below, so
--- a client can't insert an arbitrary like count or vote as another user_key.
+-- a client can never insert an arbitrary like count or vote as another user.
+
+-- user_id columns + trigger that force-stamps them from the verified session,
+-- ignoring whatever (if anything) the client sends for that column.
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'station_reports' AND column_name = 'user_id') THEN
+    ALTER TABLE station_reports ADD COLUMN user_id UUID REFERENCES auth.users(id);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'station_comments' AND column_name = 'user_id') THEN
+    ALTER TABLE station_comments ADD COLUMN user_id UUID REFERENCES auth.users(id);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'post_comments' AND column_name = 'user_id') THEN
+    ALTER TABLE post_comments ADD COLUMN user_id UUID REFERENCES auth.users(id);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'community_posts' AND column_name = 'user_id') THEN
+    ALTER TABLE community_posts ADD COLUMN user_id UUID REFERENCES auth.users(id);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'station_suggestions' AND column_name = 'user_id') THEN
+    ALTER TABLE station_suggestions ADD COLUMN user_id UUID REFERENCES auth.users(id);
+  END IF;
+END $$;
+
+CREATE OR REPLACE FUNCTION stamp_user_id()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  NEW.user_id := auth.uid();
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS stamp_user_id_station_reports ON station_reports;
+CREATE TRIGGER stamp_user_id_station_reports BEFORE INSERT ON station_reports FOR EACH ROW EXECUTE FUNCTION stamp_user_id();
+
+DROP TRIGGER IF EXISTS stamp_user_id_station_comments ON station_comments;
+CREATE TRIGGER stamp_user_id_station_comments BEFORE INSERT ON station_comments FOR EACH ROW EXECUTE FUNCTION stamp_user_id();
+
+DROP TRIGGER IF EXISTS stamp_user_id_post_comments ON post_comments;
+CREATE TRIGGER stamp_user_id_post_comments BEFORE INSERT ON post_comments FOR EACH ROW EXECUTE FUNCTION stamp_user_id();
+
+DROP TRIGGER IF EXISTS stamp_user_id_community_posts ON community_posts;
+CREATE TRIGGER stamp_user_id_community_posts BEFORE INSERT ON community_posts FOR EACH ROW EXECUTE FUNCTION stamp_user_id();
+
+DROP TRIGGER IF EXISTS stamp_user_id_station_suggestions ON station_suggestions;
+CREATE TRIGGER stamp_user_id_station_suggestions BEFORE INSERT ON station_suggestions FOR EACH ROW EXECUTE FUNCTION stamp_user_id();
+
+-- station_presence.user_key predates real auth and was a client-supplied
+-- email/phone string; force it to the verified session id instead (same
+-- "never trust the client for identity" rule as stamp_user_id() above, just
+-- writing a TEXT column rather than a UUID one).
+CREATE OR REPLACE FUNCTION stamp_user_key_from_auth()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  NEW.user_key := auth.uid()::text;
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS stamp_user_key_station_presence ON station_presence;
+CREATE TRIGGER stamp_user_key_station_presence BEFORE INSERT OR UPDATE ON station_presence FOR EACH ROW EXECUTE FUNCTION stamp_user_key_from_auth();
 
 -- Stations status updates are crowdsourced but the rest of the row must not be
 -- editable by anonymous clients. Direct UPDATE is intentionally NOT granted.
@@ -395,6 +487,10 @@ SECURITY DEFINER
 SET search_path = public
 AS $$
 BEGIN
+  IF auth.uid() IS NULL THEN
+    RAISE EXCEPTION 'Authentication required';
+  END IF;
+
   IF p_status NOT IN ('full', 'low', 'queue', 'out') THEN
     RAISE EXCEPTION 'Invalid status';
   END IF;
@@ -411,7 +507,8 @@ BEGIN
 END;
 $$;
 
-GRANT EXECUTE ON FUNCTION report_station_status(TEXT, TEXT, TEXT) TO anon, authenticated;
+REVOKE EXECUTE ON FUNCTION report_station_status(TEXT, TEXT, TEXT) FROM anon;
+GRANT EXECUTE ON FUNCTION report_station_status(TEXT, TEXT, TEXT) TO authenticated;
 
 -- Community GPS pin correction. Only touches location fields; marks the pin
 -- gps_confirmed with a tight accuracy radius and clears the review flag.
@@ -426,6 +523,10 @@ SECURITY DEFINER
 SET search_path = public
 AS $$
 BEGIN
+  IF auth.uid() IS NULL THEN
+    RAISE EXCEPTION 'Authentication required';
+  END IF;
+
   IF p_lat < -90 OR p_lat > 90 OR p_lng < -180 OR p_lng > 180 THEN
     RAISE EXCEPTION 'Invalid coordinates';
   END IF;
@@ -447,15 +548,24 @@ BEGIN
 END;
 $$;
 
-GRANT EXECUTE ON FUNCTION update_station_pin(TEXT, DOUBLE PRECISION, DOUBLE PRECISION) TO anon, authenticated;
+REVOKE EXECUTE ON FUNCTION update_station_pin(TEXT, DOUBLE PRECISION, DOUBLE PRECISION) FROM anon;
+GRANT EXECUTE ON FUNCTION update_station_pin(TEXT, DOUBLE PRECISION, DOUBLE PRECISION) TO authenticated;
 
 -- Idempotent like toggle: inserts/deletes exactly one (post_id, user_key) row
 -- and keeps community_posts.likes as a denormalized, always-correct count —
 -- avoids the classic "two clients increment at once, one increment is lost"
 -- race you'd get from a plain `UPDATE ... SET likes = likes + 1`.
+--
+-- Identity comes from auth.uid(), never a client-supplied parameter — the
+-- original version of this function took p_user_key as a free string, which
+-- meant any caller could toggle likes as literally anyone else. Drop that
+-- signature outright rather than leaving a still-callable insecure overload
+-- alongside the new one (CREATE OR REPLACE does not replace a function
+-- across a different parameter list; it just adds an overload).
+DROP FUNCTION IF EXISTS toggle_post_like(TEXT, TEXT);
+
 CREATE OR REPLACE FUNCTION toggle_post_like(
-    p_post_id TEXT,
-    p_user_key TEXT
+    p_post_id TEXT
 )
 RETURNS TABLE(liked BOOLEAN, like_count INTEGER)
 LANGUAGE plpgsql
@@ -465,16 +575,21 @@ AS $$
 DECLARE
   already_liked BOOLEAN;
   new_liked BOOLEAN;
+  caller_key TEXT := auth.uid()::text;
 BEGIN
+  IF caller_key IS NULL THEN
+    RAISE EXCEPTION 'Authentication required';
+  END IF;
+
   SELECT EXISTS(
-    SELECT 1 FROM post_likes WHERE post_id = p_post_id AND user_key = p_user_key
+    SELECT 1 FROM post_likes WHERE post_id = p_post_id AND user_key = caller_key
   ) INTO already_liked;
 
   IF already_liked THEN
-    DELETE FROM post_likes WHERE post_id = p_post_id AND user_key = p_user_key;
+    DELETE FROM post_likes WHERE post_id = p_post_id AND user_key = caller_key;
     new_liked := false;
   ELSE
-    INSERT INTO post_likes (post_id, user_key) VALUES (p_post_id, p_user_key);
+    INSERT INTO post_likes (post_id, user_key) VALUES (p_post_id, caller_key);
     new_liked := true;
   END IF;
 
@@ -490,4 +605,4 @@ BEGIN
 END;
 $$;
 
-GRANT EXECUTE ON FUNCTION toggle_post_like(TEXT, TEXT) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION toggle_post_like(TEXT) TO authenticated;

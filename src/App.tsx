@@ -4,12 +4,10 @@ import {
   CommunityPost,
   DriverReport,
   StationStatus,
-  UserProfile,
 } from './types';
 import {
   INITIAL_STATIONS,
   INITIAL_POSTS,
-  INITIAL_USER,
   INITIAL_CONVERSION_CENTERS,
 } from './data/mockData';
 import { ConversionCenter } from './types';
@@ -17,12 +15,12 @@ import { Header } from './components/Header';
 import { BottomNav } from './components/BottomNav';
 import { Sidebar } from './components/common/Sidebar';
 import { MapScreen, GpsStatus } from './components/MapScreen';
-import { OnboardingModal } from './components/OnboardingModal';
 import { OnboardingScreen } from './components/OnboardingScreen';
 import { ProximityAlertBanner } from './components/ProximityAlertBanner';
 import { SignUpScreen } from './components/SignUpScreen';
 import { SplashScreen } from './components/SplashScreen';
 import { PwaUpdateToast } from './components/PwaUpdateToast';
+import { useAuth } from './context/AuthContext';
 
 // Code-split secondary screens & modals with React.lazy
 const StationDetailScreen = lazy(() =>
@@ -103,13 +101,23 @@ export const App: React.FC = () => {
   const [globalToast, setGlobalToast] = useState<string | null>(null);
   const [gpsStatus, setGpsStatus] = useState<GpsStatus>('unavailable');
 
-  // Auth-Gated Onboarding & Registration State
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
-    return localStorage.getItem('cng_user_authenticated') === 'true';
-  });
-  const [authMode, setAuthMode] = useState<'onboarding' | 'signup' | 'login' | null>(() => {
-    return localStorage.getItem('cng_user_authenticated') === 'true' ? null : 'onboarding';
-  });
+  // Auth-Gated Onboarding & Registration State. Real identity (session +
+  // profile) lives in AuthContext, backed by Supabase Auth email-OTP —
+  // App.tsx only tracks which auth screen (if any) is currently showing.
+  const { isAuthenticated, isAuthLoading, driverProfile, updateProfile, signOut } = useAuth();
+  const [authMode, setAuthMode] = useState<'onboarding' | 'signup' | null>(null);
+
+  // Once the initial session check resolves, a guest (no session) sees the
+  // onboarding screen; an already-signed-in driver goes straight into the
+  // app. This must fire exactly once — depending on `authMode` here would
+  // re-trigger every time it returns to null, fighting "Explore as Guest"
+  // (which sets authMode back to null) by immediately reopening onboarding.
+  const hasAutoPromptedOnboarding = useRef(false);
+  useEffect(() => {
+    if (isAuthLoading || hasAutoPromptedOnboarding.current) return;
+    hasAutoPromptedOnboarding.current = true;
+    if (!isAuthenticated) setAuthMode('onboarding');
+  }, [isAuthLoading, isAuthenticated]);
 
   // Offline / Network Online Status Detector
   const [isOnline, setIsOnline] = useState<boolean>(navigator.onLine);
@@ -175,14 +183,10 @@ export const App: React.FC = () => {
     });
   }, []);
 
-  const [userProfile, setUserProfile] = useState<UserProfile>(() => {
-    try {
-      const saved = localStorage.getItem('gasfinder_user');
-      return saved ? JSON.parse(saved) : INITIAL_USER;
-    } catch {
-      return INITIAL_USER;
-    }
-  });
+  // Alias so the many existing `userProfile.*` reads below don't all need
+  // renaming — writes go through `updateProfile` (from useAuth), not a
+  // local setter, since the profile now lives in Supabase.
+  const userProfile = driverProfile;
 
   // Push notification permission state & toggle handler
   const [isPushGranted, setIsPushGranted] = useState<boolean>(() => {
@@ -290,13 +294,6 @@ export const App: React.FC = () => {
     window.history.replaceState({}, '', `${window.location.pathname}${qs ? `?${qs}` : ''}`);
   }, [stations]);
 
-  useEffect(() => {
-    try {
-      localStorage.setItem('gasfinder_user', JSON.stringify(userProfile));
-    } catch (e) {
-      console.error('Failed to save user profile to localStorage', e);
-    }
-  }, [userProfile]);
 
   // Single Source of Truth: Geolocation Watch & Distance Updates
   useEffect(() => {
@@ -399,6 +396,17 @@ export const App: React.FC = () => {
     setTimeout(() => setGlobalToast(null), 3500);
   };
 
+  // Browsing (map, stations, community feed) stays open to guests; writing
+  // (reports, comments, likes, suggestions) requires a verified session —
+  // the backend enforces this too (RLS requires `authenticated`), so this is
+  // about giving a clear prompt instead of a request silently failing.
+  const requireAuth = (): boolean => {
+    if (isAuthenticated) return true;
+    showToast('Sign in to continue — it only takes an email and a code.');
+    setAuthMode('signup');
+    return false;
+  };
+
   const handleSimulateProximityNudge = (requestedStation?: GasStation) => {
     const userKey = userProfile.email || userProfile.phone || 'default_driver';
     const userStateStations = stations.filter((st) => isSameState(st.state, userProfile.state));
@@ -435,6 +443,7 @@ export const App: React.FC = () => {
   };
 
   const handleOpenReportModal = (station: GasStation) => {
+    if (!requireAuth()) return;
     setReportingStation(station);
     setIsReportModalOpen(true);
   };
@@ -468,7 +477,7 @@ export const App: React.FC = () => {
     const oldPoints = userProfile.communityPoints || 0;
     const oldTier = getDriverTier(oldPoints).currentTier;
 
-    setUserProfile((prev) => {
+    updateProfile((prev) => {
       newTotalPoints = (prev.communityPoints || 0) + pointsAwarded;
       const newTier = getDriverTier(newTotalPoints).currentTier;
       if (newTier.id !== oldTier.id) {
@@ -485,6 +494,7 @@ export const App: React.FC = () => {
   };
 
   const handleAddStationComment = async (stationId: string, commentText: string) => {
+    if (!requireAuth()) return;
     // Optimistic local update so the comment appears instantly.
     const newComment = {
       id: `st-c-${Date.now()}`,
@@ -522,6 +532,7 @@ export const App: React.FC = () => {
   };
 
   const handleUpdateLocation = async (stationId: string, lat: number, lng: number) => {
+    if (!requireAuth()) return;
     const updated = await apiService.updateStationLocation(stationId, lat, lng);
     if (updated) {
       setStations((prev) => prev.map((st) => (st.id === stationId ? updated : st)));
@@ -541,12 +552,14 @@ export const App: React.FC = () => {
   };
 
   const handleCreatePost = async (newPost: CommunityPost) => {
+    if (!requireAuth()) return;
     const updatedPosts = await apiService.createPost(newPost);
     setPosts(updatedPosts);
     showToast('Post published to CNG-Connect Community!');
   };
 
   const handleToggleLikePost = async (postId: string) => {
+    if (!requireAuth()) return;
     // Optimistic flip so the tap feels instant.
     setPosts((prevPosts) =>
       prevPosts.map((p) => {
@@ -562,8 +575,7 @@ export const App: React.FC = () => {
       })
     );
 
-    const userKey = userProfile.email || userProfile.phone || 'default_driver';
-    const result = await apiService.togglePostLike(postId, userKey);
+    const result = await apiService.togglePostLike(postId);
     // No backend configured: the optimistic toggle above is the final state.
     if (!result) return;
 
@@ -580,6 +592,7 @@ export const App: React.FC = () => {
   };
 
   const handleAddPostComment = async (postId: string, commentText: string) => {
+    if (!requireAuth()) return;
     const newComment = {
       id: `post-c-${Date.now()}`,
       author: userProfile.name,
@@ -613,29 +626,14 @@ export const App: React.FC = () => {
     }
   };
 
-  const handleAuthSuccess = (newUserProfile: UserProfile) => {
-    setUserProfile(newUserProfile);
-    setIsAuthenticated(true);
+  const handleAuthComplete = () => {
     setAuthMode(null);
-    localStorage.setItem('cng_user_authenticated', 'true');
-    localStorage.setItem('cng_user_profile', JSON.stringify(newUserProfile));
-    showToast(`Welcome to CNG-Connect, ${newUserProfile.name}!`);
+    showToast('Welcome to CNG-Connect!');
   };
 
-  const handleLoginSuccess = (identifier: string) => {
-    const updatedUser: UserProfile = {
-      ...userProfile,
-      phone: identifier.includes('@') ? userProfile.phone : identifier,
-      email: identifier.includes('@') ? identifier : userProfile.email,
-    };
-    handleAuthSuccess(updatedUser);
-  };
-
-  const handleSignOut = () => {
-    setIsAuthenticated(false);
+  const handleSignOut = async () => {
+    await signOut();
     setAuthMode('onboarding');
-    localStorage.removeItem('cng_user_authenticated');
-    localStorage.removeItem('cng_user_profile');
     showToast('Signed out successfully.');
   };
 
@@ -773,6 +771,7 @@ export const App: React.FC = () => {
                 if (coords) setUserCoords(coords);
               }}
               onSuggestStation={async (s) => {
+                if (!requireAuth()) return;
                 await apiService.addStationSuggestion(s);
                 showToast('Station suggestion submitted!');
               }}
@@ -803,18 +802,12 @@ export const App: React.FC = () => {
               onOpenSignUp={() => setAuthMode('signup')}
               onSignOut={handleSignOut}
               onUpdateState={(newState) => {
-                setUserProfile((prev) => ({ ...prev, state: newState }));
+                if (!requireAuth()) return;
+                updateProfile({ state: newState });
               }}
               onUpdateProfile={(updatedUser) => {
-                setUserProfile((prev) => {
-                  const next = { ...prev, ...updatedUser };
-                  try {
-                    localStorage.setItem('cng_user_profile', JSON.stringify(next));
-                  } catch (e) {
-                    console.error('Failed to update profile storage', e);
-                  }
-                  return next;
-                });
+                if (!requireAuth()) return;
+                updateProfile(updatedUser);
               }}
               onOpenRoiCalculator={() => setIsRoiModalOpen(true)}
               onTriggerProximityAlert={() => {
@@ -826,30 +819,24 @@ export const App: React.FC = () => {
         </Suspense>
       </main>
 
-      {/* Auth-Gated Onboarding & Registration Screen */}
-      {(!isAuthenticated || authMode !== null) && (
+      {/* Auth-Gated Onboarding & Registration Screen. There's no separate
+          "login" mode anymore — email-OTP sign-in and sign-up are the same
+          flow (Supabase creates the account on first verify), so both
+          onStartSignUp and onStartLogin below lead to the same screen. */}
+      {authMode !== null && (
         <div className="fixed inset-0 z-[60] bg-[#f2fcf5] overflow-y-auto">
           {authMode === 'onboarding' && (
             <OnboardingScreen
               onStartSignUp={() => setAuthMode('signup')}
-              onStartLogin={() => setAuthMode('login')}
+              onStartLogin={() => setAuthMode('signup')}
               onExploreAsGuest={() => setAuthMode(null)}
             />
           )}
 
           {authMode === 'signup' && (
             <SignUpScreen
-              onSignUpComplete={handleAuthSuccess}
-              onSwitchToLogin={() => setAuthMode('login')}
+              onComplete={handleAuthComplete}
               onCancel={() => (isAuthenticated ? setAuthMode(null) : setAuthMode('onboarding'))}
-            />
-          )}
-
-          {authMode === 'login' && (
-            <OnboardingModal
-              isOpen={true}
-              onClose={() => (isAuthenticated ? setAuthMode(null) : setAuthMode('onboarding'))}
-              onLoginSuccess={handleLoginSuccess}
             />
           )}
         </div>
