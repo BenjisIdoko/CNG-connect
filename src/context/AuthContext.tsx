@@ -152,7 +152,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const nextProfile: UserProfile = computed;
 
       if (nextProfile.name) setIsNewDriver(false);
-      const { error } = await supabase.from('profiles').update(toProfileRow(nextProfile)).eq('id', session.user.id);
+      // upsert, not update: a session created before handle_new_auth_user
+      // existed (or any other reason the trigger's row is missing) would
+      // otherwise silently no-op here — an UPDATE matches zero rows and
+      // reports no error, so the profile would look saved locally but never
+      // actually persist.
+      const { error } = await supabase
+        .from('profiles')
+        .upsert({ id: session.user.id, ...toProfileRow(nextProfile) });
       if (error) console.error('Failed to persist profile update:', error.message);
     },
     [session]

@@ -372,6 +372,13 @@ CREATE POLICY "Allow public read profiles" ON profiles FOR SELECT USING (true);
 DROP POLICY IF EXISTS "Allow self update profiles" ON profiles;
 CREATE POLICY "Allow self update profiles" ON profiles FOR UPDATE TO authenticated USING (auth.uid() = id) WITH CHECK (auth.uid() = id);
 
+-- The client's updateProfile() upserts rather than updates (see
+-- AuthContext.tsx) so a session whose profile row is somehow missing (e.g.
+-- created before this trigger existed) still saves instead of silently
+-- no-op'ing — that path needs INSERT rights too, not just UPDATE.
+DROP POLICY IF EXISTS "Allow self insert profiles" ON profiles;
+CREATE POLICY "Allow self insert profiles" ON profiles FOR INSERT TO authenticated WITH CHECK (auth.uid() = id);
+
 -- Driver-generated content now requires a real signed-in session (email-OTP
 -- verified via Supabase Auth) — browsing/reading stays public, writing does
 -- not. `user_id` on each of these tables is never trusted from the client;
