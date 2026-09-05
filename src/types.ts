@@ -49,6 +49,7 @@ export interface GasStation {
   busyEstimate?: string;
   lastUpdated: string;
   verifiedByCommunity: boolean;
+  isPiCngAccredited?: boolean; // Presidential CNG Initiative (pci.gov.ng) accreditation
   operator?: string; // NIPCO, NNPC, BOVAS, Portland Gas, Axxela, etc.
   phone: string;
   lat: number; // Real GPS latitude

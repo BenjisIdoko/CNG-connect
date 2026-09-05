@@ -247,6 +247,12 @@ export const apiService = {
             area: s.area,
             accuracyRadiusM: s.accuracy_radius_m,
             needsPinReview: s.needs_pin_review ?? false,
+            stationType: (s.station_type || 'cng') as 'cng' | 'ev_charging',
+            connectorTypes: s.connector_types || undefined,
+            chargingSpeedKw: s.charging_speed_kw ?? undefined,
+            pricePerKwh: s.price_per_kwh ?? undefined,
+            totalPorts: s.total_ports ?? undefined,
+            network: s.network ?? undefined,
           };
         });
 

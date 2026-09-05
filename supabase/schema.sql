@@ -83,6 +83,49 @@ BEGIN
   ) THEN
     ALTER TABLE stations ADD COLUMN needs_pin_review BOOLEAN DEFAULT false;
   END IF;
+
+  -- EV charging station columns (the table predates the EV feature).
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'stations' AND column_name = 'station_type'
+  ) THEN
+    ALTER TABLE stations ADD COLUMN station_type TEXT NOT NULL DEFAULT 'cng' CHECK (station_type IN ('cng', 'ev_charging'));
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'stations' AND column_name = 'connector_types'
+  ) THEN
+    ALTER TABLE stations ADD COLUMN connector_types JSONB DEFAULT '[]'::jsonb;
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'stations' AND column_name = 'charging_speed_kw'
+  ) THEN
+    ALTER TABLE stations ADD COLUMN charging_speed_kw NUMERIC;
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'stations' AND column_name = 'price_per_kwh'
+  ) THEN
+    ALTER TABLE stations ADD COLUMN price_per_kwh NUMERIC;
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'stations' AND column_name = 'total_ports'
+  ) THEN
+    ALTER TABLE stations ADD COLUMN total_ports INTEGER;
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'stations' AND column_name = 'network'
+  ) THEN
+    ALTER TABLE stations ADD COLUMN network TEXT;
+  END IF;
 END $$;
 
 ALTER TABLE stations ADD CONSTRAINT stations_location_precision_check
@@ -253,6 +296,7 @@ END $$;
 -- INDEXES FOR FAST QUERYING
 CREATE INDEX IF NOT EXISTS idx_stations_status ON stations(status);
 CREATE INDEX IF NOT EXISTS idx_stations_city ON stations(city);
+CREATE INDEX IF NOT EXISTS idx_stations_station_type ON stations(station_type);
 CREATE INDEX IF NOT EXISTS idx_stations_needs_pin_review ON stations(needs_pin_review) WHERE needs_pin_review = true;
 CREATE INDEX IF NOT EXISTS idx_station_reports_station_id ON station_reports(station_id);
 CREATE INDEX IF NOT EXISTS idx_station_media_station_id ON station_media(station_id);
