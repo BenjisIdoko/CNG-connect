@@ -195,18 +195,20 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
   };
 
   const handleShareStation = () => {
+    const pricePart = station.cngPrice ? ` • ₦${station.cngPrice}/kg` : '';
+    const pressurePart = station.pumpPressure ? ` • Pressure: ${station.pumpPressure} bar` : '';
     if (navigator.share) {
       navigator
         .share({
           title: `${station.name} Station Group`,
-          text: `Join ${station.name} Station Group on CNG-Connect! Live CNG Status: ${station.statusLabel}, ₦${station.cngPrice}/kg, Pressure: ${station.pumpPressure} bar.`,
+          text: `Join ${station.name} Station Group on CNG-Connect! Status: ${station.statusLabel}${pricePart}${pressurePart}.`,
           url: window.location.href,
         })
         .catch(() => {});
     } else {
       navigator.clipboard
         .writeText(
-          `${station.name} Station Group (${station.address}): Live Status: ${station.statusLabel} • ₦${station.cngPrice}/kg • Pressure: ${station.pumpPressure} bar`
+          `${station.name} Station Group (${station.address}): Status: ${station.statusLabel}${pricePart}${pressurePart}`
         )
         .then(() => {
           setCopiedNotification(true);

@@ -20,15 +20,15 @@ CREATE TABLE IF NOT EXISTS stations (
     state TEXT NOT NULL,
     distance TEXT,
     drive_time TEXT,
-    status TEXT NOT NULL CHECK (status IN ('full', 'low', 'queue', 'out')),
-    status_label TEXT NOT NULL,
-    cng_price NUMERIC DEFAULT 230,
-    price_trend TEXT DEFAULT 'stable' CHECK (price_trend IN ('stable', 'up', 'down')),
-    pump_pressure INTEGER DEFAULT 215,
+    status TEXT NOT NULL DEFAULT 'unknown' CHECK (status IN ('full', 'low', 'queue', 'out', 'unknown')),
+    status_label TEXT NOT NULL DEFAULT 'No recent reports',
+    cng_price NUMERIC,
+    price_trend TEXT CHECK (price_trend IN ('stable', 'up', 'down')),
+    pump_pressure INTEGER,
     busy_estimate TEXT,
-    last_updated TEXT DEFAULT 'Just now',
-    verified_by_community BOOLEAN DEFAULT true,
-    is_picng_accredited BOOLEAN DEFAULT true,
+    last_updated TEXT,
+    verified_by_community BOOLEAN DEFAULT false,
+    is_picng_accredited BOOLEAN DEFAULT false,
     operator TEXT,
     phone TEXT,
     lat DOUBLE PRECISION NOT NULL,
@@ -62,6 +62,21 @@ BEGIN
   ) THEN
     ALTER TABLE stations DROP CONSTRAINT stations_location_precision_check;
   END IF;
+
+  -- Older installs only allowed status IN ('full','low','queue','out'), which
+  -- forced honest "no report yet" stations to be seeded as 'full'. Widen it to
+  -- allow 'unknown' (the real default until a driver reports), then clear any
+  -- stations still carrying a seeded status with a "No recent reports" label.
+  IF EXISTS (
+    SELECT 1 FROM information_schema.table_constraints
+    WHERE constraint_name = 'stations_status_check'
+  ) THEN
+    ALTER TABLE stations DROP CONSTRAINT stations_status_check;
+  END IF;
+  ALTER TABLE stations ADD CONSTRAINT stations_status_check
+    CHECK (status IN ('full', 'low', 'queue', 'out', 'unknown'));
+  UPDATE stations SET status = 'unknown'
+    WHERE status <> 'unknown' AND status_label = 'No recent reports';
 
   IF NOT EXISTS (
     SELECT 1 FROM information_schema.columns

@@ -2,11 +2,16 @@ import React, { useEffect, useRef, useState } from 'react';
 import { CommunityPost, GasStation } from '../types';
 import { StationGroupInfoSheet } from './StationGroupInfoSheet';
 import { EmptyState } from './common/EmptyState';
-import { MOCK_LEADERBOARD_DRIVERS } from '../utils/reputationEngine';
+import type { LeaderboardDriver } from '../utils/reputationEngine';
+import { apiService } from '../services/apiService';
+import { isSameState } from '../utils/proximityAlertEngine';
 
 interface CommunityScreenProps {
   posts: CommunityPost[];
   stations?: GasStation[];
+  /** Driver's registered state — station groups default to it until the
+   *  driver searches, which widens to every station group nationwide. */
+  homeState?: string;
   onOpenDiscussion: (post: CommunityPost) => void;
   onOpenChat: (post: CommunityPost) => void;
   onOpenCreatePost: () => void;
@@ -19,6 +24,7 @@ interface CommunityScreenProps {
 export const CommunityScreen: React.FC<CommunityScreenProps> = ({
   posts,
   stations = [],
+  homeState,
   onOpenDiscussion,
   onOpenChat,
   onOpenCreatePost,
@@ -35,11 +41,22 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
   const [likeOverrides, setLikeOverrides] = useState<Record<string, { isLiked: boolean; likes: number }>>({});
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [showInfoSheet, setShowInfoSheet] = useState(false);
+  const [leaderboard, setLeaderboard] = useState<LeaderboardDriver[]>([]);
   const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     return () => {
       if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    };
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    apiService.fetchLeaderboard().then((rows) => {
+      if (active) setLeaderboard(rows);
+    });
+    return () => {
+      active = false;
     };
   }, []);
 
@@ -99,7 +116,15 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
     return matchesCategory && matchesSearch;
   });
 
-  const filteredStations = stations.filter((st) => {
+  const scopedStationGroups =
+    homeState && !searchQuery.trim()
+      ? (() => {
+          const inHome = stations.filter((st) => isSameState(st.state, homeState));
+          return inHome.length > 0 ? inHome : stations;
+        })()
+      : stations;
+
+  const filteredStations = scopedStationGroups.filter((st) => {
     const q = searchQuery.toLowerCase();
     const matchesSearch =
       st.name.toLowerCase().includes(q) ||
@@ -325,13 +350,13 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                     {/* Latest Notice or Report snippet */}
                     <div className="bg-surface rounded-xl p-2.5 border border-surface-container-highest text-caption text-on-surface-variant">
                       <span className="font-semibold text-primary mr-1">Latest Update:</span>
-                      {st.reports?.[0]?.comment || st.stationNotice || `Active discussion feed on pressure (${st.pumpPressure} bar) & queues.`}
+                      {st.reports?.[0]?.comment || st.stationNotice || 'No driver reports yet — be the first to update this station.'}
                     </div>
 
                     <div className="flex items-center justify-between pt-1 text-caption font-medium text-outline">
                       <span className="flex items-center gap-1">
                         <span className="material-symbols-outlined text-[15px]">schedule</span>
-                        Updated {st.lastUpdated}
+                        {st.lastUpdated ? `Updated ${st.lastUpdated}` : 'No recent reports'}
                       </span>
                       <button
                         onClick={(e) => {
@@ -667,7 +692,14 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
 
             {/* Leaderboard Cards */}
             <div className="flex flex-col gap-2.5">
-              {MOCK_LEADERBOARD_DRIVERS.map((driver) => (
+              {leaderboard.length === 0 && (
+                <EmptyState
+                  icon="leaderboard"
+                  title="No ranked drivers yet"
+                  message="Be the first — submit verified station reports to earn reputation points and claim the top spot."
+                />
+              )}
+              {leaderboard.map((driver) => (
                 <div
                   key={driver.id}
                   className="bg-white rounded-3xl p-4 shadow-sm border border-slate-200/80 flex items-center justify-between gap-3 hover:border-emerald-500/40 transition-all"

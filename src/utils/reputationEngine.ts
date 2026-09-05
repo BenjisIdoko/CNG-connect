@@ -137,60 +137,34 @@ export interface LeaderboardDriver {
   vehicle: string;
 }
 
-export const MOCK_LEADERBOARD_DRIVERS: LeaderboardDriver[] = [
-  {
-    id: 'lb-1',
-    rank: 1,
-    name: 'Musa Abdullahi',
-    state: 'Abuja FCT',
-    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
-    points: 1840,
-    reportsCount: 42,
-    tier: DRIVER_TIERS[4], // Gas Finder Legend
-    vehicle: 'Toyota Corolla 1.8L (Dual Fuel CNG)',
-  },
-  {
-    id: 'lb-2',
-    rank: 2,
-    name: 'Emeka Okonkwo',
-    state: 'Lagos',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
-    points: 1320,
-    reportsCount: 31,
-    tier: DRIVER_TIERS[3], // Station Scout
-    vehicle: 'Hyundai Elantra (CNG Converted)',
-  },
-  {
-    id: 'lb-3',
-    rank: 3,
-    name: 'Ibrahim Katsina',
-    state: 'Kano',
-    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80',
-    points: 980,
-    reportsCount: 26,
-    tier: DRIVER_TIERS[3], // Station Scout
-    vehicle: 'Toyota Camry 2.4L (Pi-CNG Kit)',
-  },
-  {
-    id: 'lb-4',
-    rank: 4,
-    name: 'Femi Adebayo',
-    state: 'Ogun',
-    avatar: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=150&auto=format&fit=crop&q=80',
-    points: 620,
-    reportsCount: 18,
-    tier: DRIVER_TIERS[2], // Verified Reporter
-    vehicle: 'Honda Accord 2.4L (Dual Fuel)',
-  },
-  {
-    id: 'lb-5',
-    rank: 5,
-    name: 'Blessing Igbinovia',
-    state: 'Edo',
-    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80',
-    points: 450,
-    reportsCount: 14,
-    tier: DRIVER_TIERS[2], // Verified Reporter
-    vehicle: 'Kia Rio 1.4L (Pi-CNG Grant)',
-  },
-];
+export interface LeaderboardProfileRow {
+  id: string;
+  name?: string | null;
+  state?: string | null;
+  avatar?: string | null;
+  community_points?: number | null;
+  reports_count?: number | null;
+  vehicle?: string | null;
+}
+
+/**
+ * Builds the ranked leaderboard from real `profiles` rows (highest
+ * community_points first). No seed/mock entries — an empty list means no
+ * drivers have earned points yet.
+ */
+export function buildLeaderboard(rows: LeaderboardProfileRow[]): LeaderboardDriver[] {
+  return [...rows]
+    .filter((r) => (r.name || '').trim().length > 0)
+    .sort((a, b) => (b.community_points || 0) - (a.community_points || 0))
+    .map((r, i) => ({
+      id: r.id,
+      rank: i + 1,
+      name: r.name || 'Driver',
+      state: r.state || '',
+      avatar: r.avatar || '',
+      points: r.community_points || 0,
+      reportsCount: r.reports_count || 0,
+      tier: getDriverTier(r.community_points || 0).currentTier,
+      vehicle: r.vehicle || '',
+    }));
+}

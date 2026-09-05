@@ -7,15 +7,17 @@
     "state": "Lagos",
     "distance": "2.1 km",
     "driveTime": "6 min drive",
-    "status": "full",
-    "statusLabel": "Available (3/4 Ports Free)",
-    "lastUpdated": "Hand Verified Source",
-    "verifiedByCommunity": true,
+    "status": "unknown",
+    "statusLabel": "No recent reports",
+    "verifiedByCommunity": false,
     "isPiCngAccredited": true,
     "operator": "Qoray Mobility",
     "network": "Qoray Mobility",
     "stationType": "ev_charging",
-    "connectorTypes": ["CCS2 Combo", "Type 2 AC"],
+    "connectorTypes": [
+      "CCS2 Combo",
+      "Type 2 AC"
+    ],
     "chargingSpeedKw": 120,
     "pricePerKwh": 180,
     "totalPorts": 4,
@@ -29,7 +31,8 @@
     "locationPrecision": "source_exact",
     "dataSource": "Qoray Direct Verification",
     "dataSourceDate": "2026-08-27",
-    "createdBy": null
+    "createdBy": null,
+    "lastUpdated": ""
   },
   {
     "id": "ev-station-2",
@@ -39,15 +42,16 @@
     "state": "Lagos",
     "distance": "3.8 km",
     "driveTime": "10 min drive",
-    "status": "full",
-    "statusLabel": "Available (2/2 Ports Free)",
-    "lastUpdated": "Hand Verified Source",
-    "verifiedByCommunity": true,
+    "status": "unknown",
+    "statusLabel": "No recent reports",
+    "verifiedByCommunity": false,
     "isPiCngAccredited": true,
     "operator": "Qoray Mobility",
     "network": "Qoray Mobility",
     "stationType": "ev_charging",
-    "connectorTypes": ["CCS2 Combo"],
+    "connectorTypes": [
+      "CCS2 Combo"
+    ],
     "chargingSpeedKw": 60,
     "pricePerKwh": 175,
     "totalPorts": 2,
@@ -61,7 +65,8 @@
     "locationPrecision": "source_exact",
     "dataSource": "Qoray Direct Verification",
     "dataSourceDate": "2026-08-27",
-    "createdBy": null
+    "createdBy": null,
+    "lastUpdated": ""
   },
   {
     "id": "ev-station-3",
@@ -71,15 +76,17 @@
     "state": "Lagos",
     "distance": "4.5 km",
     "driveTime": "12 min drive",
-    "status": "full",
-    "statusLabel": "Available (4/4 Ports Free)",
-    "lastUpdated": "Hand Verified Source",
-    "verifiedByCommunity": true,
+    "status": "unknown",
+    "statusLabel": "No recent reports",
+    "verifiedByCommunity": false,
     "isPiCngAccredited": true,
     "operator": "Qoray Mobility",
     "network": "Qoray Mobility",
     "stationType": "ev_charging",
-    "connectorTypes": ["CCS2 Combo", "Type 2 AC"],
+    "connectorTypes": [
+      "CCS2 Combo",
+      "Type 2 AC"
+    ],
     "chargingSpeedKw": 120,
     "pricePerKwh": 185,
     "totalPorts": 4,
@@ -93,7 +100,8 @@
     "locationPrecision": "source_exact",
     "dataSource": "Qoray Direct Verification",
     "dataSourceDate": "2026-08-27",
-    "createdBy": null
+    "createdBy": null,
+    "lastUpdated": ""
   },
   {
     "id": "ev-station-4",
@@ -103,15 +111,17 @@
     "state": "Lagos",
     "distance": "2.4 km",
     "driveTime": "7 min drive",
-    "status": "full",
-    "statusLabel": "Available (3/4 Ports Free)",
-    "lastUpdated": "Hand Verified Source",
-    "verifiedByCommunity": true,
+    "status": "unknown",
+    "statusLabel": "No recent reports",
+    "verifiedByCommunity": false,
     "isPiCngAccredited": true,
     "operator": "SAGLEV",
     "network": "SAGLEV EV Network",
     "stationType": "ev_charging",
-    "connectorTypes": ["CCS2 Combo", "Type 2 AC"],
+    "connectorTypes": [
+      "CCS2 Combo",
+      "Type 2 AC"
+    ],
     "chargingSpeedKw": 60,
     "pricePerKwh": 170,
     "totalPorts": 4,
@@ -125,7 +135,8 @@
     "locationPrecision": "source_exact",
     "dataSource": "SAGLEV Direct Verification",
     "dataSourceDate": "2026-08-27",
-    "createdBy": null
+    "createdBy": null,
+    "lastUpdated": ""
   },
   {
     "id": "ev-station-5",
@@ -135,15 +146,18 @@
     "state": "FCT Abuja",
     "distance": "1.8 km",
     "driveTime": "5 min drive",
-    "status": "full",
-    "statusLabel": "Available (5/6 Ports Free)",
-    "lastUpdated": "Hand Verified Source",
-    "verifiedByCommunity": true,
+    "status": "unknown",
+    "statusLabel": "No recent reports",
+    "verifiedByCommunity": false,
     "isPiCngAccredited": true,
     "operator": "NNPC Retail / AYM Shafa",
     "network": "NNPC / Shafa EV Pilot",
     "stationType": "ev_charging",
-    "connectorTypes": ["CCS2 Combo", "CHAdeMO", "Type 2 AC"],
+    "connectorTypes": [
+      "CCS2 Combo",
+      "CHAdeMO",
+      "Type 2 AC"
+    ],
     "chargingSpeedKw": 120,
     "pricePerKwh": 190,
     "totalPorts": 6,
@@ -157,7 +171,8 @@
     "locationPrecision": "source_exact",
     "dataSource": "NNPC Pilot Direct Verification",
     "dataSourceDate": "2026-08-27",
-    "createdBy": null
+    "createdBy": null,
+    "lastUpdated": ""
   },
   {
     "id": "ev-station-6",
@@ -167,15 +182,16 @@
     "state": "FCT Abuja",
     "distance": "6.2 km",
     "driveTime": "14 min drive",
-    "status": "full",
-    "statusLabel": "Available (2/2 Ports Free)",
-    "lastUpdated": "Hand Verified Source",
-    "verifiedByCommunity": true,
+    "status": "unknown",
+    "statusLabel": "No recent reports",
+    "verifiedByCommunity": false,
     "isPiCngAccredited": true,
     "operator": "AYM Shafa",
     "network": "Shafa EV Pilot",
     "stationType": "ev_charging",
-    "connectorTypes": ["CCS2 Combo"],
+    "connectorTypes": [
+      "CCS2 Combo"
+    ],
     "chargingSpeedKw": 60,
     "pricePerKwh": 185,
     "totalPorts": 2,
@@ -189,6 +205,7 @@
     "locationPrecision": "source_exact",
     "dataSource": "AYM Shafa Direct Verification",
     "dataSourceDate": "2026-08-27",
-    "createdBy": null
+    "createdBy": null,
+    "lastUpdated": ""
   }
 ]

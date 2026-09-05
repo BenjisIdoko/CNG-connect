@@ -759,7 +759,8 @@ export const App: React.FC = () => {
             />
           ) : activeTab === 'map' ? (
             <MapScreen
-              stations={scopedStations}
+              stations={stations}
+              homeState={userProfile.state}
               selectedStation={selectedStation}
               onSelectStation={(st) => setSelectedStation(st)}
               onOpenStationDetails={handleOpenStationDetail}
@@ -784,7 +785,8 @@ export const App: React.FC = () => {
           ) : activeTab === 'community' ? (
             <CommunityScreen
               posts={posts}
-              stations={scopedStations}
+              stations={stations}
+              homeState={userProfile.state}
               onOpenDiscussion={(p) => setActiveDiscussionPost(p)}
               onOpenChat={(p) => setActiveChatPost(p)}
               onOpenCreatePost={() => setIsCreatePostOpen(true)}

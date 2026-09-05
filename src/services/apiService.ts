@@ -3,6 +3,7 @@ import { INITIAL_STATIONS, INITIAL_POSTS, deduplicateStations } from '../data/mo
 import { supabase, isSupabaseConfigured } from './supabaseClient';
 import { checkNotificationPermission } from '../utils/permissionManager';
 import { formatRelativeTime } from '../utils/timeUtils';
+import { buildLeaderboard, LeaderboardDriver, LeaderboardProfileRow } from '../utils/reputationEngine';
 
 // Helper: Calculate verification level and weight according to schema rules
 export function calculateVerificationMetadata(report: DriverReport): {
@@ -186,8 +187,8 @@ export const apiService = {
               statusLabel: r.status_label,
               waitMinutes: r.wait_minutes,
               comment: r.comment,
-              likes: r.likes || 1,
-              dislikes: r.dislikes || 0,
+              likes: r.likes ?? 0,
+              dislikes: r.dislikes ?? 0,
               photo: r.photo,
             }));
 
@@ -222,17 +223,17 @@ export const apiService = {
             address: s.address,
             city: s.city,
             state: s.state,
-            distance: s.distance || '2.0 km',
-            driveTime: s.drive_time || '5 min drive',
-            status: s.status as StationStatus,
-            statusLabel: s.status_label,
-            cngPrice: Number(s.cng_price || 230),
-            priceTrend: s.price_trend || 'stable',
-            pumpPressure: Number(s.pump_pressure || 215),
-            busyEstimate: s.busy_estimate || 'Fast moving',
-            lastUpdated: s.last_updated || 'Just now',
-            verifiedByCommunity: s.verified_by_community ?? true,
-            isPiCngAccredited: s.is_picng_accredited ?? true,
+            distance: s.distance || '',
+            driveTime: s.drive_time || '',
+            status: (s.status as StationStatus) || 'unknown',
+            statusLabel: s.status_label || 'No recent reports',
+            cngPrice: s.cng_price != null ? Number(s.cng_price) : undefined,
+            priceTrend: s.price_trend || undefined,
+            pumpPressure: s.pump_pressure != null ? Number(s.pump_pressure) : undefined,
+            busyEstimate: s.busy_estimate || undefined,
+            lastUpdated: s.last_updated || '',
+            verifiedByCommunity: s.verified_by_community ?? false,
+            isPiCngAccredited: s.is_picng_accredited ?? false,
             operator: s.operator,
             phone: s.phone,
             lat: Number(s.lat),
@@ -913,5 +914,29 @@ export const apiService = {
 
     // No backend configured: caller falls back to its own optimistic toggle.
     return null;
+  },
+
+  /**
+   * Fetch the ranked driver leaderboard from real `profiles` rows.
+   * Returns [] when the backend isn't configured or no driver has points yet
+   * — there is no seed/mock fallback.
+   */
+  async fetchLeaderboard(): Promise<LeaderboardDriver[]> {
+    if (!isSupabaseConfigured || !supabase) return [];
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id,name,state,avatar,community_points,reports_count,vehicle')
+        .order('community_points', { ascending: false })
+        .limit(100);
+      if (error || !data) {
+        console.error('Supabase fetchLeaderboard failed:', error?.message);
+        return [];
+      }
+      return buildLeaderboard(data as LeaderboardProfileRow[]);
+    } catch (err) {
+      console.error('API Service fetchLeaderboard exception:', err);
+      return [];
+    }
   },
 };

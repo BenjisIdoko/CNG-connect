@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet.markercluster/dist/MarkerCluster.css';
@@ -14,6 +14,7 @@ import { SuggestStationModal } from './SuggestStationModal';
 import { formatStationAge } from '../utils/timeUtils';
 import { openWhatsAppShare } from '../utils/shareMessageBuilder';
 import { getPinConfidence, getAccuracyRadiusM } from '../utils/locationPrecision';
+import { isSameState } from '../utils/proximityAlertEngine';
 
 // Bundle Leaflet's default marker assets through Vite so the map works offline
 // and never depends on a third-party CDN at runtime.
@@ -28,6 +29,9 @@ export type GpsStatus = 'active' | 'denied' | 'unavailable';
 
 interface MapScreenProps {
   stations: GasStation[];
+  /** Driver's registered state. The map opens scoped to it, but any search
+   *  or explicit city selection widens back to the full nationwide list. */
+  homeState?: string;
   selectedStation: GasStation;
   onSelectStation: (station: GasStation) => void;
   onOpenStationDetails: (station: GasStation) => void;
@@ -40,6 +44,7 @@ interface MapScreenProps {
 
 export const MapScreen: React.FC<MapScreenProps> = ({
   stations,
+  homeState,
   selectedStation,
   onSelectStation,
   onOpenStationDetails,
@@ -151,7 +156,17 @@ export const MapScreen: React.FC<MapScreenProps> = ({
     return match ? parseFloat(match[1]) : 999;
   };
 
-  const filteredStations = stations.filter((st) => {
+  // Default view is scoped to the driver's home state, but the moment they
+  // type a search term or pick a city the scope widens to every station so
+  // cross-state search actually returns results.
+  const baseStations = useMemo(() => {
+    const scopeToHome = homeState && !searchQuery.trim() && activeCity === 'all';
+    if (!scopeToHome) return stations;
+    const inHome = stations.filter((st) => isSameState(st.state, homeState));
+    return inHome.length > 0 ? inHome : stations;
+  }, [stations, homeState, searchQuery, activeCity]);
+
+  const filteredStations = baseStations.filter((st) => {
     const matchesStationType =
       stationTypeFilter === 'all' || (st.stationType || 'cng') === stationTypeFilter;
     const matchesFilter = activeFilter === 'all' || st.status === activeFilter;
