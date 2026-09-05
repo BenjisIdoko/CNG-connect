@@ -8,10 +8,6 @@ interface SplashScreenProps {
 export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
   const [progress, setProgress] = useState(0);
   const [isFadingOut, setIsFadingOut] = useState(false);
-  const [carImg, setCarImg] = useState(
-    ASSETS.onboardingIllustration ||
-      'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?q=80&w=1200&auto=format&fit=crop'
-  );
 
   useEffect(() => {
     const p1 = setTimeout(() => setProgress(35), 400);
@@ -35,15 +31,10 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
         isFadingOut ? 'opacity-0 pointer-events-none' : 'opacity-100'
       }`}
     >
-      {/* Full-Bleed Dramatic EV Photography Background */}
+      {/* Full-Bleed Nigerian Filling Station Photography Background */}
       <img
-        src={carImg}
-        alt="Modern EV Car"
-        onError={() =>
-          setCarImg(
-            'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?q=80&w=1200&auto=format&fit=crop'
-          )
-        }
+        src="/onboarding/splash-hero.jpg"
+        alt="CNG filling station in Nigeria"
         className="absolute inset-0 w-full h-full object-cover transform scale-105 transition-transform duration-[4000ms] ease-out pointer-events-none"
       />
 

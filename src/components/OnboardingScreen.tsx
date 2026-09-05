@@ -24,8 +24,7 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
       icon: 'local_gas_station',
       badge: 'Live Station Finder',
       accentColor: 'from-primary to-deep-teal',
-      image:
-        'https://images.unsplash.com/photo-1545454675-3531b543be5d?q=80&w=1000&auto=format&fit=crop',
+      image: '/onboarding/slide-stations.jpg',
     },
     {
       id: 'gps',
@@ -36,8 +35,7 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
       icon: 'near_me',
       badge: 'Live Geolocation',
       accentColor: 'from-deep-teal to-[#00281F]',
-      image:
-        'https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?q=80&w=1000&auto=format&fit=crop',
+      image: '/onboarding/slide-gps.jpg',
     },
     {
       id: 'community',
@@ -48,8 +46,7 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
       icon: 'campaign',
       badge: 'Driver Community',
       accentColor: 'from-on-primary-container to-[#003828]',
-      image:
-        'https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=1000&auto=format&fit=crop',
+      image: '/onboarding/slide-community.jpg',
     },
     {
       id: 'workshops',
@@ -60,8 +57,7 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
       icon: 'build_circle',
       badge: 'Pi-CNG Accredited',
       accentColor: 'from-primary to-status-green',
-      image:
-        'https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=1000&auto=format&fit=crop',
+      image: '/onboarding/slide-workshops.jpg',
     },
   ];
 

@@ -114,7 +114,7 @@ export default defineConfig(() => {
           ]
         },
         workbox: {
-          globPatterns: ['**/*.{js,css,html,ico,png,svg,json,woff,woff2}'],
+          globPatterns: ['**/*.{js,css,html,ico,png,jpg,svg,json,woff,woff2}'],
           globIgnores: ['sw-custom.js'],
           importScripts: ['sw-custom.js'],
           runtimeCaching: [
