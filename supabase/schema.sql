@@ -346,7 +346,7 @@ CREATE POLICY "Allow public read post_comments" ON post_comments FOR SELECT USIN
 DROP POLICY IF EXISTS "Allow public read post_likes" ON post_likes;
 CREATE POLICY "Allow public read post_likes" ON post_likes FOR SELECT USING (true);
 
-DROP POLICY IF EXISTS "Allow public read own station_suggestions" ON station_suggestions;
+DROP POLICY IF EXISTS "Allow public read station_suggestions" ON station_suggestions;
 CREATE POLICY "Allow public read station_suggestions" ON station_suggestions FOR SELECT USING (true);
 
 -- Driver-generated content: anon INSERT allowed.
