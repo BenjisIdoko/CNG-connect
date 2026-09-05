@@ -17,10 +17,10 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
   const slides = [
     {
       id: 'stations',
-      title: '90 Accredited CNG Refuelling Stations',
+      title: 'Find CNG Refilling Stations',
       subtitle: 'Real-Time Availability & Pressure',
       description:
-        'Locate accredited CNG stations across Nigeria. Check live pump pressure (bar), queue wait times, and verified stock updates reported directly by drivers.',
+        'Locate CNG stations across Nigeria. Check live pump pressure (bar), queue wait times, and verified stock updates reported directly by drivers.',
       icon: 'local_gas_station',
       badge: 'Live Station Finder',
       accentColor: 'from-primary to-deep-teal',
@@ -28,10 +28,10 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
     },
     {
       id: 'gps',
-      title: 'District-Accurate GPS & Live Distances',
+      title: 'Accurate GPS & Live Distances',
       subtitle: 'Automatic Nearest Station Sorting',
       description:
-        'Get exact physical distances (km) and drive times to Dutse-Bwari, Wuse 2, Ikeja, Oyo, and all major hubs nationwide, sorted by proximity.',
+        'Get exact physical distances (km) and drive times to the nearest stations and hubs.',
       icon: 'near_me',
       badge: 'Live Geolocation',
       accentColor: 'from-deep-teal to-[#00281F]',
@@ -42,7 +42,7 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
       title: 'State Alerts & Proximity Chat',
       subtitle: 'Connected CNG Driver Network',
       description:
-        'Receive instant state-wide push notifications when gas is restocked, and join physical proximity chats when refuelling at station hubs.',
+        'Receive instant push notifications when gas is restocked, and join physical proximity chats when refilling at station hubs.',
       icon: 'campaign',
       badge: 'Driver Community',
       accentColor: 'from-on-primary-container to-[#003828]',
@@ -50,10 +50,10 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
     },
     {
       id: 'workshops',
-      title: '451 Pi-CNG Conversion Centres',
+      title: 'Access CNG Conversion Centres',
       subtitle: 'Certified Technicians & Workshops',
       description:
-        'Browse Pi-CNG accredited conversion workshops in all 36 states. Verify registration codes, call technicians directly, and schedule cylinder inspections.',
+        'Browse CNG accredited conversion workshops in all 36 states. Verify registration codes, call technicians directly, and schedule cylinder inspections.',
       icon: 'build_circle',
       badge: 'Pi-CNG Accredited',
       accentColor: 'from-primary to-status-green',
@@ -150,9 +150,8 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
                 key={s.id}
                 onClick={() => setCurrentSlide(idx)}
                 aria-label={`Go to slide ${idx + 1}`}
-                className={`h-2 rounded-full transition-all duration-300 ${
-                  currentSlide === idx ? 'w-8 bg-status-green' : 'w-2 bg-white/30 hover:bg-white/50'
-                }`}
+                className={`h-2 rounded-full transition-all duration-300 ${currentSlide === idx ? 'w-8 bg-status-green' : 'w-2 bg-white/30 hover:bg-white/50'
+                  }`}
               />
             ))}
           </div>
