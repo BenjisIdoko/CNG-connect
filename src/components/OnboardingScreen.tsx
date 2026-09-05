@@ -20,7 +20,7 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
       title: 'Find CNG Refilling Stations',
       subtitle: 'Real-Time Availability & Pressure',
       description:
-        'Locate CNG stations across Nigeria. Check live pump pressure (bar), queue wait times, and verified stock updates reported directly by drivers.',
+        'Locate CNG stations across Nigeria. Check live pump pressure (bar), queue wait times, and verified gas-availability updates reported directly by drivers.',
       icon: 'local_gas_station',
       badge: 'Live Station Finder',
       accentColor: 'from-primary to-deep-teal',
@@ -31,7 +31,7 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
       title: 'Accurate GPS & Live Distances',
       subtitle: 'Automatic Nearest Station Sorting',
       description:
-        'Get exact physical distances (km) and drive times to the nearest stations and hubs.',
+        'Get real-time distances (km) and drive times to the nearest stations and conversion centres.',
       icon: 'near_me',
       badge: 'Live Geolocation',
       accentColor: 'from-deep-teal to-[#00281F]',
@@ -42,7 +42,7 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
       title: 'State Alerts & Proximity Chat',
       subtitle: 'Connected CNG Driver Network',
       description:
-        'Receive instant push notifications when gas is restocked, and join physical proximity chats when refilling at station hubs.',
+        'Get instant alerts when nearby stations restock, and chat with other drivers refilling alongside you.',
       icon: 'campaign',
       badge: 'Driver Community',
       accentColor: 'from-on-primary-container to-[#003828]',
@@ -53,7 +53,7 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
       title: 'Access CNG Conversion Centres',
       subtitle: 'Certified Technicians & Workshops',
       description:
-        'Browse CNG accredited conversion workshops in all 36 states. Verify registration codes, call technicians directly, and schedule cylinder inspections.',
+        'Browse CNG-accredited conversion centres in all 36 states. Verify registration codes, call technicians directly, and schedule cylinder inspections.',
       icon: 'build_circle',
       badge: 'Pi-CNG Accredited',
       accentColor: 'from-primary to-status-green',
