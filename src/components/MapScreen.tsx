@@ -550,7 +550,13 @@ export const MapScreen: React.FC<MapScreenProps> = ({
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-status-green animate-pulse" />
                 <h3 className="font-extrabold text-body-lg text-on-surface">
-                  {filteredStations.length} CNG Stations Near You
+                  {filteredStations.length}{' '}
+                  {stationTypeFilter === 'ev_charging'
+                    ? 'EV Chargers'
+                    : stationTypeFilter === 'cng'
+                    ? 'CNG Stations'
+                    : 'Stations'}{' '}
+                  Near You
                 </h3>
               </div>
               <button
@@ -576,7 +582,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                   <div className="w-12 h-12 rounded-2xl bg-surface-container text-primary flex items-center justify-center font-black">
                     <span className="material-symbols-outlined text-[28px]">filter_alt_off</span>
                   </div>
-                  <h4 className="font-extrabold text-on-surface text-body-lg">No CNG Stations Found</h4>
+                  <h4 className="font-extrabold text-on-surface text-body-lg">No Stations Found</h4>
                   <p className="text-caption text-on-surface-variant font-medium max-w-xs">
                     No stations match your current search term or filter criteria.
                   </p>
@@ -617,10 +623,18 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                       )}
                     </div>
 
-                    <div className="flex flex-col gap-2">
+                    <div className="flex flex-col divide-y divide-outline-variant/50">
                       {(sheetMode === 'expanded' ? filteredStations.slice(0, visibleCount) : nearestTop5Stations).map((station) => {
                         const statusInfo = getStatusIndicator(station.status);
                         const isSelected = selectedStation?.id === station.id;
+                        const isUnknown = station.status === 'unknown';
+                        const age = formatStationAge(station).replace(/^Updated /, '');
+                        const meta = [
+                          station.distance || null,
+                          isUnknown ? 'No recent reports' : station.statusLabel,
+                          !isUnknown && station.pumpPressure ? `${station.pumpPressure} bar` : null,
+                          !isUnknown && age !== 'No recent report' ? age : null,
+                        ].filter(Boolean);
 
                         return (
                           <div
@@ -628,34 +642,20 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                             onClick={() => {
                               onSelectStation(station);
                             }}
-                            className={`bg-white border rounded-2xl p-3 shadow-2xs flex items-center justify-between cursor-pointer transition-all active:scale-[0.99] ${
-                              isSelected
-                                ? 'border-primary ring-2 ring-primary/15 bg-surface-container/50'
-                                : 'border-outline-variant/80 hover:border-outline-variant'
+                            className={`flex items-center justify-between gap-2 py-3 px-1 cursor-pointer transition-colors ${
+                              isSelected ? 'bg-surface-container/60 rounded-lg' : 'active:bg-surface-container/40'
                             }`}
                           >
                             <div className="flex items-center gap-3 min-w-0 flex-1 pr-2">
                               <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${statusInfo.dotColor}`} />
 
                               <div className="min-w-0 flex-1">
-                                <h4 className="font-bold text-body-lg text-on-surface truncate leading-snug">
+                                <h4 className="font-semibold text-body text-on-surface truncate leading-snug">
                                   {station.name}
                                 </h4>
-                                <div className="flex flex-wrap items-center gap-1.5 text-caption text-on-surface-variant mt-0.5">
-                                  <span className="font-bold text-primary">{station.distance}</span>
-                                  <span>•</span>
-                                  <span className="font-medium">{station.statusLabel}</span>
-                                  {Boolean(station.pumpPressure && station.pumpPressure > 0) && (
-                                    <>
-                                      <span>•</span>
-                                      <span className="font-semibold text-on-surface-variant">{station.pumpPressure} bar</span>
-                                    </>
-                                  )}
-                                  <span>•</span>
-                                  <span className={`font-bold ${station.status === 'unknown' ? 'text-slate-400' : 'text-primary'}`}>
-                                    {formatStationAge(station)}
-                                  </span>
-                                </div>
+                                <p className="text-caption font-medium text-on-surface-variant truncate mt-0.5">
+                                  {meta.join('  ·  ')}
+                                </p>
                               </div>
                             </div>
 
@@ -751,7 +751,13 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                                   alt={st.name}
                                   className="w-full h-full object-cover"
                                 />
-                                <span className="absolute top-2 left-2 bg-primary/90 backdrop-blur-md text-status-green text-micro font-semibold px-2 py-0.5 rounded-xl border border-status-green/30">
+                                <span
+                                  className={`absolute top-2 left-2 backdrop-blur-md text-micro font-semibold px-2 py-0.5 rounded-xl border ${
+                                    st.status === 'unknown'
+                                      ? 'bg-black/50 text-white/90 border-white/20'
+                                      : 'bg-primary/90 text-status-green border-status-green/30'
+                                  }`}
+                                >
                                   {st.statusLabel}
                                 </span>
                               </div>
@@ -766,9 +772,15 @@ export const MapScreen: React.FC<MapScreenProps> = ({
 
                             <div className="mt-2.5 pt-2 border-t border-outline-variant/30 flex items-center justify-between">
                               <div className="flex items-center gap-1.5 text-micro font-medium text-on-surface-variant">
-                                <span className="font-semibold text-primary">{formatStationAge(st)}</span>
-                                <span>•</span>
-                                <span>{st.distance}</span>
+                                {st.status !== 'unknown' && formatStationAge(st) !== 'No recent report' && (
+                                  <>
+                                    <span className="font-semibold text-primary">
+                                      {formatStationAge(st).replace(/^Updated /, '')}
+                                    </span>
+                                    {st.distance && <span>•</span>}
+                                  </>
+                                )}
+                                {st.distance && <span>{st.distance}</span>}
                               </div>
                               <div className="flex items-center gap-1">
                                 <button

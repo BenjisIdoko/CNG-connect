@@ -294,83 +294,71 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                   }}
                 />
               ) : (
-                filteredStations.map((st) => (
-                  <div
-                    key={st.id}
-                    onClick={() => onOpenStationGroup && onOpenStationGroup(st)}
-                    className="bg-white rounded-3xl p-4 shadow-sm border border-slate-200/80 hover:border-primary/60 transition-all cursor-pointer flex flex-col gap-2.5 active:scale-[0.99]"
-                  >
-                    <div className="flex justify-between items-start gap-2">
-                      <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                        <div className="w-11 h-11 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-primary font-bold shrink-0 shadow-xs">
-                          <span className="material-symbols-outlined text-[22px]">
-                            groups
-                          </span>
+                filteredStations.map((st) => {
+                  const snippet = st.reports?.[0]?.comment || st.stationNotice || '';
+                  const reportCount = st.reports?.length ?? 0;
+                  return (
+                    <div
+                      key={st.id}
+                      onClick={() => onOpenStationGroup && onOpenStationGroup(st)}
+                      className="bg-white rounded-2xl p-4 shadow-2xs border border-slate-200/80 hover:border-primary/60 transition-all cursor-pointer flex flex-col gap-2.5 active:scale-[0.99]"
+                    >
+                      <div className="flex justify-between items-start gap-2">
+                        <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                          <div className="w-11 h-11 rounded-2xl bg-emerald-50 flex items-center justify-center text-primary shrink-0">
+                            <span className="material-symbols-outlined text-[22px]">groups</span>
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <h3 className="text-body font-semibold text-on-surface leading-tight truncate">
+                              {st.name} Group
+                            </h3>
+                            <p className="text-caption text-outline font-medium mt-0.5 truncate">
+                              {st.city}, {st.state}
+                              {reportCount > 0 && `  ·  ${reportCount} live report${reportCount === 1 ? '' : 's'}`}
+                            </p>
+                          </div>
                         </div>
-                        <div className="min-w-0 flex-1">
-                          <h3 className="text-body-lg font-bold text-on-surface leading-tight truncate">
-                            {st.name} Group
-                          </h3>
-                          <p className="text-caption text-outline font-normal flex items-center gap-1 mt-0.5 truncate">
-                            <span>{st.city}, {st.state}</span>
-                            <span>•</span>
-                            <span className="text-primary font-semibold">
-                              {st.reports.length} live report{st.reports.length === 1 ? '' : 's'}
-                            </span>
-                          </p>
-                        </div>
+
+                        {st.status !== 'unknown' && (
+                          <div
+                            className={`px-2.5 py-1 rounded-lg text-micro font-semibold flex items-center gap-1.5 shrink-0 ${
+                              st.status === 'full'
+                                ? 'bg-emerald-50 text-primary'
+                                : 'bg-amber-50 text-amber-900'
+                            }`}
+                          >
+                            <span
+                              className={`w-1.5 h-1.5 rounded-full ${
+                                st.status === 'full' ? 'bg-status-green' : 'bg-status-orange'
+                              }`}
+                            />
+                            <span className="whitespace-nowrap">{st.statusLabel}</span>
+                          </div>
+                        )}
                       </div>
 
-                      <div
-                        className={`px-2.5 py-1 rounded-xl text-micro font-semibold uppercase tracking-wide flex items-center gap-1.5 shrink-0 shadow-2xs border ${
-                          st.status === 'full'
-                            ? 'bg-emerald-50 text-primary border-emerald-200'
-                            : st.status === 'queue'
-                            ? 'bg-amber-50 text-amber-900 border-amber-200'
-                            : st.status === 'low'
-                            ? 'bg-orange-50 text-orange-900 border-orange-200'
-                            : 'bg-slate-100 text-slate-700 border-slate-200'
-                        }`}
-                      >
-                        <span
-                          className={`w-1.5 h-1.5 rounded-full ${
-                            st.status === 'full'
-                              ? 'bg-status-green'
-                              : st.status === 'queue'
-                              ? 'bg-status-orange'
-                              : st.status === 'low'
-                              ? 'bg-status-orange'
-                              : 'bg-status-red'
-                          }`}
-                        />
-                        <span className="whitespace-nowrap">{st.statusLabel}</span>
+                      {snippet && (
+                        <p className="bg-surface rounded-xl p-2.5 text-caption text-on-surface-variant line-clamp-2">
+                          {snippet}
+                        </p>
+                      )}
+
+                      <div className="flex items-center justify-between pt-1 text-caption font-medium text-outline">
+                        <span className="flex items-center gap-1">
+                          {st.lastUpdated ? (
+                            <>
+                              <span className="material-symbols-outlined text-[15px]">schedule</span>
+                              Updated {st.lastUpdated}
+                            </>
+                          ) : (
+                            'Tap to open group chat'
+                          )}
+                        </span>
+                        <span className="material-symbols-outlined text-[18px] text-outline">chevron_right</span>
                       </div>
                     </div>
-
-                    {/* Latest Notice or Report snippet */}
-                    <div className="bg-surface rounded-xl p-2.5 border border-surface-container-highest text-caption text-on-surface-variant">
-                      <span className="font-semibold text-primary mr-1">Latest Update:</span>
-                      {st.reports?.[0]?.comment || st.stationNotice || 'No driver reports yet — be the first to update this station.'}
-                    </div>
-
-                    <div className="flex items-center justify-between pt-1 text-caption font-medium text-outline">
-                      <span className="flex items-center gap-1">
-                        <span className="material-symbols-outlined text-[15px]">schedule</span>
-                        {st.lastUpdated ? `Updated ${st.lastUpdated}` : 'No recent reports'}
-                      </span>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (onOpenStationGroup) onOpenStationGroup(st);
-                        }}
-                        aria-label="Open Station Group"
-                        className="w-8 h-8 rounded-full bg-primary hover:bg-deep-teal text-white flex items-center justify-center shadow-2xs transition-colors"
-                      >
-                        <span className="material-symbols-outlined text-[18px]">chevron_right</span>
-                      </button>
-                    </div>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
           </div>
