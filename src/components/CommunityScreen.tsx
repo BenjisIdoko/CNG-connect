@@ -309,86 +309,55 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
               </div>
             </div>
 
-            {/* Station Groups Cards Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-              {filteredStations.length === 0 ? (
-                <EmptyState
-                  title="No Station Groups Found"
-                  message="No station groups match your current search query or status filter."
-                  actionLabel="Reset Filters"
-                  onAction={() => {
-                    setSearchQuery('');
-                    setStatusFilter('all');
-                  }}
-                />
-              ) : (
-                filteredStations.map((st) => {
+            {/* Station Groups — flat divider rows on mobile, cards from md up */}
+            {filteredStations.length === 0 ? (
+              <EmptyState
+                title="No Station Groups Found"
+                message="No station groups match your current search query or status filter."
+                actionLabel="Reset Filters"
+                onAction={() => {
+                  setSearchQuery('');
+                  setStatusFilter('all');
+                }}
+              />
+            ) : (
+              <div className="flex flex-col divide-y divide-outline-variant/50 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-3 md:divide-y-0">
+                {filteredStations.map((st) => {
                   const snippet = st.reports?.[0]?.comment || st.stationNotice || '';
-                  const reportCount = st.reports?.length ?? 0;
                   return (
                     <div
                       key={st.id}
                       onClick={() => onOpenStationGroup && onOpenStationGroup(st)}
-                      className="bg-white rounded-2xl p-4 shadow-2xs border border-slate-200/80 hover:border-primary/60 transition-all cursor-pointer flex flex-col gap-2.5 active:scale-[0.99]"
+                      className="flex items-center gap-3 py-4 cursor-pointer transition-colors active:bg-surface-container/40 md:bg-white md:p-4 md:rounded-2xl md:border md:border-slate-200/80 md:shadow-2xs md:hover:border-primary/60 md:active:bg-transparent"
                     >
-                      <div className="flex justify-between items-start gap-2">
-                        <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                          <div className="w-11 h-11 rounded-2xl bg-emerald-50 flex items-center justify-center text-primary shrink-0">
-                            <span className="material-symbols-outlined text-[22px]">groups</span>
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <h3 className="text-body font-semibold text-on-surface leading-tight truncate">
-                              {st.name} Group
-                            </h3>
-                            <p className="text-caption text-outline font-medium mt-0.5 truncate">
-                              {st.city}, {st.state}
-                              {reportCount > 0 && `  ·  ${reportCount} live report${reportCount === 1 ? '' : 's'}`}
-                            </p>
-                          </div>
-                        </div>
+                      <div className="w-10 h-10 rounded-2xl bg-emerald-50 flex items-center justify-center text-primary shrink-0">
+                        <span className="material-symbols-outlined text-[20px]">groups</span>
+                      </div>
 
-                        {st.status !== 'unknown' && (
-                          <div
-                            className={`px-2.5 py-1 rounded-lg text-micro font-semibold flex items-center gap-1.5 shrink-0 ${
-                              st.status === 'full'
-                                ? 'bg-emerald-50 text-primary'
-                                : 'bg-amber-50 text-amber-900'
-                            }`}
-                          >
+                      <div className="min-w-0 flex-1">
+                        <h3 className="text-body font-semibold text-on-surface leading-tight truncate">
+                          {st.name} Group
+                        </h3>
+                        <p className="text-caption text-outline font-medium mt-0.5 truncate">
+                          {st.status !== 'unknown' && (
                             <span
-                              className={`w-1.5 h-1.5 rounded-full ${
-                                st.status === 'full' ? 'bg-status-green' : 'bg-status-orange'
-                              }`}
-                            />
-                            <span className="whitespace-nowrap">{st.statusLabel}</span>
-                          </div>
-                        )}
-                      </div>
-
-                      {snippet && (
-                        <p className="bg-surface rounded-xl p-2.5 text-caption text-on-surface-variant line-clamp-2">
-                          {snippet}
-                        </p>
-                      )}
-
-                      <div className="flex items-center justify-between pt-1 text-caption font-medium text-outline">
-                        <span className="flex items-center gap-1">
-                          {st.lastUpdated ? (
-                            <>
-                              <span className="material-symbols-outlined text-[15px]">schedule</span>
-                              Updated {st.lastUpdated}
-                            </>
-                          ) : (
-                            'Tap to open group chat'
+                              className={st.status === 'full' ? 'text-primary font-semibold' : 'text-amber-700 font-semibold'}
+                            >
+                              {st.statusLabel}
+                              {'  ·  '}
+                            </span>
                           )}
-                        </span>
-                        <span className="material-symbols-outlined text-[18px] text-outline">chevron_right</span>
+                          {st.city}, {st.state}
+                          {snippet ? `  ·  ${snippet}` : ''}
+                        </p>
                       </div>
+
+                      <span className="material-symbols-outlined text-[18px] text-outline shrink-0">chevron_right</span>
                     </div>
                   );
-                })
-              )}
-            </div>
+                })}
+              </div>
+            )}
           </div>
         ) : activeMainTab === 'general' ? (
           /* MAIN TAB 2: General Community Hub (Maintenance, Parts, Deals, Conversions) */
@@ -582,7 +551,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                   <div
                     key={post.id}
                     onClick={() => onOpenDiscussion(post)}
-                    className="bg-white rounded-3xl p-4 shadow-sm border border-slate-200/70 flex flex-col gap-3 relative overflow-hidden group hover:border-primary/50 transition-all cursor-pointer"
+                    className="bg-white rounded-2xl p-4 shadow-2xs border border-slate-200/70 flex flex-col gap-3 relative overflow-hidden group hover:border-primary/50 transition-all cursor-pointer"
                   >
                     <div className="flex items-center gap-3">
                       {post.authorAvatar ? (
@@ -593,7 +562,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                         />
                       ) : (
                         <div
-                          className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-body-lg ${
+                          className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-body ${
                             post.authorInitialBg || 'bg-secondary-container text-white'
                           }`}
                         >
@@ -602,25 +571,22 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                       )}
 
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between">
-                          <h3 className="text-body-lg font-black text-slate-900 truncate">
+                        <div className="flex items-center justify-between gap-2">
+                          <h3 className="text-body font-semibold text-slate-900 truncate">
                             {post.author}
                           </h3>
-                          <span className="text-micro font-medium text-slate-400">
+                          <span className="text-micro font-medium text-slate-400 shrink-0">
                             {post.timeAgo}
                           </span>
                         </div>
-
-                        <div className="inline-flex items-center gap-1 bg-primary-container/20 text-on-primary-container px-2.5 py-0.5 rounded-xl mt-0.5">
-                          <span className="text-micro font-black tracking-wider uppercase">
-                            {post.categoryLabel || post.category}
-                          </span>
-                        </div>
+                        <span className="text-micro font-semibold text-outline uppercase tracking-wide">
+                          {post.categoryLabel || post.category}
+                        </span>
                       </div>
                     </div>
 
                     <div>
-                      <h4 className="text-body-lg font-extrabold text-slate-900 mb-1 group-hover:text-primary transition-colors leading-snug">
+                      <h4 className="text-body-lg font-bold text-slate-900 mb-1 group-hover:text-primary transition-colors leading-snug">
                         {post.title}
                       </h4>
                       <p className="text-body font-medium text-slate-600 line-clamp-3 leading-relaxed">
@@ -706,8 +672,8 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
               </div>
             </div>
 
-            {/* Leaderboard Cards */}
-            <div className="flex flex-col gap-2.5">
+            {/* Leaderboard — flat divider rows */}
+            <div className="flex flex-col divide-y divide-outline-variant/50">
               {leaderboard.length === 0 && (
                 <EmptyState
                   icon="leaderboard"
@@ -716,56 +682,32 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                 />
               )}
               {leaderboard.map((driver) => (
-                <div
-                  key={driver.id}
-                  className="bg-white rounded-3xl p-4 shadow-sm border border-slate-200/80 flex items-center justify-between gap-3 hover:border-emerald-500/40 transition-all"
-                >
-                  <div className="flex items-center gap-3 min-w-0">
-                    {/* Rank Badge */}
-                    <div
-                      className={`w-9 h-9 rounded-2xl flex items-center justify-center font-extrabold text-xs shrink-0 ${
-                        driver.rank === 1
-                          ? 'bg-amber-100 text-amber-900 border border-amber-300'
-                          : driver.rank === 2
-                          ? 'bg-slate-200 text-slate-800 border border-slate-300'
-                          : driver.rank === 3
-                          ? 'bg-amber-800/10 text-amber-900 border border-amber-800/20'
-                          : 'bg-slate-100 text-slate-600 border border-slate-200'
-                      }`}
-                    >
-                      #{driver.rank}
-                    </div>
+                <div key={driver.id} className="flex items-center gap-3 py-4">
+                  <span
+                    className={`w-6 text-body font-bold shrink-0 text-center ${
+                      driver.rank <= 3 ? 'text-primary' : 'text-outline'
+                    }`}
+                  >
+                    {driver.rank}
+                  </span>
 
-                    {/* Avatar & Info */}
-                    <img
-                      src={driver.avatar}
-                      alt={driver.name}
-                      className="w-12 h-12 rounded-full object-cover border-2 border-primary/30 shrink-0"
-                    />
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-extrabold text-slate-900 text-sm truncate">
-                          {driver.name}
-                        </h3>
-                        <span className="text-[10.5px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200 shrink-0">
-                          {driver.state}
-                        </span>
-                      </div>
-                      <p className="text-xs text-slate-500 font-medium truncate mt-0.5">
-                        {driver.vehicle}
-                      </p>
-                    </div>
+                  <img
+                    src={driver.avatar}
+                    alt={driver.name}
+                    className="w-10 h-10 rounded-full object-cover shrink-0"
+                  />
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-body font-semibold text-on-surface truncate">
+                      {driver.name}
+                    </h3>
+                    <p className="text-caption text-outline font-medium truncate mt-0.5">
+                      {[driver.state, driver.tier.title, driver.vehicle].filter(Boolean).join('  ·  ')}
+                    </p>
                   </div>
 
-                  {/* Points & Tier Badge */}
-                  <div className="flex flex-col items-end shrink-0">
-                    <div className={`px-2.5 py-1 rounded-full border ${driver.tier.badgeBg} ${driver.tier.badgeColor} ${driver.tier.badgeBorder} flex items-center gap-1 font-extrabold text-[11px] shadow-2xs`}>
-                      <span>{driver.tier.badgeIcon}</span>
-                      <span className="hidden sm:inline">{driver.tier.title}</span>
-                    </div>
-                    <span className="text-xs font-black text-primary mt-1">
-                      {driver.points} pts <span className="text-[10px] text-slate-400 font-medium">({driver.reportsCount} reports)</span>
-                    </span>
+                  <div className="shrink-0 text-right">
+                    <span className="text-body font-bold text-primary">{driver.points}</span>
+                    <span className="text-caption text-outline font-medium"> pts</span>
                   </div>
                 </div>
               ))}
