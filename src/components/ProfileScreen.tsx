@@ -15,6 +15,8 @@ interface ProfileScreenProps {
   onUpdateState?: (newState: string) => void;
   onUpdateProfile?: (updatedUser: Partial<UserProfile>) => void;
   onOpenRoiCalculator?: () => void;
+  onTogglePushNotifications?: () => void;
+  isPushGranted?: boolean;
 }
 
 export const ProfileScreen: React.FC<ProfileScreenProps> = ({
@@ -25,8 +27,14 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   onUpdateState,
   onUpdateProfile,
   onOpenRoiCalculator,
+  onTogglePushNotifications,
+  isPushGranted,
 }) => {
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [notificationsEnabledLocal, setNotificationsEnabledLocal] = useState(true);
+  // Prefer the real browser push-permission state when the parent wires it in;
+  // fall back to a local toggle otherwise.
+  const notificationsEnabled = onTogglePushNotifications ? Boolean(isPushGranted) : notificationsEnabledLocal;
+  const handleToggleNotifications = onTogglePushNotifications ?? (() => setNotificationsEnabledLocal((v) => !v));
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
@@ -440,7 +448,8 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
               </div>
 
               <button
-                onClick={() => setNotificationsEnabled(!notificationsEnabled)}
+                onClick={handleToggleNotifications}
+                aria-pressed={notificationsEnabled}
                 className={`w-12 h-6 rounded-full transition-colors relative flex items-center px-0.5 ${
                   notificationsEnabled ? 'bg-primary' : 'bg-surface-container-high'
                 }`}
