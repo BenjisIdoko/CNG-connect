@@ -298,7 +298,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
         html: `
           <div class="relative group cursor-pointer flex flex-col items-center">
             <div class="px-2 py-1 rounded-full text-[10px] font-black text-white shadow-md flex items-center gap-1 transition-transform transform ${pillBorder} ${pillOpacity} ${isSelected ? 'scale-125 ring-2 ring-white' : ''}" style="background-color: ${colorClass};" title="${isApprox ? 'Approximate location' : ''}">
-              <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+              ${st.status !== 'unknown' ? '<span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>' : ''}
               <span class="material-symbols-outlined text-[12px]">${iconSymbol}</span>
               <span>${isApprox ? '~' : ''}${displayText}</span>
             </div>
@@ -452,6 +452,10 @@ export const MapScreen: React.FC<MapScreenProps> = ({
     }
   };
 
+  // True only when at least one visible station carries a real driver report
+  // (anything other than 'unknown'). Drives whether the "live" pulse shows.
+  const hasLiveData = filteredStations.some((s) => s.status !== 'unknown');
+
   const activeFilterCount =
     (activeFilter !== 'all' ? 1 : 0) +
     (activeCity !== 'all' ? 1 : 0) +
@@ -548,7 +552,11 @@ export const MapScreen: React.FC<MapScreenProps> = ({
             <div className="w-10 h-1.25 bg-outline-variant rounded-full mb-2" />
             <div className="w-full flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-status-green animate-pulse" />
+                <span
+                  className={`w-2.5 h-2.5 rounded-full ${
+                    hasLiveData ? 'bg-status-green animate-pulse' : 'bg-outline-variant'
+                  }`}
+                />
                 <h3 className="font-extrabold text-body-lg text-on-surface">
                   {filteredStations.length}{' '}
                   {stationTypeFilter === 'ev_charging'

@@ -18,45 +18,29 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
     {
       id: 'stations',
       title: 'Find CNG Refilling Stations',
-      subtitle: 'Real-Time Availability & Pressure',
       description:
         'Locate CNG stations across Nigeria. Check live pump pressure (bar), queue wait times, and verified gas-availability updates reported directly by drivers.',
-      icon: 'local_gas_station',
-      badge: 'Live Station Finder',
-      accentColor: 'from-primary to-deep-teal',
       image: '/onboarding/slide-stations.jpg',
     },
     {
       id: 'gps',
       title: 'Accurate GPS & Live Distances',
-      subtitle: 'Automatic Nearest Station Sorting',
       description:
         'Get real-time distances (km) and drive times to the nearest stations and conversion centres.',
-      icon: 'near_me',
-      badge: 'Live Geolocation',
-      accentColor: 'from-deep-teal to-[#00281F]',
       image: '/onboarding/slide-gps.jpg',
     },
     {
       id: 'community',
       title: 'State Alerts & Proximity Chat',
-      subtitle: 'Connected CNG Driver Network',
       description:
         'Get instant alerts when nearby stations restock, and chat with other drivers refilling alongside you.',
-      icon: 'campaign',
-      badge: 'Driver Community',
-      accentColor: 'from-on-primary-container to-[#003828]',
       image: '/onboarding/slide-community.jpg',
     },
     {
       id: 'workshops',
       title: 'Access CNG Conversion Centres',
-      subtitle: 'Certified Technicians & Workshops',
       description:
         'Browse CNG-accredited conversion centres in all 36 states. Verify registration codes, call technicians directly, and schedule cylinder inspections.',
-      icon: 'build_circle',
-      badge: 'Pi-CNG Accredited',
-      accentColor: 'from-primary to-status-green',
       image: '/onboarding/slide-workshops.jpg',
     },
   ];
@@ -90,9 +74,9 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
       </div>
 
       {/* Top Header Bar */}
-      <div className="relative z-10 p-5 pt-8 max-w-xl mx-auto w-full flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl bg-white/90 p-1 shadow-md flex items-center justify-center">
+      <div className="relative z-10 p-4 pt-8 max-w-xl mx-auto w-full flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2 shrink-0 whitespace-nowrap">
+          <div className="w-8 h-8 rounded-xl bg-white/90 p-1 shadow-md flex items-center justify-center shrink-0">
             <img src={ASSETS.logo} alt="CNG-Connect Logo" className="w-full h-full object-contain" />
           </div>
           <span className="text-[20px] font-extrabold text-white tracking-tight">
@@ -100,51 +84,28 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
           </span>
         </div>
 
-        <div className="flex items-center gap-2">
-          {onExploreAsGuest && (
-            <button
-              onClick={onExploreAsGuest}
-              className="h-9 px-3.5 text-[12.5px] font-bold text-status-green hover:text-white bg-status-green/10 hover:bg-status-green/20 rounded-full backdrop-blur-md transition-all active:scale-95 border border-status-green/30 flex items-center justify-center whitespace-nowrap"
-            >
-              <span>Explore</span>
-            </button>
-          )}
-          <button
-            onClick={onStartLogin}
-            className="h-9 px-3.5 text-[12.5px] font-semibold text-white/90 hover:text-white bg-white/10 hover:bg-white/20 rounded-full backdrop-blur-md transition-all active:scale-95 border border-white/15 flex items-center justify-center gap-1.5 whitespace-nowrap"
-          >
-            <span>Log In</span>
-            <span className="material-symbols-outlined text-[15px]">login</span>
-          </button>
-        </div>
+        <button
+          onClick={onStartLogin}
+          className="shrink-0 h-9 px-4 text-[12.5px] font-semibold text-white/90 hover:text-white bg-white/10 hover:bg-white/20 rounded-full backdrop-blur-md transition-all active:scale-95 border border-white/15 flex items-center justify-center gap-1 whitespace-nowrap"
+        >
+          <span>Log In</span>
+          <span className="material-symbols-outlined text-[15px]">login</span>
+        </button>
       </div>
 
       {/* Main Slide Content Card */}
       <div className="relative z-10 max-w-xl mx-auto w-full px-6 flex-1 flex flex-col justify-end pb-8">
-        <div className="animate-fade-in space-y-4">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-1.5 bg-status-green/20 border border-status-green/40 px-3 py-1 rounded-full text-status-green text-[11px] font-bold uppercase tracking-wider backdrop-blur-md">
-            <span className="material-symbols-outlined text-[15px]">{activeSlide.icon}</span>
-            <span>{activeSlide.badge}</span>
-          </div>
+        <div className="animate-fade-in space-y-3">
+          <h1 className="text-[24px] sm:text-[28px] font-bold text-white leading-tight tracking-tight">
+            {activeSlide.title}
+          </h1>
 
-          {/* Title & Subtitle */}
-          <div>
-            <span className="text-status-green text-[13px] font-semibold block mb-1">
-              {activeSlide.subtitle}
-            </span>
-            <h1 className="text-[26px] sm:text-[30px] font-bold text-white leading-tight tracking-tight">
-              {activeSlide.title}
-            </h1>
-          </div>
-
-          {/* Description */}
           <p className="text-[14px] font-normal text-slate-300 leading-relaxed max-w-md">
             {activeSlide.description}
           </p>
 
           {/* Slide Indicator Dots */}
-          <div className="flex items-center gap-2 pt-2">
+          <div className="flex items-center gap-2 pt-1">
             {slides.map((s, idx) => (
               <button
                 key={s.id}

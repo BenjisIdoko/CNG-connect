@@ -18,7 +18,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onOpenRoiCalculator,
 }) => {
   const navItems = [
-    { id: 'map' as const, label: 'Map & Stations', icon: 'map', badge: 'Live' },
+    { id: 'map' as const, label: 'Map & Stations', icon: 'map' },
     { id: 'conversions' as const, label: 'Conversion Centres', icon: 'build_circle' },
     { id: 'community' as const, label: 'Driver Community', icon: 'forum' },
     { id: 'profile' as const, label: 'My Profile', icon: 'person' },
@@ -68,15 +68,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </span>
                 <span>{item.label}</span>
               </div>
-              {item.badge && (
-                <span
-                  className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase ${
-                    isActive ? 'bg-white/20 text-white' : 'bg-emerald-100 text-emerald-800'
-                  }`}
-                >
-                  {item.badge}
-                </span>
-              )}
             </button>
           );
         })}
