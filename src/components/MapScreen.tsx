@@ -456,7 +456,9 @@ export const MapScreen: React.FC<MapScreenProps> = ({
     (activeFilter !== 'all' ? 1 : 0) +
     (activeCity !== 'all' ? 1 : 0) +
     (searchQuery.trim() !== '' ? 1 : 0) +
-    (minPressure > 0 ? 1 : 0);
+    (minPressure > 0 ? 1 : 0) +
+    (maxDistanceKm > 0 ? 1 : 0) +
+    (stationTypeFilter !== 'all' ? 1 : 0);
 
   return (
     <div className="relative w-full h-[calc(100vh-4rem)] overflow-hidden bg-surface-container-low lg:flex lg:flex-row">
@@ -471,8 +473,8 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       )}
 
       {/* Mobile-Only Floating Search Bar Container (< lg:) */}
-      <div className="lg:hidden relative z-30 p-4 max-w-xl mx-auto flex flex-col gap-2 pointer-events-auto">
-        {/* Floating Search Pill Bar */}
+      <div className="lg:hidden relative z-30 p-4 max-w-xl mx-auto pointer-events-auto">
+        {/* Floating Search Pill Bar — single row: search + filter + locate */}
         <div className="flex items-center bg-white/95 backdrop-blur-xl rounded-full shadow-[0_6px_24px_rgba(0,0,0,0.08)] border border-slate-200/80 p-2 pl-4 gap-2 transition-all focus-within:ring-2 focus-within:ring-emerald-500/30">
           <span className="material-symbols-outlined text-primary text-[20px] shrink-0">
             search
@@ -524,53 +526,6 @@ export const MapScreen: React.FC<MapScreenProps> = ({
               </span>
             </button>
           </div>
-        </div>
-
-        {/* Station Type Filter Pills & Suggest Station Action Button */}
-        <div className="flex items-center gap-1.5 overflow-x-auto hide-scrollbar pt-0.5">
-          <button
-            onClick={() => setStationTypeFilter('all')}
-            className={`px-3.5 py-1.5 rounded-full text-micro font-extrabold transition-all shadow-xs flex items-center gap-1 shrink-0 ${
-              stationTypeFilter === 'all'
-                ? 'bg-slate-900 text-white ring-2 ring-slate-900/20'
-                : 'bg-white/95 backdrop-blur-md text-slate-700 hover:bg-white border border-slate-200'
-            }`}
-          >
-            <span>All Stations</span>
-          </button>
-
-          <button
-            onClick={() => setStationTypeFilter('cng')}
-            className={`px-3.5 py-1.5 rounded-full text-micro font-extrabold transition-all shadow-xs flex items-center gap-1 shrink-0 ${
-              stationTypeFilter === 'cng'
-                ? 'bg-emerald-600 text-white ring-2 ring-emerald-600/30'
-                : 'bg-white/95 backdrop-blur-md text-emerald-800 hover:bg-white border border-emerald-200'
-            }`}
-          >
-            <span className="material-symbols-outlined text-[14px]">local_gas_station</span>
-            <span>CNG Refuelling</span>
-          </button>
-
-          <button
-            onClick={() => setStationTypeFilter('ev_charging')}
-            className={`px-3.5 py-1.5 rounded-full text-micro font-extrabold transition-all shadow-xs flex items-center gap-1 shrink-0 ${
-              stationTypeFilter === 'ev_charging'
-                ? 'bg-sky-600 text-white ring-2 ring-sky-600/30'
-                : 'bg-white/95 backdrop-blur-md text-sky-900 hover:bg-white border border-sky-200'
-            }`}
-          >
-            <span className="material-symbols-outlined text-[14px]">bolt</span>
-            <span>⚡ EV Charging</span>
-          </button>
-
-          <button
-            onClick={() => setIsSuggestModalOpen(true)}
-            className="ml-auto px-3.5 py-1.5 rounded-full bg-primary/95 hover:bg-primary text-white text-micro font-extrabold shadow-md flex items-center gap-1 shrink-0 active:scale-95 transition-all"
-            title="Suggest a new CNG or EV station"
-          >
-            <span className="material-symbols-outlined text-[14px]">add_location_alt</span>
-            <span>+ Suggest Station</span>
-          </button>
         </div>
       </div>
 
@@ -632,6 +587,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                       setActiveCity('all');
                       setMinPressure(0);
                       setMaxDistanceKm(0);
+                      setStationTypeFilter('all');
                     }}
                     className="mt-1 px-5 py-2.5 bg-primary hover:opacity-95 text-on-primary text-caption font-extrabold rounded-full shadow-md active:scale-95 transition-all"
                   >
@@ -756,6 +712,14 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                         <span>Load More Stations (Showing {visibleCount} of {filteredStations.length})</span>
                       </button>
                     )}
+
+                    <button
+                      onClick={() => setIsSuggestModalOpen(true)}
+                      className="w-full mt-1 py-2.5 text-primary text-caption font-bold flex items-center justify-center gap-1.5 active:scale-[0.98] transition-all"
+                    >
+                      <span className="material-symbols-outlined text-[16px]">add_location_alt</span>
+                      <span>Can&apos;t find a station? Suggest one</span>
+                    </button>
                   </div>
 
                   {/* Secondary Horizontal Carousel (Shown ONLY in Expanded Mode below the vertical list) */}
@@ -974,6 +938,36 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       {/* Filter Modal */}
       <Modal isOpen={isFilterModalOpen} onClose={() => setIsFilterModalOpen(false)} title="Filter Stations">
         <div className="flex flex-col gap-4 py-1 text-on-surface">
+          {/* Station Type */}
+          <div>
+            <label className="block text-caption font-bold text-slate-700 mb-2">Station Type</label>
+            <div className="grid grid-cols-3 gap-1 p-1 bg-slate-100 rounded-xl">
+              {([
+                { key: 'all', label: 'All', icon: null },
+                { key: 'cng', label: 'CNG', icon: 'local_gas_station' },
+                { key: 'ev_charging', label: 'EV', icon: 'bolt' },
+              ] as const).map((opt) => (
+                <button
+                  key={opt.key}
+                  type="button"
+                  onClick={() => setStationTypeFilter(opt.key)}
+                  className={`py-2 rounded-lg text-caption font-extrabold transition-all flex items-center justify-center gap-1 ${
+                    stationTypeFilter === opt.key
+                      ? opt.key === 'cng'
+                        ? 'bg-emerald-600 text-white shadow-2xs'
+                        : opt.key === 'ev_charging'
+                        ? 'bg-sky-600 text-white shadow-2xs'
+                        : 'bg-white text-slate-900 shadow-2xs'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  {opt.icon && <span className="material-symbols-outlined text-[14px]">{opt.icon}</span>}
+                  <span>{opt.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* Minimum Pressure */}
           <div>
             <div className="flex justify-between text-caption font-bold text-slate-700 mb-1.5">
@@ -1061,6 +1055,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                 setMinPressure(0);
                 setMaxDistanceKm(0);
                 setActiveFilter('all');
+                setStationTypeFilter('all');
                 setIsFilterModalOpen(false);
               }}
               className="flex-1 py-3 text-slate-700 font-extrabold text-body bg-slate-100 hover:bg-slate-200 rounded-full active:scale-95 transition-all"
