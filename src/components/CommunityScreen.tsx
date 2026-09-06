@@ -6,6 +6,14 @@ import type { LeaderboardDriver } from '../utils/reputationEngine';
 import { apiService } from '../services/apiService';
 import { isSameState } from '../utils/proximityAlertEngine';
 
+const STATUS_OPTIONS: { id: string; label: string; dotColor?: string }[] = [
+  { id: 'all', label: 'All Statuses' },
+  { id: 'full', label: 'Full Stock', dotColor: 'bg-status-green' },
+  { id: 'queue', label: 'Queuing', dotColor: 'bg-status-orange' },
+  { id: 'low', label: 'Low Pressure', dotColor: 'bg-status-orange' },
+  { id: 'out', label: 'Out of Gas', dotColor: 'bg-status-red' },
+];
+
 interface CommunityScreenProps {
   posts: CommunityPost[];
   stations?: GasStation[];
@@ -41,6 +49,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
   const [likeOverrides, setLikeOverrides] = useState<Record<string, { isLiked: boolean; likes: number }>>({});
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [showInfoSheet, setShowInfoSheet] = useState(false);
+  const [showStatusMenu, setShowStatusMenu] = useState(false);
   const [leaderboard, setLeaderboard] = useState<LeaderboardDriver[]>([]);
   const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -236,49 +245,68 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
         {/* MAIN TAB 1: Station Groups List & Scoping Notice */}
         {activeMainTab === 'station_groups' ? (
           <div className="flex flex-col gap-3">
-            <div className="flex items-center justify-between pt-1">
-              <div className="flex items-center gap-2">
-                <h2 className="text-title font-bold text-on-surface tracking-tight">
-                  All Station Groups ({filteredStations.length})
+            <div className="flex items-center justify-between gap-2 pt-1">
+              <div className="flex items-center gap-1.5 min-w-0">
+                <h2 className="text-title font-bold text-on-surface tracking-tight truncate">
+                  Station Groups ({filteredStations.length})
                 </h2>
                 <button
                   onClick={() => setShowInfoSheet(true)}
                   aria-label="Station Group Policy Info"
-                  className="w-6 h-6 rounded-full bg-emerald-100 hover:bg-emerald-200 text-primary flex items-center justify-center transition-all active:scale-95"
+                  className="w-6 h-6 rounded-full bg-emerald-100 hover:bg-emerald-200 text-primary flex items-center justify-center transition-all active:scale-95 shrink-0"
                   title="Policy Info"
                 >
                   <span className="material-symbols-outlined text-[15px]">info</span>
                 </button>
               </div>
-              <span className="text-micro font-semibold text-primary bg-emerald-100 px-2.5 py-0.5 rounded-xl shrink-0 whitespace-nowrap">
-                Active Discussions
-              </span>
-            </div>
-
-            {/* Status Quick Filter Pills */}
-            <div className="flex overflow-x-auto gap-1.5 pb-1 hide-scrollbar">
-              {[
-                { id: 'all', label: 'All Statuses' },
-                { id: 'full', label: 'Full Stock', dotColor: 'bg-status-green' },
-                { id: 'queue', label: 'Queuing', dotColor: 'bg-status-orange' },
-                { id: 'low', label: 'Low Pressure', dotColor: 'bg-status-orange' },
-                { id: 'out', label: 'Out of Gas', dotColor: 'bg-status-red' },
-              ].map((st) => (
+              {/* Status filter — collapsed into a single control */}
+              <div className="relative shrink-0">
                 <button
-                  key={st.id}
-                  onClick={() => setStatusFilter(st.id)}
-                  className={`shrink-0 px-3 py-1 rounded-xl text-micro font-semibold transition-all shadow-2xs active:scale-95 flex items-center gap-1.5 ${
-                    statusFilter === st.id
-                      ? 'bg-primary text-white shadow-xs'
-                      : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
+                  onClick={() => setShowStatusMenu((v) => !v)}
+                  aria-label="Filter station groups by status"
+                  className={`flex items-center gap-1 text-micro font-semibold px-2 py-1.5 rounded-xl border transition-colors active:scale-95 ${
+                    statusFilter === 'all'
+                      ? 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+                      : 'bg-primary text-white border-primary'
                   }`}
                 >
-                  {st.dotColor && (
-                    <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${st.dotColor}`} />
+                  <span className="material-symbols-outlined text-[16px]">tune</span>
+                  {statusFilter !== 'all' && (
+                    <span className="whitespace-nowrap">
+                      {STATUS_OPTIONS.find((o) => o.id === statusFilter)?.label}
+                    </span>
                   )}
-                  <span className="whitespace-nowrap">{st.label}</span>
+                  <span className="material-symbols-outlined text-[14px]">
+                    {showStatusMenu ? 'expand_less' : 'expand_more'}
+                  </span>
                 </button>
-              ))}
+
+                {showStatusMenu && (
+                  <>
+                    <div className="fixed inset-0 z-30" onClick={() => setShowStatusMenu(false)} />
+                    <div className="absolute right-0 top-full mt-1.5 z-40 w-44 bg-white rounded-2xl border border-slate-200 shadow-lg py-1 overflow-hidden">
+                      {STATUS_OPTIONS.map((o) => (
+                        <button
+                          key={o.id}
+                          onClick={() => {
+                            setStatusFilter(o.id);
+                            setShowStatusMenu(false);
+                          }}
+                          className={`w-full flex items-center gap-2 px-3 py-2 text-caption font-medium text-left transition-colors ${
+                            statusFilter === o.id ? 'bg-emerald-50 text-primary' : 'text-slate-700 hover:bg-slate-50'
+                          }`}
+                        >
+                          <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${o.dotColor ?? 'bg-transparent'}`} />
+                          <span>{o.label}</span>
+                          {statusFilter === o.id && (
+                            <span className="material-symbols-outlined text-[16px] ml-auto">check</span>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
 
             {/* Station Groups Cards Grid */}
