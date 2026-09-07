@@ -1,59 +1,70 @@
 /**
- * Station pin enrichment via Mapbox Geocoding v6.
+ * Station pin enrichment via OpenStreetMap (Overpass) proximity matching.
  *
- * ~63% of the stations in Supabase are pinned at their city centroid (the
- * Nominatim pass in scripts/geocode-stations.ts could not resolve Nigerian CNG
- * addresses below city level). This script re-geocodes each station with
- * Mapbox — which has real POI coverage for the named chains (NIPCO, Bovas,
- * NNPC, TotalEnergies, Qoray, SAGLEV) — records an honest precision tier, and
- * writes the improved pins back to the `stations` table.
+ * ~63% of the stations in Supabase sit at their city centroid (Nominatim could
+ * not resolve Nigerian CNG addresses below city level, and Mapbox has no
+ * filling-station POI coverage for Nigeria). OSM *does* have most fuel stations
+ * mapped as `amenity=fuel` nodes — just generically named ("NIPCO", "NNPC",
+ * "Total") and rarely CNG-tagged. So for each station this script pulls every
+ * fuel node within a few km of the current (bad) pin and picks the best match
+ * by brand-name + CNG tag + distance, then writes the improved pin back.
  *
- * Mapbox free tier: 100k permanent geocodes/month, no billing card required.
+ * Free, no API key.
  *
  * Usage:
- *   # dry run (default): geocode everything, write a report, touch nothing
- *   MAPBOX_TOKEN=pk.xxx \
+ *   # dry run (default): match everything, write a report, touch nothing
  *   SUPABASE_URL=https://xxx.supabase.co \
- *   SUPABASE_SERVICE_ROLE_KEY=xxx \
+ *   SUPABASE_ANON_KEY=xxx \
  *   npx tsx scripts/enrich-station-pins.ts
  *
- *   # apply the changes to Supabase
- *   ... same env ... npx tsx scripts/enrich-station-pins.ts --commit
+ *   # apply the changes to Supabase (needs the service-role key)
+ *   SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... \
+ *   npx tsx scripts/enrich-station-pins.ts --commit
  *
- *   # only process N stations (useful while iterating)
- *   ... --limit=10
+ *   # tune the search radius / cap the run
+ *   ... --radius=8000 --limit=20
  *
- * Responses are cached in scratch/mapbox-cache.json so re-runs cost nothing and
- * only hit Mapbox for queries it has not seen. A full before-snapshot of every
- * row it would change is written to scratch/pin-enrichment.before.json.
+ * Overpass responses are cached in scratch/overpass-cache.json so re-runs are
+ * free. A before-snapshot of every row it would change is written to
+ * scratch/pin-enrichment.before.json.
  */
 import fs from 'fs';
 import path from 'path';
 import { createClient } from '@supabase/supabase-js';
 
-const MAPBOX_TOKEN = process.env.MAPBOX_TOKEN;
+const COMMIT = process.argv.includes('--commit');
+
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const SUPABASE_KEY = COMMIT ? SERVICE_ROLE_KEY : SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
 
-if (!MAPBOX_TOKEN || !SUPABASE_URL || !SERVICE_ROLE_KEY) {
-  console.error('Set MAPBOX_TOKEN, SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.');
+if (!SUPABASE_URL || !SUPABASE_KEY) {
+  console.error(
+    COMMIT
+      ? 'Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (required for --commit).'
+      : 'Set SUPABASE_URL and SUPABASE_ANON_KEY (or SUPABASE_SERVICE_ROLE_KEY).'
+  );
   process.exit(1);
 }
 
-const COMMIT = process.argv.includes('--commit');
+const radiusArg = process.argv.find((a) => a.startsWith('--radius='));
+const RADIUS_M = radiusArg ? parseInt(radiusArg.split('=')[1], 10) : 6000;
 const limitArg = process.argv.find((a) => a.startsWith('--limit='));
 const LIMIT = limitArg ? parseInt(limitArg.split('=')[1], 10) : undefined;
 
-const CACHE_PATH = path.resolve(process.cwd(), 'scratch/mapbox-cache.json');
+const FUEL_CACHE_PATH = path.resolve(process.cwd(), 'scratch/overpass-fuel-ng.json');
 const REPORT_PATH = path.resolve(process.cwd(), 'scratch/pin-enrichment-report.md');
 const BEFORE_PATH = path.resolve(process.cwd(), 'scratch/pin-enrichment.before.json');
 const PROPOSED_PATH = path.resolve(process.cwd(), 'scratch/pin-enrichment.proposed.json');
 
-const MAPBOX_ENDPOINT = 'https://api.mapbox.com/search/geocode/v6/forward';
-const REQUEST_DELAY_MS = 150; // Mapbox allows 600 req/min; stay well under.
-
-// Rough Nigeria bounding box — a result outside this is a bad match.
-const NG_BBOX = { minLat: 4.0, maxLat: 14.0, minLng: 2.5, maxLng: 15.0 };
+const OVERPASS_MIRRORS = [
+  'https://overpass-api.de/api/interpreter',
+  'https://overpass.kumi.systems/api/interpreter',
+  'https://maps.mail.ru/osm/tools/overpass/api/interpreter',
+  'https://overpass.private.coffee/api/interpreter',
+];
+// Nigeria bounding box — one bulk query for every fuel station, matched locally.
+const NG_BBOX = '4.0,2.5,14.0,15.0';
 
 type PrecisionTier = 'source_exact' | 'rooftop' | 'street' | 'area' | 'city' | 'unlocated';
 
@@ -64,21 +75,6 @@ const ACCURACY_RADIUS_M: Record<PrecisionTier, number> = {
   area: 700,
   city: 4000,
   unlocated: 15000,
-};
-
-// Mapbox v6 feature_type -> our precision tier.
-const FEATURE_TIER: Record<string, PrecisionTier> = {
-  poi: 'rooftop',
-  address: 'rooftop',
-  street: 'street',
-  block: 'street',
-  neighborhood: 'area',
-  locality: 'area',
-  place: 'city',
-  district: 'city',
-  postcode: 'city',
-  region: 'city',
-  country: 'unlocated',
 };
 
 interface StationRow {
@@ -94,23 +90,14 @@ interface StationRow {
   location_precision: string | null;
 }
 
-interface MapboxFeature {
-  properties: {
-    feature_type: string;
-    name?: string;
-    full_address?: string;
-    coordinates?: { longitude: number; latitude: number };
-    match_code?: { confidence?: string };
-  };
-  geometry?: { coordinates: [number, number] };
+interface OsmEl {
+  type: 'node' | 'way' | 'relation';
+  id: number;
+  lat?: number;
+  lon?: number;
+  center?: { lat: number; lon: number };
+  tags?: Record<string, string>;
 }
-
-interface CacheEntry {
-  query: string;
-  feature: MapboxFeature | null;
-  fetchedAt: string;
-}
-type Cache = Record<string, CacheEntry>;
 
 function loadJson<T>(p: string, fallback: T): T {
   try {
@@ -132,97 +119,145 @@ function haversineMeters(a: { lat: number; lng: number }, b: { lat: number; lng:
   return 2 * R * Math.asin(Math.sqrt(s));
 }
 
-function normStateForQuery(state: string | null): string {
-  if (!state) return '';
-  if (/fct|abuja/i.test(state)) return 'Federal Capital Territory';
-  return state;
+const STOPWORDS = new Set([
+  'cng',
+  'gas',
+  'ltd',
+  'limited',
+  'plc',
+  'nig',
+  'nigeria',
+  'station',
+  'filling',
+  'fuel',
+  'energy',
+  'oil',
+  'retail',
+  'group',
+  'mega',
+  'the',
+  'and',
+  'autogas',
+]);
+
+function tokens(s: string | null | undefined): string[] {
+  if (!s) return [];
+  return s
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .split(/\s+/)
+    .filter((t) => t.length > 2 && !STOPWORDS.has(t));
 }
 
-/** "NIPCO Gas Limited - Warri-Sapele Rd" -> landmark "Warri-Sapele Rd" */
-function landmarkFromName(name: string): string {
-  const dash = name.split(/[-–—]/).slice(1).join('-').trim();
-  return dash || '';
+/** "NIPCO Gas Limited - Warri-Sapele Rd" -> ["warri", "sapele", "rd"-dropped] */
+function landmarkTokens(name: string): string[] {
+  const after = name.split(/[-–—]/).slice(1).join(' ');
+  return tokens(after).filter((t) => !['road', 'rd', 'street', 'st', 'ave', 'way', 'expressway'].includes(t));
 }
 
-function tokenize(s: string): Set<string> {
-  return new Set(
-    s
-      .toLowerCase()
-      .replace(/[^a-z0-9\s]/g, ' ')
-      .split(/\s+/)
-      .filter((t) => t.length > 2 && !['cng', 'gas', 'ltd', 'limited', 'station', 'the', 'and'].includes(t))
-  );
-}
-
-function nameOverlap(ours: string, theirs: string): number {
-  const a = tokenize(ours);
-  const b = tokenize(theirs);
-  if (a.size === 0 || b.size === 0) return 0;
-  let hits = 0;
-  for (const t of a) if (b.has(t)) hits++;
-  return hits / a.size;
-}
-
-/** Most- to least-specific Mapbox queries for a station. */
-function buildQueries(st: StationRow): { q: string; lastResort: boolean }[] {
-  const stateQ = normStateForQuery(st.state);
-  const city = st.city || '';
-  const fuelWord = st.station_type === 'ev_charging' ? 'EV charging station' : 'CNG station';
-  const landmark = landmarkFromName(st.name);
-  const parts = (arr: (string | null | undefined)[]) => arr.filter(Boolean).join(', ');
-
-  const list: { q: string; lastResort: boolean }[] = [];
-  list.push({ q: parts([st.name, city, stateQ, 'Nigeria']), lastResort: false });
-  if (st.operator) {
-    list.push({ q: parts([st.operator, fuelWord, landmark || city, stateQ, 'Nigeria']), lastResort: false });
-  }
-  if (st.address) list.push({ q: parts([st.address, 'Nigeria']), lastResort: false });
-  if (landmark && city) list.push({ q: parts([landmark, city, stateQ, 'Nigeria']), lastResort: false });
-  list.push({ q: parts([city || stateQ, stateQ, 'Nigeria']), lastResort: true });
-
-  const seen = new Set<string>();
-  return list.filter((c) => c.q && !seen.has(c.q) && seen.add(c.q));
-}
-
-async function geocode(query: string, cache: Cache): Promise<MapboxFeature | null> {
-  const key = query.toLowerCase().trim();
-  if (cache[key]) return cache[key].feature;
-
-  const url =
-    `${MAPBOX_ENDPOINT}?q=${encodeURIComponent(query)}` +
-    `&country=ng&limit=1&types=poi,address,street,neighborhood,locality,place` +
-    `&access_token=${MAPBOX_TOKEN}`;
-
-  let feature: MapboxFeature | null = null;
-  try {
-    const res = await fetch(url);
-    if (res.ok) {
-      const body = (await res.json()) as { features?: MapboxFeature[] };
-      feature = body.features?.[0] ?? null;
-    } else {
-      console.warn(`[mapbox] HTTP ${res.status} for "${query}"`);
-    }
-  } catch (err) {
-    console.warn(`[mapbox] request failed for "${query}":`, err instanceof Error ? err.message : err);
-  }
-
-  cache[key] = { query, feature, fetchedAt: new Date().toISOString() };
-  await sleep(REQUEST_DELAY_MS);
-  return feature;
-}
-
-function coordsOf(f: MapboxFeature): { lat: number; lng: number } | null {
-  const c = f.properties.coordinates;
-  if (c && typeof c.latitude === 'number') return { lat: c.latitude, lng: c.longitude };
-  const g = f.geometry?.coordinates;
-  if (g && g.length === 2) return { lat: g[1], lng: g[0] };
+function osmCoords(el: OsmEl): { lat: number; lng: number } | null {
+  if (typeof el.lat === 'number' && typeof el.lon === 'number') return { lat: el.lat, lng: el.lon };
+  if (el.center) return { lat: el.center.lat, lng: el.center.lon };
   return null;
 }
 
-function inNigeria(p: { lat: number; lng: number }): boolean {
-  return (
-    p.lat >= NG_BBOX.minLat && p.lat <= NG_BBOX.maxLat && p.lng >= NG_BBOX.minLng && p.lng <= NG_BBOX.maxLng
-  );
+/**
+ * One bulk Overpass query for every fuel station in the Nigeria bbox, cached to
+ * disk. Public Overpass instances rate-limit hard, so this makes exactly one
+ * network request (per fresh cache) instead of 113 `around:` queries.
+ */
+async function fetchAllFuelNodes(): Promise<OsmEl[]> {
+  const cached = loadJson<{ fetchedAt: string; elements: OsmEl[] } | null>(FUEL_CACHE_PATH, null);
+  if (cached && cached.elements.length > 0) {
+    console.log(`Using cached OSM fuel set (${cached.elements.length} nodes, fetched ${cached.fetchedAt}).`);
+    return cached.elements;
+  }
+
+  // Named fuel stations only — the payload for *all* amenity=fuel in Nigeria is
+  // too heavy for the loaded public instances, and unnamed nodes can't be
+  // brand-matched anyway.
+  const query = `[out:json][timeout:120];nwr["amenity"="fuel"]["name"](${NG_BBOX});out center tags;`;
+  for (let m = 0; m < OVERPASS_MIRRORS.length; m++) {
+    console.log(`[overpass] fetching all NG fuel nodes via mirror ${m} (${OVERPASS_MIRRORS[m]}) ...`);
+    try {
+      const res = await fetch(OVERPASS_MIRRORS[m], {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `data=${encodeURIComponent(query)}`,
+      });
+      if (res.ok) {
+        const body = (await res.json()) as { elements?: OsmEl[] };
+        const elements = (body.elements ?? []).filter((e) => e.tags?.amenity === 'fuel');
+        fs.mkdirSync(path.dirname(FUEL_CACHE_PATH), { recursive: true });
+        fs.writeFileSync(
+          FUEL_CACHE_PATH,
+          JSON.stringify({ fetchedAt: new Date().toISOString(), elements }, null, 2)
+        );
+        console.log(`[overpass] got ${elements.length} fuel nodes; cached to ${FUEL_CACHE_PATH}`);
+        return elements;
+      }
+      console.warn(`[overpass] HTTP ${res.status} from mirror ${m}; trying next`);
+    } catch (err) {
+      console.warn(`[overpass] mirror ${m} failed:`, err instanceof Error ? err.message : err);
+    }
+    await sleep(4000);
+  }
+  console.error('[overpass] every mirror failed. Try again later, or fetch the query manually:');
+  console.error(`  ${query}`);
+  process.exit(1);
+}
+
+interface Scored {
+  el: OsmEl;
+  coords: { lat: number; lng: number };
+  distM: number;
+  score: number;
+  brandHit: boolean;
+  cngHit: boolean;
+  osmName: string;
+}
+
+function scoreCandidate(st: StationRow, el: OsmEl, oldPin: { lat: number; lng: number }): Scored | null {
+  const coords = osmCoords(el);
+  if (!coords) return null;
+  const t = el.tags ?? {};
+  const distM = haversineMeters(oldPin, coords);
+
+  const opTokens = tokens(st.operator);
+  const nameTok = tokens(st.name).filter((x) => !opTokens.includes(x));
+  const landTok = landmarkTokens(st.name);
+  const osmBrandName = `${t.name ?? ''} ${t.brand ?? ''} ${t.operator ?? ''}`.toLowerCase();
+  const osmAddr = `${t['addr:street'] ?? ''} ${t['addr:suburb'] ?? ''} ${t['addr:place'] ?? ''} ${
+    t['addr:city'] ?? ''
+  }`.toLowerCase();
+
+  const brandHit = opTokens.length > 0 && opTokens.some((tok) => osmBrandName.includes(tok));
+  const cngHit =
+    t['fuel:cng'] === 'yes' ||
+    t['fuel:CNG'] === 'yes' ||
+    t['fuel:compressed_natural_gas'] === 'yes' ||
+    /cng/i.test(t.name ?? '');
+
+  let score = 0;
+  if (brandHit) score += 100;
+  if (cngHit) score += 70;
+  // landmark / neighbourhood tokens matching the OSM address or name
+  const landMatches = [...landTok, ...nameTok].filter(
+    (tok) => osmAddr.includes(tok) || osmBrandName.includes(tok)
+  ).length;
+  score += Math.min(40, landMatches * 20);
+  // distance: full 60 at 0m, 0 at the search radius
+  score += Math.max(0, 60 * (1 - distM / RADIUS_M));
+
+  return {
+    el,
+    coords,
+    distM,
+    score,
+    brandHit,
+    cngHit,
+    osmName: t.name || t.brand || t.operator || '(unnamed fuel)',
+  };
 }
 
 interface Proposal {
@@ -231,14 +266,17 @@ interface Proposal {
   before: { lat: number; lng: number; precision: string | null };
   after: { lat: number; lng: number; precision: PrecisionTier; accuracyRadiusM: number; area: string | null };
   movedM: number;
-  matchedOn: string;
-  mapboxName: string;
+  candidates: number;
+  bestScore: number;
+  runnerUpScore: number;
+  osmName: string;
+  osmMatch: string;
   needsPinReview: boolean;
   note: string;
 }
 
 async function main() {
-  const supabase = createClient(SUPABASE_URL!, SERVICE_ROLE_KEY!);
+  const supabase = createClient(SUPABASE_URL!, SUPABASE_KEY!);
   const { data, error } = await supabase
     .from('stations')
     .select('id,name,address,city,state,lat,lng,operator,station_type,location_precision')
@@ -248,18 +286,16 @@ async function main() {
     process.exit(1);
   }
   const stations = data as StationRow[];
-  console.log(`Loaded ${stations.length} stations from Supabase.`);
+  console.log(`Loaded ${stations.length} stations. Search radius: ${RADIUS_M}m.`);
 
-  const cache = loadJson<Cache>(CACHE_PATH, {});
+  const allFuel = await fetchAllFuelNodes();
+
   const proposals: Proposal[] = [];
   const before: Record<string, unknown>[] = [];
   const tierCounts: Record<string, number> = {};
   let processed = 0;
-  let netCalls = 0;
-  let cacheHits = 0;
 
   for (const st of stations) {
-    // Never overwrite a hand-verified or GPS-confirmed pin.
     if (st.location_precision === 'source_exact' || st.location_precision === 'gps_confirmed') {
       tierCounts[st.location_precision] = (tierCounts[st.location_precision] || 0) + 1;
       continue;
@@ -268,70 +304,55 @@ async function main() {
     processed++;
 
     const oldPin = { lat: Number(st.lat), lng: Number(st.lng) };
-    const queries = buildQueries(st);
+    const scored = allFuel
+      .map((el) => scoreCandidate(st, el, oldPin))
+      .filter((s): s is Scored => s !== null && s.distM <= RADIUS_M)
+      .sort((a, b) => b.score - a.score);
 
-    let feature: MapboxFeature | null = null;
-    let matchedOn = '';
-    let lastResort = false;
-    for (const cand of queries) {
-      const wasCached = Boolean(cache[cand.q.toLowerCase().trim()]);
-      const f = await geocode(cand.q, cache);
-      if (wasCached) cacheHits++;
-      else netCalls++;
-      if (f) {
-        feature = f;
-        matchedOn = cand.q;
-        lastResort = cand.lastResort;
-        break;
-      }
-    }
+    const best = scored[0];
+    const runnerUp = scored[1];
 
     let tier: PrecisionTier = 'unlocated';
     let after = oldPin;
     let area: string | null = null;
     let needsReview = false;
     let note = '';
-    const mapboxName = feature?.properties.name ?? '';
+    let osmMatch = '';
 
-    if (!feature) {
+    if (!best) {
       needsReview = true;
-      note = 'no Mapbox match — pin left as-is';
+      note = `no fuel node within ${RADIUS_M}m — pin left as-is`;
     } else {
-      const c = coordsOf(feature);
-      const ftype = feature.properties.feature_type;
-      const baseTier = lastResort ? 'city' : FEATURE_TIER[ftype] ?? 'city';
+      osmMatch = `${best.osmName}${best.cngHit ? ' [CNG]' : ''}${best.brandHit ? ' [brand]' : ''}`;
+      const strong = best.brandHit || best.cngHit;
+      const nearTie =
+        runnerUp &&
+        best.score - runnerUp.score < 20 &&
+        haversineMeters(best.coords, runnerUp.coords) > 200;
 
-      if (!c || !inNigeria(c)) {
+      if (best.score >= 120 && strong) {
+        after = { lat: Number(best.coords.lat.toFixed(6)), lng: Number(best.coords.lng.toFixed(6)) };
+        tier = best.distM < 80 ? 'rooftop' : 'street';
+        area =
+          best.el.tags?.['addr:street'] ||
+          best.el.tags?.['addr:suburb'] ||
+          best.el.tags?.['addr:place'] ||
+          (landmarkTokens(st.name)[0] ?? null);
+        if (nearTie) {
+          needsReview = true;
+          note = `close 2nd candidate ("${runnerUp!.osmName}", ${Math.round(
+            haversineMeters(best.coords, runnerUp!.coords)
+          )}m away) — verify`;
+        }
+      } else if (best.score >= 70) {
+        after = { lat: Number(best.coords.lat.toFixed(6)), lng: Number(best.coords.lng.toFixed(6)) };
+        tier = 'area';
+        area = best.el.tags?.['addr:suburb'] || best.el.tags?.['addr:place'] || null;
         needsReview = true;
-        note = `result outside Nigeria bbox — pin left as-is`;
+        note = `weak match (score ${Math.round(best.score)}${strong ? '' : ', no brand/CNG tag'}) — verify`;
       } else {
-        after = { lat: Number(c.lat.toFixed(6)), lng: Number(c.lng.toFixed(6)) };
-        tier = baseTier;
-        area = feature.properties.name || landmarkFromName(st.name) || null;
-
-        // Guard against pinning to the wrong business: a POI hit whose name
-        // shares nothing with our operator/name is demoted and flagged.
-        if ((ftype === 'poi' || ftype === 'address') && !lastResort) {
-          const overlap = nameOverlap(`${st.operator ?? ''} ${st.name}`, mapboxName);
-          if (overlap < 0.15) {
-            tier = 'street';
-            needsReview = true;
-            note = `weak name match ("${mapboxName}") — demoted to street, review`;
-          }
-        }
-
-        const conf = feature.properties.match_code?.confidence;
-        if (conf === 'low' && tier === 'rooftop') tier = 'street';
-
-        const moved = haversineMeters(oldPin, after);
-        if (moved > 200_000) {
-          needsReview = true;
-          note = note || `moved ${Math.round(moved / 1000)}km from prior pin — review`;
-        }
-        if (tier === 'city') {
-          needsReview = true;
-          note = note || 'city-level only — no better match found';
-        }
+        needsReview = true;
+        note = `best candidate too weak (score ${Math.round(best.score)}) — pin left as-is`;
       }
     }
 
@@ -345,35 +366,47 @@ async function main() {
       before: { lat: oldPin.lat, lng: oldPin.lng, precision: st.location_precision },
       after: { ...after, precision: tier, accuracyRadiusM: ACCURACY_RADIUS_M[tier], area },
       movedM,
-      matchedOn,
-      mapboxName,
+      candidates: scored.length,
+      bestScore: best ? Math.round(best.score) : 0,
+      runnerUpScore: runnerUp ? Math.round(runnerUp.score) : 0,
+      osmName: best?.osmName ?? '',
+      osmMatch,
       needsPinReview: needsReview,
       note,
     });
 
     console.log(
-      `[pin] ${st.id} "${st.name}" -> ${tier}${needsReview ? ' (review)' : ''}  moved ${movedM}m  via "${matchedOn}"`
+      `[pin] ${st.id} "${st.name}" -> ${tier}${needsReview ? ' (review)' : ''}  ` +
+        `${scored.length} cand, best ${best ? Math.round(best.score) : 0}  moved ${movedM}m  ${osmMatch}`
     );
   }
 
-  fs.mkdirSync(path.dirname(CACHE_PATH), { recursive: true });
-  fs.writeFileSync(CACHE_PATH, JSON.stringify(cache, null, 2));
+  fs.mkdirSync(path.dirname(BEFORE_PATH), { recursive: true });
   fs.writeFileSync(BEFORE_PATH, JSON.stringify(before, null, 2));
   fs.writeFileSync(PROPOSED_PATH, JSON.stringify(proposals, null, 2));
 
   // --- Report ---
   const reviewCount = proposals.filter((p) => p.needsPinReview).length;
   const improved = proposals.filter(
-    (p) => p.after.precision !== 'city' && p.after.precision !== 'unlocated'
+    (p) => p.after.precision === 'rooftop' || p.after.precision === 'street' || p.after.precision === 'area'
+  ).length;
+  const rooftopOrStreet = proposals.filter(
+    (p) => p.after.precision === 'rooftop' || p.after.precision === 'street'
   ).length;
   const lines: string[] = [];
-  lines.push('# Station pin enrichment report (Mapbox v6)');
+  lines.push('# Station pin enrichment report (OSM / Overpass proximity)');
   lines.push('');
   lines.push(`Generated ${new Date().toISOString()}`);
   lines.push(`Mode: ${COMMIT ? 'COMMIT (writes to Supabase)' : 'dry run'}`);
-  lines.push(`Stations processed: ${proposals.length}  (skipped verified: ${(tierCounts.source_exact || 0) + (tierCounts.gps_confirmed || 0)})`);
-  lines.push(`Mapbox requests: ${netCalls}  (cache hits: ${cacheHits})`);
-  lines.push(`Now street-level or better: ${improved} / ${proposals.length}`);
+  lines.push(`Search radius: ${RADIUS_M}m`);
+  lines.push(
+    `Stations processed: ${proposals.length}  (skipped verified: ${
+      (tierCounts.source_exact || 0) + (tierCounts.gps_confirmed || 0)
+    })`
+  );
+  lines.push(`OSM fuel nodes considered: ${allFuel.length}`);
+  lines.push(`Moved to a real OSM fuel node (street/rooftop): ${rooftopOrStreet} / ${proposals.length}`);
+  lines.push(`Any improvement (area or better): ${improved} / ${proposals.length}`);
   lines.push(`Flagged for manual review: ${reviewCount}`);
   lines.push('');
   lines.push('## Precision tier breakdown (after)');
@@ -382,14 +415,17 @@ async function main() {
   lines.push('## Flagged for review');
   const flagged = proposals.filter((p) => p.needsPinReview);
   if (flagged.length === 0) lines.push('None.');
-  for (const p of flagged) lines.push(`- \`${p.id}\` **${p.name}** — ${p.note} (matched "${p.mapboxName || '—'}")`);
+  for (const p of flagged)
+    lines.push(`- \`${p.id}\` **${p.name}** — ${p.note}` + (p.osmMatch ? ` (best: ${p.osmMatch})` : ''));
   lines.push('');
   lines.push('## All moves (sorted by distance)');
-  lines.push('| id | name | tier | moved | matched Mapbox name |');
-  lines.push('|---|---|---|---|---|');
+  lines.push('| id | name | tier | moved | best score | OSM match |');
+  lines.push('|---|---|---|---|---|---|');
   for (const p of [...proposals].sort((a, b) => b.movedM - a.movedM)) {
     lines.push(
-      `| ${p.id} | ${p.name} | ${p.after.precision}${p.needsPinReview ? ' ⚠' : ''} | ${p.movedM}m | ${p.mapboxName || '—'} |`
+      `| ${p.id} | ${p.name} | ${p.after.precision}${p.needsPinReview ? ' ⚠' : ''} | ${p.movedM}m | ${
+        p.bestScore
+      }${p.runnerUpScore ? ` (2nd ${p.runnerUpScore})` : ''} | ${p.osmMatch || '—'} |`
     );
   }
   const report = lines.join('\n') + '\n';
@@ -408,18 +444,17 @@ async function main() {
   let ok = 0;
   let fail = 0;
   for (const p of proposals) {
-    // Leave the pin untouched when we had nothing better; only update metadata.
-    const noBetterPin = p.movedM === 0 && (p.after.precision === 'unlocated' || p.note.includes('left as-is'));
+    const keepPin = p.movedM === 0 && p.note.includes('left as-is');
     const patch: Record<string, unknown> = {
-      location_precision: p.after.precision,
-      accuracy_radius_m: p.after.accuracyRadiusM,
       needs_pin_review: p.needsPinReview,
-      data_source: 'Mapbox Geocoding v6',
+      data_source: 'OSM proximity match',
       data_source_date: new Date().toISOString().split('T')[0],
     };
-    if (!noBetterPin) {
+    if (!keepPin) {
       patch.lat = p.after.lat;
       patch.lng = p.after.lng;
+      patch.location_precision = p.after.precision;
+      patch.accuracy_radius_m = p.after.accuracyRadiusM;
       if (p.after.area) patch.area = p.after.area;
     }
     const { error: upErr } = await supabase.from('stations').update(patch).eq('id', p.id);
