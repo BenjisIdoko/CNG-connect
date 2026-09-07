@@ -235,7 +235,11 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
                   Email Verification
                 </span>
                 <p className="text-[13px] text-on-surface-variant font-medium leading-relaxed">
-                  We sent a verification code to <strong>{email}</strong>.
+                  We sent a verification code to <strong>{email}</strong>. Enter it below.
+                </p>
+                <p className="text-[12px] text-outline font-medium leading-relaxed">
+                  Got a confirmation link instead of a code? Open it, come back here, then tap
+                  <strong> Resend Code</strong>.
                 </p>
               </div>
 
@@ -259,7 +263,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
                       setUserCodeInput(e.target.value.replace(/\D/g, ''));
                       if (codeError) setCodeError(null);
                     }}
-                    placeholder="1 2 3 4 5 6"
+                    placeholder="Enter code"
                     className="flex-1 bg-transparent text-[22px] font-extrabold tracking-[0.3em] text-primary outline-none placeholder:tracking-normal placeholder:text-outline placeholder:text-[15px]"
                   />
                 </div>

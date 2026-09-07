@@ -58,7 +58,7 @@
 - Embedded directly into driver profiles and accessible via modal dialogs.
 
 ### 📲 7. Passwordless Email Sign-In
-- Real accounts via Supabase Auth's email-OTP flow (`signInWithOtp` / `verifyOtp`) — no password, no separate login/signup forms. The same email + 6-digit code either creates a new account or signs back into an existing one.
+- Real accounts via Supabase Auth's email-OTP flow (`signInWithOtp` / `verifyOtp`) — no password, no separate login/signup forms. The same email + one-time code either creates a new account or signs back into an existing one. (Requires "Confirm email" **off** in the Supabase dashboard so new users get a code, not a confirmation link — see `.env.example`.)
 - Browsing (map, stations, community feed) stays open to guests; writing (reports, comments, likes, station suggestions) requires a verified session, enforced by Postgres RLS, not just the UI.
 - A driver's profile (name, vehicle, reputation, points) lives in a `profiles` table keyed to their Supabase Auth user, so it's the same account across devices — not per-browser `localStorage`.
 
@@ -152,7 +152,8 @@ CNG-connect/
    ```env
    # Supabase Credentials (also powers sign-in — see .env.example for the
    # dashboard steps needed to make email-OTP delivery actually work:
-   # custom SMTP + editing the Magic Link template to send a code)
+   # disable "Confirm email", custom SMTP, and edit the Magic Link
+   # template to send {{ .Token }})
    VITE_SUPABASE_URL=https://your-supabase-project.supabase.co
    VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
 
