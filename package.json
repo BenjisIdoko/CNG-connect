@@ -11,7 +11,8 @@
     "lint": "eslint . && tsc --noEmit",
     "test": "vitest run",
     "test:e2e": "playwright test",
-    "geocode:stations": "tsx scripts/geocode-stations.ts"
+    "geocode:stations": "tsx scripts/geocode-stations.ts",
+    "enrich:pins": "tsx scripts/enrich-station-pins.ts"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",
