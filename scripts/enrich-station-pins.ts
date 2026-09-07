@@ -262,6 +262,7 @@ async function placesSearch(
 interface Proposal {
   id: string;
   name: string;
+  placeId: string | null;
   before: { lat: number; lng: number; precision: string | null };
   after: { lat: number; lng: number; precision: PrecisionTier; accuracyRadiusM: number; area: string | null };
   movedM: number;
@@ -397,6 +398,7 @@ async function main() {
     proposals.push({
       id: st.id,
       name: st.name,
+      placeId: chosen?.id ?? null,
       before: { lat: oldPin.lat, lng: oldPin.lng, precision: st.location_precision },
       after: { ...after, precision: tier, accuracyRadiusM: ACCURACY_RADIUS_M[tier], area },
       movedM,
@@ -411,6 +413,22 @@ async function main() {
       `[pin] ${st.id} "${st.name}" -> ${tier}${needsReview ? ' (review)' : ''}  moved ${movedM}m  ` +
         `"${placeName || '—'}"  via ${matchedOn || '(no match)'}`
     );
+  }
+
+  // Duplicate-collapse guard: when several stations resolve to the same Google
+  // Place, our address strings were too vague to tell them apart — flag them all
+  // (and note how many share the pin) rather than stacking them silently.
+  const byPlace = new Map<string, Proposal[]>();
+  for (const p of proposals) {
+    if (!p.placeId) continue;
+    (byPlace.get(p.placeId) ?? byPlace.set(p.placeId, []).get(p.placeId)!).push(p);
+  }
+  for (const group of byPlace.values()) {
+    if (group.length < 2) continue;
+    for (const p of group) {
+      p.needsPinReview = true;
+      p.note = (p.note ? p.note + '; ' : '') + `${group.length} stations resolved to the same Place — disambiguate`;
+    }
   }
 
   fs.mkdirSync(path.dirname(CACHE_PATH), { recursive: true });
