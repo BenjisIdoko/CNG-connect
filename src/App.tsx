@@ -20,6 +20,7 @@ import { ProximityAlertBanner } from './components/ProximityAlertBanner';
 import { SignUpScreen } from './components/SignUpScreen';
 import { SplashScreen } from './components/SplashScreen';
 import { PwaUpdateToast } from './components/PwaUpdateToast';
+import { InstallPrompt } from './components/InstallPrompt';
 import { useAuth } from './context/AuthContext';
 
 // Code-split secondary screens & modals with React.lazy
@@ -911,15 +912,18 @@ export const App: React.FC = () => {
 
       {/* Bottom Navigation Bar (Shown when not in sub-screens or auth modals) */}
       {!activeDetailStation && !activeDiscussionPost && !activeChatPost && !authMode && (
-        <BottomNav
-          activeTab={activeTab}
-          onTabChange={(tab) => {
-            setActiveDetailStation(null);
-            setActiveDiscussionPost(null);
-            setActiveChatPost(null);
-            setActiveTab(tab);
-          }}
-        />
+        <>
+          <BottomNav
+            activeTab={activeTab}
+            onTabChange={(tab) => {
+              setActiveDetailStation(null);
+              setActiveDiscussionPost(null);
+              setActiveChatPost(null);
+              setActiveTab(tab);
+            }}
+          />
+          {!showSplash && <InstallPrompt />}
+        </>
       )}
 
       {/* Driver Reputation Level-Up Celebration Modal */}
