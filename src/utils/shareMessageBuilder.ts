@@ -1,7 +1,15 @@
 import { GasStation } from '../types';
 
+// Share links point at whatever origin the app is actually served from
+// (cngconnect.com.ng in prod, a preview URL, or localhost in dev). The
+// literal fallback only applies where there's no `window` (tests, SSR).
+const APP_ORIGIN =
+  typeof window !== 'undefined' && window.location?.origin
+    ? window.location.origin
+    : 'https://cngconnect.com.ng';
+
 export function buildStationShareUrl(stationId: string): string {
-  return `https://cng-connect.vercel.app?station=${encodeURIComponent(stationId)}`;
+  return `${APP_ORIGIN}?station=${encodeURIComponent(stationId)}`;
 }
 
 export function buildStationShareMessage(station: GasStation): string {

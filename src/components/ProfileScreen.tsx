@@ -149,7 +149,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                 {user.name}
               </h2>
               <p className="text-caption text-on-surface-variant font-normal mt-0.5 truncate">
-                {user.email || user.phone || 'driver@cngconnect.ng'}
+                {user.email || user.phone || 'driver@cngconnect.com.ng'}
               </p>
               <PopoverPrimitive.Root>
                 <PopoverPrimitive.Trigger className="flex items-center gap-1.5 mt-1 text-micro font-semibold text-primary hover:bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 transition-all cursor-pointer text-left">

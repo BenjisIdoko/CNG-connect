@@ -194,7 +194,7 @@ CNG-connect/
 
 The platform is deployed and hosted on Vercel:
 
-- **Production URL**: [https://cng-connect.vercel.app](https://cng-connect.vercel.app)
+- **Production URL**: [https://cngconnect.com.ng](https://cngconnect.com.ng)
 - **Deployment Command**: `npx vercel --prod`
 
 ---

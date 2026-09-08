@@ -37,7 +37,7 @@ describe('shareMessageBuilder', () => {
 
   it('builds a valid deep-link share URL with station query param', () => {
     const url = buildStationShareUrl('nipc-001');
-    expect(url).toBe('https://cng-connect.vercel.app?station=nipc-001');
+    expect(url).toBe('https://cngconnect.com.ng?station=nipc-001');
   });
 
   it('builds a full WhatsApp share message with name, status, wait time, pressure, and URL', () => {
@@ -47,7 +47,7 @@ describe('shareMessageBuilder', () => {
     expect(message).toContain('📊 Status: *Full stock*');
     expect(message).toContain('⏱️ Est. Wait: *10 mins*');
     expect(message).toContain('⚡ Pump Pressure: *215 bar*');
-    expect(message).toContain('https://cng-connect.vercel.app?station=nipc-001');
+    expect(message).toContain('https://cngconnect.com.ng?station=nipc-001');
   });
 
   it('handles station missing wait time or pump pressure cleanly', () => {
@@ -60,6 +60,6 @@ describe('shareMessageBuilder', () => {
     expect(message).toContain('⛽ *CNG Station Alert*');
     expect(message).toContain('📊 Status: *Full stock*');
     expect(message).not.toContain('⚡ Pump Pressure');
-    expect(message).toContain('https://cng-connect.vercel.app?station=nipc-001');
+    expect(message).toContain('https://cngconnect.com.ng?station=nipc-001');
   });
 });
