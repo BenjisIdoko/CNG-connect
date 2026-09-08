@@ -14,6 +14,7 @@ interface ProfileScreenProps {
   onTriggerProximityAlert?: () => void;
   onUpdateState?: (newState: string) => void;
   onUpdateProfile?: (updatedUser: Partial<UserProfile>) => void;
+  onUploadAvatar?: (file: File) => Promise<{ url?: string; error?: string }>;
   onOpenRoiCalculator?: () => void;
   onTogglePushNotifications?: () => void;
   isPushGranted?: boolean;
@@ -26,10 +27,13 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   onSignOut,
   onUpdateState,
   onUpdateProfile,
+  onUploadAvatar,
   onOpenRoiCalculator,
   onTogglePushNotifications,
   isPushGranted,
 }) => {
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const avatarInputRef = React.useRef<HTMLInputElement>(null);
   const [notificationsEnabledLocal, setNotificationsEnabledLocal] = useState(true);
   // Prefer the real browser push-permission state when the parent wires it in;
   // fall back to a local toggle otherwise.
@@ -68,6 +72,16 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
     setTimeout(() => setToastMessage(null), 2500);
   };
 
+  const handleAvatarPick = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = ''; // allow re-picking the same file
+    if (!file || !onUploadAvatar) return;
+    setIsUploadingAvatar(true);
+    const res = await onUploadAvatar(file);
+    setIsUploadingAvatar(false);
+    showToast(res.error ? `Photo upload failed: ${res.error}` : 'Profile photo updated!');
+  };
+
   const handleSaveProfile = (e: React.FormEvent) => {
     e.preventDefault();
     const updatedData: Partial<UserProfile> = {
@@ -101,11 +115,35 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
         {/* Profile Card */}
         <div className="bg-white rounded-3xl p-4 shadow-sm border border-outline-variant flex items-center justify-between">
           <div className="flex items-center gap-3.5 min-w-0 flex-1">
-            <img
-              src={user.avatar || ASSETS.userAvatar}
-              alt={user.name}
-              className="w-14 h-14 rounded-full object-cover border-2 border-primary shadow-xs shrink-0"
-            />
+            <div className="relative shrink-0">
+              <img
+                src={user.avatar || ASSETS.userAvatar}
+                alt={user.name}
+                className="w-14 h-14 rounded-full object-cover border-2 border-primary shadow-xs"
+              />
+              {onUploadAvatar && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => avatarInputRef.current?.click()}
+                    disabled={isUploadingAvatar}
+                    aria-label="Change profile photo"
+                    className="absolute -bottom-0.5 -right-0.5 w-6 h-6 rounded-full bg-primary text-white border-2 border-white flex items-center justify-center shadow-sm active:scale-90 transition-transform disabled:opacity-60"
+                  >
+                    <span className="material-symbols-outlined text-[14px]">
+                      {isUploadingAvatar ? 'progress_activity' : 'photo_camera'}
+                    </span>
+                  </button>
+                  <input
+                    ref={avatarInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleAvatarPick}
+                  />
+                </>
+              )}
+            </div>
             <div className="min-w-0 flex-1">
               <h2 className="font-bold text-title text-on-surface leading-tight truncate">
                 {user.name}

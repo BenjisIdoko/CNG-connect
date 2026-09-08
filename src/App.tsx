@@ -104,7 +104,7 @@ export const App: React.FC = () => {
   // Auth-Gated Onboarding & Registration State. Real identity (session +
   // profile) lives in AuthContext, backed by Supabase Auth email-OTP —
   // App.tsx only tracks which auth screen (if any) is currently showing.
-  const { isAuthenticated, isAuthLoading, driverProfile, updateProfile, signOut } = useAuth();
+  const { isAuthenticated, isAuthLoading, driverProfile, updateProfile, uploadAvatar, signOut } = useAuth();
   const [authMode, setAuthMode] = useState<'onboarding' | 'signup' | null>(null);
 
   // Once the initial session check resolves, a guest (no session) sees the
@@ -803,6 +803,7 @@ export const App: React.FC = () => {
                 if (!requireAuth()) return;
                 updateProfile(updatedUser);
               }}
+              onUploadAvatar={isAuthenticated ? uploadAvatar : undefined}
               onOpenRoiCalculator={() => setIsRoiModalOpen(true)}
               onTogglePushNotifications={handleTogglePushNotifications}
               isPushGranted={isPushGranted}

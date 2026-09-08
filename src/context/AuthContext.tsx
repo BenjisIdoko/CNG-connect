@@ -3,6 +3,7 @@ import type { Session } from '@supabase/supabase-js';
 import { supabase, isSupabaseConfigured } from '../services/supabaseClient';
 import { UserProfile } from '../types';
 import { INITIAL_USER } from '../data/mockData';
+import { resizeToSquareJpeg } from '../utils/resizeImage';
 
 interface AuthResult {
   success: boolean;
@@ -24,6 +25,8 @@ interface AuthContextType {
   sendLoginCode: (email: string) => Promise<AuthResult>;
   verifyLoginCode: (email: string, code: string) => Promise<VerifyResult>;
   updateProfile: (updater: Partial<UserProfile> | ((prev: UserProfile) => UserProfile)) => Promise<void>;
+  /** Resize + upload an image to the `avatars` bucket and save its URL on the profile. */
+  uploadAvatar: (file: File) => Promise<{ url?: string; error?: string }>;
   signOut: () => Promise<void>;
 }
 
@@ -167,6 +170,39 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     [session]
   );
 
+  const uploadAvatar = useCallback(
+    async (file: File): Promise<{ url?: string; error?: string }> => {
+      if (!session || !supabase) return { error: 'You need to be signed in.' };
+      if (!file.type.startsWith('image/')) return { error: 'Please choose an image file.' };
+
+      let blob: Blob;
+      try {
+        blob = await resizeToSquareJpeg(file);
+      } catch (e) {
+        return { error: e instanceof Error ? e.message : 'Could not process that image.' };
+      }
+
+      // One file per user, always overwritten; a cache-busting query param on the
+      // saved URL forces the <img> and any CDN to refetch after a change.
+      const objectPath = `${session.user.id}/avatar.jpg`;
+      const { error: upErr } = await supabase.storage
+        .from('avatars')
+        .upload(objectPath, blob, { contentType: 'image/jpeg', upsert: true });
+      if (upErr) {
+        const msg = /bucket.*not found/i.test(upErr.message)
+          ? 'Avatar storage isn’t set up yet (run supabase/avatars-bucket.sql).'
+          : upErr.message;
+        return { error: msg };
+      }
+
+      const { data } = supabase.storage.from('avatars').getPublicUrl(objectPath);
+      const url = `${data.publicUrl}?v=${Date.now()}`;
+      await updateProfile({ avatar: url });
+      return { url };
+    },
+    [session, updateProfile]
+  );
+
   const signOut = useCallback(async () => {
     if (supabase) await supabase.auth.signOut();
     setSession(null);
@@ -185,6 +221,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         sendLoginCode,
         verifyLoginCode,
         updateProfile,
+        uploadAvatar,
         signOut,
       }}
     >
