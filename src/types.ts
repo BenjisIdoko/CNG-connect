@@ -145,6 +145,7 @@ export interface UserProfile {
   reputationScore: number;
   communityPoints?: number;
   state?: string; // Registered or detected state (e.g., 'Abuja FCT', 'Lagos', etc.)
+  isAdmin?: boolean; // Set manually in the DB; unlocks the ?admin=1 pin editor.
 }
 
 export interface ConversionCenter {

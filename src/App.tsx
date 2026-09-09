@@ -77,7 +77,20 @@ import { getDriverTier, DriverTier } from './utils/reputationEngine';
 import { ReputationLevelModal } from './components/ReputationLevelModal';
 import { apiService } from './services/apiService';
 
+const AdminPinsScreen = lazy(() =>
+  import('./components/AdminPinsScreen').then((m) => ({ default: m.AdminPinsScreen }))
+);
+
 export const App: React.FC = () => {
+  // Hidden ?admin=1 route — a full-screen pin editor, gated on profiles.is_admin.
+  const [adminMode] = useState(() => {
+    try {
+      return new URLSearchParams(window.location.search).has('admin');
+    } catch {
+      return false;
+    }
+  });
+
   // Animated Splash Screen State
   const [showSplash, setShowSplash] = useState(true);
 
@@ -637,6 +650,18 @@ export const App: React.FC = () => {
     setAuthMode('onboarding');
     showToast('Signed out successfully.');
   };
+
+  if (adminMode) {
+    return (
+      <Suspense fallback={<div className="fixed inset-0 grid place-items-center text-slate-500">Loading admin…</div>}>
+        <AdminPinsScreen
+          onExit={() => {
+            window.location.href = window.location.pathname;
+          }}
+        />
+      </Suspense>
+    );
+  }
 
   // Determine current view title and back button
   let headerTitle: string | undefined;

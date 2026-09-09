@@ -45,6 +45,7 @@ function mapProfileRow(row: Record<string, unknown>, fallbackEmail: string): Use
     reputationScore: Number(row.reputation_score ?? 5.0),
     communityPoints: Number(row.community_points || 0),
     state: (row.state as string) || undefined,
+    isAdmin: Boolean(row.is_admin),
   };
 }
 
