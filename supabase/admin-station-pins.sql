@@ -1,19 +1,23 @@
--- Admin pin-editing support for CNG-Connect.
+-- Admin pin/name editing support for CNG-Connect.
 -- Run once in the Supabase dashboard: SQL Editor -> paste -> Run.
 -- Then grant yourself admin:
 --   update profiles set is_admin = true where email = 'strictly4eternity@gmail.com';
 
 alter table profiles add column if not exists is_admin boolean not null default false;
 
--- Sets a station's pin + precision. SECURITY DEFINER so it can write the
--- location columns (anon/authenticated have no direct UPDATE grant on
+-- Drop the earlier 5-arg version if it exists (adding p_name changes the signature).
+drop function if exists admin_set_station_pin(text, double precision, double precision, text, text);
+
+-- Sets a station's pin + precision (+ optional name). SECURITY DEFINER so it can
+-- write those columns (anon/authenticated have no direct UPDATE grant on
 -- `stations`), but it hard-checks the caller is an admin first.
 create or replace function admin_set_station_pin(
   p_station_id text,
   p_lat        double precision,
   p_lng        double precision,
   p_precision  text,
-  p_area       text default null
+  p_area       text default null,
+  p_name       text default null
 ) returns void
 language plpgsql
 security definer
@@ -48,6 +52,7 @@ begin
     location_precision = p_precision,
     accuracy_radius_m  = v_radius,
     area               = coalesce(nullif(trim(p_area), ''), area),
+    name               = coalesce(nullif(trim(p_name), ''), name),
     needs_pin_review   = (p_precision = 'city'),
     data_source        = 'Admin verified',
     data_source_date   = to_char(timezone('utc', now()), 'YYYY-MM-DD')
@@ -59,5 +64,5 @@ begin
 end;
 $$;
 
-revoke all on function admin_set_station_pin(text, double precision, double precision, text, text) from anon;
-grant execute on function admin_set_station_pin(text, double precision, double precision, text, text) to authenticated;
+revoke all on function admin_set_station_pin(text, double precision, double precision, text, text, text) from anon;
+grant execute on function admin_set_station_pin(text, double precision, double precision, text, text, text) to authenticated;
