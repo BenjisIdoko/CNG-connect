@@ -24,6 +24,8 @@ interface AuthContextType {
   isNewDriver: boolean;
   sendLoginCode: (email: string) => Promise<AuthResult>;
   verifyLoginCode: (email: string, code: string) => Promise<VerifyResult>;
+  /** Redirect to Google's consent screen. Resolves only on error (a success redirects the page). */
+  signInWithGoogle: () => Promise<AuthResult>;
   updateProfile: (updater: Partial<UserProfile> | ((prev: UserProfile) => UserProfile)) => Promise<void>;
   /** Resize + upload an image to the `avatars` bucket and save its URL on the profile. */
   uploadAvatar: (file: File) => Promise<{ url?: string; error?: string }>;
@@ -83,7 +85,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return true;
     }
     setDriverProfile(mapProfileRow(data, fallbackEmail));
-    const isNew = !data.name;
+    // "New" = still needs the profile step. Google users arrive with a name
+    // prefilled but no phone, so gate on both.
+    const isNew = !data.name || !String(data.phone || '').trim();
     setIsNewDriver(isNew);
     return isNew;
   }, []);
@@ -131,6 +135,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const { error } = await supabase.auth.signInWithOtp({ email, options: { shouldCreateUser: true } });
     if (error) return { success: false, error: error.message };
     return { success: true };
+  }, []);
+
+  const signInWithGoogle = useCallback(async (): Promise<AuthResult> => {
+    if (!supabase) return { success: false, error: 'Backend not configured.' };
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: window.location.origin },
+    });
+    if (error) return { success: false, error: error.message };
+    return { success: true }; // browser is now navigating to Google
   }, []);
 
   const verifyLoginCode = useCallback(async (email: string, code: string): Promise<VerifyResult> => {
@@ -221,6 +235,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isNewDriver,
         sendLoginCode,
         verifyLoginCode,
+        signInWithGoogle,
         updateProfile,
         uploadAvatar,
         signOut,

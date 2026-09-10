@@ -18,9 +18,20 @@ interface SignUpScreenProps {
  * short "complete your profile" step; a returning driver skips straight in.
  */
 export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel }) => {
-  const { sendLoginCode, verifyLoginCode, updateProfile } = useAuth();
+  const { sendLoginCode, verifyLoginCode, signInWithGoogle, updateProfile, isAuthenticated, isNewDriver, driverProfile } =
+    useAuth();
 
   const [step, setStep] = useState<1 | 2 | 3>(1);
+  const [googleBusy, setGoogleBusy] = useState(false);
+  const [googleError, setGoogleError] = useState<string | null>(null);
+
+  // Arriving here already signed in (e.g. back from Google's consent screen):
+  // skip straight to the profile step if it's still incomplete, else finish.
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    if (isNewDriver) setStep(3);
+    else onComplete();
+  }, [isAuthenticated, isNewDriver, onComplete]);
 
   // Step 1: identity
   const [email, setEmail] = useState('');
@@ -50,6 +61,11 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
     const timer = setInterval(() => setResendCooldown((c) => Math.max(0, c - 1)), 1000);
     return () => clearInterval(timer);
   }, [resendCooldown]);
+
+  // Prefill the name step from a Google profile (once, while it's still blank).
+  useEffect(() => {
+    setFullName((cur) => cur || driverProfile.name || '');
+  }, [driverProfile.name]);
 
   const handleStep1Submit = async () => {
     const emailValidation = validateEmail(email);
@@ -192,8 +208,44 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           {step === 1 && (
             <>
+              <button
+                type="button"
+                disabled={googleBusy}
+                onClick={async () => {
+                  setGoogleBusy(true);
+                  setGoogleError(null);
+                  const res = await signInWithGoogle();
+                  if (!res.success) {
+                    setGoogleBusy(false);
+                    setGoogleError(res.error || 'Could not start Google sign-in.');
+                  }
+                  // on success the page is already navigating to Google
+                }}
+                className="w-full h-12 flex items-center justify-center gap-2.5 rounded-2xl border border-outline-variant bg-white hover:bg-surface font-semibold text-[14px] text-on-surface active:scale-[0.99] transition-all disabled:opacity-60"
+              >
+                <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
+                  <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                  <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                  <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                  <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                </svg>
+                <span>{googleBusy ? 'Redirecting to Google…' : 'Continue with Google'}</span>
+              </button>
+              {googleError && (
+                <p className="text-[12px] font-bold text-status-red -mt-2 flex items-center gap-1">
+                  <span className="material-symbols-outlined text-[16px]">error</span>
+                  {googleError}
+                </p>
+              )}
+
+              <div className="flex items-center gap-3 text-[11.5px] font-semibold text-outline">
+                <span className="flex-1 h-px bg-outline-variant" />
+                or with email
+                <span className="flex-1 h-px bg-outline-variant" />
+              </div>
+
               <p className="text-[13px] text-on-surface-variant font-medium leading-relaxed">
-                No password needed — we'll email you a verification code. New here? The same code creates your account.
+                No password — we'll email you a one-time code. New here? The same code creates your account.
               </p>
               <div>
                 <label className="block text-[12.5px] font-semibold text-on-surface-variant mb-1">
