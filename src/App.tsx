@@ -118,7 +118,7 @@ export const App: React.FC = () => {
   // Auth-Gated Onboarding & Registration State. Real identity (session +
   // profile) lives in AuthContext, backed by Supabase Auth email-OTP —
   // App.tsx only tracks which auth screen (if any) is currently showing.
-  const { isAuthenticated, isAuthLoading, isNewDriver, driverProfile, updateProfile, uploadAvatar, signOut } = useAuth();
+  const { isAuthenticated, isAuthLoading, driverProfile, updateProfile, uploadAvatar, signOut } = useAuth();
   const [authMode, setAuthMode] = useState<'onboarding' | 'signup' | null>(null);
 
   // Once the initial session check resolves, a guest (no session) sees the
@@ -132,13 +132,6 @@ export const App: React.FC = () => {
     hasAutoPromptedOnboarding.current = true;
     if (!isAuthenticated) setAuthMode('onboarding');
   }, [isAuthLoading, isAuthenticated]);
-
-  // A signed-in driver whose profile is still incomplete (e.g. just came back
-  // from Google and has a name but no phone/vehicle) is sent to finish it.
-  useEffect(() => {
-    if (isAuthLoading) return;
-    if (isAuthenticated && isNewDriver && authMode === null) setAuthMode('signup');
-  }, [isAuthLoading, isAuthenticated, isNewDriver, authMode]);
 
   // Offline / Network Online Status Detector
   const [isOnline, setIsOnline] = useState<boolean>(navigator.onLine);
