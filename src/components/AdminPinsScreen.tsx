@@ -3,6 +3,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { supabase } from '../services/supabaseClient';
 import { useAuth } from '../context/AuthContext';
 import { loadGoogleMaps, hasGoogleMapsKey } from '../utils/googleMaps';
+import { parseCsv, toCsv } from '../utils/csv';
 
 type Tier = 'source_exact' | 'rooftop' | 'street' | 'area' | 'city';
 const TIERS: Tier[] = ['rooftop', 'street', 'area', 'source_exact', 'city'];
@@ -31,6 +32,88 @@ interface Row {
 }
 
 const NG = { minLat: 4, maxLat: 14, minLng: 2.5, maxLng: 15 };
+
+// Text fields the CSV bulk-update can touch, in export column order.
+const CSV_TEXT_FIELDS = ['name', 'address', 'operator', 'city', 'state', 'station_type', 'area'] as const;
+type CsvTextField = (typeof CSV_TEXT_FIELDS)[number];
+const CSV_COLUMNS = [...CSV_TEXT_FIELDS, 'lat', 'lng', 'location_precision'] as const;
+
+interface CsvDiffRow {
+  id: string;
+  current: Row | undefined;
+  label: string;
+  changes: Partial<Record<(typeof CSV_COLUMNS)[number], { from: string; to: string }>>;
+  error?: string;
+}
+
+/** Compares an uploaded CSV against the currently-loaded rows. Blank cells mean
+ * "leave this field alone" so a spreadsheet only needs to fill in what changed. */
+function buildCsvDiff(parsed: string[][], rows: Row[]): { diffs: CsvDiffRow[]; headerErr?: string } {
+  if (parsed.length === 0) return { diffs: [], headerErr: 'That file is empty.' };
+  const header = parsed[0].map((h) => h.trim().toLowerCase());
+  const idIdx = header.indexOf('id');
+  if (idIdx === -1) {
+    return { diffs: [], headerErr: 'CSV needs an "id" column — use Export CSV to get a starter file.' };
+  }
+  const colIdx: Partial<Record<(typeof CSV_COLUMNS)[number], number>> = {};
+  for (const f of CSV_COLUMNS) {
+    const i = header.indexOf(f);
+    if (i !== -1) colIdx[f] = i;
+  }
+
+  const byId = new Map(rows.map((r) => [r.id, r]));
+  const diffs: CsvDiffRow[] = [];
+  for (let i = 1; i < parsed.length; i++) {
+    const line = parsed[i];
+    const id = (line[idIdx] || '').trim();
+    if (!id) continue;
+    const current = byId.get(id);
+    if (!current) {
+      diffs.push({ id, current: undefined, label: id, changes: {}, error: 'Unknown station id — skipped.' });
+      continue;
+    }
+
+    const changes: CsvDiffRow['changes'] = {};
+    let rowErr: string | undefined;
+    for (const f of CSV_TEXT_FIELDS) {
+      const idx = colIdx[f];
+      if (idx === undefined) continue;
+      const raw = (line[idx] ?? '').trim();
+      if (!raw) continue;
+      const cur = (current[f as CsvTextField] as string | null) || '';
+      if (raw !== cur) changes[f] = { from: cur, to: raw };
+    }
+    for (const f of ['lat', 'lng'] as const) {
+      const idx = colIdx[f];
+      if (idx === undefined) continue;
+      const raw = (line[idx] ?? '').trim();
+      if (!raw) continue;
+      const num = Number(raw);
+      if (Number.isNaN(num)) {
+        rowErr = `bad ${f}: "${raw}"`;
+        continue;
+      }
+      const cur = current[f];
+      if (Math.abs(num - cur) > 0.000001) changes[f] = { from: cur.toFixed(6), to: num.toFixed(6) };
+    }
+    const pIdx = colIdx.location_precision;
+    if (pIdx !== undefined) {
+      const raw = (line[pIdx] ?? '').trim();
+      if (raw) {
+        if (!TIERS.includes(raw as Tier)) {
+          rowErr = `bad location_precision: "${raw}"`;
+        } else if (raw !== (current.location_precision || '')) {
+          changes.location_precision = { from: current.location_precision || '', to: raw };
+        }
+      }
+    }
+
+    if (rowErr || Object.keys(changes).length > 0) {
+      diffs.push({ id, current, label: current.name, changes, error: rowErr });
+    }
+  }
+  return { diffs };
+}
 
 function haversineM(a: [number, number], b: [number, number]) {
   const R = 6371000;
@@ -99,6 +182,10 @@ export const AdminPinsScreen: React.FC<{ onExit: () => void }> = ({ onExit }) =>
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [mapErr, setMapErr] = useState<string | null>(null);
+
+  // bulk CSV import
+  const [csvDiffs, setCsvDiffs] = useState<CsvDiffRow[] | null>(null);
+  const [applyingCsv, setApplyingCsv] = useState(false);
 
   const mapEl = useRef<HTMLDivElement>(null);
   const mapRef = useRef<google.maps.Map | null>(null);
@@ -279,6 +366,80 @@ export const AdminPinsScreen: React.FC<{ onExit: () => void }> = ({ onExit }) =>
     flash(`Saved · ${nameChanged ? editName.trim() : sel.name}`);
   };
 
+  const exportCsv = () => {
+    const headers = ['id', ...CSV_COLUMNS, 'needs_pin_review', 'data_source'];
+    const data = rows.map((r) => [
+      r.id,
+      r.name,
+      r.address ?? '',
+      r.operator ?? '',
+      r.city ?? '',
+      r.state ?? '',
+      r.station_type ?? '',
+      r.area ?? '',
+      r.lat,
+      r.lng,
+      r.location_precision ?? '',
+      r.needs_pin_review ? 'true' : 'false',
+      r.data_source ?? '',
+    ]);
+    const blob = new Blob([toCsv(headers, data)], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `stations-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  };
+
+  const onCsvFileSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    const text = await file.text();
+    const { diffs, headerErr } = buildCsvDiff(parseCsv(text), rows);
+    if (headerErr) {
+      flash(headerErr);
+      return;
+    }
+    if (diffs.length === 0) {
+      flash('No changes found in that file.');
+      return;
+    }
+    setCsvDiffs(diffs);
+  };
+
+  const applyCsv = async () => {
+    if (!supabase || !csvDiffs) return;
+    const toApply = csvDiffs.filter((d) => d.current && !d.error && Object.keys(d.changes).length > 0);
+    setApplyingCsv(true);
+    let ok = 0;
+    const failures: string[] = [];
+    for (const d of toApply) {
+      const params: Record<string, unknown> = { p_station_id: d.id };
+      if (d.changes.name) params.p_name = d.changes.name.to;
+      if (d.changes.address) params.p_address = d.changes.address.to;
+      if (d.changes.operator) params.p_operator = d.changes.operator.to;
+      if (d.changes.city) params.p_city = d.changes.city.to;
+      if (d.changes.state) params.p_state = d.changes.state.to;
+      if (d.changes.station_type) params.p_station_type = d.changes.station_type.to;
+      if (d.changes.area) params.p_area = d.changes.area.to;
+      if (d.changes.lat) params.p_lat = Number(d.changes.lat.to);
+      if (d.changes.lng) params.p_lng = Number(d.changes.lng.to);
+      if (d.changes.location_precision) params.p_precision = d.changes.location_precision.to;
+      const { error } = await supabase.rpc('admin_update_station', params);
+      if (error) failures.push(`${d.label}: ${error.message}`);
+      else ok++;
+    }
+    setApplyingCsv(false);
+    setCsvDiffs(null);
+    await load();
+    flash(`Bulk update: ${ok} saved${failures.length ? `, ${failures.length} failed` : ''}`);
+    if (failures.length) console.error('Bulk update failures:\n' + failures.join('\n'));
+  };
+
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     return rows.filter((r) => {
@@ -394,9 +555,21 @@ export const AdminPinsScreen: React.FC<{ onExit: () => void }> = ({ onExit }) =>
           <span className="font-extrabold text-slate-900 text-sm whitespace-nowrap">Station Pin Admin</span>
           <span className="text-xs text-orange-600 font-semibold whitespace-nowrap">{reviewCount} need review</span>
         </div>
-        <button onClick={onExit} className="text-xs px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 shrink-0">
-          Exit
-        </button>
+        <div className="flex items-center gap-2 shrink-0">
+          <button
+            onClick={exportCsv}
+            className="text-xs px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200"
+          >
+            Export CSV
+          </button>
+          <label className="text-xs px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 cursor-pointer">
+            Upload CSV
+            <input type="file" accept=".csv,text/csv" className="hidden" onChange={onCsvFileSelected} />
+          </label>
+          <button onClick={onExit} className="text-xs px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200">
+            Exit
+          </button>
+        </div>
       </div>
 
       <div className="flex-1 flex min-h-0">
@@ -560,6 +733,64 @@ export const AdminPinsScreen: React.FC<{ onExit: () => void }> = ({ onExit }) =>
       {toast && (
         <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[210] bg-slate-900 text-white text-xs font-semibold px-4 py-2 rounded-full shadow-lg">
           {toast}
+        </div>
+      )}
+
+      {csvDiffs && (
+        <div className="fixed inset-0 z-[220] bg-black/40 grid place-items-center p-6">
+          <div className="w-full max-w-2xl max-h-[80vh] bg-white rounded-2xl shadow-xl flex flex-col">
+            <div className="p-4 border-b border-slate-200 flex items-center justify-between shrink-0">
+              <h2 className="font-extrabold text-slate-900 text-sm">
+                Review bulk update — {csvDiffs.filter((d) => d.current && !d.error).length} station(s) to change
+                {csvDiffs.some((d) => d.error || !d.current)
+                  ? `, ${csvDiffs.filter((d) => d.error || !d.current).length} problem row(s)`
+                  : ''}
+              </h2>
+              <button
+                onClick={() => setCsvDiffs(null)}
+                className="text-xs px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 shrink-0"
+              >
+                Cancel
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-2.5">
+              {csvDiffs.map((d) => (
+                <div
+                  key={d.id}
+                  className={`border rounded-lg p-2.5 text-xs ${
+                    d.error || !d.current ? 'border-rose-300 bg-rose-50' : 'border-slate-200'
+                  }`}
+                >
+                  <p className="font-semibold text-slate-900">{d.label}</p>
+                  {d.error && <p className="text-rose-600 mt-0.5">{d.error}</p>}
+                  {!d.current && <p className="text-rose-600 mt-0.5">Unknown station id "{d.id}" — will be skipped.</p>}
+                  {Object.entries(d.changes).map(([k, v]) => (
+                    <p key={k} className="text-slate-600 mt-0.5">
+                      <span className="font-mono text-[11px] text-slate-400">{k}</span>: {v.from || '(empty)'} →{' '}
+                      <span className="font-semibold text-emerald-700">{v.to}</span>
+                    </p>
+                  ))}
+                </div>
+              ))}
+            </div>
+            <div className="p-4 border-t border-slate-200 flex justify-end gap-2 shrink-0">
+              <button
+                onClick={() => setCsvDiffs(null)}
+                className="text-xs px-4 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={applyCsv}
+                disabled={applyingCsv || csvDiffs.every((d) => d.error || !d.current)}
+                className="text-xs px-4 py-1.5 rounded-lg bg-emerald-600 text-white font-bold disabled:opacity-50"
+              >
+                {applyingCsv
+                  ? 'Applying…'
+                  : `Apply ${csvDiffs.filter((d) => d.current && !d.error && Object.keys(d.changes).length > 0).length} change(s)`}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
