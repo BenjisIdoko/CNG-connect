@@ -906,12 +906,12 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
       <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md p-3 px-4 border-t border-surface-container-highest shadow-lg z-40 pb-safe">
         <div className="max-w-xl mx-auto flex flex-col gap-2">
           {/* Main Action Buttons */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             <button
               onClick={() => onOpenReportModal(station)}
               aria-label="Update station status"
               title="Update status"
-              className="w-12 h-12 min-w-[48px] min-h-[48px] bg-primary hover:bg-deep-teal text-white rounded-full flex items-center justify-center shadow-md active:scale-95 transition-all shrink-0"
+              className="w-11 h-11 min-w-[44px] min-h-[44px] bg-primary hover:bg-deep-teal text-white rounded-full flex items-center justify-center shadow-md active:scale-95 transition-all shrink-0"
             >
               <span className="material-symbols-outlined text-[20px] shrink-0">
                 edit_document
@@ -925,7 +925,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                   onNavigate(station);
                 }
               }}
-              className="flex-1 h-12 bg-primary hover:bg-deep-teal text-white font-extrabold text-body rounded-full flex items-center justify-center gap-1.5 shadow-md active:scale-[0.98] transition-all px-3 min-w-0"
+              className="flex-1 h-11 bg-primary hover:bg-deep-teal text-white font-extrabold text-body rounded-full flex items-center justify-center gap-1 shadow-md active:scale-[0.98] transition-all px-2.5 min-w-0"
             >
               <span
                 className="material-symbols-outlined text-[18px] shrink-0"
@@ -933,17 +933,14 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
               >
                 navigation
               </span>
-              <span className="whitespace-nowrap truncate">Get Directions</span>
-              <span className="bg-emerald-800/70 text-emerald-100 text-micro font-bold px-2 py-0.5 rounded-xl ml-0.5 shrink-0">
-                {station.distance}
-              </span>
+              <span className="whitespace-nowrap">Get Directions</span>
             </button>
 
             <button
               onClick={() => openWhatsAppShare(station)}
               aria-label="Share update on WhatsApp"
               title="Share to WhatsApp"
-              className="px-3 h-12 bg-emerald-50 hover:bg-emerald-100 text-primary border border-surface-container-highest font-bold text-body rounded-full flex items-center justify-center gap-1.5 active:scale-[0.98] transition-all shrink-0"
+              className="px-2.5 h-11 bg-emerald-50 hover:bg-emerald-100 text-primary border border-surface-container-highest font-bold text-body rounded-full flex items-center justify-center gap-1 active:scale-[0.98] transition-all shrink-0"
             >
               <span className="material-symbols-outlined text-[18px] shrink-0">
                 share

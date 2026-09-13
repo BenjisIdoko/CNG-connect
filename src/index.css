@@ -22,13 +22,20 @@
   --font-headline: 'Plus Jakarta Sans', sans-serif;
   
   /* Type Scale Utility Tokens */
-  --text-micro: 0.6875rem;     /* 11px - badges, timestamps, micro tags */
-  --text-caption: 0.75rem;     /* 12px - secondary text, meta info, captions */
-  --text-body: 0.875rem;       /* 14px - default body text, inputs, descriptions */
-  --text-body-lg: 0.9375rem;   /* 15px - emphasized body, list item titles */
-  --text-title: 1.0625rem;     /* 17px - section titles, card headers */
-  --text-heading: 1.25rem;     /* 20px - modal titles, screen subheaders */
-  --text-display: 1.5rem;      /* 24px - hero headers, splash display text */
+  --text-micro: 0.75rem;         /* 12px - badges, timestamps, micro tags */
+  --text-micro--line-height: 1rem;
+  --text-caption: 0.8125rem;     /* 13px - secondary text, meta info, captions */
+  --text-caption--line-height: 1.15rem;
+  --text-body: 0.9375rem;        /* 15px - default body text, inputs, descriptions */
+  --text-body--line-height: 1.4rem;
+  --text-body-lg: 1rem;          /* 16px - emphasized body, list item titles */
+  --text-body-lg--line-height: 1.45rem;
+  --text-title: 1.1875rem;       /* 19px - section titles, card headers */
+  --text-title--line-height: 1.5rem;
+  --text-heading: 1.375rem;      /* 22px - modal titles, screen subheaders */
+  --text-heading--line-height: 1.7rem;
+  --text-display: 1.75rem;       /* 28px - hero headers, splash display text */
+  --text-display--line-height: 2.1rem;
 
   --color-primary: #006c50;
   --color-primary-container: #00ffc2;
