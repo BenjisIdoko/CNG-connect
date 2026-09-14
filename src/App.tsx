@@ -261,6 +261,7 @@ export const App: React.FC = () => {
   }, [stations, userProfile.state]);
 
   // Load backend data from API Service on mount
+  const [liveStationsSettled, setLiveStationsSettled] = useState(false);
   useEffect(() => {
     let isMounted = true;
     apiService.fetchStations().then((data) => {
@@ -269,6 +270,7 @@ export const App: React.FC = () => {
         setStations(data);
         setSelectedStation(data[0]);
       }
+      if (isMounted) setLiveStationsSettled(true);
     });
 
     const mountUserKey = userProfile.email || userProfile.phone || 'default_driver';
@@ -285,6 +287,12 @@ export const App: React.FC = () => {
 
   // Deep link: open a station's detail view when arriving via ?stationId= / ?station=
   // (e.g. a tapped push notification or a shared station link). Runs once a match loads.
+  //
+  // Waits for the initial live-stations fetch to settle before matching: `stations`
+  // starts out as the bundled offline seed data, and matching against that first
+  // would permanently lock the deep-linked station onto stale seed data (wrong
+  // images/pin/etc.) even after the live fetch resolves moments later — this ref
+  // never re-fires once deepLinkHandledRef is set, so there'd be no second chance.
   const deepLinkHandledRef = useRef(false);
   useEffect(() => {
     if (deepLinkHandledRef.current) return;
@@ -294,6 +302,7 @@ export const App: React.FC = () => {
       deepLinkHandledRef.current = true;
       return;
     }
+    if (!liveStationsSettled) return;
     const match = stations.find((s) => s.id === deepLinkId);
     if (!match) return;
 
@@ -306,7 +315,7 @@ export const App: React.FC = () => {
     params.delete('station');
     const qs = params.toString();
     window.history.replaceState({}, '', `${window.location.pathname}${qs ? `?${qs}` : ''}`);
-  }, [stations]);
+  }, [stations, liveStationsSettled]);
 
 
   // Single Source of Truth: Geolocation Watch & Distance Updates
