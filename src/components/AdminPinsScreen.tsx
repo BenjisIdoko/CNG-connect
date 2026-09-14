@@ -108,6 +108,14 @@ function buildCsvDiff(parsed: string[][], rows: Row[]): { diffs: CsvDiffRow[]; h
       }
     }
 
+    // A moved pin with no explicit precision column is no longer "city centroid"
+    // accuracy — without this, admin_update_station leaves needs_pin_review
+    // untouched (it only reacts to an explicit p_precision), so a coordinate fix
+    // would silently fail to clear the review flag.
+    if ((changes.lat || changes.lng) && !changes.location_precision && current.location_precision === 'city') {
+      changes.location_precision = { from: 'city', to: 'rooftop' };
+    }
+
     if (rowErr || Object.keys(changes).length > 0) {
       diffs.push({ id, current, label: current.name, changes, error: rowErr });
     }
@@ -317,6 +325,13 @@ export const AdminPinsScreen: React.FC<{ onExit: () => void }> = ({ onExit }) =>
     mapRef.current?.panTo(pending);
     if ((mapRef.current?.getZoom() ?? 0) < 16) mapRef.current?.setZoom(17);
   }, [pending, selId]);
+
+  // A manually-placed pin is no longer "city centroid" accuracy — bump the precision
+  // tier off 'city' the moment a coordinate is actually moved (drag or paste), so Save
+  // doesn't silently resubmit 'city' and leave needs_pin_review stuck true.
+  useEffect(() => {
+    if (pending && tier === 'city') setTier('rooftop');
+  }, [pending]);
 
   const applyPaste = () => {
     const parsed = parseLatLng(pasteVal);
