@@ -7,10 +7,11 @@ photography.
 
 | File | Subject |
 | --- | --- |
-| `splash-hero.jpg`, `slide-community.jpg` | Branded "CNG" single-pump island |
-| `slide-stations.jpg`, `slide-workshops.jpg` | Multi-pump CNG station, ribbon-cutting/commissioning |
+| `splash-hero.jpg`, `slide-stations.jpg` | Pi-CNG electric bus depot with EV chargers being installed |
+| `slide-community.jpg` | Branded "CNG" single-pump island |
+| `slide-workshops.jpg` | Multi-pump CNG station, ribbon-cutting/commissioning |
 | `slide-gps.jpg` | NNPC CNG station forecourt with drivers queuing |
 
-Images were resized/re-compressed for web delivery (no crop or content edits).
-If swapping these out later, five distinct photos (one per slot) would read
-better than the current reuse of two images across five slots.
+Images were resized/re-compressed for web delivery (no crop or content edits,
+aside from `splash-hero.jpg`/`slide-stations.jpg` which are center-cropped
+from one source photo to fit their slot's aspect ratio).
