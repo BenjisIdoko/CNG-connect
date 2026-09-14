@@ -76,6 +76,10 @@ export interface GasStation {
   dataSource?: string;
   dataSourceDate?: string;
   createdBy?: string | null;
+  opensAt?: string | null; // "HH:MM:SS", null when unknown or is24Hours
+  closesAt?: string | null;
+  is24Hours?: boolean;
+  hoursNote?: string | null; // e.g. "Closed Sundays"
 }
 
 export interface StationSuggestion {

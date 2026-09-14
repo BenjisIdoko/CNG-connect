@@ -4,6 +4,7 @@ import { supabase } from '../services/supabaseClient';
 import { useAuth } from '../context/AuthContext';
 import { loadGoogleMaps, hasGoogleMapsKey } from '../utils/googleMaps';
 import { parseCsv, toCsv } from '../utils/csv';
+import { FullStationEditorModal } from './FullStationEditorModal';
 
 type Tier = 'source_exact' | 'rooftop' | 'street' | 'area' | 'city';
 const TIERS: Tier[] = ['rooftop', 'street', 'area', 'source_exact', 'city'];
@@ -29,6 +30,20 @@ interface Row {
   station_type: string | null;
   area: string | null;
   data_source: string | null;
+  phone: string | null;
+  cng_price: number | null;
+  pump_pressure: number | null;
+  is_picng_accredited: boolean | null;
+  images: string[] | null;
+  opens_at: string | null;
+  closes_at: string | null;
+  is_24_hours: boolean | null;
+  hours_note: string | null;
+  connector_types: string[] | null;
+  charging_speed_kw: number | null;
+  price_per_kwh: number | null;
+  total_ports: number | null;
+  network: string | null;
 }
 
 const NG = { minLat: 4, maxLat: 14, minLng: 2.5, maxLng: 15 };
@@ -195,6 +210,9 @@ export const AdminPinsScreen: React.FC<{ onExit: () => void }> = ({ onExit }) =>
   const [csvDiffs, setCsvDiffs] = useState<CsvDiffRow[] | null>(null);
   const [applyingCsv, setApplyingCsv] = useState(false);
 
+  // full station details editor
+  const [fullEditorId, setFullEditorId] = useState<string | null>(null);
+
   const mapEl = useRef<HTMLDivElement>(null);
   const mapRef = useRef<google.maps.Map | null>(null);
   const markersRef = useRef<Record<string, google.maps.Marker>>({});
@@ -214,7 +232,7 @@ export const AdminPinsScreen: React.FC<{ onExit: () => void }> = ({ onExit }) =>
     const { data, error } = await supabase
       .from('stations')
       .select(
-        'id,name,address,operator,city,state,lat,lng,location_precision,needs_pin_review,station_type,area,data_source'
+        'id,name,address,operator,city,state,lat,lng,location_precision,needs_pin_review,station_type,area,data_source,phone,cng_price,pump_pressure,is_picng_accredited,images,opens_at,closes_at,is_24_hours,hours_note,connector_types,charging_speed_kw,price_per_kwh,total_ports,network'
       )
       .order('needs_pin_review', { ascending: false })
       .order('name');
@@ -660,6 +678,12 @@ export const AdminPinsScreen: React.FC<{ onExit: () => void }> = ({ onExit }) =>
                       : 'border-slate-300'
                   }`}
                 />
+                <button
+                  onClick={() => setFullEditorId(sel.id)}
+                  className="text-xs px-3 py-1.5 rounded-lg bg-slate-800 text-white font-semibold whitespace-nowrap shrink-0"
+                >
+                  Full details
+                </button>
               </div>
               <p className="text-xs text-slate-500 truncate pl-14 -mt-1">{sel.address || '(no address)'}</p>
 
@@ -808,6 +832,22 @@ export const AdminPinsScreen: React.FC<{ onExit: () => void }> = ({ onExit }) =>
           </div>
         </div>
       )}
+
+      {fullEditorId &&
+        (() => {
+          const row = rows.find((r) => r.id === fullEditorId);
+          if (!row) return null;
+          return (
+            <FullStationEditorModal
+              station={row}
+              onClose={() => setFullEditorId(null)}
+              onSaved={(id, patch) => {
+                setRows((rs) => rs.map((r) => (r.id === id ? { ...r, ...patch } : r)));
+                flash('Saved station details');
+              }}
+            />
+          );
+        })()}
     </div>
   );
 };

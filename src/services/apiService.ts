@@ -254,6 +254,10 @@ export const apiService = {
             pricePerKwh: s.price_per_kwh ?? undefined,
             totalPorts: s.total_ports ?? undefined,
             network: s.network ?? undefined,
+            opensAt: s.opens_at ?? null,
+            closesAt: s.closes_at ?? null,
+            is24Hours: s.is_24_hours ?? false,
+            hoursNote: s.hours_note ?? null,
           };
         });
 
