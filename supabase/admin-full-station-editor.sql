@@ -160,12 +160,12 @@ $$;
 
 revoke all on function admin_update_station(
   text, text, text, text, text, text, text, text, double precision, double precision, text,
-  text, double precision, double precision, boolean, jsonb, text, text, boolean, text,
+  text, double precision, integer, boolean, jsonb, text, text, boolean, text,
   jsonb, double precision, double precision, integer, text
 ) from anon;
 
 grant execute on function admin_update_station(
   text, text, text, text, text, text, text, text, double precision, double precision, text,
-  text, double precision, double precision, boolean, jsonb, text, text, boolean, text,
+  text, double precision, integer, boolean, jsonb, text, text, boolean, text,
   jsonb, double precision, double precision, integer, text
 ) to authenticated;
