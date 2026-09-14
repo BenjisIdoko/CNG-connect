@@ -5,9 +5,9 @@
 -- onboarding screen's images — no Supabase Storage bucket needed.
 
 update stations
-set images = array[
-  '/stations/rolling-energy-jahi/canopy.jpg',
-  '/stations/rolling-energy-jahi/commissioning.jpg',
-  '/stations/rolling-energy-jahi/tanker.jpg'
-]
+set images = '[
+  "/stations/rolling-energy-jahi/canopy.jpg",
+  "/stations/rolling-energy-jahi/commissioning.jpg",
+  "/stations/rolling-energy-jahi/tanker.jpg"
+]'::jsonb
 where id = 'pci-station-84';
