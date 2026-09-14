@@ -161,7 +161,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
         <div className="flex bg-surface-container p-1 rounded-2xl border border-surface-container-highest">
           <button
             onClick={() => setActiveMainTab('station_groups')}
-            className={`flex-1 py-3 rounded-xl text-body font-bold transition-all text-center ${
+            className={`flex-1 py-3 rounded-xl text-caption font-bold transition-all text-center ${
               activeMainTab === 'station_groups'
                 ? 'bg-primary text-white shadow-xs'
                 : 'text-on-surface-variant hover:text-on-surface'
@@ -172,7 +172,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
 
           <button
             onClick={() => setActiveMainTab('general')}
-            className={`flex-1 py-3 rounded-xl text-body font-bold transition-all text-center ${
+            className={`flex-1 py-3 rounded-xl text-caption font-bold transition-all text-center ${
               activeMainTab === 'general'
                 ? 'bg-primary text-white shadow-xs'
                 : 'text-on-surface-variant hover:text-on-surface'
@@ -183,13 +183,13 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
 
           <button
             onClick={() => setActiveMainTab('leaderboard')}
-            className={`flex-1 py-3 rounded-xl text-body font-bold transition-all text-center flex items-center justify-center gap-1 ${
+            className={`flex-1 py-3 rounded-xl text-caption font-bold transition-all text-center flex items-center justify-center gap-1 ${
               activeMainTab === 'leaderboard'
                 ? 'bg-[#004D40] text-[#00FFC2] shadow-xs'
                 : 'text-on-surface-variant hover:text-on-surface'
             }`}
           >
-            <span>🏆 Legends</span>
+            <span className="whitespace-nowrap">🏆 Legends</span>
           </button>
         </div>
 

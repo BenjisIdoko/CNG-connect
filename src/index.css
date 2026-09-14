@@ -23,19 +23,19 @@
   
   /* Type Scale Utility Tokens */
   --text-micro: 0.75rem;         /* 12px - badges, timestamps, micro tags */
-  --text-micro--line-height: 1rem;
+  --text-micro--line-height: 1.35;
   --text-caption: 0.8125rem;     /* 13px - secondary text, meta info, captions */
-  --text-caption--line-height: 1.15rem;
-  --text-body: 0.9375rem;        /* 15px - default body text, inputs, descriptions */
-  --text-body--line-height: 1.4rem;
-  --text-body-lg: 1rem;          /* 16px - emphasized body, list item titles */
-  --text-body-lg--line-height: 1.45rem;
-  --text-title: 1.1875rem;       /* 19px - section titles, card headers */
-  --text-title--line-height: 1.5rem;
-  --text-heading: 1.375rem;      /* 22px - modal titles, screen subheaders */
-  --text-heading--line-height: 1.7rem;
+  --text-caption--line-height: 1.4;
+  --text-body: 1rem;             /* 16px - default body text, inputs, descriptions */
+  --text-body--line-height: 1.5;
+  --text-body-lg: 1.125rem;      /* 18px - emphasized body, list item titles */
+  --text-body-lg--line-height: 1.35;
+  --text-title: 1.25rem;         /* 20px - section titles, card headers */
+  --text-title--line-height: 1.3;
+  --text-heading: 1.5rem;        /* 24px - modal titles, screen subheaders */
+  --text-heading--line-height: 1.25;
   --text-display: 1.75rem;       /* 28px - hero headers, splash display text */
-  --text-display--line-height: 2.1rem;
+  --text-display--line-height: 1.2;
 
   --color-primary: #006c50;
   --color-primary-container: #00ffc2;
