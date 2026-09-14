@@ -920,7 +920,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-2 min-w-0">
                       <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${statusInfo.dotColor}`} />
-                      <h4 className="font-extrabold text-[14px] text-slate-900 truncate">
+                      <h4 className="font-extrabold text-body-lg text-slate-900 truncate">
                         {station.name}
                       </h4>
                     </div>
