@@ -474,9 +474,6 @@ export const App: React.FC = () => {
   const handleSubmitReport = async (newReport: DriverReport, newStatus: StationStatus) => {
     if (!reportingStation) return;
 
-    const pointsAwarded = newReport.isPhotoVerified ? 100 : 50;
-    let newTotalPoints = 0;
-
     const updatedStations = await apiService.submitReport(reportingStation.id, newReport, newStatus);
     updateStationsWithAlerts(updatedStations);
 
@@ -500,20 +497,23 @@ export const App: React.FC = () => {
     const oldPoints = userProfile.communityPoints || 0;
     const oldTier = getDriverTier(oldPoints).currentTier;
 
+    const award = await apiService.awardReportPoints(newReport.id, Boolean(newReport.isPhotoVerified));
+
     updateProfile((prev) => {
-      newTotalPoints = (prev.communityPoints || 0) + pointsAwarded;
+      const newTotalPoints = award.communityPoints ?? (prev.communityPoints || 0) + award.pointsAwarded;
+      const newReportsCount = award.reportsCount ?? prev.reportsCount + 1;
       const newTier = getDriverTier(newTotalPoints).currentTier;
       if (newTier.id !== oldTier.id) {
         setUnlockedTierModal(newTier);
       }
       return {
         ...prev,
-        reportsCount: prev.reportsCount + 1,
+        reportsCount: newReportsCount,
         communityPoints: newTotalPoints,
       };
     });
 
-    showToast(`Thanks! +${pointsAwarded} reputation points earned.`);
+    showToast(`Thanks! +${award.pointsAwarded} reputation points earned.`);
   };
 
   const handleAddStationComment = async (stationId: string, commentText: string) => {

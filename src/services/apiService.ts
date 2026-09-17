@@ -424,6 +424,38 @@ export const apiService = {
   },
 
   /**
+   * Award reputation points for a just-submitted report via a server-side
+   * RPC (award_report_points) rather than computing and writing the new
+   * total client-side — the DB validates report ownership, derives the
+   * points from the report's own is_photo_verified value, and is idempotent
+   * per report_id so this can't be called repeatedly to farm points.
+   * Falls back to the old client-computed amount when Supabase isn't
+   * configured (offline/local-only mode), so behavior is unchanged there.
+   */
+  async awardReportPoints(
+    reportId: string,
+    isPhotoVerified: boolean
+  ): Promise<{ pointsAwarded: number; communityPoints?: number; reportsCount?: number }> {
+    const fallback = { pointsAwarded: isPhotoVerified ? 100 : 50 };
+    if (!isSupabaseConfigured || !supabase) return fallback;
+    try {
+      const { data, error } = await supabase.rpc('award_report_points', { p_report_id: reportId });
+      if (error || !data) {
+        console.error('award_report_points failed:', error?.message);
+        return fallback;
+      }
+      return {
+        pointsAwarded: data.points_awarded,
+        communityPoints: data.community_points,
+        reportsCount: data.reports_count,
+      };
+    } catch (err) {
+      console.error('award_report_points exception:', err);
+      return fallback;
+    }
+  },
+
+  /**
    * Fetch all community posts. Pass the current driver's userKey to also
    * resolve which posts they've personally liked (post_likes is the source
    * of truth for that; community_posts.likes is just the cached count).
