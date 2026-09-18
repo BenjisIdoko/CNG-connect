@@ -71,11 +71,17 @@ export function deduplicateStations(stationsList: GasStation[]): GasStation[] {
   });
 }
 
+// Temporary switch to pull EV charging stations out of the app entirely
+// (map, lists, search, counts) without deleting their data — flip back to
+// true to bring them back. Also honored in apiService.fetchStations() for
+// the live/local-cache path.
+export const SHOW_EV_STATIONS = false;
+
 export const INITIAL_STATIONS: GasStation[] = deduplicateStations([
   ...(evStationsSeed as GasStation[]),
   ...(coreCngStationsSeed as GasStation[]),
   ...(pciStationsSeed as GasStation[]).map((s) => ({ ...s, stationType: (s.stationType || 'cng') as 'cng' })),
-]);
+]).filter((s) => SHOW_EV_STATIONS || s.stationType !== 'ev_charging');
 
 export const INITIAL_COMMUNITY_POSTS: CommunityPost[] = [];
 

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { supabase } from '../services/supabaseClient';
 
 export interface FullStationRow {
@@ -30,6 +30,14 @@ interface Props {
   station: FullStationRow;
   onClose: () => void;
   onSaved: (id: string, patch: Partial<FullStationRow>) => void;
+  /** Shows the manager-assignment section — only admins may assign/remove managers. */
+  isAdmin?: boolean;
+}
+
+interface ManagerInfo {
+  userId: string;
+  email: string;
+  name: string;
 }
 
 // HH:MM:SS (from the DB) -> HH:MM (what <input type="time"> wants).
@@ -39,7 +47,7 @@ const inputCls =
   'w-full border border-slate-300 rounded-lg px-2.5 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/30';
 const labelCls = 'text-xs font-semibold text-slate-500 mb-1 block';
 
-export const FullStationEditorModal: React.FC<Props> = ({ station, onClose, onSaved }) => {
+export const FullStationEditorModal: React.FC<Props> = ({ station, onClose, onSaved, isAdmin = false }) => {
   const isEv = station.station_type === 'ev_charging';
 
   const [name, setName] = useState(station.name);
@@ -76,6 +84,79 @@ export const FullStationEditorModal: React.FC<Props> = ({ station, onClose, onSa
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [managers, setManagers] = useState<ManagerInfo[]>([]);
+  const [loadingManagers, setLoadingManagers] = useState(false);
+  const [newManagerEmail, setNewManagerEmail] = useState('');
+  const [managerBusy, setManagerBusy] = useState(false);
+
+  useEffect(() => {
+    if (!isAdmin || !supabase) return;
+    let cancelled = false;
+    setLoadingManagers(true);
+    (async () => {
+      const { data: links } = await supabase!
+        .from('station_managers')
+        .select('user_id')
+        .eq('station_id', station.id);
+      const userIds = (links || []).map((l) => l.user_id as string);
+      if (userIds.length === 0) {
+        if (!cancelled) setManagers([]);
+      } else {
+        const { data: profs } = await supabase!
+          .from('profiles')
+          .select('id,email,name')
+          .in('id', userIds);
+        if (!cancelled) {
+          setManagers(
+            (profs || []).map((p) => ({ userId: p.id as string, email: p.email as string, name: (p.name as string) || '' }))
+          );
+        }
+      }
+      if (!cancelled) setLoadingManagers(false);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [isAdmin, station.id]);
+
+  const addManager = async () => {
+    if (!supabase || !newManagerEmail.trim()) return;
+    setManagerBusy(true);
+    setErr(null);
+    const { error } = await supabase.rpc('admin_assign_station_manager', {
+      p_station_id: station.id,
+      p_manager_email: newManagerEmail.trim(),
+    });
+    setManagerBusy(false);
+    if (error) {
+      setErr(`Add manager failed: ${error.message}`);
+      return;
+    }
+    setNewManagerEmail('');
+    const { data: profs } = await supabase.from('profiles').select('id,email,name').eq('email', newManagerEmail.trim());
+    if (profs && profs[0]) {
+      setManagers((prev) => [
+        ...prev.filter((m) => m.userId !== profs[0].id),
+        { userId: profs[0].id as string, email: profs[0].email as string, name: (profs[0].name as string) || '' },
+      ]);
+    }
+  };
+
+  const removeManager = async (email: string) => {
+    if (!supabase) return;
+    setManagerBusy(true);
+    const { error } = await supabase.rpc('admin_remove_station_manager', {
+      p_station_id: station.id,
+      p_manager_email: email,
+    });
+    setManagerBusy(false);
+    if (error) {
+      setErr(`Remove manager failed: ${error.message}`);
+      return;
+    }
+    setManagers((prev) => prev.filter((m) => m.email !== email));
+  };
 
   const persistImages = async (next: string[]) => {
     if (!supabase) return;
@@ -344,6 +425,62 @@ export const FullStationEditorModal: React.FC<Props> = ({ station, onClose, onSa
               <input className={inputCls} placeholder="e.g. Closed Sundays" value={hoursNote} onChange={(e) => setHoursNote(e.target.value)} />
             </div>
           </section>
+
+          {isAdmin && (
+            <section className="flex flex-col gap-2">
+              <h3 className="text-xs font-extrabold text-slate-400 uppercase tracking-wide">
+                Station managers
+              </h3>
+              <p className="text-xs text-slate-500 -mt-1">
+                A manager can edit only this station's details (not pin location review, bulk tools, or other stations).
+              </p>
+              {loadingManagers ? (
+                <p className="text-xs text-slate-400">Loading…</p>
+              ) : managers.length === 0 ? (
+                <p className="text-xs text-slate-400">No managers assigned yet.</p>
+              ) : (
+                <div className="flex flex-col gap-1.5">
+                  {managers.map((m) => (
+                    <div
+                      key={m.userId}
+                      className="flex items-center justify-between gap-2 border border-slate-200 rounded-lg px-2.5 py-1.5"
+                    >
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-slate-900 truncate">{m.name || 'Unnamed driver'}</p>
+                        <p className="text-xs text-slate-500 truncate">{m.email}</p>
+                      </div>
+                      <button
+                        onClick={() => removeManager(m.email)}
+                        disabled={managerBusy}
+                        className="text-xs px-2.5 py-1 rounded-full bg-rose-50 text-rose-600 hover:bg-rose-100 font-semibold shrink-0 disabled:opacity-50"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <div className="flex items-center gap-2">
+                <input
+                  className={inputCls}
+                  placeholder="manager@email.com"
+                  value={newManagerEmail}
+                  onChange={(e) => setNewManagerEmail(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && addManager()}
+                />
+                <button
+                  onClick={addManager}
+                  disabled={managerBusy || !newManagerEmail.trim()}
+                  className="text-xs px-3 py-1.5 rounded-lg bg-slate-800 text-white font-semibold whitespace-nowrap disabled:opacity-50"
+                >
+                  Add
+                </button>
+              </div>
+              <p className="text-xs text-slate-400">
+                The email must belong to a driver who has already signed up (any email-verified account works).
+              </p>
+            </section>
+          )}
         </div>
 
         <div className="p-4 border-t border-slate-200 flex justify-end gap-2 shrink-0">

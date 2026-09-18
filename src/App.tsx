@@ -80,12 +80,26 @@ import { apiService } from './services/apiService';
 const AdminPinsScreen = lazy(() =>
   import('./components/AdminPinsScreen').then((m) => ({ default: m.AdminPinsScreen }))
 );
+const StationManagerScreen = lazy(() =>
+  import('./components/StationManagerScreen').then((m) => ({ default: m.StationManagerScreen }))
+);
 
 export const App: React.FC = () => {
   // Hidden ?admin=1 route — a full-screen pin editor, gated on profiles.is_admin.
   const [adminMode] = useState(() => {
     try {
       return new URLSearchParams(window.location.search).has('admin');
+    } catch {
+      return false;
+    }
+  });
+
+  // Hidden ?manager=1 route — lets a station manager (assigned by an admin via
+  // the "Station managers" section of the full editor) edit only their own
+  // station(s); gated on a station_managers row, not profiles.is_admin.
+  const [managerMode] = useState(() => {
+    try {
+      return new URLSearchParams(window.location.search).has('manager');
     } catch {
       return false;
     }
@@ -664,6 +678,18 @@ export const App: React.FC = () => {
     return (
       <Suspense fallback={<div className="fixed inset-0 grid place-items-center text-slate-500">Loading admin…</div>}>
         <AdminPinsScreen
+          onExit={() => {
+            window.location.href = window.location.pathname;
+          }}
+        />
+      </Suspense>
+    );
+  }
+
+  if (managerMode) {
+    return (
+      <Suspense fallback={<div className="fixed inset-0 grid place-items-center text-slate-500">Loading…</div>}>
+        <StationManagerScreen
           onExit={() => {
             window.location.href = window.location.pathname;
           }}

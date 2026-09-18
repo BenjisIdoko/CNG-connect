@@ -857,8 +857,8 @@ export const MapScreen: React.FC<MapScreenProps> = ({
             )}
           </div>
 
-          {/* Type Filter Segment Bar */}
-          <div className="grid grid-cols-3 gap-1 p-1 bg-slate-100 rounded-xl">
+          {/* Type Filter Segment Bar — EV temporarily hidden app-wide (SHOW_EV_STATIONS in mockData.ts) */}
+          <div className="grid grid-cols-2 gap-1 p-1 bg-slate-100 rounded-xl">
             <button
               onClick={() => setStationTypeFilter('all')}
               className={`py-2 rounded-lg text-micro font-extrabold transition-all ${
@@ -875,15 +875,6 @@ export const MapScreen: React.FC<MapScreenProps> = ({
             >
               <span className="material-symbols-outlined text-[13px]">local_gas_station</span>
               <span>CNG</span>
-            </button>
-            <button
-              onClick={() => setStationTypeFilter('ev_charging')}
-              className={`py-2 rounded-lg text-micro font-extrabold transition-all flex items-center justify-center gap-1 ${
-                stationTypeFilter === 'ev_charging' ? 'bg-sky-600 text-white shadow-2xs' : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <span className="material-symbols-outlined text-[13px]">bolt</span>
-              <span>⚡ EV</span>
             </button>
           </div>
 
@@ -961,11 +952,10 @@ export const MapScreen: React.FC<MapScreenProps> = ({
           {/* Station Type */}
           <div>
             <label className="block text-caption font-bold text-slate-700 mb-2">Station Type</label>
-            <div className="grid grid-cols-3 gap-1 p-1 bg-slate-100 rounded-xl">
+            <div className="grid grid-cols-2 gap-1 p-1 bg-slate-100 rounded-xl">
               {([
                 { key: 'all', label: 'All', icon: null },
                 { key: 'cng', label: 'CNG', icon: 'local_gas_station' },
-                { key: 'ev_charging', label: 'EV', icon: 'bolt' },
               ] as const).map((opt) => (
                 <button
                   key={opt.key}
@@ -975,8 +965,6 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                     stationTypeFilter === opt.key
                       ? opt.key === 'cng'
                         ? 'bg-emerald-600 text-white shadow-2xs'
-                        : opt.key === 'ev_charging'
-                        ? 'bg-sky-600 text-white shadow-2xs'
                         : 'bg-white text-slate-900 shadow-2xs'
                       : 'text-slate-600 hover:text-slate-900'
                   }`}

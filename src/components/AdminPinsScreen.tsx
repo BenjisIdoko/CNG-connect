@@ -213,6 +213,11 @@ export const AdminPinsScreen: React.FC<{ onExit: () => void }> = ({ onExit }) =>
   // full station details editor
   const [fullEditorId, setFullEditorId] = useState<string | null>(null);
 
+  // bulk delete
+  const [selectedForDelete, setSelectedForDelete] = useState<Set<string>>(new Set());
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
   const mapEl = useRef<HTMLDivElement>(null);
   const mapRef = useRef<google.maps.Map | null>(null);
   const markersRef = useRef<Record<string, google.maps.Marker>>({});
@@ -473,6 +478,33 @@ export const AdminPinsScreen: React.FC<{ onExit: () => void }> = ({ onExit }) =>
     if (failures.length) console.error('Bulk update failures:\n' + failures.join('\n'));
   };
 
+  const toggleDeleteSelect = (id: string) => {
+    setSelectedForDelete((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const deleteSelected = async () => {
+    if (!supabase || selectedForDelete.size === 0) return;
+    setDeleting(true);
+    const ids = Array.from(selectedForDelete);
+    const { error } = await supabase.rpc('admin_delete_stations', { p_station_ids: ids });
+    setDeleting(false);
+    setConfirmingDelete(false);
+    if (error) {
+      flash(`Delete failed: ${error.message}`);
+      return;
+    }
+    setRows((rs) => rs.filter((r) => !selectedForDelete.has(r.id)));
+    if (selId && selectedForDelete.has(selId)) setSelId(null);
+    if (fullEditorId && selectedForDelete.has(fullEditorId)) setFullEditorId(null);
+    flash(`Deleted ${ids.length} station${ids.length === 1 ? '' : 's'}`);
+    setSelectedForDelete(new Set());
+  };
+
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     return rows.filter((r) => {
@@ -620,17 +652,46 @@ export const AdminPinsScreen: React.FC<{ onExit: () => void }> = ({ onExit }) =>
               Only needs-review ({reviewCount})
             </label>
           </div>
+          {selectedForDelete.size > 0 && (
+            <div className="flex items-center justify-between gap-2 px-2.5 py-2 bg-rose-50 border-b border-rose-200">
+              <span className="text-xs font-semibold text-rose-700">{selectedForDelete.size} selected</span>
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={() => setSelectedForDelete(new Set())}
+                  className="text-xs px-2.5 py-1 rounded-full bg-white text-slate-600 hover:bg-slate-100"
+                >
+                  Clear
+                </button>
+                <button
+                  onClick={() => setConfirmingDelete(true)}
+                  className="text-xs px-2.5 py-1 rounded-full bg-rose-600 text-white font-semibold hover:bg-rose-700"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          )}
           <div className="flex-1 overflow-y-auto">
             {loading && <p className="p-3 text-xs text-slate-400">Loading stations…</p>}
             {filtered.map((r) => (
-              <button
+              <div
                 key={r.id}
+                role="button"
+                tabIndex={0}
                 onClick={() => setSelId(r.id)}
-                className={`w-full text-left px-3 py-2 border-b border-slate-100 ${
+                onKeyDown={(e) => e.key === 'Enter' && setSelId(r.id)}
+                className={`w-full text-left px-3 py-2 border-b border-slate-100 cursor-pointer ${
                   r.id === selId ? 'bg-emerald-50' : 'hover:bg-slate-50'
                 }`}
               >
                 <div className="flex items-center gap-1.5">
+                  <input
+                    type="checkbox"
+                    checked={selectedForDelete.has(r.id)}
+                    onClick={(e) => e.stopPropagation()}
+                    onChange={() => toggleDeleteSelect(r.id)}
+                    className="shrink-0"
+                  />
                   <span
                     className={`w-1.5 h-1.5 rounded-full shrink-0 ${
                       r.needs_pin_review ? 'bg-orange-500' : 'bg-emerald-500'
@@ -641,7 +702,7 @@ export const AdminPinsScreen: React.FC<{ onExit: () => void }> = ({ onExit }) =>
                 <p className="text-[11px] text-slate-500 truncate mt-0.5">
                   {r.location_precision || '—'} · {r.city}, {r.state}
                 </p>
-              </button>
+              </div>
             ))}
             {!loading && filtered.length === 0 && <p className="p-3 text-xs text-slate-400">Nothing matches.</p>}
           </div>
@@ -775,6 +836,43 @@ export const AdminPinsScreen: React.FC<{ onExit: () => void }> = ({ onExit }) =>
         </div>
       )}
 
+      {confirmingDelete && (
+        <div className="fixed inset-0 z-[225] bg-black/40 grid place-items-center p-6">
+          <div className="w-full max-w-sm bg-white rounded-2xl shadow-xl p-5 flex flex-col gap-3">
+            <h2 className="font-extrabold text-slate-900 text-sm">
+              Delete {selectedForDelete.size} station{selectedForDelete.size === 1 ? '' : 's'}?
+            </h2>
+            <div className="max-h-40 overflow-y-auto text-xs text-slate-600 flex flex-col gap-1 border border-slate-200 rounded-lg p-2.5">
+              {rows
+                .filter((r) => selectedForDelete.has(r.id))
+                .map((r) => (
+                  <span key={r.id} className="truncate">
+                    {r.name}
+                  </span>
+                ))}
+            </div>
+            <p className="text-xs text-rose-600 font-semibold">
+              This permanently deletes each station and its reports, photos, and comments. This can't be undone.
+            </p>
+            <div className="flex justify-end gap-2 mt-1">
+              <button
+                onClick={() => setConfirmingDelete(false)}
+                className="text-xs px-4 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={deleteSelected}
+                disabled={deleting}
+                className="text-xs px-4 py-1.5 rounded-lg bg-rose-600 text-white font-bold disabled:opacity-50"
+              >
+                {deleting ? 'Deleting…' : 'Delete permanently'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {csvDiffs && (
         <div className="fixed inset-0 z-[220] bg-black/40 grid place-items-center p-6">
           <div className="w-full max-w-2xl max-h-[80vh] bg-white rounded-2xl shadow-xl flex flex-col">
@@ -840,6 +938,7 @@ export const AdminPinsScreen: React.FC<{ onExit: () => void }> = ({ onExit }) =>
           return (
             <FullStationEditorModal
               station={row}
+              isAdmin
               onClose={() => setFullEditorId(null)}
               onSaved={(id, patch) => {
                 setRows((rs) => rs.map((r) => (r.id === id ? { ...r, ...patch } : r)));

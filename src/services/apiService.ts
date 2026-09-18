@@ -1,5 +1,5 @@
 import { GasStation, DriverReport, CommunityPost, StationStatus, VerificationLevel, StationMedia, StationSuggestion, CommentItem } from '../types';
-import { INITIAL_STATIONS, INITIAL_POSTS, deduplicateStations } from '../data/mockData';
+import { INITIAL_STATIONS, INITIAL_POSTS, deduplicateStations, SHOW_EV_STATIONS } from '../data/mockData';
 import { supabase, isSupabaseConfigured } from './supabaseClient';
 import { checkNotificationPermission } from '../utils/permissionManager';
 import { formatRelativeTime } from '../utils/timeUtils';
@@ -99,18 +99,25 @@ function purgeStaleLocalStorage() {
   }
 }
 
+// Drops EV charging stations when SHOW_EV_STATIONS is off — applied here too
+// (not just at INITIAL_STATIONS) in case a stale localStorage cache from
+// before this flag existed still has them.
+function applyStationTypeVisibility(stations: GasStation[]): GasStation[] {
+  return SHOW_EV_STATIONS ? stations : stations.filter((s) => s.stationType !== 'ev_charging');
+}
+
 function getLocalStations(): GasStation[] {
   purgeStaleLocalStorage();
   try {
     const saved = getStorageItem(STATIONS_STORAGE_KEY);
-    if (!saved) return deduplicateStations(INITIAL_STATIONS);
+    if (!saved) return applyStationTypeVisibility(deduplicateStations(INITIAL_STATIONS));
     const parsed = JSON.parse(saved);
     if (!Array.isArray(parsed) || parsed.length === 0) {
-      return deduplicateStations(INITIAL_STATIONS);
+      return applyStationTypeVisibility(deduplicateStations(INITIAL_STATIONS));
     }
-    return deduplicateStations(parsed);
+    return applyStationTypeVisibility(deduplicateStations(parsed));
   } catch {
-    return deduplicateStations(INITIAL_STATIONS);
+    return applyStationTypeVisibility(deduplicateStations(INITIAL_STATIONS));
   }
 }
 
@@ -261,9 +268,10 @@ export const apiService = {
           };
         });
 
-        if (stations.length > 0) {
-          saveLocalStations(stations);
-          return stations;
+        const visibleStations = applyStationTypeVisibility(stations);
+        if (visibleStations.length > 0) {
+          saveLocalStations(visibleStations);
+          return visibleStations;
         }
         return getLocalStations();
       } catch (err) {
