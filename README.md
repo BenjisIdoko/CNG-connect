@@ -2,69 +2,60 @@
 
 > **Nigeria's Premier Compressed Natural Gas (CNG) Driver Platform & Live Station Locator**
 
-[![React](https://img.shields.io/badge/React-19.0-blue.svg?logo=react)](https://react.dev/)
+[![React](https://img.shields.io/badge/React-19-blue.svg?logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-blue.svg?logo=typescript)](https://www.typescriptlang.org/)
-[![Vite](https://img.shields.io/badge/Vite-6.4-purple.svg?logo=vite)](https://vitejs.dev/)
-[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4.1-38B2AC.svg?logo=tailwind-css)](https://tailwindcss.com/)
-[![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL%20%26%20Realtime-emerald.svg?logo=supabase)](https://supabase.com/)
+[![Vite](https://img.shields.io/badge/Vite-6-purple.svg?logo=vite)](https://vitejs.dev/)
+[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4-38B2AC.svg?logo=tailwind-css)](https://tailwindcss.com/)
+[![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL%2C%20Auth%20%26%20Storage-emerald.svg?logo=supabase)](https://supabase.com/)
 [![Vercel](https://img.shields.io/badge/Vercel-Serverless-black.svg?logo=vercel)](https://vercel.com/)
-[![Tests](https://img.shields.io/badge/Tests-45%2F45%20Passed-success.svg)](https://vitest.dev/)
+[![Tests](https://img.shields.io/badge/Tests-87%2F87%20Passed-success.svg)](https://vitest.dev/)
 
-**CNG-Connect** is a high-performance web application built for Nigerian commercial (Bolt, Uber, inDrive) and private drivers transitioning to Compressed Natural Gas (CNG). Developed in support of the Presidential CNG Initiative (Pi-CNG), the platform provides real-time CNG station tracking, crowdsourced pump status and pressure reporting (up to 220 bar), directory of 451 accredited Pi-CNG conversion workshops, an interactive fuel savings & payback ROI calculator, and an AI-powered driver assistant.
+**CNG-Connect** is a driver-facing PWA built for Nigerian commercial (Bolt, Uber, inDrive) and private drivers running on Compressed Natural Gas. Built in support of the Presidential CNG & EV Initiative (Pi-CNG), it provides a live, crowdsourced map of CNG refuelling stations, a directory of accredited conversion centres, a fuel-savings calculator, a driver community, and an internal toolset for keeping the underlying station data accurate.
+
+**Live**: [cngconnect.com.ng](https://cngconnect.com.ng)
 
 ---
 
-## 🌟 Key Features
+## 🌟 Driver-Facing Features
 
-### ⛽ 1. Real-Time CNG Station Tracker & Leaflet Clustering
-- **Geocoded Nationwide Data**: Track 90 real geocoded CNG refuelling stations across 28 states (Abuja FCT, Lagos, Ogun, Kano, Edo, Rivers, Delta, Oyo, Kaduna, etc.).
-- **High-Density Marker Clustering**: Powered by `leaflet.markercluster` to group dense station markers into numeric badges (`3`, `12`, `25`), dynamically expanding upon zoom.
-- **Filter Controls**: Filter stations by pump pressure (0 to 220 bar), distance radius (5km to 50km), and live availability status (*Full Stock*, *Queuing*, *Low Pressure*, *Out of Gas*, *No Recent Reports*).
-- **One-Tap Native Navigation**: Deep-links directly to Google Maps, Apple Maps, or Waze (`https://www.google.com/maps/dir/?api=1&destination=LAT,LNG`).
+### ⛽ Live Station Map
+- Crowdsourced CNG station tracker across Nigeria, rendered on a Leaflet map with marker clustering for dense areas.
+- Filter by pump pressure, distance radius, and live availability (*Full Stock*, *Queuing*, *Low Pressure*, *Out of Gas*).
+- One-tap turn-by-turn navigation via Google Maps, Apple Maps, or Waze.
+- Every station shows a plain-language report age (`"Updated 5 min ago"`, `"No recent report"`) so drivers know how fresh a status actually is.
 
-### ⏱️ 2. Human-Readable Station Report Age Copy
-- **Age Transparency**: Displays human-readable age text everywhere stations appear (list cards, map drawers, photo carousels, and station details).
-- **Clear Copy**: Formats timestamps into unambiguous driver-friendly text:
-  - `"Updated Just now"`
-  - `"Updated 5 min ago"`
-  - `"Updated 2 hrs ago"`
-  - `"No recent report"` (when status is unknown or `lastUpdated` is missing/stale like *"Seeded from PCI"*).
-- **Trust-First UI**: Green status badges (*Full Stock*) are never rendered without visible report age text.
+### 📍 Proximity Alerts
+- Background location watch detects when a driver is near a station they'd want to know about, and surfaces a push notification/in-app banner — the point being drivers find out about a nearby restock without needing to have the app open.
 
-### ⚡ 3. Fast 1-Tap Driver Status Reporting
-- **Driver-Centric UI**: Designed for fast operation by commercial and private Nigerian drivers (~28–70 years old).
-- **Large Full-Width Action Buttons**:
-  - 🟢 **Full stock (Fast pump)** (`bg-emerald-600`)
-  - 🟡 **Long queue / Queuing** (`bg-amber-500`)
-  - 🟠 **Low pressure** (`bg-orange-500`)
-  - 🔴 **Out of gas** (`bg-rose-600`)
-- **Optional Secondary Details**: Optional wait-time stepper, live camera photo capture (anti-fake verification), and driver notes are grouped into an expandable section (`+ Add details`), enabling single-tap submission.
-- **Instant Confirmation**: Submitting a report instantly updates local storage and displays a friendly confirmation toast: `"Thanks. Other drivers can see this."`
+### ⏱️ Fast Driver Status Reporting
+- One-tap status buttons (Full stock / Queuing / Low pressure / Out of gas) with optional wait-time, live camera photo attachment, and notes.
+- Reports build a driver's reputation score and community points, with unlockable tiers as they contribute more.
 
-### 🌐 4. Single Source of Truth Geolocation & Weak Network Resilience
-- **Unified Location Engine**: Unified GPS acquisition in `App.tsx` prevents duplicate position watches, minimizes battery drain, and maintains consistent distance & drive time math (`Math.round(distKm * 2.5 + 2) min drive`).
-- **Clear Permission State**: When GPS access is denied, displays a clear status notice: `"Turn on location to find nearby stations"`.
-- **Reliable Offline Fallback**: Detects weak network connectivity and displays a plain-language banner (`"No network. Showing last known stations."`), persisting cached stations in `localStorage` (`gasfinder_stations_v7`). Automatically refetches and syncs when back online.
+### 🛠️ Conversion Centre Directory
+- Searchable directory of 451+ Pi-CNG accredited conversion workshops, filterable by state/LGA, with in-app booking.
 
-### 🛠️ 5. 451 Pi-CNG Accredited Conversion Centers
-- Searchable directory of 451 certified conversion centers across Nigeria.
-- Filter by LGA, State, or center code (e.g. `LA5137YGK`).
-- In-app conversion appointment booking modal for dual-fuel kit installation and cylinder safety testing.
+### 💰 Fuel Savings & Payback Calculator
+- Computes monthly/annual naira savings and CO₂ reduction from switching to CNG, with a toggle between the free Pi-CNG driver grant and a privately-funded conversion kit.
 
-### 💰 6. Interactive Fuel Savings & Payback ROI Calculator
-- **Real-Time Savings Simulator**: Calculate exact monthly and annual savings (₦) by adjusting daily driving distance (km/day), petrol vs. CNG prices, and vehicle mileage.
-- **Pi-CNG Grant vs. Private Kit**: Toggle between the free Presidential CNG Initiative commercial driver grant (₦0) and private conversion kits (₦750,000) to compute payback period in months.
-- **Environmental Impact**: Computes annual CO₂ emissions cut (tons/year).
-- Embedded directly into driver profiles and accessible via modal dialogs.
+### 📲 Passwordless Sign-In
+- Real accounts via Supabase Auth's email-OTP flow — no password. Browsing stays open to guests; posting a report, comment, or joining the community requires a verified session, enforced at the database layer (Postgres RLS), not just the UI.
+- Profiles (name, vehicle, reputation, points) are tied to the Supabase Auth account, so they follow a driver across devices.
 
-### 📲 7. Passwordless Email Sign-In
-- Real accounts via Supabase Auth's email-OTP flow (`signInWithOtp` / `verifyOtp`) — no password, no separate login/signup forms. The same email + one-time code either creates a new account or signs back into an existing one. (Requires "Confirm email" **off** in the Supabase dashboard so new users get a code, not a confirmation link — see `.env.example`.)
-- Browsing (map, stations, community feed) stays open to guests; writing (reports, comments, likes, station suggestions) requires a verified session, enforced by Postgres RLS, not just the UI.
-- A driver's profile (name, vehicle, reputation, points) lives in a `profiles` table keyed to their Supabase Auth user, so it's the same account across devices — not per-browser `localStorage`.
+### 💬 Driver Community & AI Guide
+- Category-filtered discussion forum (Maintenance, Parts, Reviews, Deals, Conversions) with photo attachments and upvoting.
+- An in-app AI assistant for CNG-related questions and station recommendations.
 
-### 💬 8. Driver Community & CNG-Connect AI Guide
-- **Live Discussion Forum**: Category-filtered forum (*Maintenance*, *Parts*, *Reviews*, *Deals*, *Conversions*) with photo attachments and upvoting.
-- **CNG-Connect AI Guide**: Context-aware AI assistant tracking nationwide pump pressures, wait times, and station recommendations.
+### 📱 Installable PWA
+- "Add to Home Screen" prompt on both Android (native install banner) and iOS (guided Share → Add to Home Screen), plus offline-cached map tiles and station data so the app stays usable on a weak connection.
+
+---
+
+## 🔧 Internal Tools
+
+Two hidden, authentication-gated routes exist for keeping station data accurate — neither is linked from the regular app UI:
+
+- **`/?admin=1` — Admin dashboard.** Gated on an `is_admin` flag. Lets an admin drag a station's map pin to correct its location, edit every field on a station (name, address, hours, pricing, photos — uploaded straight to Supabase Storage), bulk-import corrections from a CSV spreadsheet, and bulk-delete stations.
+- **`/?manager=1` — Station manager.** A lighter role: an admin can assign a specific driver's email to one or more specific stations, and that driver can then sign in to edit only those station(s)' details (pricing, hours, photos, contact info) — without seeing or touching any other station.
 
 ---
 
@@ -74,12 +65,16 @@
 | :--- | :--- |
 | **Frontend Framework** | React 19 + TypeScript 5.8 |
 | **Build Tool & Bundler** | Vite 6 |
-| **Styling & System UI** | TailwindCSS 4 + Vanilla CSS Design Tokens |
-| **Map Rendering** | Leaflet 1.9 + `leaflet.markercluster` |
-| **Database, Auth & Realtime Sync** | Supabase (PostgreSQL, Auth email-OTP, Realtime Subscriptions, RLS) |
-| **Serverless API** | Vercel Serverless Functions (`/api/chat`) |
-| **State Management** | React Context (`AuthContext`) |
-| **Test Runner** | Vitest 4 |
+| **Styling** | TailwindCSS 4 (custom design-token type scale in `src/index.css`) |
+| **Map Rendering** | Leaflet 1.9 + `leaflet.markercluster` (driver-facing); Google Maps JS API (admin pin editor only) |
+| **Backend** | Supabase — Postgres with Row Level Security, Auth (email-OTP), Storage (avatars + station photos), and SQL functions (`SECURITY DEFINER` RPCs) for every privileged write |
+| **Hosting** | Vercel, custom domain via Cloudflare DNS |
+| **AI Assistant** | Vercel Serverless Function (`api/chat.ts`) calling Gemini |
+| **PWA** | `vite-plugin-pwa` (Workbox) — offline caching, installability |
+| **State Management** | React Context (`AuthContext`) + component state; no global store |
+| **Test Runner** | Vitest (87 tests) |
+
+The app runs as a client-only SPA — there's no traditional application server. The React client talks to Supabase directly with a public anon key; every write that needs privilege beyond "any signed-in driver" (station edits, admin actions, point awards) goes through a Postgres RPC function that checks authorization server-side, rather than trusting the client.
 
 ---
 
@@ -87,41 +82,39 @@
 
 ```
 CNG-connect/
-├── api/                        # Vercel Serverless API Functions
-│   └── chat.ts                 # Serverless Gemini AI endpoint
-├── scripts/
-│   └── seed-stations.ts        # Geocoding & seed generator script
+├── api/
+│   └── chat.ts                      # Serverless AI Guide endpoint (Gemini)
+├── scripts/                         # One-off data enrichment/geocoding scripts
+├── supabase/
+│   ├── schema.sql                   # Full DB schema: tables, RLS policies, triggers
+│   └── *.sql                        # Incremental migrations (run in the SQL editor)
 ├── src/
-│   ├── components/             # UI Components & Modals
-│   │   ├── common/
-│   │   │   ├── Modal.tsx       # Accessible Modal Primitive (z-[100])
-│   │   │   └── ImageWithFallback.tsx
-│   │   ├── MapScreen.tsx       # Leaflet Map & Clustered Stations
-│   │   ├── StationDetailScreen.tsx # Detailed station specs & live report timeline
-│   │   ├── ReportStatusModal.tsx   # Fast 1-Tap Driver Report Modal
-│   │   ├── ConversionCentersScreen.tsx # Accredited Workshop Directory
-│   │   ├── CngRoiCalculatorModal.tsx # Fuel Savings ROI Calculator
-│   │   ├── ProfileScreen.tsx   # Driver Profile & Editable Details
-│   │   ├── CommunityScreen.tsx # Driver Forum & Discussion Cards
-│   │   ├── AiAssistantModal.tsx# CNG-Connect AI Guide
-│   │   ├── Header.tsx          # Top Bar Navigation
-│   │   └── BottomNav.tsx       # Floating Bottom Navigation Bar
-│   ├── context/                # React Context Providers
-│   │   └── AuthContext.tsx     # Supabase Auth session + driver profile
-│   ├── data/                   # Seed Data & Mock Sets
-│   │   ├── pci-stations-seed.json
-│   │   └── pci-conversion-centers-seed.json
+│   ├── components/
+│   │   ├── MapScreen.tsx            # Leaflet map, filters, station list
+│   │   ├── StationDetailScreen.tsx  # Station detail, photos, live report feed
+│   │   ├── ReportStatusModal.tsx    # 1-tap driver status reporting
+│   │   ├── ConversionCentersScreen.tsx
+│   │   ├── CngRoiCalculatorModal.tsx
+│   │   ├── ProfileScreen.tsx
+│   │   ├── CommunityScreen.tsx / ChatScreen.tsx / DiscussionScreen.tsx
+│   │   ├── AiAssistantModal.tsx
+│   │   ├── InstallPrompt.tsx        # PWA "Add to Home Screen" banner
+│   │   ├── AdminPinsScreen.tsx      # ?admin=1 dashboard
+│   │   ├── FullStationEditorModal.tsx # Full station editor (used by both admin & manager)
+│   │   ├── StationManagerScreen.tsx # ?manager=1 scoped editor
+│   │   ├── Header.tsx / BottomNav.tsx
+│   │   └── common/
+│   ├── context/
+│   │   └── AuthContext.tsx          # Supabase Auth session + driver profile
+│   ├── data/                        # Bundled seed data (stations, conversion centres)
 │   ├── services/
-│   │   ├── apiService.ts       # Supabase Client, Local Cache & Realtime Sync
-│   │   └── supabaseClient.ts   # Supabase Client Initialization
-│   ├── utils/
-│   │   ├── timeUtils.ts        # Human-readable station age formatter
-│   │   ├── phoneValidator.ts   # Nigerian phone number validation helper
-│   │   └── permissionManager.ts# Presence & live update permission checks
-│   ├── types.ts                # TypeScript Interfaces & Models
-│   ├── App.tsx                 # Main Application Container & GPS Watcher
-│   └── main.tsx                # Entrypoint & Context Provider Wrapping
-├── index.html                  # HTML Shell
+│   │   ├── apiService.ts            # All Supabase reads/writes + local-cache fallback
+│   │   └── supabaseClient.ts
+│   ├── utils/                       # Formatting, validation, proximity/push logic, etc.
+│   ├── types.ts
+│   ├── App.tsx                      # App shell, GPS watcher, routing between screens
+│   └── main.tsx
+├── index.html
 ├── package.json
 └── vite.config.ts
 ```
@@ -131,75 +124,56 @@ CNG-connect/
 ## 🚀 Getting Started
 
 ### Prerequisites
-- **Node.js**: v18.0.0 or higher
-- **npm**: v9.0.0 or higher
+- **Node.js** v18+
+- **npm** v9+
 
 ### Installation
 
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/BenjisIdoko/CNG-connect.git
-   cd CNG-connect
-   ```
+```bash
+git clone https://github.com/BenjisIdoko/CNG-connect.git
+cd CNG-connect
+npm install
+```
 
-2. **Install dependencies**:
-   ```bash
-   npm install
-   ```
+### Configure environment variables
 
-3. **Configure Environment Variables**:
-   Create a `.env` file in the root directory:
-   ```env
-   # Supabase Credentials (also powers sign-in — see .env.example for the
-   # dashboard steps needed to make email-OTP delivery actually work:
-   # disable "Confirm email", custom SMTP, and edit the Magic Link
-   # template to send {{ .Token }})
-   VITE_SUPABASE_URL=https://your-supabase-project.supabase.co
-   VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
+Copy `.env.example` to `.env.local` and fill in the values — it documents each one in detail, including the Supabase dashboard steps needed to make email-OTP sign-in actually deliver a code (disable "Confirm email", set up custom SMTP, edit the email template). At minimum you need:
 
-   # Gemini AI Key (Optional for AI Guide)
-   GEMINI_API_KEY=your-gemini-api-key
-   ```
-   See `.env.example` for the full list and setup notes.
+```env
+VITE_SUPABASE_URL="https://YOUR_PROJECT.supabase.co"
+VITE_SUPABASE_ANON_KEY="YOUR_ANON_PUBLIC_KEY"
+```
 
-4. **Start Local Development Server**:
-   ```bash
-   npm run dev
-   ```
-   Open [http://localhost:3002](http://localhost:3002) in your browser.
+Then, in the Supabase SQL editor, run `supabase/schema.sql` followed by the other `supabase/*.sql` files in the order they were added (each is a self-contained, idempotent migration — safe to re-run).
+
+### Run locally
+
+```bash
+npm run dev
+```
+
+Open [http://localhost:3002](http://localhost:3002).
 
 ---
 
 ## 🧪 Verification & Testing
 
-- **Run Automated Unit Tests**:
-  ```bash
-  npm test
-  ```
-  *(Executes 45 Vitest unit tests across station age formatting, OTP services, proximity alert engine, permissions, and phone validation).*
-
-- **Run TypeScript Compiler Check**:
-  ```bash
-  npx tsc --noEmit
-  ```
-
-- **Build for Production**:
-  ```bash
-  npm run build
-  ```
+```bash
+npm test           # Vitest — 87 tests across formatting, validation, proximity/push logic, etc.
+npx tsc --noEmit   # TypeScript compiler check
+npm run build      # Production build
+```
 
 ---
 
-## 🌐 Live Production Deployment
+## 🌐 Deployment
 
-The platform is deployed and hosted on Vercel:
-
-- **Production URL**: [https://cngconnect.com.ng](https://cngconnect.com.ng)
-- **Deployment Command**: `npx vercel --prod`
+- **Production**: [cngconnect.com.ng](https://cngconnect.com.ng), hosted on Vercel with DNS on Cloudflare.
+- **Deploy**: pushes to `main` auto-deploy via Vercel's GitHub integration.
 
 ---
 
 ## 📄 License & Acknowledgments
 
-- **Data Sourcing**: Geocoded refuelling station locations and accredited conversion workshop registries sourced from the **Presidential CNG Initiative (Pi-CNG / pci.gov.ng)**.
-- **License**: MIT License.
+- **Data sourcing**: Refuelling station locations and accredited conversion-workshop registries sourced from the **Presidential CNG & EV Initiative (Pi-CNG / pci.gov.ng)**.
+- **License**: MIT.
