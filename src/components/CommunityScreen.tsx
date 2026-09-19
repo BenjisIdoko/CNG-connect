@@ -156,14 +156,14 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
       )}
 
       {/* Sticky Top Bar: Main Segment Control + Search */}
-      <div className="sticky top-0 z-30 bg-surface/95 backdrop-blur-md py-3 px-4 md:px-6 border-b border-surface-container-highest/70 max-w-4xl mx-auto flex flex-col gap-2">
+      <div className="sticky top-0 z-30 bg-surface/95 backdrop-blur-md py-3 px-4 md:px-6 shadow-[0_2px_10px_rgba(31,41,35,0.04)] max-w-4xl mx-auto flex flex-col gap-2">
         {/* Main Section Tab Switcher */}
-        <div className="flex bg-surface-container p-1 rounded-2xl border border-surface-container-highest">
+        <div className="flex bg-surface-container p-1 rounded-full">
           <button
             onClick={() => setActiveMainTab('station_groups')}
-            className={`flex-1 py-3 rounded-xl text-caption font-bold transition-all text-center ${
+            className={`flex-1 py-2.5 rounded-full text-caption font-bold transition-all text-center ${
               activeMainTab === 'station_groups'
-                ? 'bg-primary text-white shadow-xs'
+                ? 'bg-deep-teal text-white shadow-xs'
                 : 'text-on-surface-variant hover:text-on-surface'
             }`}
           >
@@ -172,9 +172,9 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
 
           <button
             onClick={() => setActiveMainTab('general')}
-            className={`flex-1 py-3 rounded-xl text-caption font-bold transition-all text-center ${
+            className={`flex-1 py-2.5 rounded-full text-caption font-bold transition-all text-center ${
               activeMainTab === 'general'
-                ? 'bg-primary text-white shadow-xs'
+                ? 'bg-deep-teal text-white shadow-xs'
                 : 'text-on-surface-variant hover:text-on-surface'
             }`}
           >
@@ -183,9 +183,9 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
 
           <button
             onClick={() => setActiveMainTab('leaderboard')}
-            className={`flex-1 py-3 rounded-xl text-caption font-bold transition-all text-center flex items-center justify-center gap-1 ${
+            className={`flex-1 py-2.5 rounded-full text-caption font-bold transition-all text-center flex items-center justify-center gap-1 ${
               activeMainTab === 'leaderboard'
-                ? 'bg-[#004D40] text-[#00FFC2] shadow-xs'
+                ? 'bg-deep-teal text-white shadow-xs'
                 : 'text-on-surface-variant hover:text-on-surface'
             }`}
           >
@@ -208,7 +208,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                   ? 'Search station groups, city, state...'
                   : 'Search tips, station updates, deals...'
               }
-              className="w-full bg-surface-container border border-surface-container-highest/70 rounded-full py-2 pl-10 pr-9 text-body font-normal text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary/30 focus:bg-white transition-all"
+              className="w-full bg-surface-container rounded-full py-2.5 pl-10 pr-9 text-body font-normal text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary/30 focus:bg-white transition-all"
             />
             {searchQuery && (
               <button
