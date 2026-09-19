@@ -152,7 +152,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
   const isBusy = isSendingCode || isVerifyingCode || isSavingProfile;
 
   return (
-    <div className="min-h-screen bg-surface text-on-surface font-['Plus_Jakarta_Sans',sans-serif] flex flex-col justify-between p-4 max-w-xl mx-auto animate-fade-in">
+    <div className="min-h-screen bg-surface text-on-surface font-['Urbanist',sans-serif] flex flex-col justify-between p-4 max-w-xl mx-auto animate-fade-in">
       {/* Top Bar */}
       <div className="flex items-center justify-between pt-3 pb-2">
         <div className="flex items-center gap-2">

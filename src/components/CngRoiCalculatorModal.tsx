@@ -48,7 +48,7 @@ export const CngRoiCalculatorModal: React.FC<CngRoiCalculatorModalProps> = ({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="CNG Conversion ROI & Savings Calculator" className="max-w-lg">
-      <div className="flex flex-col gap-4 text-on-surface font-['Plus_Jakarta_Sans',sans-serif]">
+      <div className="flex flex-col gap-4 text-on-surface font-['Urbanist',sans-serif]">
         {/* Header Hero Banner */}
         <div className="bg-gradient-to-r from-deep-teal via-primary to-emerald-900 rounded-2xl p-4 text-white shadow-xs">
           <div className="flex items-center justify-between">

@@ -220,7 +220,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-surface text-on-surface pb-36 font-['Plus_Jakarta_Sans',sans-serif]">
+    <div className="min-h-screen bg-surface text-on-surface pb-36 font-['Urbanist',sans-serif]">
       {/* Toast Notification */}
       {copiedNotification && (
         <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-on-surface text-white text-[13px] font-bold px-4 py-2 rounded-full shadow-lg">

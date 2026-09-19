@@ -62,7 +62,7 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#0c1411] text-white flex flex-col justify-between overflow-hidden font-['Plus_Jakarta_Sans',sans-serif] selection:bg-status-green selection:text-deep-teal">
+    <div className="fixed inset-0 z-50 bg-[#0c1411] text-white flex flex-col justify-between overflow-hidden font-['Urbanist',sans-serif] selection:bg-status-green selection:text-deep-teal">
       {/* Dynamic Background Image with Smooth Gradient Overlay */}
       <div className="absolute inset-0 z-0">
         <img

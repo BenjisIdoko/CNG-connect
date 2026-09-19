@@ -71,7 +71,7 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
   };
 
   return (
-    <div className="pb-32 min-h-screen bg-slate-50 font-['Plus_Jakarta_Sans',sans-serif]">
+    <div className="pb-32 min-h-screen bg-slate-50 font-['Urbanist',sans-serif]">
       {/* Top Banner Hero */}
       <div className="bg-gradient-to-b from-deep-teal via-primary to-deep-teal text-white pt-6 pb-8 px-4 rounded-b-[2.5rem] shadow-lg relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-400/10 rounded-full blur-3xl pointer-events-none" />
