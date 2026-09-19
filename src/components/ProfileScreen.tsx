@@ -138,7 +138,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   );
 
   return (
-    <div className="min-h-screen bg-surface-container text-on-surface pb-36 font-['Urbanist',sans-serif]">
+    <div className="min-h-screen bg-surface-container text-on-surface pb-36">
       {toastMessage && (
         <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-on-surface/90 text-white text-caption font-bold px-4 py-2 rounded-full shadow-lg backdrop-blur-md">
           {toastMessage}

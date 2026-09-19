@@ -744,7 +744,7 @@ export const App: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-surface text-on-surface font-['Urbanist',sans-serif] flex flex-col selection:bg-primary/20 selection:text-deep-teal">
+    <div className="min-h-screen bg-surface text-on-surface flex flex-col selection:bg-primary/20 selection:text-deep-teal">
       {/* Animated Splash Screen */}
       {showSplash && <SplashScreen onFinish={() => setShowSplash(false)} />}
 

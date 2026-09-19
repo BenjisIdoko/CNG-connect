@@ -73,7 +73,7 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
   const stateCount = new Set(centers.map((c) => c.state)).size;
 
   return (
-    <div className="pb-32 min-h-screen bg-surface-container font-['Urbanist',sans-serif]">
+    <div className="pb-32 min-h-screen bg-surface-container">
       {/* Header + stats */}
       <div className="bg-white px-5 pt-5 pb-4 shadow-[0_2px_10px_rgba(14,20,32,0.04)]">
         <div className="max-w-3xl mx-auto">

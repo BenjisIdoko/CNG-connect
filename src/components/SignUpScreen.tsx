@@ -155,7 +155,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
   const fmtCooldown = `0:${String(resendCooldown).padStart(2, '0')}`;
 
   return (
-    <div className="min-h-[100dvh] bg-white text-on-surface font-['Urbanist',sans-serif] flex flex-col p-6 pt-[max(env(safe-area-inset-top,0px),1.75rem)] max-w-xl mx-auto animate-fade-in">
+    <div className="min-h-[100dvh] bg-white text-on-surface flex flex-col p-6 pt-[max(env(safe-area-inset-top,0px),1.75rem)] max-w-xl mx-auto animate-fade-in">
       {/* Top bar: back / step */}
       <div className="flex items-center gap-3.5 min-h-[36px]">
         {step === 2 ? (

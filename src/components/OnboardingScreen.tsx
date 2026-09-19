@@ -64,7 +64,7 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
   const isLast = currentSlide === slides.length - 1;
 
   return (
-    <div className="fixed inset-0 z-50 bg-white text-slate-900 flex flex-col overflow-hidden font-['Urbanist',sans-serif]">
+    <div className="fixed inset-0 z-50 bg-white text-slate-900 flex flex-col overflow-hidden">
       {/* Hero photo */}
       <div className="relative h-[55%] min-h-[300px] shrink-0 bg-surface-container-high">
         <img

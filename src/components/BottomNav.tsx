@@ -21,7 +21,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
   unreadNotifications = 0,
 }) => {
   return (
-    <nav className="lg:hidden fixed bottom-3 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-[380px] bg-white rounded-[28px] shadow-[0_10px_32px_rgba(31,41,35,0.18)] grid grid-cols-4 items-end px-2 pb-2 pt-2 font-['Urbanist',sans-serif]">
+    <nav className="lg:hidden fixed bottom-3 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-[380px] bg-white rounded-[28px] shadow-[0_10px_32px_rgba(31,41,35,0.18)] grid grid-cols-4 items-end px-2 pb-2 pt-2">
       {TABS.map((tab) => {
         const active = activeTab === tab.id;
         return (

@@ -48,7 +48,7 @@ export const CngRoiCalculatorModal: React.FC<CngRoiCalculatorModalProps> = ({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Fuel Savings Calculator" bare className="max-w-lg">
-      <div className="flex flex-col text-on-surface font-['Urbanist',sans-serif]">
+      <div className="flex flex-col text-on-surface">
         <div className="bg-deep-teal text-white px-5 pt-5 pb-6">
           <div className="flex items-center justify-between">
             <span className="font-bold text-body">Fuel Savings Calculator</span>

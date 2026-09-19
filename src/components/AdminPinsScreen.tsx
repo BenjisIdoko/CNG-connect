@@ -529,7 +529,7 @@ export const AdminPinsScreen: React.FC<{ onExit: () => void }> = ({ onExit }) =>
 
   if (!session) {
     return (
-      <div className="fixed inset-0 z-[200] bg-slate-50 grid place-items-center p-6 font-['Urbanist',sans-serif]">
+      <div className="fixed inset-0 z-[200] bg-slate-50 grid place-items-center p-6">
         <div className="w-full max-w-sm bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col gap-3">
           <h1 className="text-lg font-extrabold text-slate-900">Station Pin Admin</h1>
           <p className="text-sm text-slate-500">Sign in with an admin email.</p>
@@ -592,7 +592,7 @@ export const AdminPinsScreen: React.FC<{ onExit: () => void }> = ({ onExit }) =>
 
   if (!isAdmin) {
     return (
-      <div className="fixed inset-0 z-[200] bg-slate-50 grid place-items-center p-6 font-['Urbanist',sans-serif]">
+      <div className="fixed inset-0 z-[200] bg-slate-50 grid place-items-center p-6">
         <div className="w-full max-w-sm bg-white rounded-2xl border border-slate-200 shadow-sm p-6 text-center flex flex-col gap-3">
           <h1 className="text-lg font-extrabold text-slate-900">Not authorized</h1>
           <p className="text-sm text-slate-500">
@@ -614,7 +614,7 @@ export const AdminPinsScreen: React.FC<{ onExit: () => void }> = ({ onExit }) =>
 
   // ---------- editor ----------
   return (
-    <div className="fixed inset-0 z-[200] bg-white flex flex-col font-['Urbanist',sans-serif]">
+    <div className="fixed inset-0 z-[200] bg-white flex flex-col">
       <div className="h-12 shrink-0 border-b border-slate-200 flex items-center justify-between px-4 gap-3">
         <div className="flex items-center gap-3 min-w-0">
           <span className="font-extrabold text-slate-900 text-sm whitespace-nowrap">Station Pin Admin</span>

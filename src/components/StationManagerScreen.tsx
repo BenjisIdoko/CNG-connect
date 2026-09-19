@@ -63,7 +63,7 @@ export const StationManagerScreen: React.FC<{ onExit: () => void }> = ({ onExit 
 
   if (!session) {
     return (
-      <div className="fixed inset-0 z-[200] bg-slate-50 grid place-items-center p-6 font-['Urbanist',sans-serif]">
+      <div className="fixed inset-0 z-[200] bg-slate-50 grid place-items-center p-6">
         <div className="w-full max-w-sm bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col gap-3">
           <h1 className="text-lg font-extrabold text-slate-900">Station Manager</h1>
           <p className="text-sm text-slate-500">Sign in with the email an admin assigned you under.</p>
@@ -125,7 +125,7 @@ export const StationManagerScreen: React.FC<{ onExit: () => void }> = ({ onExit 
   }
 
   return (
-    <div className="fixed inset-0 z-[200] bg-white flex flex-col font-['Urbanist',sans-serif]">
+    <div className="fixed inset-0 z-[200] bg-white flex flex-col">
       <div className="h-12 shrink-0 border-b border-slate-200 flex items-center justify-between px-4 gap-3">
         <div className="flex items-center gap-3 min-w-0">
           <span className="font-extrabold text-slate-900 text-sm whitespace-nowrap">My Stations</span>

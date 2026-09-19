@@ -43,7 +43,7 @@ export const Header: React.FC<HeaderProps> = ({
               alt="CNG-Connect Logo"
               className="h-6 w-auto object-contain shrink-0"
             />
-            <span className="font-extrabold text-heading text-primary tracking-tight truncate">
+            <span className="font-headline font-extrabold text-heading text-primary tracking-tight truncate">
               {title || 'CNG-Connect'}
             </span>
           </div>
