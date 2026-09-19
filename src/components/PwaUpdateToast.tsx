@@ -13,10 +13,17 @@ export const PwaUpdateToast: React.FC = () => {
   } = useRegisterSW({
     onRegistered(r) {
       if (r) {
-        // Check for updates every 15 minutes
-        setInterval(() => {
+        // Check for updates every 15 minutes, and whenever the app is
+        // reopened / brought back to the foreground (installed PWAs are
+        // otherwise slow to notice a new deploy).
+        const check = () => {
           r.update().catch(console.error);
-        }, 15 * 60 * 1000);
+        };
+        setInterval(check, 15 * 60 * 1000);
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'visible') check();
+        });
+        check();
       }
     },
     onRegisterError(error) {
