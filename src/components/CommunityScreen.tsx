@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { CommunityPost, GasStation } from '../types';
 import { StationGroupInfoSheet } from './StationGroupInfoSheet';
 import { EmptyState } from './common/EmptyState';
+import type { LeaderboardDriver } from '../utils/reputationEngine';
+import { apiService } from '../services/apiService';
 import { isSameState } from '../utils/proximityAlertEngine';
 
 const STATUS_OPTIONS: { id: string; label: string; dotColor?: string }[] = [
@@ -39,7 +41,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
   onToggleLikePost,
   onOpenConversions,
 }) => {
-  const [activeMainTab, setActiveMainTab] = useState<'station_groups' | 'general'>('station_groups');
+  const [activeMainTab, setActiveMainTab] = useState<'station_groups' | 'general' | 'leaderboard'>('station_groups');
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   // Local like-state overlay keyed by post id; the post list itself stays in
@@ -48,11 +50,22 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [showInfoSheet, setShowInfoSheet] = useState(false);
   const [showStatusMenu, setShowStatusMenu] = useState(false);
+  const [leaderboard, setLeaderboard] = useState<LeaderboardDriver[]>([]);
   const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     return () => {
       if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    };
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    apiService.fetchLeaderboard().then((rows) => {
+      if (active) setLeaderboard(rows);
+    });
+    return () => {
+      active = false;
     };
   }, []);
 
@@ -166,6 +179,17 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
             }`}
           >
             <span className="whitespace-nowrap">General Hub</span>
+          </button>
+
+          <button
+            onClick={() => setActiveMainTab('leaderboard')}
+            className={`flex-1 py-2.5 rounded-full text-caption font-bold transition-all text-center flex items-center justify-center gap-1 ${
+              activeMainTab === 'leaderboard'
+                ? 'bg-deep-teal text-white shadow-xs'
+                : 'text-on-surface-variant hover:text-on-surface'
+            }`}
+          >
+            <span className="whitespace-nowrap">🏆 Legends</span>
           </button>
         </div>
 
@@ -628,6 +652,65 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                   </div>
                 ))
               )}
+            </div>
+          </div>
+        ) : activeMainTab === 'leaderboard' ? (
+          /* MAIN TAB 3: Top Gas Finder Legends Leaderboard */
+          <div className="flex flex-col gap-4">
+            {/* Header Banner */}
+            <div className="bg-deep-teal rounded-3xl p-6 text-white shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div>
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/30 text-white text-xs font-extrabold mb-2">
+                  <span>🏆 Nationwide Driver Leaderboard</span>
+                </div>
+                <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight">
+                  Gas Finder Legends of Nigeria
+                </h2>
+                <p className="text-xs text-emerald-100/90 mt-1 max-w-xl leading-relaxed">
+                  Top drivers earning reputation points & badges by reporting real-time pump pressures, queue wait times, and station stock status.
+                </p>
+              </div>
+            </div>
+
+            {/* Leaderboard — flat divider rows */}
+            <div className="flex flex-col divide-y divide-outline-variant/50">
+              {leaderboard.length === 0 && (
+                <EmptyState
+                  icon="leaderboard"
+                  title="No ranked drivers yet"
+                  message="Be the first — submit verified station reports to earn reputation points and claim the top spot."
+                />
+              )}
+              {leaderboard.map((driver) => (
+                <div key={driver.id} className="flex items-center gap-3 py-4">
+                  <span
+                    className={`w-6 text-body font-bold shrink-0 text-center ${
+                      driver.rank <= 3 ? 'text-primary' : 'text-outline'
+                    }`}
+                  >
+                    {driver.rank}
+                  </span>
+
+                  <img
+                    src={driver.avatar}
+                    alt={driver.name}
+                    className="w-10 h-10 rounded-full object-cover shrink-0"
+                  />
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-body font-semibold text-on-surface truncate">
+                      {driver.name}
+                    </h3>
+                    <p className="text-caption text-outline font-medium truncate mt-1">
+                      {[driver.state, driver.tier.title, driver.vehicle].filter(Boolean).join('  ·  ')}
+                    </p>
+                  </div>
+
+                  <div className="shrink-0 text-right">
+                    <span className="text-body font-bold text-primary">{driver.points}</span>
+                    <span className="text-caption text-outline font-medium"> pts</span>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         ) : null}
