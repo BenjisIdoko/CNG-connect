@@ -707,21 +707,20 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       </div>
 
       {/* Desktop Persistent Right-Hand Panel (lg: 1024px and above) */}
-      <div className="hidden lg:flex flex-col w-[380px] xl:w-[420px] bg-white border-l border-slate-200 h-full z-20 shadow-lg overflow-hidden shrink-0">
+      <div className="hidden lg:flex flex-col w-[380px] xl:w-[420px] bg-surface h-full z-20 shadow-[-8px_0_24px_rgba(31,41,35,0.08)] overflow-hidden shrink-0">
         {/* Right Panel Header: Search & Filter */}
-        <div className="p-4 border-b border-slate-200/80 flex flex-col gap-3 bg-slate-50/50">
+        <div className="p-4 flex flex-col gap-3 bg-white shadow-[0_2px_10px_rgba(31,41,35,0.05)]">
           <div className="flex items-center justify-between">
             <h3 className="font-extrabold text-[16px] text-slate-900 flex items-center gap-2">
-              <span className="material-symbols-outlined text-primary text-[20px]">explore</span>
               <span>Stations & Chargers</span>
             </h3>
-            <span className="text-[11px] font-bold text-primary bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
+            <span className="text-[11px] font-bold text-primary bg-primary-container px-3 py-1 rounded-full">
               {filteredStations.length} Results
             </span>
           </div>
 
           {/* Desktop Search Input */}
-          <div className="flex items-center bg-white rounded-xl border border-slate-300 px-3 py-2 gap-2 shadow-2xs focus-within:ring-2 focus-within:ring-primary/20">
+          <div className="flex items-center bg-surface rounded-full px-4 py-2.5 gap-2 focus-within:ring-2 focus-within:ring-primary/20">
             <span className="material-symbols-outlined text-slate-400 text-[18px]">search</span>
             <input
               type="text"
@@ -738,19 +737,19 @@ export const MapScreen: React.FC<MapScreenProps> = ({
           </div>
 
           {/* Type Filter Segment Bar — EV temporarily hidden app-wide (SHOW_EV_STATIONS in mockData.ts) */}
-          <div className="grid grid-cols-2 gap-1 p-1 bg-slate-100 rounded-xl">
+          <div className="grid grid-cols-2 gap-1 p-1 bg-surface-container rounded-full">
             <button
               onClick={() => setStationTypeFilter('all')}
-              className={`py-2 rounded-lg text-micro font-extrabold transition-all ${
-                stationTypeFilter === 'all' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-600 hover:text-slate-900'
+              className={`py-2 rounded-full text-micro font-extrabold transition-all ${
+                stationTypeFilter === 'all' ? 'bg-deep-teal text-white' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               All
             </button>
             <button
               onClick={() => setStationTypeFilter('cng')}
-              className={`py-2 rounded-lg text-micro font-extrabold transition-all flex items-center justify-center gap-1 ${
-                stationTypeFilter === 'cng' ? 'bg-emerald-600 text-white shadow-2xs' : 'text-slate-600 hover:text-slate-900'
+              className={`py-2 rounded-full text-micro font-extrabold transition-all flex items-center justify-center gap-1 ${
+                stationTypeFilter === 'cng' ? 'bg-deep-teal text-white' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               <span className="material-symbols-outlined text-[13px]">local_gas_station</span>
@@ -760,7 +759,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
 
           <button
             onClick={() => setIsSuggestModalOpen(true)}
-            className="w-full py-2 bg-primary hover:bg-deep-teal text-white rounded-xl text-micro font-extrabold shadow-sm active:scale-98 transition-all flex items-center justify-center gap-2"
+            className="w-full py-2.5 bg-primary hover:bg-emerald-700 text-white rounded-full text-micro font-extrabold active:scale-98 transition-all flex items-center justify-center gap-2"
           >
             <span className="material-symbols-outlined text-[16px]">add_location_alt</span>
             <span>+ Suggest New Station</span>
@@ -782,10 +781,10 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                 <div
                   key={`desktop-${station.id}`}
                   onClick={() => onSelectStation(station)}
-                  className={`p-4 rounded-2xl border transition-all cursor-pointer ${
+                  className={`p-4 rounded-2xl transition-all cursor-pointer ${
                     isSelected
-                      ? 'bg-emerald-50/60 border-primary ring-2 ring-primary/20 shadow-sm'
-                      : 'bg-white border-slate-200 hover:border-slate-300'
+                      ? 'bg-white ring-2 ring-primary shadow-[0_6px_18px_rgba(49,154,63,0.18)]'
+                      : 'bg-white shadow-[0_4px_14px_rgba(31,41,35,0.05)] hover:shadow-[0_6px_18px_rgba(31,41,35,0.1)]'
                   }`}
                 >
                   <div className="flex items-start justify-between gap-2">
@@ -804,7 +803,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                     {station.address}
                   </p>
 
-                  <div className="flex items-center justify-between mt-3 pt-2 border-t border-slate-100">
+                  <div className="flex items-center justify-between mt-3">
                     <span className={`text-[11px] font-bold px-2 py-1 rounded-full ${statusInfo.badgeBg}`}>
                       {station.statusLabel}
                     </span>
