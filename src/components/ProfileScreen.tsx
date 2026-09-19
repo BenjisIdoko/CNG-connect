@@ -4,7 +4,6 @@ import { UserProfile } from '../types';
 import { ASSETS } from '../data/mockData';
 import { Modal } from './common/Modal';
 import { getDriverTier, DRIVER_TIERS } from '../utils/reputationEngine';
-import { Award, ShieldCheck, Zap, Trophy, ChevronRight } from 'lucide-react';
 
 interface ProfileScreenProps {
   user: UserProfile;
@@ -103,69 +102,90 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
     showToast('Profile updated successfully!');
   };
 
+  const points = user.communityPoints ?? 450;
+  const tierProgress = getDriverTier(points);
+  const openEdit = () => {
+    setEditName(user.name);
+    setEditPhone(user.phone);
+    setEditEmail(user.email);
+    setEditVehicle(user.vehicle || 'Toyota Corolla 1.8L (Dual Fuel CNG)');
+    setEditState(user.state || 'Abuja FCT');
+    setIsEditModalOpen(true);
+  };
+
+  const Row: React.FC<{
+    icon: string;
+    label: string;
+    hint?: string;
+    onClick?: () => void;
+    right?: React.ReactNode;
+    danger?: boolean;
+  }> = ({ icon, label, hint, onClick, right, danger }) => (
+    <div
+      onClick={onClick}
+      className={`px-4 py-3.5 flex items-center justify-between gap-3 ${onClick ? 'cursor-pointer active:bg-surface-container' : ''}`}
+    >
+      <div className="flex items-center gap-3 min-w-0">
+        <span className={`material-symbols-outlined text-[20px] ${danger ? 'text-status-red' : 'text-outline'}`}>{icon}</span>
+        <div className="min-w-0">
+          <span className={`text-body font-semibold block leading-tight ${danger ? 'text-status-red' : 'text-on-surface'}`}>{label}</span>
+          {hint && <span className="text-micro text-outline">{hint}</span>}
+        </div>
+      </div>
+      {right ?? (onClick && <span className="material-symbols-outlined text-outline text-[18px]">chevron_right</span>)}
+    </div>
+  );
+
   return (
-    <div className="min-h-screen bg-surface text-on-surface pb-36 pt-4 font-['Plus_Jakarta_Sans',sans-serif]">
+    <div className="min-h-screen bg-surface-container text-on-surface pb-36 font-['Urbanist',sans-serif]">
       {toastMessage && (
-        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-on-surface/90 text-white text-caption font-bold px-4 py-2 rounded-full shadow-lg backdrop-blur-md">
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-on-surface/90 text-white text-caption font-bold px-4 py-2 rounded-full shadow-lg backdrop-blur-md">
           {toastMessage}
         </div>
       )}
 
-      <div className="max-w-3xl mx-auto px-4 md:px-6 pt-4 flex flex-col gap-4">
-        {/* Profile Card */}
-        <div className="bg-white rounded-3xl p-4 shadow-sm border border-outline-variant flex items-center justify-between">
-          <div className="flex items-center gap-3.5 min-w-0 flex-1">
+      {/* Dark identity header */}
+      <div className="bg-deep-teal text-white px-5 pt-[max(env(safe-area-inset-top,0px),2.75rem)] lg:pt-8 pb-5">
+        <div className="max-w-3xl mx-auto">
+          <div className="flex items-center gap-3.5">
             <div className="relative shrink-0">
               <img
                 src={user.avatar || ASSETS.userAvatar}
                 alt={user.name}
-                className="w-14 h-14 rounded-full object-cover border-2 border-primary shadow-xs"
+                className="w-14 h-14 rounded-full object-cover bg-white/10"
               />
-              {onUploadAvatar && (
+              {onUploadAvatar ? (
                 <>
                   <button
                     type="button"
                     onClick={() => avatarInputRef.current?.click()}
                     disabled={isUploadingAvatar}
                     aria-label="Change profile photo"
-                    className="absolute -bottom-0.5 -right-0.5 w-6 h-6 rounded-full bg-primary text-white border-2 border-white flex items-center justify-center shadow-sm active:scale-90 transition-transform disabled:opacity-60"
+                    className="absolute -bottom-0.5 -right-0.5 w-[22px] h-[22px] rounded-full bg-primary text-white border-2 border-deep-teal flex items-center justify-center active:scale-90 transition-transform disabled:opacity-60"
                   >
-                    <span className="material-symbols-outlined text-[14px]">
+                    <span className="material-symbols-outlined text-[12px]">
                       {isUploadingAvatar ? 'progress_activity' : 'photo_camera'}
                     </span>
                   </button>
-                  <input
-                    ref={avatarInputRef}
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={handleAvatarPick}
-                  />
+                  <input ref={avatarInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarPick} />
                 </>
+              ) : (
+                <span className="absolute -bottom-0.5 -right-0.5 w-[18px] h-[18px] rounded-full bg-primary border-2 border-deep-teal" />
               )}
             </div>
             <div className="min-w-0 flex-1">
-              <h2 className="font-bold text-title text-on-surface leading-tight truncate">
-                {user.name}
-              </h2>
-              <p className="text-caption text-on-surface-variant font-normal mt-0.5 truncate">
-                {user.email || user.phone || 'driver@cngconnect.com.ng'}
-              </p>
+              <h2 className="font-bold text-body-lg leading-tight truncate">{user.name || 'Driver'}</h2>
               <PopoverPrimitive.Root>
-                <PopoverPrimitive.Trigger className="flex items-center gap-1.5 mt-1 text-micro font-semibold text-primary hover:bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 transition-all cursor-pointer text-left">
-                  <span className="material-symbols-outlined text-[14px]">directions_car</span>
-                  <span className="truncate max-w-[160px] sm:max-w-[220px]">{user.vehicle || 'Toyota Corolla 1.8L (CNG)'}</span>
-                  <span className="material-symbols-outlined text-[14px]">unfold_more</span>
+                <PopoverPrimitive.Trigger className="flex items-center gap-1 mt-0.5 text-micro text-[#B7CBB9] cursor-pointer text-left max-w-full">
+                  <span className="truncate">{user.vehicle || 'Add your vehicle'}</span>
+                  <span className="material-symbols-outlined text-[14px] shrink-0">chevron_right</span>
                 </PopoverPrimitive.Trigger>
-
                 <PopoverPrimitive.Portal>
                   <PopoverPrimitive.Content
                     sideOffset={5}
-                    className="z-[150] w-64 bg-white rounded-2xl p-3 shadow-xl border border-slate-200 flex flex-col gap-1.5"
+                    className="z-[150] w-64 bg-white rounded-2xl p-3 shadow-xl flex flex-col gap-1.5"
                   >
-                    <span className="text-micro font-bold text-slate-400 uppercase tracking-wider px-2">
-                      Switch Active Vehicle
-                    </span>
+                    <span className="text-micro font-bold text-outline uppercase tracking-wider px-2">Switch active vehicle</span>
                     {[
                       'Toyota Corolla 1.8L (Dual Fuel CNG)',
                       'Hyundai Accent 1.6L (CNG Kit)',
@@ -179,415 +199,158 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                             showToast(`Active vehicle switched to ${v}`);
                           }
                         }}
-                        className={`w-full text-left px-2.5 py-1.5 rounded-xl text-[12px] font-bold transition-all flex items-center justify-between ${
-                          user.vehicle === v
-                            ? 'bg-emerald-50 text-primary border border-emerald-200'
-                            : 'text-slate-700 hover:bg-slate-100'
+                        className={`w-full text-left px-2.5 py-2 rounded-xl text-caption font-semibold flex items-center justify-between ${
+                          user.vehicle === v ? 'bg-primary-container text-emerald-800' : 'text-slate-700 hover:bg-surface-container'
                         }`}
                       >
                         <span className="truncate">{v}</span>
-                        {user.vehicle === v && (
-                          <span className="material-symbols-outlined text-[14px] text-primary">check</span>
-                        )}
+                        {user.vehicle === v && <span className="material-symbols-outlined text-[14px] text-primary">check</span>}
                       </button>
                     ))}
                   </PopoverPrimitive.Content>
                 </PopoverPrimitive.Portal>
               </PopoverPrimitive.Root>
             </div>
-          </div>
-
-          <button
-            onClick={() => {
-              setEditName(user.name);
-              setEditPhone(user.phone);
-              setEditEmail(user.email);
-              setEditVehicle(user.vehicle || 'Toyota Corolla 1.8L (Dual Fuel CNG)');
-              setEditState(user.state || 'Abuja FCT');
-              setIsEditModalOpen(true);
-            }}
-            className="w-11 h-11 rounded-full bg-emerald-50 hover:bg-emerald-100 text-primary flex items-center justify-center transition-all active:scale-95 shrink-0 ml-2 border border-emerald-200"
-            aria-label="Edit Profile"
-          >
-            <span className="material-symbols-outlined text-[19px]">edit</span>
-          </button>
-        </div>
-
-        {/* Driver Stats */}
-        <div className="grid grid-cols-3 gap-2">
-          {/* Points */}
-          <div className="bg-primary text-on-primary rounded-2xl p-3 flex flex-col justify-between shadow-xs border border-primary">
-            <div className="flex items-center justify-between text-status-green">
-              <span className="material-symbols-outlined text-[18px]">emoji_events</span>
-              <span className="text-micro font-black uppercase tracking-wider bg-black/20 px-1.5 py-0.5 rounded-xl border border-status-green/30">
-                PTS
-              </span>
-            </div>
-            <div className="mt-2">
-              <span className="text-heading font-black text-status-green leading-none block">
-                {user.communityPoints ?? 450}
-              </span>
-              <span className="text-micro font-semibold text-white/90 uppercase tracking-wider">
-                Points
-              </span>
-            </div>
-          </div>
-
-          {/* Reports */}
-          <div className="bg-white rounded-2xl p-3 border border-outline-variant shadow-xs flex flex-col justify-between">
-            <span className="material-symbols-outlined text-primary text-[18px]">
-              edit_document
-            </span>
-            <div className="mt-2">
-              <span className="text-heading font-black text-on-surface leading-none block">
-                {user.reportsCount}
-              </span>
-              <span className="text-micro font-semibold text-outline uppercase tracking-wider">
-                Reports
-              </span>
-            </div>
-          </div>
-
-          {/* Reputation */}
-          <div className="bg-white rounded-2xl p-3 border border-outline-variant shadow-xs flex flex-col justify-between">
-            <span className="material-symbols-outlined text-secondary text-[18px]">
-              star
-            </span>
-            <div className="mt-2">
-              <span className="text-heading font-black text-on-surface leading-none block">
-                {user.reputationScore}
-              </span>
-              <span className="text-micro font-semibold text-outline uppercase tracking-wider">
-                Rating
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Driver Reputation & Badges Card */}
-        {(() => {
-          const tierProgress = getDriverTier(user.communityPoints ?? 450);
-          return (
-            <div className="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm flex flex-col gap-3.5">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Trophy className="w-5 h-5 text-amber-500" />
-                  <h3 className="font-extrabold text-slate-900 text-sm tracking-tight">
-                    Driver Level & Reputation Badges
-                  </h3>
-                </div>
-                <div className={`px-3 py-1 rounded-full border ${tierProgress.currentTier.badgeBg} ${tierProgress.currentTier.badgeColor} ${tierProgress.currentTier.badgeBorder} flex items-center gap-1.5 font-black text-xs shadow-2xs`}>
-                  <span>{tierProgress.currentTier.badgeIcon}</span>
-                  <span>{tierProgress.currentTier.title}</span>
-                </div>
-              </div>
-
-              {/* Level Progress Bar */}
-              {tierProgress.nextTier ? (
-                <div className="flex flex-col gap-1.5 bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
-                  <div className="flex items-center justify-between text-xs font-bold text-slate-700">
-                    <span>Progress to {tierProgress.nextTier.badgeIcon} {tierProgress.nextTier.title}</span>
-                    <span className="text-primary font-extrabold">{tierProgress.progressPercent}%</span>
-                  </div>
-                  <div className="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
-                    <div
-                      className="bg-[#004D40] h-full rounded-full transition-all duration-500"
-                      style={{ width: `${tierProgress.progressPercent}%` }}
-                    />
-                  </div>
-                  <p className="text-[11px] text-slate-500 font-medium mt-0.5">
-                    Need <strong className="text-slate-900 font-bold">{tierProgress.pointsForNextTier} pts</strong> to unlock <span className="font-semibold text-slate-800">{tierProgress.nextTier.title}</span> perks!
-                  </p>
-                </div>
-              ) : (
-                <div className="bg-amber-50 border border-amber-200 p-3 rounded-2xl text-xs text-amber-900 font-semibold flex items-center gap-2">
-                  <span className="text-lg">👑</span>
-                  <span>Maximum Tier Unlocked! You are a legendary CNG station finder across Nigeria.</span>
-                </div>
-              )}
-
-              {/* Badges Grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 pt-1">
-                {DRIVER_TIERS.map((t) => {
-                  const isUnlocked = (user.communityPoints ?? 450) >= t.minPoints;
-                  return (
-                    <div
-                      key={t.id}
-                      className={`p-2.5 rounded-2xl border flex flex-col items-center text-center transition-all ${
-                        isUnlocked
-                          ? `${t.badgeBg} ${t.badgeBorder} shadow-2xs`
-                          : 'bg-slate-50 border-slate-200 opacity-50 grayscale'
-                      }`}
-                    >
-                      <span className="text-2xl mb-1">{t.badgeIcon}</span>
-                      <span className={`text-[11px] font-extrabold leading-tight ${isUnlocked ? 'text-slate-900' : 'text-slate-500'}`}>
-                        {t.title}
-                      </span>
-                      <span className="text-[10px] text-slate-500 mt-1 font-semibold">
-                        {t.minPoints}+ pts
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          );
-        })()}
-
-        {/* Embedded Interactive CNG ROI & Savings Calculator Card */}
-        <div className="bg-gradient-to-br from-deep-teal via-primary to-emerald-950 rounded-3xl p-5 text-white shadow-lg border border-emerald-500/20 space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-emerald-400/20 text-status-green flex items-center justify-center border border-status-green/30">
-                <span className="material-symbols-outlined text-[18px]">calculate</span>
-              </div>
-              <h3 className="font-extrabold text-body-lg text-white">
-                CNG Fuel Savings &amp; ROI Calculator
-              </h3>
-            </div>
-            <span className="bg-status-green/20 text-status-green text-micro font-extrabold px-2.5 py-0.5 rounded-xl uppercase border border-status-green/30">
-              Interactive
-            </span>
-          </div>
-
-          {/* Real-time Display Hero */}
-          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/15">
-            <span className="text-micro text-emerald-200 font-semibold block uppercase tracking-wider">Estimated Monthly Fuel Savings</span>
-            <div className="flex items-baseline gap-1.5 mt-0.5">
-              <span className="text-display font-black text-white leading-none">
-                ₦{monthlySavings.toLocaleString()}
-              </span>
-              <span className="text-body font-extrabold text-status-green">
-                ({savingsPercent}% Saved)
-              </span>
-            </div>
-          </div>
-
-          {/* Sliders */}
-          <div className="space-y-3 bg-black/20 p-4 rounded-2xl border border-white/10">
-            <div>
-              <div className="flex justify-between text-micro font-bold text-emerald-100 mb-1">
-                <span>Daily Driving Distance</span>
-                <span className="text-status-green">{dailyKm} km / day</span>
-              </div>
-              <input
-                type="range"
-                min="20"
-                max="300"
-                step="5"
-                value={dailyKm}
-                onChange={(e) => setDailyKm(Number(e.target.value))}
-                className="w-full accent-status-green h-1.5 bg-white/20 rounded-lg cursor-pointer"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-3 pt-1 border-t border-white/10">
-              <div>
-                <label className="block text-micro font-bold text-emerald-200 mb-1">Petrol Price (₦/L)</label>
-                <input
-                  type="number"
-                  value={petrolPrice}
-                  onChange={(e) => setPetrolPrice(Number(e.target.value))}
-                  className="w-full bg-white/10 border border-white/20 rounded-xl px-2.5 py-1.5 text-caption font-bold text-white outline-none focus:border-status-green"
-                />
-              </div>
-              <div>
-                <label className="block text-micro font-bold text-emerald-200 mb-1">CNG Price (₦/kg)</label>
-                <input
-                  type="number"
-                  value={cngPrice}
-                  onChange={(e) => setCngPrice(Number(e.target.value))}
-                  className="w-full bg-white/10 border border-white/20 rounded-xl px-2.5 py-1.5 text-caption font-bold text-white outline-none focus:border-status-green"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Key Metrics Pill Bar */}
-          <div className="grid grid-cols-2 gap-2 text-center text-caption">
-            <div className="bg-white/10 rounded-xl p-2.5 border border-white/10">
-              <span className="text-micro text-emerald-200 block uppercase font-bold">Annual Savings</span>
-              <span className="font-extrabold text-white text-body">₦{annualSavings.toLocaleString()}</span>
-            </div>
-            <div className="bg-white/10 rounded-xl p-2.5 border border-white/10">
-              <span className="text-micro text-emerald-200 block uppercase font-bold">CO₂ Reduced / Year</span>
-              <span className="font-extrabold text-status-green text-body">{annualCo2SavedTons} Tons</span>
-            </div>
-          </div>
-
-          {onOpenRoiCalculator && (
             <button
-              onClick={onOpenRoiCalculator}
-              className="w-full py-2.5 bg-white/15 hover:bg-white/25 text-white text-caption font-extrabold rounded-xl border border-white/20 transition-all flex items-center justify-center gap-1.5 active:scale-98"
+              onClick={openEdit}
+              aria-label="Edit Profile"
+              className="w-10 h-10 rounded-full bg-white/10 text-white flex items-center justify-center active:scale-95 transition-transform shrink-0"
             >
-              <span className="material-symbols-outlined text-[16px]">open_in_full</span>
-              <span>Open Detailed Kit Payback Calculator Modal</span>
+              <span className="material-symbols-outlined text-[18px]">edit</span>
             </button>
+          </div>
+
+          <div className="flex gap-2.5 mt-5">
+            {[
+              { v: points.toLocaleString(), l: 'Points', big: true },
+              { v: String(user.reportsCount), l: 'Reports' },
+              { v: String(user.reputationScore), l: 'Rating' },
+            ].map((t) => (
+              <div key={t.l} className="flex-1 bg-white/[0.06] rounded-[14px] py-2.5 text-center">
+                <div className={`font-extrabold tracking-tight ${t.big ? 'text-[23px]' : 'text-[19px]'}`}>{t.v}</div>
+                <div className="text-[10px] text-[#9FB8A3] mt-0.5">{t.l}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-3xl mx-auto px-5 pt-5 flex flex-col gap-4">
+        {/* Tier + badges */}
+        <div>
+          <div className="flex items-center justify-between">
+            <div className="font-bold text-caption">{tierProgress.currentTier.title}</div>
+            {tierProgress.nextTier ? (
+              <div className="text-micro text-outline">
+                {tierProgress.pointsForNextTier} pts to {tierProgress.nextTier.title}
+              </div>
+            ) : (
+              <div className="text-micro text-outline">Top tier reached</div>
+            )}
+          </div>
+          <div className="h-1.5 rounded-full bg-surface-container-highest mt-2 overflow-hidden">
+            <div
+              className="h-full bg-primary rounded-full transition-all duration-500"
+              style={{ width: `${tierProgress.nextTier ? tierProgress.progressPercent : 100}%` }}
+            />
+          </div>
+          <div className="flex gap-2 mt-3.5">
+            {DRIVER_TIERS.map((t) => {
+              const unlocked = points >= t.minPoints;
+              return (
+                <div
+                  key={t.id}
+                  title={`${t.title} · ${t.minPoints}+ pts`}
+                  className={`w-11 h-11 rounded-xl flex items-center justify-center text-[20px] ${
+                    unlocked ? 'bg-primary-container' : 'bg-surface-dim/60 opacity-60 grayscale'
+                  }`}
+                >
+                  {unlocked ? t.badgeIcon : <span className="material-symbols-outlined text-[16px] text-slate-500">lock</span>}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Savings summary → canonical calculator */}
+        <div
+          onClick={onOpenRoiCalculator}
+          className={`bg-white rounded-2xl p-4 shadow-[0_4px_14px_rgba(14,20,32,0.05)] ${onOpenRoiCalculator ? 'cursor-pointer active:scale-[0.99] transition-transform' : ''}`}
+        >
+          <div className="text-micro font-semibold text-outline">Estimated savings</div>
+          <div className="font-extrabold text-[22px] text-primary mt-0.5 tracking-tight">
+            ₦{monthlySavings.toLocaleString()}
+            <span className="text-caption font-semibold text-outline">/mo</span>
+          </div>
+          {onOpenRoiCalculator && (
+            <div className="text-micro font-bold text-emerald-700 mt-1">Open full calculator →</div>
           )}
         </div>
 
-        {/* Preferences Section */}
-        <div className="flex flex-col gap-2">
-          <span className="text-body font-semibold text-on-surface-variant px-1">
-            Preferences &amp; Settings
-          </span>
-
-          <div className="bg-white rounded-3xl shadow-sm border border-outline-variant overflow-hidden divide-y divide-outline-variant/30">
-            {/* Registered State */}
-            <div className="p-4 flex items-center justify-between hover:bg-surface transition-colors rounded-2xl">
-              <div className="flex items-center gap-3">
-                <span className="material-symbols-outlined text-on-surface-variant text-[20px]">
-                  location_on
-                </span>
-                <div>
-                  <span className="text-body font-medium text-on-surface block leading-tight">
-                    Registered State
-                  </span>
-                  <span className="text-micro text-outline font-normal">
-                    Push notifications are scoped to this state
-                  </span>
-                </div>
-              </div>
+        {/* Settings */}
+        <div className="bg-white rounded-2xl shadow-[0_4px_14px_rgba(14,20,32,0.05)] divide-y divide-surface-container overflow-hidden">
+          <Row
+            icon="location_on"
+            label="Home state"
+            hint="Alerts are scoped to this state"
+            right={
               <select
                 value={user.state || 'Abuja FCT'}
                 onChange={(e) => {
                   const newState = e.target.value;
-                  if (onUpdateState) {
-                    onUpdateState(newState);
-                  }
-                  if (onUpdateProfile) {
-                    onUpdateProfile({ state: newState });
-                  }
-                  showToast(`Registered state updated to ${newState}`);
+                  if (onUpdateState) onUpdateState(newState);
+                  if (onUpdateProfile) onUpdateProfile({ state: newState });
+                  showToast(`Home state updated to ${newState}`);
                 }}
-                className="bg-surface-container text-primary border border-outline-variant font-semibold text-caption rounded-xl px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary"
+                className="bg-transparent text-outline font-semibold text-caption focus:outline-none"
               >
-                <option value="Abuja FCT">Abuja FCT</option>
-                <option value="Lagos">Lagos</option>
-                <option value="Ogun">Ogun</option>
-                <option value="Rivers">Rivers</option>
-                <option value="Kano">Kano</option>
-                <option value="Edo">Edo</option>
-                <option value="Delta">Delta</option>
-                <option value="Oyo">Oyo</option>
-                <option value="Kaduna">Kaduna</option>
+                {['Abuja FCT', 'Lagos', 'Ogun', 'Rivers', 'Kano', 'Edo', 'Delta', 'Oyo', 'Kaduna'].map((st) => (
+                  <option key={st} value={st}>
+                    {st}
+                  </option>
+                ))}
               </select>
-            </div>
-
-            {/* Notifications */}
-            <div className="p-4 flex items-center justify-between rounded-2xl">
-              <div className="flex items-center gap-3">
-                <span className="material-symbols-outlined text-on-surface-variant text-[20px]">
-                  notifications
-                </span>
-                <span className="text-body font-medium text-on-surface">
-                  Proximity Alert Notifications
-                </span>
-              </div>
-
+            }
+          />
+          <Row
+            icon="notifications"
+            label="Proximity alerts"
+            right={
               <button
                 onClick={handleToggleNotifications}
                 aria-pressed={notificationsEnabled}
-                className={`w-12 h-6 rounded-full transition-colors relative flex items-center px-0.5 ${
-                  notificationsEnabled ? 'bg-primary' : 'bg-surface-container-high'
+                aria-label="Toggle proximity alerts"
+                className={`w-[34px] h-5 rounded-full transition-colors relative shrink-0 ${
+                  notificationsEnabled ? 'bg-primary' : 'bg-surface-container-highest'
                 }`}
               >
-                <div
-                  className={`w-5 h-5 rounded-full bg-white shadow-md transform transition-transform ${
-                    notificationsEnabled ? 'translate-x-6' : 'translate-x-0'
+                <span
+                  className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-all ${
+                    notificationsEnabled ? 'right-0.5' : 'left-0.5'
                   }`}
                 />
               </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Community & Support */}
-        <div className="flex flex-col gap-2">
-          <span className="text-body font-semibold text-on-surface-variant px-1">
-            Community &amp; Support
-          </span>
-
-          <div className="bg-white rounded-3xl shadow-sm border border-outline-variant overflow-hidden divide-y divide-outline-variant/30">
-            <div
-              onClick={() => {
-                if (navigator.share) {
-                  navigator.share({
-                    title: 'CNG-Connect Locator',
-                    text: 'Locate CNG refuelling stations across Nigeria with live pressure updates!',
-                    url: window.location.href,
-                  });
-                } else {
-                  showToast('App link copied!');
-                }
-              }}
-              className="p-4 flex items-center justify-between hover:bg-surface transition-colors cursor-pointer rounded-2xl"
-            >
-              <div className="flex items-center gap-3">
-                <span className="material-symbols-outlined text-on-surface-variant text-[20px]">
-                  share
-                </span>
-                <span className="text-body font-medium text-on-surface">
-                  Share App with Drivers
-                </span>
-              </div>
-              <span className="material-symbols-outlined text-outline text-[18px]">
-                chevron_right
-              </span>
-            </div>
-
-            <div
-              onClick={() => showToast('Help Center')}
-              className="p-4 flex items-center justify-between hover:bg-surface transition-colors cursor-pointer rounded-2xl"
-            >
-              <div className="flex items-center gap-3">
-                <span className="material-symbols-outlined text-on-surface-variant text-[20px]">
-                  help
-                </span>
-                <span className="text-body font-medium text-on-surface">
-                  Help &amp; FAQ
-                </span>
-              </div>
-              <span className="material-symbols-outlined text-outline text-[18px]">
-                chevron_right
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex flex-col gap-2 pt-1">
-          {onOpenSignUp && (
-            <button
-              onClick={onOpenSignUp}
-              className="w-full py-3 px-4 bg-primary hover:opacity-95 text-on-primary font-bold text-body rounded-2xl shadow-xs flex items-center justify-center gap-2 active:scale-98 transition-all"
-            >
-              <span className="material-symbols-outlined text-status-green text-[20px] shrink-0">
-                person_add
-              </span>
-              <span className="whitespace-nowrap">Sign Up / Switch Account</span>
-            </button>
-          )}
-
-          <button
-            onClick={onOpenOnboarding}
-            className="w-full py-3 px-4 bg-white hover:bg-surface text-on-surface font-semibold text-body rounded-2xl shadow-xs border border-outline-variant flex items-center justify-center gap-2 active:scale-98 transition-all"
-          >
-            <span className="material-symbols-outlined text-primary text-[20px] shrink-0">
-              slideshow
-            </span>
-            <span className="whitespace-nowrap">Replay Onboarding Guide</span>
-          </button>
-
-          <button
-            onClick={onSignOut || onOpenOnboarding}
-            className="w-full py-3 px-4 bg-secondary-container/20 hover:bg-secondary-container/30 text-secondary font-semibold text-body rounded-2xl border border-secondary/30 flex items-center justify-center gap-2 active:scale-98 transition-all min-h-[44px]"
-          >
-            <span className="material-symbols-outlined text-secondary text-[20px] shrink-0">
-              logout
-            </span>
-            <span className="whitespace-nowrap">Sign Out</span>
-          </button>
+            }
+          />
+          <Row
+            icon="ios_share"
+            label="Share app with drivers"
+            onClick={() => {
+              if (navigator.share) {
+                navigator.share({
+                  title: 'CNG-Connect',
+                  text: 'Find CNG stations across Nigeria with live pressure updates!',
+                  url: window.location.href,
+                });
+              } else {
+                showToast('App link copied!');
+              }
+            }}
+          />
+          <Row icon="help" label="Help & FAQ" onClick={() => showToast('Help Center')} />
+          <Row icon="slideshow" label="Replay onboarding" onClick={onOpenOnboarding} />
+          {onOpenSignUp && <Row icon="person_add" label="Sign up / switch account" onClick={onOpenSignUp} />}
+          <Row icon="logout" label="Sign out" danger onClick={onSignOut || onOpenOnboarding} />
         </div>
       </div>
 

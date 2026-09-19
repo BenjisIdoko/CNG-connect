@@ -6,6 +6,9 @@ import type { LeaderboardDriver } from '../utils/reputationEngine';
 import { apiService } from '../services/apiService';
 import { isSameState } from '../utils/proximityAlertEngine';
 
+// Legends leaderboard is built but hidden for now; flip to true to bring the tab back.
+const SHOW_LEADERBOARD = false;
+
 const STATUS_OPTIONS: { id: string; label: string; dotColor?: string }[] = [
   { id: 'all', label: 'All Statuses' },
   { id: 'full', label: 'Full Stock', dotColor: 'bg-status-green' },
@@ -60,6 +63,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
   }, []);
 
   useEffect(() => {
+    if (!SHOW_LEADERBOARD) return;
     let active = true;
     apiService.fetchLeaderboard().then((rows) => {
       if (active) setLeaderboard(rows);
@@ -156,14 +160,14 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
       )}
 
       {/* Sticky Top Bar: Main Segment Control + Search */}
-      <div className="sticky top-0 z-30 bg-surface/95 backdrop-blur-md py-3 px-4 md:px-6 border-b border-surface-container-highest/70 max-w-4xl mx-auto flex flex-col gap-2">
+      <div className="sticky top-0 z-30 bg-surface/95 backdrop-blur-md py-3 px-4 md:px-6 shadow-[0_2px_10px_rgba(31,41,35,0.04)] max-w-4xl mx-auto flex flex-col gap-2">
         {/* Main Section Tab Switcher */}
-        <div className="flex bg-surface-container p-1 rounded-2xl border border-surface-container-highest">
+        <div className="flex bg-surface-container p-1 rounded-full">
           <button
             onClick={() => setActiveMainTab('station_groups')}
-            className={`flex-1 py-3 rounded-xl text-caption font-bold transition-all text-center ${
+            className={`flex-1 py-2.5 rounded-full text-caption font-bold transition-all text-center ${
               activeMainTab === 'station_groups'
-                ? 'bg-primary text-white shadow-xs'
+                ? 'bg-deep-teal text-white shadow-xs'
                 : 'text-on-surface-variant hover:text-on-surface'
             }`}
           >
@@ -172,25 +176,27 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
 
           <button
             onClick={() => setActiveMainTab('general')}
-            className={`flex-1 py-3 rounded-xl text-caption font-bold transition-all text-center ${
+            className={`flex-1 py-2.5 rounded-full text-caption font-bold transition-all text-center ${
               activeMainTab === 'general'
-                ? 'bg-primary text-white shadow-xs'
+                ? 'bg-deep-teal text-white shadow-xs'
                 : 'text-on-surface-variant hover:text-on-surface'
             }`}
           >
             <span className="whitespace-nowrap">General Hub</span>
           </button>
 
-          <button
-            onClick={() => setActiveMainTab('leaderboard')}
-            className={`flex-1 py-3 rounded-xl text-caption font-bold transition-all text-center flex items-center justify-center gap-1 ${
-              activeMainTab === 'leaderboard'
-                ? 'bg-[#004D40] text-[#00FFC2] shadow-xs'
-                : 'text-on-surface-variant hover:text-on-surface'
-            }`}
-          >
-            <span className="whitespace-nowrap">🏆 Legends</span>
-          </button>
+          {SHOW_LEADERBOARD && (
+            <button
+              onClick={() => setActiveMainTab('leaderboard')}
+              className={`flex-1 py-2.5 rounded-full text-caption font-bold transition-all text-center flex items-center justify-center gap-1 ${
+                activeMainTab === 'leaderboard'
+                  ? 'bg-deep-teal text-white shadow-xs'
+                  : 'text-on-surface-variant hover:text-on-surface'
+              }`}
+            >
+              <span className="whitespace-nowrap">🏆 Legends</span>
+            </button>
+          )}
         </div>
 
         {/* Search Bar & Notification Button */}
@@ -208,7 +214,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                   ? 'Search station groups, city, state...'
                   : 'Search tips, station updates, deals...'
               }
-              className="w-full bg-surface-container border border-surface-container-highest/70 rounded-full py-2 pl-10 pr-9 text-body font-normal text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary/30 focus:bg-white transition-all"
+              className="w-full bg-surface-container rounded-full py-2.5 pl-10 pr-9 text-body font-normal text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary/30 focus:bg-white transition-all"
             />
             {searchQuery && (
               <button
@@ -658,9 +664,9 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
           /* MAIN TAB 3: Top Gas Finder Legends Leaderboard */
           <div className="flex flex-col gap-4">
             {/* Header Banner */}
-            <div className="bg-gradient-to-r from-[#004D40] via-primary to-emerald-950 rounded-3xl p-6 text-white shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border border-emerald-500/20">
+            <div className="bg-deep-teal rounded-3xl p-6 text-white shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#00FFC2]/20 text-[#00FFC2] border border-[#00FFC2]/30 text-xs font-extrabold mb-2">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/30 text-white text-xs font-extrabold mb-2">
                   <span>🏆 Nationwide Driver Leaderboard</span>
                 </div>
                 <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight">

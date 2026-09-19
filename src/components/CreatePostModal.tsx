@@ -103,22 +103,10 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Create Community Post" className="p-5 max-h-[90vh] overflow-y-auto">
-        <div className="flex justify-between items-center mb-3">
-          <h2 className="text-[20px] font-bold text-on-surface">
-            Create Community Post
-          </h2>
-          <button
-            onClick={onClose}
-            aria-label="Close modal"
-            className="w-11 h-11 rounded-full flex items-center justify-center text-outline hover:bg-surface-container shrink-0"
-          >
-            <span className="material-symbols-outlined text-[22px]">close</span>
-          </button>
-        </div>
+    <Modal isOpen={isOpen} onClose={onClose} title="Create Community Post" className="max-h-[90vh] overflow-y-auto">
 
         {/* Station Group Policy Notice */}
-        <div className="bg-surface-container border border-outline-variant rounded-2xl p-2.5 mb-4 flex items-center justify-between">
+        <div className="bg-surface-container rounded-2xl p-2.5 mb-4 flex items-center justify-between">
           <span className="text-[12px] font-medium text-primary">
             Gas availability posts belong in Station Groups
           </span>
@@ -176,7 +164,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g. Best place for sequential CNG kit calibration?"
-              className="w-full bg-surface-container border border-outline-variant rounded-2xl p-3 text-[14px] font-medium text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary/30"
+              className="w-full bg-surface-container rounded-2xl p-3 text-[14px] font-medium text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary/30"
             />
           </div>
 
@@ -197,7 +185,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
                   value={price}
                   onChange={(e) => setPrice(e.target.value)}
                   placeholder="8,500,000"
-                  className="w-full bg-surface-container border border-outline-variant rounded-2xl p-3 pl-8 text-[14px] font-medium text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  className="w-full bg-surface-container rounded-2xl p-3 pl-8 text-[14px] font-medium text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary/30"
                 />
               </div>
               {priceError && (
@@ -219,7 +207,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
               value={content}
               onChange={(e) => setContent(e.target.value)}
               placeholder="Provide more context, location, vehicle specs or symptoms..."
-              className="w-full bg-surface-container border border-outline-variant rounded-2xl p-3 text-[14px] font-normal text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary/30"
+              className="w-full bg-surface-container rounded-2xl p-3 text-[14px] font-normal text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary/30"
             />
           </div>
 
@@ -236,7 +224,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
             </div>
 
             {imageError && (
-              <div className="mb-2 p-2.5 bg-status-red-container border border-status-red/30 rounded-xl text-status-red text-[11.5px] font-medium flex items-start gap-2">
+              <div className="mb-2 p-2.5 bg-status-red-container border rounded-xl text-status-red text-[11.5px] font-medium flex items-start gap-2">
                 <span className="material-symbols-outlined text-[16px] shrink-0 text-status-red">
                   gpp_bad
                 </span>
@@ -273,7 +261,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
                 <button
                   type="button"
                   onClick={() => setShowLiveCamera(true)}
-                  className="w-full py-3 px-3 bg-primary hover:opacity-95 text-on-primary rounded-xl font-bold text-[13px] shadow-xs flex items-center justify-center gap-2 active:scale-95 transition-all"
+                  className="w-full py-3.5 px-3 bg-primary hover:opacity-95 text-on-primary rounded-full font-bold text-[13px] shadow-xs flex items-center justify-center gap-2 active:scale-95 transition-all"
                 >
                   <span className="material-symbols-outlined text-[20px] text-status-green shrink-0">photo_camera</span>
                   <span className="whitespace-nowrap">Take Live Photo</span>

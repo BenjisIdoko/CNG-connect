@@ -23,42 +23,23 @@ export const LiveNavigationModal: React.FC<LiveNavigationModalProps> = ({
   };
 
   return (
-    <Modal isOpen={true} onClose={onClose} title="Station Navigation Summary" className="bg-on-surface text-white p-6 border border-emerald-500/30">
+    <Modal isOpen={true} onClose={onClose} title="Station Navigation Summary" className="text-on-surface">
       <div className="flex flex-col gap-5">
-        {/* Modal Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-status-green text-[22px]">
-              navigation
-            </span>
-            <span className="font-bold text-[16px] text-white">
-              Station Navigation Summary
-            </span>
-          </div>
-          <button
-            onClick={onClose}
-            className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-all active:scale-95"
-            aria-label="Close Summary"
-          >
-            <span className="material-symbols-outlined text-[20px]">close</span>
-          </button>
-        </div>
-
         {/* Station Overview Card */}
-        <div className="bg-surface-container-high/20 rounded-2xl p-4 border border-status-green/20 flex flex-col gap-2.5">
+        <div className="bg-surface-container rounded-2xl p-4 flex flex-col gap-2.5">
           <div>
-            <h2 className="font-bold text-[19px] text-white leading-snug truncate">
+            <h2 className="font-bold text-[19px] text-on-surface leading-snug truncate">
               {station.name}
             </h2>
-            <p className="text-[13px] text-slate-300 font-normal mt-0.5 flex items-center gap-1">
-              <span className="material-symbols-outlined text-[16px] text-slate-400">
+            <p className="text-[13px] text-slate-500 font-normal mt-0.5 flex items-center gap-1">
+              <span className="material-symbols-outlined text-[16px] text-outline">
                 location_on
               </span>
               <span>{station.address}</span>
             </p>
 
             {station.lat && station.lng && (
-              <p className="text-[11.5px] text-emerald-300 font-medium mt-1 flex items-center gap-1">
+              <p className="text-[11.5px] text-primary font-medium mt-1 flex items-center gap-1">
                 <span className="material-symbols-outlined text-[14px]">
                   {station.locationPrecision === 'gps_confirmed' ? 'my_location' : 'pin_drop'}
                 </span>
@@ -70,12 +51,12 @@ export const LiveNavigationModal: React.FC<LiveNavigationModalProps> = ({
             )}
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-white/10">
-            <span className="bg-status-green/20 text-status-green text-[11.5px] font-semibold px-3 py-1 rounded-full border border-status-green/30">
+          <div className="flex flex-wrap items-center gap-2 pt-2">
+            <span className="bg-primary-container text-on-primary-container text-[11.5px] font-semibold px-3 py-1 rounded-full">
               {station.statusLabel} {station.pumpPressure ? `• ${station.pumpPressure} bar` : ''}
             </span>
             {station.cngPrice && (
-              <span className="bg-white/10 text-white text-[11.5px] font-medium px-3 py-1 rounded-full">
+              <span className="bg-white text-slate-700 text-[11.5px] font-medium px-3 py-1 rounded-full">
                 ₦{station.cngPrice}/kg
               </span>
             )}
@@ -84,20 +65,20 @@ export const LiveNavigationModal: React.FC<LiveNavigationModalProps> = ({
 
         {/* Real Distance & Drive Time Summary Grid */}
         <div className="grid grid-cols-2 gap-3">
-          <div className="bg-white/5 rounded-2xl p-3.5 border border-white/10 text-center">
-            <span className="text-[10.5px] font-semibold uppercase text-slate-400 block mb-0.5">
+          <div className="bg-surface-container rounded-2xl p-3.5 text-center">
+            <span className="text-[10.5px] font-semibold uppercase text-outline block mb-0.5">
               Estimated Distance
             </span>
-            <span className="text-[20px] font-bold text-white">
+            <span className="text-[20px] font-bold text-on-surface">
               {station.distance}
             </span>
           </div>
 
-          <div className="bg-white/5 rounded-2xl p-3.5 border border-white/10 text-center">
-            <span className="text-[10.5px] font-semibold uppercase text-slate-400 block mb-0.5">
+          <div className="bg-surface-container rounded-2xl p-3.5 text-center">
+            <span className="text-[10.5px] font-semibold uppercase text-outline block mb-0.5">
               Drive Time ETA
             </span>
-            <span className="text-[20px] font-bold text-status-green">
+            <span className="text-[20px] font-bold text-primary">
               {station.driveTime}
             </span>
           </div>
@@ -107,7 +88,7 @@ export const LiveNavigationModal: React.FC<LiveNavigationModalProps> = ({
         <div className="flex flex-col gap-2.5 pt-1">
           <button
             onClick={handleLaunchPin}
-            className="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-[14.5px] rounded-full shadow-lg flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
+            className="w-full py-3.5 bg-surface-container hover:bg-surface-container-high text-on-surface font-bold text-[14.5px] rounded-full flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
           >
             <span className="material-symbols-outlined text-[20px] shrink-0">pin_drop</span>
             <span>Open Location Pin on Google Maps</span>
@@ -115,7 +96,7 @@ export const LiveNavigationModal: React.FC<LiveNavigationModalProps> = ({
 
           <button
             onClick={handleLaunchMaps}
-            className="w-full py-3.5 bg-status-green hover:opacity-95 text-on-surface font-bold text-[14.5px] rounded-full shadow-lg flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
+            className="w-full py-3.5 bg-primary hover:opacity-95 text-white font-bold text-[14.5px] rounded-full flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
           >
             <span className="material-symbols-outlined text-[20px] shrink-0">turn_right</span>
             <span>Turn-by-Turn Navigation</span>
@@ -123,7 +104,7 @@ export const LiveNavigationModal: React.FC<LiveNavigationModalProps> = ({
 
           <button
             onClick={onClose}
-            className="w-full py-2.5 bg-white/10 hover:bg-white/15 text-slate-300 font-bold text-[13px] rounded-full active:scale-[0.98] transition-all"
+            className="w-full py-2.5 text-outline hover:text-slate-900 font-bold text-[13px] rounded-full active:scale-[0.98] transition-all"
           >
             Close Summary
           </button>

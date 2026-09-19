@@ -34,10 +34,10 @@ export const BookConversionModal: React.FC<BookConversionModalProps> = ({
   };
 
   return (
-    <Modal isOpen={true} onClose={onClose} title="Book CNG Kit Conversion" className="p-6 max-h-[90vh] overflow-y-auto">
+    <Modal isOpen={true} onClose={onClose} title="Book CNG Kit Conversion" className="max-h-[90vh] overflow-y-auto">
       {bookingSuccessRef ? (
           <div className="py-6 text-center space-y-4">
-            <div className="w-16 h-16 rounded-full bg-surface-container text-primary flex items-center justify-center mx-auto border border-outline-variant">
+            <div className="w-16 h-16 rounded-full bg-surface-container text-primary flex items-center justify-center mx-auto">
               <span className="material-symbols-outlined text-[36px]">verified</span>
             </div>
 
@@ -53,7 +53,7 @@ export const BookConversionModal: React.FC<BookConversionModalProps> = ({
               </p>
             </div>
 
-            <div className="bg-surface-container rounded-2xl p-4 border border-outline-variant text-left space-y-2 text-[13px]">
+            <div className="bg-surface-container rounded-2xl p-4 text-left space-y-2 text-[13px]">
               <div className="flex justify-between">
                 <span className="text-on-surface-variant font-medium">Booking Reference:</span>
                 <span className="font-bold text-primary">{bookingSuccessRef}</span>
@@ -72,7 +72,7 @@ export const BookConversionModal: React.FC<BookConversionModalProps> = ({
               </div>
             </div>
 
-            <div className="bg-surface border border-outline-variant rounded-2xl p-3 text-primary text-[12px] font-semibold flex items-center gap-2">
+            <div className="bg-surface rounded-2xl p-3 text-primary text-[12px] font-semibold flex items-center gap-2">
               <span className="material-symbols-outlined text-[18px]">stars</span>
               <span>+100 Driver Reward Points added to your profile!</span>
             </div>
@@ -93,25 +93,12 @@ export const BookConversionModal: React.FC<BookConversionModalProps> = ({
           </div>
         ) : (
           <div>
-            <div className="flex justify-between items-center mb-4 pb-3 border-b border-outline-variant/40">
-              <div>
-                <span className="text-[11px] font-semibold text-primary bg-surface-container px-2.5 py-0.5 rounded-full uppercase">
-                  Accredited Workshop
-                </span>
-                <h3 className="font-bold text-[18px] text-on-surface mt-1">
-                  Book CNG Kit Conversion
-                </h3>
-              </div>
-              <button
-                onClick={onClose}
-                className="w-8 h-8 rounded-full flex items-center justify-center text-outline hover:bg-surface-container"
-              >
-                <span className="material-symbols-outlined text-[20px]">close</span>
-              </button>
-            </div>
+            <span className="inline-block text-[11px] font-semibold text-primary bg-primary-container px-2.5 py-0.5 rounded-full uppercase mb-3">
+              Accredited Workshop
+            </span>
 
             {/* Selected Center Summary Card */}
-            <div className="bg-surface-container rounded-2xl p-3.5 border border-outline-variant mb-4 space-y-1">
+            <div className="bg-surface-container rounded-2xl p-3.5 mb-4 space-y-1">
               <span className="text-[10.5px] font-semibold text-primary uppercase tracking-wider block">
                 Selected Workshop ({center.code})
               </span>

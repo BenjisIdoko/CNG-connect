@@ -40,6 +40,7 @@ interface MapScreenProps {
   userGps?: { lat: number; lng: number } | null;
   onGpsStatusChange?: (status: GpsStatus, coords?: { lat: number; lng: number }) => void;
   onSuggestStation?: (suggestion: Omit<StationSuggestion, 'id' | 'createdAt' | 'status'>) => void;
+  onOpenAiAssistant?: () => void;
 }
 
 export const MapScreen: React.FC<MapScreenProps> = ({
@@ -53,6 +54,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
   userGps: propUserGps,
   onGpsStatusChange,
   onSuggestStation,
+  onOpenAiAssistant,
 }) => {
   const [activeFilter, setActiveFilter] = useState<string>('all');
   const [stationTypeFilter, setStationTypeFilter] = useState<'all' | 'cng' | 'ev_charging'>('all');
@@ -221,7 +223,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       attributionControl: false,
     });
 
-    // Standard OpenStreetMap public tile server (100% free, no API key required)
+    // Standard OpenStreetMap public tiles (free, no API key), light style.
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -233,7 +235,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       iconCreateFunction: (cluster: any) => {
         const childCount = cluster.getChildCount();
         return L.divIcon({
-          html: `<div class="w-9 h-9 rounded-full bg-primary text-white font-extrabold text-[12px] flex items-center justify-center border-2 border-white shadow-md transition-transform hover:scale-110"><span>${childCount}</span></div>`,
+          html: `<div class="w-9 h-9 rounded-full bg-primary text-white font-extrabold text-[13px] flex items-center justify-center border-[3px] border-white shadow-[0_2px_8px_rgba(31,41,35,0.35),0_0_0_4px_rgba(49,154,63,0.3)] transition-transform hover:scale-110"><span>${childCount}</span></div>`,
           className: 'custom-cluster-icon',
           iconSize: [36, 36],
         });
@@ -260,53 +262,30 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       const isSelected = selectedStation?.id === st.id;
       const isEv = st.stationType === 'ev_charging';
 
-      let colorClass = '#00c853';
-      let iconSymbol = 'local_gas_station';
+      let colorClass = '#319A3F';
+      const iconSymbol = isEv ? 'bolt' : 'local_gas_station';
+      if (st.status === 'queue') colorClass = '#F5A623';
+      if (st.status === 'low') colorClass = '#F85B23';
+      if (st.status === 'out') colorClass = '#E5484D';
+      if (st.status === 'unknown') colorClass = '#8B9389';
 
-      if (isEv) {
-        // Visually distinct Cyan/Sky Blue color family for EV stations
-        colorClass = '#0284c7'; // Available Sky Blue
-        if (st.status === 'queue') colorClass = '#0891b2'; // Busy Cyan
-        if (st.status === 'low') colorClass = '#0369a1'; // Full Dark Cyan
-        if (st.status === 'out') colorClass = '#475569'; // Out of Service Slate
-        if (st.status === 'unknown') colorClass = '#64748b';
-        iconSymbol = 'bolt';
-      } else {
-        if (st.status === 'queue') colorClass = '#FF6D00';
-        if (st.status === 'low') colorClass = '#FF6D00';
-        if (st.status === 'out') colorClass = '#FF3D00';
-        if (st.status === 'unknown') colorClass = '#94a3b8';
-      }
-
-      const displayText = isEv
-        ? (st.chargingSpeedKw ? `${st.chargingSpeedKw}kW` : 'EV')
-        : (st.pumpPressure ? `${st.pumpPressure} bar` : (st.status === 'unknown' ? 'No reports' : 'CNG'));
-
-      // Precision tier drives the pin's visual confidence: a real geocoding pass
-      // (scripts/geocode-stations.ts) now tells us how much to trust each pin —
-      // don't draw a guessed city-center pin the same way as a GPS-confirmed one.
+      // Precision tier drives the pin's confidence: exact pins are solid glowing
+      // dots, approximate ones are hollow/dashed with an accuracy ring.
       const confidence = getPinConfidence(st.locationPrecision);
       const isApprox = confidence !== 'confident';
-      const pillBorder = confidence === 'wide' ? 'border-2 border-dashed border-white/90' : confidence === 'moderate' ? 'border border-dashed border-white/80' : '';
-      const pillOpacity = confidence === 'wide' ? 'opacity-80' : confidence === 'moderate' ? 'opacity-90' : '';
-      const pointerShape = isApprox
-        ? `<div class="w-2.5 h-2.5 rotate-45 border-2 border-white -mt-1 shadow-xs" style="background-color: transparent; border-color: ${colorClass};"></div>`
-        : `<div class="w-2.5 h-2.5 rotate-45 border-r border-b border-white -mt-1 shadow-xs" style="background-color: ${colorClass};"></div>`;
 
       const customIcon = L.divIcon({
         className: 'custom-leaflet-marker',
         html: `
-          <div class="relative group cursor-pointer flex flex-col items-center">
-            <div class="px-2 py-1 rounded-full text-[10px] font-black text-white shadow-md flex items-center gap-1 transition-transform transform ${pillBorder} ${pillOpacity} ${isSelected ? 'scale-125 ring-2 ring-white' : ''}" style="background-color: ${colorClass};" title="${isApprox ? 'Approximate location' : ''}">
-              ${st.status !== 'unknown' ? '<span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>' : ''}
-              <span class="material-symbols-outlined text-[12px]">${iconSymbol}</span>
-              <span>${isApprox ? '~' : ''}${displayText}</span>
+          <div class="relative flex items-center justify-center" style="width:40px;height:40px;" title="${isApprox ? 'Approximate location' : ''}">
+            ${isApprox ? '<div style="position:absolute;inset:0;border:1.5px dashed ${colorClass}99;border-radius:9999px"></div>' : ''}
+            <div class="rounded-full flex items-center justify-center transition-transform ${isSelected ? 'scale-125' : ''}" style="width:30px;height:30px;background:${isApprox ? '#ffffff' : colorClass};border:${isApprox ? '2.5px dashed ' + colorClass : '3px solid #ffffff'};box-shadow:0 2px 8px rgba(31,41,35,0.35), 0 0 0 4px ${colorClass}${isApprox ? '00' : '44'}${isSelected ? ', 0 0 0 7px rgba(31,41,35,0.85)' : ''};">
+              <span class="material-symbols-outlined" style="font-size:15px;color:${isApprox ? colorClass : '#fff'}">${iconSymbol}</span>
             </div>
-            ${pointerShape}
           </div>
         `,
-        iconSize: [70, 30],
-        iconAnchor: [35, 30],
+        iconSize: [40, 40],
+        iconAnchor: [20, 20],
       });
 
       const marker = L.marker([lat, lng], { icon: customIcon });
@@ -418,13 +397,17 @@ export const MapScreen: React.FC<MapScreenProps> = ({
           barColor: 'bg-status-green',
           badgeBg: 'bg-emerald-50 border-emerald-200 text-primary',
           dotColor: 'bg-status-green',
+          solidBg: 'bg-status-green',
+          shortLabel: '✓ Available',
           label: 'Full stock',
         };
       case 'queue':
         return {
-          barColor: 'bg-status-orange',
+          barColor: 'bg-status-amber',
           badgeBg: 'bg-amber-50 border-amber-200 text-amber-900',
-          dotColor: 'bg-status-orange',
+          dotColor: 'bg-status-amber',
+          solidBg: 'bg-status-amber',
+          shortLabel: 'Queuing',
           label: 'Queuing',
         };
       case 'low':
@@ -432,6 +415,8 @@ export const MapScreen: React.FC<MapScreenProps> = ({
           barColor: 'bg-status-orange',
           badgeBg: 'bg-orange-50 border-orange-200 text-orange-900',
           dotColor: 'bg-status-orange',
+          solidBg: 'bg-status-orange',
+          shortLabel: 'Low pressure',
           label: 'Low pressure',
         };
       case 'out':
@@ -439,6 +424,8 @@ export const MapScreen: React.FC<MapScreenProps> = ({
           barColor: 'bg-status-red',
           badgeBg: 'bg-rose-50 border-rose-200 text-rose-900',
           dotColor: 'bg-status-red',
+          solidBg: 'bg-status-red',
+          shortLabel: 'Out of service',
           label: 'Out of gas',
         };
       case 'unknown':
@@ -447,6 +434,8 @@ export const MapScreen: React.FC<MapScreenProps> = ({
           barColor: 'bg-slate-400',
           badgeBg: 'bg-slate-100 border-slate-200 text-slate-700',
           dotColor: 'bg-slate-400',
+          solidBg: 'bg-slate-400',
+          shortLabel: 'No recent report',
           label: 'No recent reports',
         };
     }
@@ -465,7 +454,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
     (stationTypeFilter !== 'all' ? 1 : 0);
 
   return (
-    <div className="relative w-full h-[calc(100vh-4rem)] overflow-hidden bg-surface-container-low lg:flex lg:flex-row">
+    <div className="relative w-full h-[100dvh] lg:h-[calc(100vh-4rem)] overflow-hidden bg-surface-container-low lg:flex lg:flex-row">
       {/* Leaflet Map Container (Flex-1 on Desktop) */}
       <div ref={mapContainerRef} className="absolute inset-0 z-0 lg:flex-1 lg:relative lg:h-full" />
 
@@ -476,19 +465,29 @@ export const MapScreen: React.FC<MapScreenProps> = ({
         </div>
       )}
 
-      {/* Mobile-Only Floating Search Bar Container (< lg:) */}
-      <div className="lg:hidden relative z-30 p-4 max-w-xl mx-auto pointer-events-auto">
-        {/* Floating Search Pill Bar — single row: search + filter + locate */}
-        <div className="flex items-center bg-white/95 backdrop-blur-xl rounded-full shadow-[0_6px_24px_rgba(0,0,0,0.08)] border border-slate-200/80 p-2 pl-4 gap-2 transition-all focus-within:ring-2 focus-within:ring-emerald-500/30">
-          <span className="material-symbols-outlined text-primary text-[20px] shrink-0">
-            search
-          </span>
+      {/* Mobile top overlay: wordmark, search, filter chips */}
+      <div className="lg:hidden absolute top-0 inset-x-0 z-30 pointer-events-none pt-safe px-5">
+        <div className="flex items-center justify-between pt-2 pointer-events-auto">
+          <span className="font-extrabold text-slate-900 text-[19px] tracking-tight [text-shadow:0_1px_6px_rgba(255,255,255,0.9)]">CNG&#8209;Connect</span>
+          {onOpenAiAssistant && (
+            <button
+              onClick={onOpenAiAssistant}
+              aria-label="Open AI Assistant"
+              className="w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center shadow-[0_4px_12px_rgba(49,154,63,0.5)] active:scale-95 transition-transform"
+            >
+              <span className="material-symbols-outlined text-[18px]">auto_awesome</span>
+            </button>
+          )}
+        </div>
+
+        <div className="mt-3 flex items-center bg-white rounded-full shadow-[0_8px_20px_rgba(31,41,35,0.18)] px-4 gap-2 pointer-events-auto focus-within:ring-2 focus-within:ring-primary/40">
+          <span className="material-symbols-outlined text-slate-400 text-[20px] shrink-0">search</span>
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search by station, city, state, or operator..."
-            className="flex-1 bg-transparent border-none outline-none text-body font-medium text-slate-900 placeholder:text-slate-400"
+            placeholder="Search stations, city, state"
+            className="flex-1 min-w-0 bg-transparent border-none outline-none text-caption font-medium text-slate-900 placeholder:text-slate-400 py-3.5"
           />
           {searchQuery && (
             <button
@@ -499,349 +498,229 @@ export const MapScreen: React.FC<MapScreenProps> = ({
               <span className="material-symbols-outlined text-[18px]">close</span>
             </button>
           )}
+        </div>
 
-          <div className="flex items-center gap-2 shrink-0 pr-1">
+        <div className="mt-3 flex gap-2 overflow-x-auto hide-scrollbar pointer-events-auto pb-1">
+          {[
+            { label: 'Status', active: activeFilter !== 'all', icon: 'radio_button_checked' },
+            { label: 'Pressure', active: minPressure > 0, icon: null },
+            { label: 'Distance', active: maxDistanceKm > 0, icon: null },
+          ].map((chip) => (
             <button
+              key={chip.label}
               onClick={() => setIsFilterModalOpen(true)}
-              aria-label="Filter stations"
-              className="w-9 h-9 bg-slate-100 hover:bg-slate-200 rounded-full text-slate-700 active:scale-95 transition-all flex items-center justify-center relative"
-            >
-              <span className="material-symbols-outlined text-[18px]">tune</span>
-              {activeFilterCount > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-status-green text-deep-teal text-micro font-black rounded-full flex items-center justify-center border border-white shadow-xs">
-                  {activeFilterCount}
-                </span>
-              )}
-            </button>
-            <button
-              onClick={handleRecenter}
-              aria-label="My Location"
-              title={gpsStatusText}
-              className={`w-9 h-9 text-white rounded-full active:scale-95 transition-all flex items-center justify-center shadow-md ${
-                gpsStatus === 'active'
-                  ? 'bg-live-pulse hover:bg-emerald-600 shadow-emerald-500/25'
-                  : gpsStatus === 'denied'
-                  ? 'bg-rose-600 hover:bg-rose-700 shadow-rose-600/25'
-                  : 'bg-amber-600 hover:bg-amber-700 shadow-amber-600/25'
+              className={`shrink-0 rounded-full px-3.5 py-1.5 text-micro font-bold flex items-center gap-1 shadow-sm active:scale-95 transition-transform ${
+                chip.active ? 'bg-primary text-white' : 'bg-white text-slate-900'
               }`}
             >
-              <span className="material-symbols-outlined text-[18px]">
-                {gpsStatus === 'active' ? 'near_me' : gpsStatus === 'denied' ? 'location_off' : 'wrong_location'}
-              </span>
+              {chip.icon && <span className="material-symbols-outlined text-[13px]">{chip.icon}</span>}
+              {chip.label}
             </button>
-          </div>
+          ))}
+          {activeFilterCount > 0 && (
+            <button
+              onClick={() => {
+                setSearchQuery('');
+                setActiveFilter('all');
+                setActiveCity('all');
+                setMinPressure(0);
+                setMaxDistanceKm(0);
+                setStationTypeFilter('all');
+              }}
+              className="shrink-0 rounded-full px-3 py-1.5 text-micro font-bold text-slate-700 underline underline-offset-2"
+            >
+              Reset
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Mobile Bottom Sheet (< lg:) */}
+      {/* Mobile bottom sheet */}
       <div className="lg:hidden absolute bottom-0 left-0 right-0 z-30 max-w-xl mx-auto pointer-events-none">
-        <div
-          className={`w-full bg-white rounded-t-[32px] shadow-[0_-8px_32px_rgba(0,0,0,0.14)] border-t border-outline-variant pointer-events-auto transition-all duration-300 flex flex-col overflow-hidden ${
-            sheetMode === 'expanded'
-              ? 'h-[calc(100vh-8rem)]'
-              : sheetMode === 'collapsed'
-              ? 'h-[68px]'
-              : 'max-h-[58vh]'
+        <button
+          onClick={handleRecenter}
+          aria-label="My Location"
+          title={gpsStatusText}
+          className={`pointer-events-auto absolute right-4 -top-14 w-11 h-11 rounded-full text-white flex items-center justify-center active:scale-95 transition-all ${
+            gpsStatus === 'active'
+              ? 'bg-primary shadow-[0_6px_16px_rgba(49,154,63,0.5)]'
+              : gpsStatus === 'denied'
+              ? 'bg-status-red shadow-[0_6px_16px_rgba(229,72,77,0.4)]'
+              : 'bg-status-amber shadow-[0_6px_16px_rgba(245,166,35,0.4)]'
           }`}
         >
-          {/* Drawer Drag Bar & Header */}
-          <div
+          <span className="material-symbols-outlined text-[20px]">
+            {gpsStatus === 'active' ? 'my_location' : gpsStatus === 'denied' ? 'location_disabled' : 'location_searching'}
+          </span>
+        </button>
+
+        <div
+          className={`w-full bg-surface-container rounded-t-[24px] shadow-[0_-8px_24px_rgba(0,0,0,0.25)] pointer-events-auto transition-all duration-300 flex flex-col overflow-hidden ${
+            sheetMode === 'expanded' ? 'h-[calc(100dvh-8rem)]' : ''
+          }`}
+        >
+          <button
             onClick={toggleSheetMode}
-            className="w-full pt-3 pb-2 px-4 flex flex-col items-center cursor-pointer select-none bg-white shrink-0 border-b border-outline-variant/30"
+            aria-label="Toggle station list size"
+            className="w-full pt-2.5 pb-1 px-5 flex flex-col items-center shrink-0"
           >
-            <div className="w-10 h-1.25 bg-outline-variant rounded-full mb-2" />
+            <div className="w-10 h-1.5 bg-slate-900/15 rounded-full mb-2.5" />
             <div className="w-full flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span
-                  className={`w-2.5 h-2.5 rounded-full ${
-                    hasLiveData ? 'bg-status-green animate-pulse' : 'bg-outline-variant'
-                  }`}
-                />
-                <h3 className="font-extrabold text-body-lg text-on-surface">
-                  {filteredStations.length}{' '}
-                  {stationTypeFilter === 'ev_charging'
-                    ? 'EV Chargers'
-                    : stationTypeFilter === 'cng'
-                    ? 'CNG Stations'
-                    : 'Stations'}{' '}
-                  Near You
-                </h3>
-              </div>
+              <h3 className="font-extrabold text-body-lg tracking-tight text-on-surface flex items-center gap-2">
+                {hasLiveData && <span className="w-2 h-2 rounded-full bg-live-pulse animate-pulse" />}
+                {filteredStations.length}{' '}
+                {filteredStations.length === 1 ? 'station' : 'stations'} near you
+              </h3>
+              <span className="material-symbols-outlined text-slate-400 text-[20px]">
+                {sheetMode === 'expanded' ? 'keyboard_arrow_down' : 'keyboard_arrow_up'}
+              </span>
+            </div>
+          </button>
+
+          {filteredStations.length === 0 ? (
+            <div className="px-5 pt-4 pb-28 text-center flex flex-col items-center gap-2">
+              <h4 className="font-extrabold text-on-surface text-body-lg">No stations found</h4>
+              <p className="text-caption text-on-surface-variant max-w-xs">
+                Nothing matches your search or filters right now.
+              </p>
               <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  toggleSheetMode();
+                onClick={() => {
+                  setSearchQuery('');
+                  setActiveFilter('all');
+                  setActiveCity('all');
+                  setMinPressure(0);
+                  setMaxDistanceKm(0);
+                  setStationTypeFilter('all');
                 }}
-                className="text-outline hover:text-on-surface text-caption font-bold flex items-center gap-1"
+                className="mt-1 px-6 py-3 bg-primary text-white text-caption font-bold rounded-full active:scale-95 transition-all"
               >
-                <span>{sheetMode === 'expanded' ? 'Collapse' : sheetMode === 'standard' ? 'Expand' : 'Show list'}</span>
-                <span className="material-symbols-outlined text-[16px]">
-                  {sheetMode === 'expanded' ? 'keyboard_arrow_down' : 'keyboard_arrow_up'}
-                </span>
+                Reset filters
               </button>
             </div>
-          </div>
-
-          {/* Drawer Scrollable Content */}
-          {sheetMode !== 'collapsed' && (
-            <div className="px-4 pb-20 pt-3 overflow-y-auto flex-1 hide-scrollbar flex flex-col gap-4">
-              {filteredStations.length === 0 ? (
-                <div className="bg-white rounded-3xl p-6 text-center border border-outline-variant shadow-xs flex flex-col items-center gap-2 my-2">
-                  <div className="w-12 h-12 rounded-2xl bg-surface-container text-primary flex items-center justify-center font-black">
-                    <span className="material-symbols-outlined text-[28px]">filter_alt_off</span>
-                  </div>
-                  <h4 className="font-extrabold text-on-surface text-body-lg">No Stations Found</h4>
-                  <p className="text-caption text-on-surface-variant font-medium max-w-xs">
-                    No stations match your current search term or filter criteria.
-                  </p>
+          ) : sheetMode !== 'expanded' ? (
+            <div className="flex gap-3 overflow-x-auto hide-scrollbar px-5 pt-2 pb-28">
+              {nearestTop5Stations.map((st) => {
+                const info = getStatusIndicator(st.status);
+                return (
                   <button
+                    key={st.id}
                     onClick={() => {
-                      setSearchQuery('');
-                      setActiveFilter('all');
-                      setActiveCity('all');
-                      setMinPressure(0);
-                      setMaxDistanceKm(0);
-                      setStationTypeFilter('all');
+                      onSelectStation(st);
+                      onOpenStationDetails(st);
                     }}
-                    className="mt-1 px-6 py-3 bg-primary hover:opacity-95 text-on-primary text-caption font-extrabold rounded-full shadow-md active:scale-95 transition-all"
+                    className="w-40 shrink-0 bg-white rounded-2xl overflow-hidden text-left shadow-[0_4px_14px_rgba(14,20,32,0.07)] active:scale-[0.98] transition-transform"
                   >
-                    Reset All Filters
-                  </button>
-                </div>
-              ) : (
-                <>
-                  {/* Vertical Ranked List (Primary Decision-Useful View) */}
-                  <div>
-                    <div className="flex items-center justify-between mb-3 px-1">
-                      <div>
-                        <h3 className="font-black text-body-lg text-on-surface leading-tight">
-                          Nearest Stations
-                        </h3>
-                        <span className="text-micro font-bold text-outline">
-                          Sorted by GPS distance ({sheetMode === 'expanded' ? filteredStations.length : nearestTop5Stations.length} shown)
-                        </span>
+                    <div className="h-20 bg-surface-container-high">
+                      <img src={st.images?.[0] || ASSETS.stationWide} alt="" className="w-full h-full object-cover" />
+                    </div>
+                    <div className="p-2.5">
+                      <div className="font-bold text-caption text-on-surface truncate">{st.name}</div>
+                      <div className="text-micro text-outline mt-0.5 truncate">
+                        {st.distance || '—'}
+                        {st.pumpPressure ? ` · ${st.pumpPressure} bar` : ''}
                       </div>
-                      {sheetMode === 'standard' && (
-                        <button
-                          onClick={() => setSheetMode('expanded')}
-                          className="text-caption font-extrabold text-primary hover:underline"
-                        >
-                          See all ({filteredStations.length})
-                        </button>
-                      )}
-                    </div>
-
-                    <div className="flex flex-col divide-y divide-outline-variant/50">
-                      {(sheetMode === 'expanded' ? filteredStations.slice(0, visibleCount) : nearestTop5Stations).map((station) => {
-                        const statusInfo = getStatusIndicator(station.status);
-                        const isSelected = selectedStation?.id === station.id;
-                        const isUnknown = station.status === 'unknown';
-                        const age = formatStationAge(station).replace(/^Updated /, '');
-                        const meta = [
-                          station.distance || null,
-                          isUnknown ? 'No recent reports' : station.statusLabel,
-                          !isUnknown && station.pumpPressure ? `${station.pumpPressure} bar` : null,
-                          !isUnknown && age !== 'No recent report' ? age : null,
-                        ].filter(Boolean);
-
-                        return (
-                          <div
-                            key={station.id}
-                            onClick={() => {
-                              onSelectStation(station);
-                            }}
-                            className={`flex items-center justify-between gap-2 py-3 px-1 cursor-pointer transition-colors ${
-                              isSelected ? 'bg-surface-container/60 rounded-lg' : 'active:bg-surface-container/40'
-                            }`}
-                          >
-                            <div className="flex items-center gap-3 min-w-0 flex-1 pr-2">
-                              <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${statusInfo.dotColor}`} />
-
-                              <div className="min-w-0 flex-1">
-                                <h4 className="font-semibold text-body text-on-surface truncate leading-snug">
-                                  {station.name}
-                                </h4>
-                                <p className="text-caption font-medium text-on-surface-variant truncate mt-1">
-                                  {meta.join('  ·  ')}
-                                </p>
-                              </div>
-                            </div>
-
-                            <div className="flex items-center gap-1 shrink-0">
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  openWhatsAppShare(station);
-                                }}
-                                aria-label={`Share ${station.name} on WhatsApp`}
-                                title="Share update on WhatsApp"
-                                className="w-8 h-8 rounded-full bg-emerald-50 text-whatsapp hover:bg-emerald-100 flex items-center justify-center active:scale-95 transition-all"
-                              >
-                                <span className="material-symbols-outlined text-[16px]">
-                                  share
-                                </span>
-                              </button>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  onNavigate(station);
-                                }}
-                                aria-label={`Navigate to ${station.name}`}
-                                className="w-8 h-8 rounded-full bg-surface-container text-primary hover:bg-surface-container-high flex items-center justify-center active:scale-95 transition-all"
-                              >
-                                <span className="material-symbols-outlined text-[17px]">
-                                  navigation
-                                </span>
-                              </button>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  onOpenStationDetails(station);
-                                }}
-                                aria-label={`View details of ${station.name}`}
-                                className="w-7 h-7 rounded-full text-outline hover:text-on-surface flex items-center justify-center"
-                              >
-                                <span className="material-symbols-outlined text-[18px]">
-                                  chevron_right
-                                </span>
-                              </button>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-
-                    {sheetMode === 'expanded' && filteredStations.length > visibleCount && (
-                      <button
-                        onClick={() => setVisibleCount((prev) => prev + 25)}
-                        className="w-full py-3 my-2 bg-emerald-50 hover:bg-emerald-100 text-primary border border-emerald-200 text-body font-extrabold rounded-full transition-all active:scale-[0.98] flex items-center justify-center gap-2 shadow-2xs"
+                      <span
+                        className={`inline-flex items-center gap-1 mt-2 rounded-md px-1.5 py-0.5 text-micro font-bold text-white ${info.solidBg}`}
                       >
-                        <span className="material-symbols-outlined text-[18px]">expand_more</span>
-                        <span>Load More Stations (Showing {visibleCount} of {filteredStations.length})</span>
-                      </button>
-                    )}
-
-                    <button
-                      onClick={() => setIsSuggestModalOpen(true)}
-                      className="w-full mt-1 py-3 text-primary text-caption font-bold flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
-                    >
-                      <span className="material-symbols-outlined text-[16px]">add_location_alt</span>
-                      <span>Can&apos;t find a station? Suggest one</span>
-                    </button>
-                  </div>
-
-                  {/* Secondary Horizontal Carousel (Shown ONLY in Expanded Mode below the vertical list) */}
-                  {sheetMode === 'expanded' && (
-                    <div className="pt-2 border-t border-outline-variant/40">
-                      <div className="flex items-center justify-between mb-3 px-1">
-                        <h3 className="font-bold text-body-lg text-on-surface">
-                          Browse Station Photos
-                        </h3>
-                        <span className="text-micro font-semibold text-outline">
-                          Swipe to view
-                        </span>
-                      </div>
-
-                      <div className="flex overflow-x-auto gap-4 pb-2 px-1 hide-scrollbar">
-                        {nearestTop5Stations.map((st) => (
-                          <div
-                            key={`carousel-${st.id}`}
-                            onClick={() => {
-                              onSelectStation(st);
-                              onOpenStationDetails(st);
-                            }}
-                            className="w-56 shrink-0 bg-white rounded-2xl border border-outline-variant/80 p-3 shadow-xs hover:shadow-md transition-all cursor-pointer flex flex-col justify-between active:scale-98"
-                          >
-                            <div>
-                              <div className="w-full h-24 rounded-xl overflow-hidden relative mb-2 bg-surface-container">
-                                <img
-                                  src={st.images?.[0] || ASSETS.stationWide}
-                                  alt={st.name}
-                                  className="w-full h-full object-cover"
-                                />
-                                <span
-                                  className={`absolute top-2 left-2 backdrop-blur-md text-micro font-semibold px-2 py-1 rounded-xl border ${
-                                    st.status === 'unknown'
-                                      ? 'bg-black/50 text-white/90 border-white/20'
-                                      : 'bg-primary/90 text-status-green border-status-green/30'
-                                  }`}
-                                >
-                                  {st.statusLabel}
-                                </span>
-                              </div>
-
-                              <h4 className="font-bold text-body text-on-surface truncate leading-snug">
-                                {st.name}
-                              </h4>
-                              <p className="text-micro font-normal text-on-surface-variant truncate mt-1">
-                                {st.address}
-                              </p>
-                            </div>
-
-                            <div className="mt-3 pt-2 border-t border-outline-variant/30 flex items-center justify-between">
-                              <div className="flex items-center gap-2 text-micro font-medium text-on-surface-variant">
-                                {st.status !== 'unknown' && formatStationAge(st) !== 'No recent report' && (
-                                  <>
-                                    <span className="font-semibold text-primary">
-                                      {formatStationAge(st).replace(/^Updated /, '')}
-                                    </span>
-                                    {st.distance && <span>•</span>}
-                                  </>
-                                )}
-                                {st.distance && <span>{st.distance}</span>}
-                              </div>
-                              <div className="flex items-center gap-1">
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    openWhatsAppShare(st);
-                                  }}
-                                  aria-label={`Share ${st.name} on WhatsApp`}
-                                  title="Share to WhatsApp"
-                                  className="w-6 h-6 rounded-full bg-emerald-50 text-whatsapp hover:bg-emerald-100 flex items-center justify-center active:scale-95 transition-all"
-                                >
-                                  <span className="material-symbols-outlined text-[13px]">share</span>
-                                </button>
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    onNavigate(st);
-                                  }}
-                                  className="px-3 py-1 bg-status-green text-on-surface rounded-full text-micro font-bold shadow-xs active:scale-95 transition-all flex items-center gap-1"
-                                >
-                                  <span className="material-symbols-outlined text-[13px]">navigation</span>
-                                  <span>Nav</span>
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
+                        {info.shortLabel}
+                      </span>
                     </div>
-                  )}
-                </>
+                  </button>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="px-5 pt-2 pb-28 overflow-y-auto flex-1 hide-scrollbar flex flex-col gap-2">
+              {filteredStations.slice(0, visibleCount).map((station) => {
+                const info = getStatusIndicator(station.status);
+                const isUnknown = station.status === 'unknown';
+                const age = formatStationAge(station).replace(/^Updated /, '');
+                const meta = [
+                  station.distance || null,
+                  !isUnknown && station.pumpPressure ? `${station.pumpPressure} bar` : null,
+                  !isUnknown && age !== 'No recent report' ? age : null,
+                ].filter(Boolean);
+                return (
+                  <div
+                    key={station.id}
+                    onClick={() => {
+                      onSelectStation(station);
+                      onOpenStationDetails(station);
+                    }}
+                    className="bg-white rounded-2xl p-3 flex items-center gap-3 shadow-[0_4px_14px_rgba(14,20,32,0.05)] cursor-pointer active:scale-[0.99] transition-transform"
+                  >
+                    <div className="w-12 h-12 rounded-xl overflow-hidden bg-surface-container-high shrink-0">
+                      <img src={station.images?.[0] || ASSETS.stationWide} alt="" className="w-full h-full object-cover" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h4 className="font-bold text-body text-on-surface truncate leading-snug">{station.name}</h4>
+                      <p className="text-caption text-outline truncate">{meta.join(' · ') || 'No recent reports'}</p>
+                      <span
+                        className={`inline-flex items-center mt-1 rounded-md px-1.5 py-0.5 text-micro font-bold text-white ${info.solidBg}`}
+                      >
+                        {info.shortLabel}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1 shrink-0">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openWhatsAppShare(station);
+                        }}
+                        aria-label={`Share ${station.name} on WhatsApp`}
+                        className="w-9 h-9 rounded-full bg-emerald-50 text-whatsapp flex items-center justify-center active:scale-95"
+                      >
+                        <span className="material-symbols-outlined text-[16px]">share</span>
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onNavigate(station);
+                        }}
+                        aria-label={`Navigate to ${station.name}`}
+                        className="w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center active:scale-95"
+                      >
+                        <span className="material-symbols-outlined text-[16px]">navigation</span>
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+              {visibleCount < filteredStations.length && (
+                <button
+                  onClick={() => setVisibleCount((c) => c + 25)}
+                  className="w-full py-3 rounded-full bg-white text-primary text-caption font-bold active:scale-[0.98] transition-all"
+                >
+                  Show more ({filteredStations.length - visibleCount} left)
+                </button>
               )}
+              <button
+                onClick={() => setIsSuggestModalOpen(true)}
+                className="w-full py-3 text-primary text-caption font-bold flex items-center justify-center gap-2"
+              >
+                <span className="material-symbols-outlined text-[16px]">add_location_alt</span>
+                Can&apos;t find a station? Suggest one
+              </button>
             </div>
           )}
         </div>
       </div>
 
       {/* Desktop Persistent Right-Hand Panel (lg: 1024px and above) */}
-      <div className="hidden lg:flex flex-col w-[380px] xl:w-[420px] bg-white border-l border-slate-200 h-full z-20 shadow-lg overflow-hidden shrink-0">
+      <div className="hidden lg:flex flex-col w-[380px] xl:w-[420px] bg-surface h-full z-20 shadow-[-8px_0_24px_rgba(31,41,35,0.08)] overflow-hidden shrink-0">
         {/* Right Panel Header: Search & Filter */}
-        <div className="p-4 border-b border-slate-200/80 flex flex-col gap-3 bg-slate-50/50">
+        <div className="p-4 flex flex-col gap-3 bg-white shadow-[0_2px_10px_rgba(31,41,35,0.05)]">
           <div className="flex items-center justify-between">
             <h3 className="font-extrabold text-[16px] text-slate-900 flex items-center gap-2">
-              <span className="material-symbols-outlined text-primary text-[20px]">explore</span>
               <span>Stations & Chargers</span>
             </h3>
-            <span className="text-[11px] font-bold text-primary bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
+            <span className="text-[11px] font-bold text-primary bg-primary-container px-3 py-1 rounded-full">
               {filteredStations.length} Results
             </span>
           </div>
 
           {/* Desktop Search Input */}
-          <div className="flex items-center bg-white rounded-xl border border-slate-300 px-3 py-2 gap-2 shadow-2xs focus-within:ring-2 focus-within:ring-primary/20">
+          <div className="flex items-center bg-surface rounded-full px-4 py-2.5 gap-2 focus-within:ring-2 focus-within:ring-primary/20">
             <span className="material-symbols-outlined text-slate-400 text-[18px]">search</span>
             <input
               type="text"
@@ -858,19 +737,19 @@ export const MapScreen: React.FC<MapScreenProps> = ({
           </div>
 
           {/* Type Filter Segment Bar — EV temporarily hidden app-wide (SHOW_EV_STATIONS in mockData.ts) */}
-          <div className="grid grid-cols-2 gap-1 p-1 bg-slate-100 rounded-xl">
+          <div className="grid grid-cols-2 gap-1 p-1 bg-surface-container rounded-full">
             <button
               onClick={() => setStationTypeFilter('all')}
-              className={`py-2 rounded-lg text-micro font-extrabold transition-all ${
-                stationTypeFilter === 'all' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-600 hover:text-slate-900'
+              className={`py-2 rounded-full text-micro font-extrabold transition-all ${
+                stationTypeFilter === 'all' ? 'bg-deep-teal text-white' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               All
             </button>
             <button
               onClick={() => setStationTypeFilter('cng')}
-              className={`py-2 rounded-lg text-micro font-extrabold transition-all flex items-center justify-center gap-1 ${
-                stationTypeFilter === 'cng' ? 'bg-emerald-600 text-white shadow-2xs' : 'text-slate-600 hover:text-slate-900'
+              className={`py-2 rounded-full text-micro font-extrabold transition-all flex items-center justify-center gap-1 ${
+                stationTypeFilter === 'cng' ? 'bg-deep-teal text-white' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               <span className="material-symbols-outlined text-[13px]">local_gas_station</span>
@@ -880,7 +759,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
 
           <button
             onClick={() => setIsSuggestModalOpen(true)}
-            className="w-full py-2 bg-primary hover:bg-deep-teal text-white rounded-xl text-micro font-extrabold shadow-sm active:scale-98 transition-all flex items-center justify-center gap-2"
+            className="w-full py-2.5 bg-primary hover:bg-emerald-700 text-white rounded-full text-micro font-extrabold active:scale-98 transition-all flex items-center justify-center gap-2"
           >
             <span className="material-symbols-outlined text-[16px]">add_location_alt</span>
             <span>+ Suggest New Station</span>
@@ -902,10 +781,10 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                 <div
                   key={`desktop-${station.id}`}
                   onClick={() => onSelectStation(station)}
-                  className={`p-4 rounded-2xl border transition-all cursor-pointer ${
+                  className={`p-4 rounded-2xl transition-all cursor-pointer ${
                     isSelected
-                      ? 'bg-emerald-50/60 border-primary ring-2 ring-primary/20 shadow-sm'
-                      : 'bg-white border-slate-200 hover:border-slate-300'
+                      ? 'bg-white ring-2 ring-primary shadow-[0_6px_18px_rgba(49,154,63,0.18)]'
+                      : 'bg-white shadow-[0_4px_14px_rgba(31,41,35,0.05)] hover:shadow-[0_6px_18px_rgba(31,41,35,0.1)]'
                   }`}
                 >
                   <div className="flex items-start justify-between gap-2">
@@ -924,7 +803,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                     {station.address}
                   </p>
 
-                  <div className="flex items-center justify-between mt-3 pt-2 border-t border-slate-100">
+                  <div className="flex items-center justify-between mt-3">
                     <span className={`text-[11px] font-bold px-2 py-1 rounded-full ${statusInfo.badgeBg}`}>
                       {station.statusLabel}
                     </span>
@@ -947,40 +826,62 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       </div>
 
       {/* Filter Modal */}
-      <Modal isOpen={isFilterModalOpen} onClose={() => setIsFilterModalOpen(false)} title="Filter Stations">
-        <div className="flex flex-col gap-4 py-1 text-on-surface">
-          {/* Station Type */}
+      <Modal isOpen={isFilterModalOpen} onClose={() => setIsFilterModalOpen(false)} title="Filters">
+        <div className="flex flex-col gap-6 py-1 text-on-surface">
+          {/* Distance */}
           <div>
-            <label className="block text-caption font-bold text-slate-700 mb-2">Station Type</label>
-            <div className="grid grid-cols-2 gap-1 p-1 bg-slate-100 rounded-xl">
-              {([
-                { key: 'all', label: 'All', icon: null },
-                { key: 'cng', label: 'CNG', icon: 'local_gas_station' },
-              ] as const).map((opt) => (
+            <label className="block text-micro font-bold text-outline uppercase tracking-wider mb-2.5">Distance</label>
+            <div className="flex gap-2 flex-wrap">
+              {[0, 5, 10, 25, 50].map((dist) => (
                 <button
-                  key={opt.key}
+                  key={dist}
                   type="button"
-                  onClick={() => setStationTypeFilter(opt.key)}
-                  className={`py-2 rounded-lg text-caption font-extrabold transition-all flex items-center justify-center gap-1 ${
-                    stationTypeFilter === opt.key
-                      ? opt.key === 'cng'
-                        ? 'bg-emerald-600 text-white shadow-2xs'
-                        : 'bg-white text-slate-900 shadow-2xs'
-                      : 'text-slate-600 hover:text-slate-900'
+                  onClick={() => setMaxDistanceKm(dist)}
+                  className={`px-4 py-2 rounded-full text-caption font-semibold transition-all active:scale-95 ${
+                    maxDistanceKm === dist ? 'bg-slate-900 text-white' : 'bg-surface text-slate-500'
                   }`}
                 >
-                  {opt.icon && <span className="material-symbols-outlined text-[14px]">{opt.icon}</span>}
-                  <span>{opt.label}</span>
+                  {dist === 0 ? 'Any' : `${dist} km`}
                 </button>
               ))}
             </div>
           </div>
 
+          {/* Status */}
+          <div>
+            <label className="block text-micro font-bold text-outline uppercase tracking-wider mb-2.5">Status</label>
+            <div className="flex flex-col gap-2">
+              {[
+                { key: 'all', label: 'All statuses', dot: 'bg-slate-400' },
+                { key: 'full', label: 'Available', dot: 'bg-status-green' },
+                { key: 'queue', label: 'Queuing', dot: 'bg-status-amber' },
+                { key: 'low', label: 'Low pressure', dot: 'bg-status-orange' },
+                { key: 'out', label: 'Out of service', dot: 'bg-status-red' },
+              ].map((opt) => {
+                const on = activeFilter === opt.key;
+                return (
+                  <button
+                    key={opt.key}
+                    type="button"
+                    onClick={() => setActiveFilter(opt.key)}
+                    className={`flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-left transition-all active:scale-[0.99] ${
+                      on ? 'bg-primary-container ring-[1.5px] ring-primary' : 'bg-surface-container'
+                    }`}
+                  >
+                    <span className={`w-2 h-2 rounded-full ${opt.dot}`} />
+                    <span className="flex-1 text-caption font-semibold">{opt.label}</span>
+                    {on && <span className="material-symbols-outlined text-primary text-[18px]">check</span>}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
           {/* Minimum Pressure */}
           <div>
-            <div className="flex justify-between text-caption font-bold text-slate-700 mb-2">
-              <span>Minimum Pump Pressure</span>
-              <span className="text-primary font-extrabold">{minPressure} bar</span>
+            <div className="flex justify-between text-micro font-bold uppercase tracking-wider mb-3">
+              <span className="text-outline">Minimum pump pressure</span>
+              <span className="text-primary">{minPressure === 0 ? 'Any' : `${minPressure}+ bar`}</span>
             </div>
             <input
               type="range"
@@ -989,74 +890,18 @@ export const MapScreen: React.FC<MapScreenProps> = ({
               step="20"
               value={minPressure}
               onChange={(e) => setMinPressure(Number(e.target.value))}
-              className="w-full accent-primary h-2 bg-slate-100 rounded-lg cursor-pointer"
+              className="w-full accent-primary cursor-pointer"
             />
-            <div className="flex justify-between text-micro font-semibold text-slate-400 mt-1">
-              <span>Any (0 bar)</span>
-              <span>150 bar</span>
-              <span>220 bar (Max)</span>
-            </div>
           </div>
 
-          {/* Maximum Distance Radius */}
-          <div>
-            <div className="flex justify-between text-caption font-bold text-slate-700 mb-2">
-              <span>Maximum Distance Radius</span>
-              <span className="text-primary font-extrabold">
-                {maxDistanceKm === 0 ? 'Any Distance' : `Within ${maxDistanceKm} km`}
-              </span>
-            </div>
-            <div className="flex gap-2 overflow-x-auto pb-1 hide-scrollbar">
-              {[0, 5, 10, 25, 50].map((dist) => (
-                <button
-                  key={dist}
-                  type="button"
-                  onClick={() => setMaxDistanceKm(dist)}
-                  className={`flex-1 py-2 px-2 rounded-xl text-caption font-extrabold border transition-all active:scale-95 ${
-                    maxDistanceKm === dist
-                      ? 'bg-primary text-white border-primary'
-                      : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
-                  }`}
-                >
-                  {dist === 0 ? 'Any' : `${dist}km`}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Status checkboxes */}
-          <div>
-            <label className="block text-caption font-bold text-slate-700 mb-2">
-              Fuel &amp; Pump Status Availability
-            </label>
-            <div className="grid grid-cols-2 gap-2">
-              {['all', 'full', 'queue', 'low', 'out'].map((st) => (
-                <button
-                  key={st}
-                  type="button"
-                  onClick={() => setActiveFilter(st)}
-                  className={`p-3 rounded-xl text-caption font-extrabold border transition-all active:scale-95 text-center ${
-                    activeFilter === st
-                      ? 'bg-primary text-white border-primary'
-                      : 'bg-slate-50 text-slate-800 border-slate-200 hover:bg-slate-100'
-                  }`}
-                >
-                  {st === 'all'
-                    ? 'All Statuses'
-                    : st === 'full'
-                    ? 'Full Stock Only'
-                    : st === 'queue'
-                    ? 'Queuing'
-                    : st === 'low'
-                    ? 'Low Pressure'
-                    : 'Out of Gas'}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Bottom Action Buttons */}
-          <div className="pt-3 border-t border-slate-100 flex gap-3 mt-1">
+          <div className="flex flex-col gap-2 pt-1">
+            <button
+              type="button"
+              onClick={() => setIsFilterModalOpen(false)}
+              className="w-full py-3.5 bg-primary text-white font-bold text-body rounded-full shadow-[0_8px_18px_rgba(49,154,63,0.3)] active:scale-[0.98] transition-all"
+            >
+              Show {filteredStations.length} {filteredStations.length === 1 ? 'station' : 'stations'}
+            </button>
             <button
               type="button"
               onClick={() => {
@@ -1064,18 +909,10 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                 setMaxDistanceKm(0);
                 setActiveFilter('all');
                 setStationTypeFilter('all');
-                setIsFilterModalOpen(false);
               }}
-              className="flex-1 py-3 text-slate-700 font-extrabold text-body bg-slate-100 hover:bg-slate-200 rounded-full active:scale-95 transition-all"
+              className="w-full py-2 text-primary font-semibold text-caption"
             >
-              Reset Filters
-            </button>
-            <button
-              type="button"
-              onClick={() => setIsFilterModalOpen(false)}
-              className="flex-1 py-3 bg-primary text-white font-extrabold text-body rounded-full shadow-md hover:bg-deep-teal active:scale-95 transition-all"
-            >
-              Apply Filters
+              Reset filters
             </button>
           </div>
         </div>

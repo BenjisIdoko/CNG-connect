@@ -21,8 +21,8 @@ export const StationGroupInfoSheet: React.FC<StationGroupInfoSheetProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 font-['Plus_Jakarta_Sans',sans-serif] animate-fade-in">
-      <div className="w-full max-w-sm bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl p-5 border border-outline-variant flex flex-col gap-4 animate-slide-up">
+    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 font-['Urbanist',sans-serif] animate-fade-in">
+      <div className="w-full max-w-sm bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl p-5 flex flex-col gap-4 animate-slide-up">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -43,7 +43,7 @@ export const StationGroupInfoSheet: React.FC<StationGroupInfoSheetProps> = ({
         </div>
 
         {/* Canonical 1-Sentence Explainer */}
-        <div className="bg-surface border border-outline-variant rounded-2xl p-4">
+        <div className="bg-surface rounded-2xl p-4">
           <p className="text-body font-medium text-primary leading-relaxed">
             Reports and availability chat only happen in a station's group.
           </p>

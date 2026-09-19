@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0;}
+@keyframes livePulse{0%{box-shadow:0 0 0 0 rgba(49,154,63,0.55);}70%{box-shadow:0 0 0 9px rgba(49,154,63,0);}100%{box-shadow:0 0 0 0 rgba(49,154,63,0);}}
+@keyframes dotFade{0%,80%,100%{opacity:0.25;}40%{opacity:1;}}
+a{color:#319A3F;}
+a:hover{color:#267A32;}
+</style>
+</helmet>
+
+<div style="background:#F6F5EF;min-height:100vh;padding:56px 40px 140px;font-family:'Urbanist',sans-serif;color:#1F2923;">
+
+<div style="max-width:920px;margin:0 auto 64px;">
+  <div style="font-family:'Urbanist',sans-serif;font-weight:800;font-size:42px;letter-spacing:-0.02em;">CNG&#8209;Connect — Redesign</div>
+  <div style="margin-top:14px;font-size:16px;line-height:1.65;color:#5C6B60;max-width:660px;">A premium visual system for Nigeria's CNG driver network. Fruit Salad green and International Orange sit on a warm Spring Wood ground, closer to the mobility category than flat "gas-station green." Urbanist carries hero numbers and headlines and everything a driver reads at a glance. Shadow-based elevation replaces the old border-everywhere grid — the 4-state status language and live-camera verification carry through unchanged, just louder and clearer.</div>
+  <div style="display:flex;gap:14px;margin-top:32px;flex-wrap:wrap;align-items:center;">
+    <div style="width:56px;height:56px;border-radius:16px;background:#1F2923;"></div>
+    <div style="width:56px;height:56px;border-radius:16px;background:#319A3F;"></div>
+    <div style="width:56px;height:56px;border-radius:16px;background:#F85B23;"></div>
+    <div style="width:1px;height:40px;background:#DAD7CB;margin:0 8px;"></div>
+    <div style="display:flex;align-items:center;gap:6px;background:#319A3F;color:#fff;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:700;"><span>&#10003;</span>Available</div>
+    <div style="display:flex;align-items:center;gap:6px;background:#F5A623;color:#fff;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:700;"><span>&#8987;</span>Queuing</div>
+    <div style="display:flex;align-items:center;gap:6px;background:#F85B23;color:#fff;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:700;"><span>&#9888;</span>Low pressure</div>
+    <div style="display:flex;align-items:center;gap:6px;background:#E5484D;color:#fff;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:700;"><span>&#10007;</span>Out of service</div>
+  </div>
+</div>
+
+<!-- ===== SECTION: App Icon ===== -->
+<div style="max-width:1400px;margin:0 auto 88px;">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:28px;">
+    <div style="width:10px;height:10px;border-radius:2px;background:#319A3F;"></div>
+    <div style="font-family:'Urbanist',sans-serif;font-weight:700;font-size:13px;letter-spacing:0.08em;text-transform:uppercase;color:#5C6B60;">App icon</div>
+  </div>
+  <div style="display:flex;gap:40px;flex-wrap:wrap;align-items:flex-start;">
+
+    <figure style="margin:0;">
+      <div style="width:180px;height:180px;border-radius:40px;background:radial-gradient(circle at 35% 30%,#28362F,#1A2420);display:flex;align-items:center;justify-content:center;box-shadow:0 20px 40px -12px rgba(31,41,35,0.4);">
+        <svg width="128" height="128" viewBox="0 0 200 200"><defs><linearGradient id="pB1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5CC96C"/><stop offset="1" stop-color="#1F7A2C"/></linearGradient><linearGradient id="pS1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#EAF6EC"/><stop offset="1" stop-color="#8FD9B8"/></linearGradient><linearGradient id="pD1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFB067"/><stop offset="1" stop-color="#F85B23"/></linearGradient></defs><rect x="20" y="70" width="16" height="42" rx="8" fill="#C7CFC9"/><rect x="136" y="70" width="16" height="42" rx="8" fill="#C7CFC9"/><rect x="36" y="28" width="100" height="140" rx="24" fill="url(#pB1)"/><rect x="50" y="44" width="72" height="50" rx="10" fill="#17251C"/><rect x="55" y="49" width="62" height="40" rx="7" fill="url(#pS1)"/><path d="M86 118 C86 118 68 142 68 156 C68 168 76 176 86 176 C96 176 104 168 104 156 C104 142 86 118 86 118 Z" fill="url(#pD1)"/><path d="M132 50 C158 58 168 82 164 112 C161 136 154 144 150 150" fill="none" stroke="#17251C" stroke-width="9" stroke-linecap="round"/><g transform="translate(150,150) rotate(18)"><rect x="-7" y="-30" width="14" height="24" rx="6" fill="url(#pB1)"/><rect x="-11" y="-6" width="22" height="20" rx="9" fill="url(#pB1)"/><rect x="-24" y="2" width="20" height="7" rx="3.5" fill="url(#pB1)" transform="rotate(-15)"/><circle cx="-3" cy="-32" r="5.5" fill="#F85B23"/></g></svg>
+      </div>
+      <figcaption style="margin-top:14px;">
+        <div style="font-family:'Urbanist',sans-serif;font-weight:700;font-size:14px;">iOS — squircle, 1024&times;1024 source</div>
+        <div style="font-size:12px;color:#5C6B60;margin-top:3px;">Corners masked by the OS; export the flat square.</div>
+      </figcaption>
+    </figure>
+
+    <figure style="margin:0;">
+      <div style="width:180px;height:180px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#28362F,#1A2420);display:flex;align-items:center;justify-content:center;box-shadow:0 20px 40px -12px rgba(31,41,35,0.4);">
+        <svg width="106" height="106" viewBox="0 0 200 200"><defs><linearGradient id="pB2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5CC96C"/><stop offset="1" stop-color="#1F7A2C"/></linearGradient><linearGradient id="pS2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#EAF6EC"/><stop offset="1" stop-color="#8FD9B8"/></linearGradient><linearGradient id="pD2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFB067"/><stop offset="1" stop-color="#F85B23"/></linearGradient></defs><rect x="20" y="70" width="16" height="42" rx="8" fill="#C7CFC9"/><rect x="136" y="70" width="16" height="42" rx="8" fill="#C7CFC9"/><rect x="36" y="28" width="100" height="140" rx="24" fill="url(#pB2)"/><rect x="50" y="44" width="72" height="50" rx="10" fill="#17251C"/><rect x="55" y="49" width="62" height="40" rx="7" fill="url(#pS2)"/><path d="M86 118 C86 118 68 142 68 156 C68 168 76 176 86 176 C96 176 104 168 104 156 C104 142 86 118 86 118 Z" fill="url(#pD2)"/><path d="M132 50 C158 58 168 82 164 112 C161 136 154 144 150 150" fill="none" stroke="#17251C" stroke-width="9" stroke-linecap="round"/><g transform="translate(150,150) rotate(18)"><rect x="-7" y="-30" width="14" height="24" rx="6" fill="url(#pB2)"/><rect x="-11" y="-6" width="22" height="20" rx="9" fill="url(#pB2)"/><rect x="-24" y="2" width="20" height="7" rx="3.5" fill="url(#pB2)" transform="rotate(-15)"/><circle cx="-3" cy="-32" r="5.5" fill="#F85B23"/></g></svg>
+      </div>
+      <figcaption style="margin-top:14px;">
+        <div style="font-family:'Urbanist',sans-serif;font-weight:700;font-size:14px;">Android — adaptive, circle mask</div>
+        <div style="font-size:12px;color:#5C6B60;margin-top:3px;">Same foreground layer; mark stays inside the 66% safe zone for square/rounded-square/circle masks.</div>
+      </figcaption>
+    </figure>
+
+    <figure style="margin:0;">
+      <div style="width:180px;height:180px;background:radial-gradient(circle at 35% 30%,#28362F,#1A2420);display:flex;align-items:center;justify-content:center;position:relative;">
+        <div style="position:absolute;inset:18px;border:1px dashed rgba(246,245,239,0.25);border-radius:50%;"></div>
+        <svg width="128" height="128" viewBox="0 0 200 200"><defs><linearGradient id="pB3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5CC96C"/><stop offset="1" stop-color="#1F7A2C"/></linearGradient><linearGradient id="pS3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#EAF6EC"/><stop offset="1" stop-color="#8FD9B8"/></linearGradient><linearGradient id="pD3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFB067"/><stop offset="1" stop-color="#F85B23"/></linearGradient></defs><rect x="20" y="70" width="16" height="42" rx="8" fill="#C7CFC9"/><rect x="136" y="70" width="16" height="42" rx="8" fill="#C7CFC9"/><rect x="36" y="28" width="100" height="140" rx="24" fill="url(#pB3)"/><rect x="50" y="44" width="72" height="50" rx="10" fill="#17251C"/><rect x="55" y="49" width="62" height="40" rx="7" fill="url(#pS3)"/><path d="M86 118 C86 118 68 142 68 156 C68 168 76 176 86 176 C96 176 104 168 104 156 C104 142 86 118 86 118 Z" fill="url(#pD3)"/><path d="M132 50 C158 58 168 82 164 112 C161 136 154 144 150 150" fill="none" stroke="#17251C" stroke-width="9" stroke-linecap="round"/><g transform="translate(150,150) rotate(18)"><rect x="-7" y="-30" width="14" height="24" rx="6" fill="url(#pB3)"/><rect x="-11" y="-6" width="22" height="20" rx="9" fill="url(#pB3)"/><rect x="-24" y="2" width="20" height="7" rx="3.5" fill="url(#pB3)" transform="rotate(-15)"/><circle cx="-3" cy="-32" r="5.5" fill="#F85B23"/></g></svg>
+      </div>
+      <figcaption style="margin-top:14px;">
+        <div style="font-family:'Urbanist',sans-serif;font-weight:700;font-size:14px;">Flat source + safe zone</div>
+        <div style="font-size:12px;color:#5C6B60;margin-top:3px;">Full pump-machine mark — body, digital screen, fuel-drop badge, and hose-to-nozzle — reads clearly down to real icon sizes.</div>
+      </figcaption>
+    </figure>
+
+    <figure style="margin:0;">
+      <div style="display:flex;gap:8px;align-items:center;background:#111;border-radius:20px;padding:16px 20px;">
+        <div style="width:52px;height:52px;border-radius:13px;background:radial-gradient(circle at 35% 30%,#28362F,#1A2420);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="38" height="38" viewBox="0 0 200 200"><defs><linearGradient id="pB4" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5CC96C"/><stop offset="1" stop-color="#1F7A2C"/></linearGradient><linearGradient id="pS4" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#EAF6EC"/><stop offset="1" stop-color="#8FD9B8"/></linearGradient><linearGradient id="pD4" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFB067"/><stop offset="1" stop-color="#F85B23"/></linearGradient></defs><rect x="20" y="70" width="16" height="42" rx="8" fill="#C7CFC9"/><rect x="136" y="70" width="16" height="42" rx="8" fill="#C7CFC9"/><rect x="36" y="28" width="100" height="140" rx="24" fill="url(#pB4)"/><rect x="50" y="44" width="72" height="50" rx="10" fill="#17251C"/><rect x="55" y="49" width="62" height="40" rx="7" fill="url(#pS4)"/><path d="M86 118 C86 118 68 142 68 156 C68 168 76 176 86 176 C96 176 104 168 104 156 C104 142 86 118 86 118 Z" fill="url(#pD4)"/><path d="M132 50 C158 58 168 82 164 112 C161 136 154 144 150 150" fill="none" stroke="#17251C" stroke-width="9" stroke-linecap="round"/><g transform="translate(150,150) rotate(18)"><rect x="-7" y="-30" width="14" height="24" rx="6" fill="url(#pB4)"/><rect x="-11" y="-6" width="22" height="20" rx="9" fill="url(#pB4)"/><rect x="-24" y="2" width="20" height="7" rx="3.5" fill="url(#pB4)" transform="rotate(-15)"/><circle cx="-3" cy="-32" r="5.5" fill="#F85B23"/></g></svg></div>
+        <div style="width:52px;height:52px;border-radius:13px;background:#2A2A2A;"></div>
+        <div style="width:52px;height:52px;border-radius:13px;background:#2A2A2A;"></div>
+      </div>
+      <figcaption style="margin-top:14px;">
+        <div style="font-family:'Urbanist',sans-serif;font-weight:700;font-size:14px;">Home screen — 52px context check</div>
+        <div style="font-size:12px;color:#5C6B60;margin-top:3px;">Silhouette (body + screen + drop + hose) still reads at real icon size, distinct from neighboring apps.</div>
+      </figcaption>
+    </figure>
+
+  </div>
+</div>
+
+<!-- ===== SECTION: Onboarding & Auth ===== -->
+<div style="max-width:1400px;margin:0 auto 88px;">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:28px;">
+    <div style="width:10px;height:10px;border-radius:2px;background:#319A3F;"></div>
+    <div style="font-family:'Urbanist',sans-serif;font-weight:700;font-size:13px;letter-spacing:0.08em;text-transform:uppercase;color:#5C6B60;">Onboarding &amp; Auth</div>
+  </div>
+  <div style="display:flex;gap:40px;flex-wrap:wrap;align-items:flex-start;">
+
+    <!-- Onboarding slide -->
+    <figure style="margin:0;width:336px;">
+      <div style="background:#05070C;border-radius:46px;padding:8px;box-shadow:0 30px 60px -20px rgba(14,20,32,0.45),0 8px 24px -8px rgba(14,20,32,0.25);position:relative;">
+        <div style="position:absolute;top:18px;left:50%;transform:translateX(-50%);width:8px;height:8px;border-radius:50%;background:#1c1f2b;z-index:2;"></div>
+        <div style="width:320px;height:692px;background:#fff;border-radius:38px;overflow:hidden;position:relative;display:flex;flex-direction:column;">
+          <div style="height:420px;background:repeating-linear-gradient(135deg,#E6E2D6 0px,#E6E2D6 12px,#F1EEE3 12px,#F1EEE3 24px);display:flex;align-items:center;justify-content:center;position:relative;">
+            <div style="font-family:monospace;font-size:11px;color:#8B9389;letter-spacing:0.05em;">STATION HERO PHOTO</div>
+            <div style="position:absolute;top:44px;right:20px;font-size:13px;font-weight:600;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.4);">Log in</div>
+            <div style="position:absolute;bottom:0;left:0;right:0;height:80px;background:linear-gradient(transparent,rgba(0,0,0,0.15));"></div>
+          </div>
+          <div style="padding:26px 24px;flex:1;display:flex;flex-direction:column;">
+            <div style="font-family:'Urbanist',sans-serif;font-weight:700;font-size:23px;line-height:1.3;">Live pressure and queue status, before you drive there.</div>
+            <div style="margin-top:10px;font-size:14px;color:#5C6B60;line-height:1.6;">See which stations actually have gas right now — reported by drivers who are there.</div>
+            <div style="flex:1;"></div>
+            <div style="display:flex;gap:6px;margin:18px 0;">
+              <div style="width:6px;height:6px;border-radius:50%;background:#DAD7CB;"></div>
+              <div style="width:22px;height:6px;border-radius:3px;background:#319A3F;"></div>
+              <div style="width:6px;height:6px;border-radius:50%;background:#DAD7CB;"></div>
+              <div style="width:6px;height:6px;border-radius:50%;background:#DAD7CB;"></div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <div style="font-size:14px;font-weight:600;color:#5C6B60;">Skip</div>
+              <div style="width:48px;height:48px;border-radius:50%;background:#319A3F;color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;">&#8594;</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <figcaption style="margin-top:16px;">
+        <div style="font-family:'Urbanist',sans-serif;font-weight:700;font-size:15px;">Onboarding carousel</div>
+        <div style="font-size:13px;color:#5C6B60;margin-top:4px;line-height:1.5;">4 slides, tap/swipe/dots. Log in stays reachable from slide 1.</div>
+      </figcaption>
+    </figure>
+
+    <!-- Sign up / Login -->
+    <figure style="margin:0;width:336px;">
+      <div style="background:#05070C;border-radius:46px;padding:8px;box-shadow:0 30px 60px -20px rgba(14,20,32,0.45),0 8px 24px -8px rgba(14,20,32,0.25);position:relative;">
+        <div style="position:absolute;top:18px;left:50%;transform:translateX(-50%);width:8px;height:8px;border-radius:50%;background:#1c1f2b;z-index:2;"></div>
+        <div style="width:320px;height:692px;background:#fff;border-radius:38px;overflow:hidden;position:relative;display:flex;flex-direction:column;padding:28px 24px;">
+          <div style="display:flex;align-items:center;gap:14px;">
+            <div style="font-size:20px;">&#8592;</div>
+            <div style="font-size:12px;font-weight:600;color:#8B9389;">Step 2 of 2</div>
+          </div>
+          <div style="font-family:'Urbanist',sans-serif;font-weight:700;font-size:26px;margin-top:24px;">Enter code</div>
+          <div style="font-size:14px;color:#5C6B60;margin-top:8px;line-height:1.5;">We sent a 6-digit code to<br><strong style="color:#1F2923;">driver@example.com</strong></div>
+          <div style="display:flex;gap:8px;margin-top:32px;">
+            <div style="width:42px;height:50px;border-radius:12px;background:#E3F5E6;display:flex;align-items:center;justify-content:center;font-family:'Urbanist',sans-serif;font-weight:700;font-size:20px;">4</div>
+            <div style="width:42px;height:50px;border-radius:12px;background:#E3F5E6;display:flex;align-items:center;justify-content:center;font-family:'Urbanist',sans-serif;font-weight:700;font-size:20px;">1</div>
+            <div style="width:42px;height:50px;border-radius:12px;background:#E3F5E6;display:flex;align-items:center;justify-content:center;font-family:'Urbanist',sans-serif;font-weight:700;font-size:20px;">2</div>
+            <div style="width:42px;height:50px;border-radius:12px;background:#F6F5EF;border:2px solid #319A3F;display:flex;align-items:center;justify-content:center;"></div>
+            <div style="width:42px;height:50px;border-radius:12px;background:#F6F5EF;"></div>
+            <div style="width:42px;height:50px;border-radius:12px;background:#F6F5EF;"></div>
+          </div>
+          <div style="margin-top:18px;font-size:13px;color:#8B9389;">Didn't get a code? Resend in 0:47</div>
+          <div style="margin-top:6px;font-size:12px;color:#8B9389;font-style:italic;">A confirmation link may arrive instead, in some cases.</div>
+          <div style="flex:1;"></div>
+          <div style="background:#1F2923;color:#fff;border-radius:999px;padding:16px;text-align:center;font-weight:600;font-size:15px;">Verify &amp; continue</div>
+        </div>
+      </div>
+      <figcaption style="margin-top:16px;">
+        <div style="font-family:'Urbanist',sans-serif;font-weight:700;font-size:15px;">Sign up / Log in — step 2</div>
+        <div style="font-size:13px;color:#5C6B60;margin-top:4px;line-height:1.5;">Same 2 steps for new &amp; returning drivers; profile step only appears for new accounts.</div>
+      </figcaption>
+    </figure>
+
+  </div>
+</div>
+
+<!-- ===== SECTION: Core loop ===== -->
+<div style="max-width:1400px;margin:0 auto 88px;">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:28px;">
+    <div style="width:10px;height:10px;border-radius:2px;background:#319A3F;"></div>
+    <div style="font-family:'Urbanist',sans-serif;font-weight:700;font-size:13px;letter-spacing:0.08em;text-transform:uppercase;color:#5C6B60;">Core loop — Map, Station, Report</div>
+  </div>
+  <div style="display:flex;gap:40px;flex-wrap:wrap;align-items:flex-start;">
+
+    <!-- Map mobile -->
+    <figure style="margin:0;width:336px;">
+      <div style="background:#05070C;border-radius:46px;padding:8px;box-shadow:0 30px 60px -20px rgba(14,20,32,0.45),0 8px 24px -8px rgba(14,20,32,0.25);position:relative;">
+        <div style="position:absolute;top:18px;left:50%;transform:translateX(-50%);width:8px;height:8px;border-radius:50%;background:#1c1f2b;z-index:2;"></div>
+<div style="width:320px;height:692px;background:#14180F;border-radius:38px;overflow:hidden;position:relative;display:flex;flex-direction:column;">
+          <div style="position:relative;flex:1;background:repeating-linear-gradient(135deg,#171C10 0px,#171C10 12px,#1C2214 12px,#1C2214 24px);overflow:hidden;">
+            <div style="position:absolute;top:0;left:0;right:0;padding:44px 20px 0;display:flex;align-items:center;justify-content:space-between;z-index:3;">
+              <div style="font-family:'Urbanist',sans-serif;font-weight:800;color:#fff;font-size:19px;letter-spacing:-0.02em;">CNG&#8209;Connect</div>
+              <div style="width:34px;height:34px;border-radius:50%;background:#319A3F;display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;box-shadow:0 4px 12px rgba(49,154,63,0.5);">&#9733;</div>
+            </div>
+            <div style="position:absolute;top:88px;left:20px;right:20px;z-index:3;">
+              <div style="background:#fff;border-radius:999px;padding:13px 18px;font-size:13px;color:#8B9389;font-weight:500;box-shadow:0 8px 20px rgba(0,0,0,0.25);">Search stations, city, state</div>
+            </div>
+            <div style="position:absolute;top:144px;left:20px;display:flex;gap:8px;z-index:3;">
+              <div style="background:#319A3F;color:#fff;border-radius:999px;padding:7px 14px;font-size:11px;font-weight:700;white-space:nowrap;">&#9673; Status</div>
+              <div style="background:rgba(255,255,255,0.9);color:#1F2923;border-radius:999px;padding:7px 14px;font-size:11px;font-weight:700;white-space:nowrap;">Pressure</div>
+              <div style="background:rgba(255,255,255,0.9);color:#1F2923;border-radius:999px;padding:7px 14px;font-size:11px;font-weight:700;white-space:nowrap;">Distance</div>
+            </div>
+            <div style="position:absolute;top:230px;left:54px;width:30px;height:30px;border-radius:50%;background:#319A3F;border:3px solid #14180F;box-shadow:0 0 0 4px rgba(22,163,74,0.35);"></div>
+            <div style="position:absolute;top:280px;left:168px;width:30px;height:30px;border-radius:50%;background:#F5A623;border:3px solid #14180F;box-shadow:0 0 0 4px rgba(245,166,35,0.3);"></div>
+            <div style="position:absolute;top:326px;left:96px;width:54px;height:54px;border:1.5px dashed rgba(255,255,255,0.4);border-radius:50%;"></div>
+            <div style="position:absolute;top:338px;left:108px;width:28px;height:28px;border-radius:50%;background:#14180F;border:2.5px dashed rgba(255,255,255,0.6);"></div>
+            <div style="position:absolute;bottom:18px;right:16px;width:40px;height:40px;border-radius:50%;background:#319A3F;box-shadow:0 6px 16px rgba(49,154,63,0.5);display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff;">&#9678;</div>
+          </div>
+          <div style="background:#F1EFE6;border-radius:24px 24px 0 0;box-shadow:0 -8px 24px rgba(0,0,0,0.25);padding:8px 20px 10px;overflow:visible;display:flex;flex-direction:column;flex-shrink:0;">
+            <div style="width:40px;height:5px;background:#1F2923;opacity:0.15;border-radius:3px;margin:0 auto 6px;flex-shrink:0;"></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+              <div style="font-family:'Urbanist',sans-serif;font-weight:800;font-size:16px;letter-spacing:-0.01em;">5 stations near you</div>
+              <div style="font-size:9px;color:#8B9389;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;">Cached</div>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:6px;height:124px;flex-shrink:0;">
+              <div style="width:148px;flex-shrink:0;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 4px 14px rgba(14,20,32,0.06);">
+                <div style="height:42px;background:repeating-linear-gradient(135deg,#E6E2D6 0px,#E6E2D6 8px,#F1EEE3 8px,#F1EEE3 16px);"></div>
+                <div style="padding:7px 8px;">
+                  <div style="font-weight:700;font-size:11px;">Total Energies</div>
+                  <div style="display:flex;align-items:center;gap:5px;margin-top:3px;font-size:9px;color:#8B9389;"><span>&#9733;4.3</span><span>&middot;</span><span>1.2 km</span></div>
+                  <div style="display:inline-flex;align-items:center;gap:3px;background:#319A3F;color:#fff;border-radius:6px;padding:2px 6px;font-size:9px;font-weight:700;margin-top:6px;">&#10003; Available</div>
+                </div>
+              </div>
+              <div style="width:148px;flex-shrink:0;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 4px 14px rgba(14,20,32,0.06);">
+                <div style="height:42px;background:repeating-linear-gradient(135deg,#E6E2D6 0px,#E6E2D6 8px,#F1EEE3 8px,#F1EEE3 16px);"></div>
+                <div style="padding:7px 8px;">
+                  <div style="font-weight:700;font-size:11px;">NIPCO — Yaba</div>
+                  <div style="display:flex;align-items:center;gap:5px;margin-top:3px;font-size:9px;color:#8B9389;"><span>&#9733;4.0</span><span>&middot;</span><span>2.6 km</span></div>
+                  <div style="display:inline-flex;align-items:center;gap:3px;background:#F5A623;color:#fff;border-radius:6px;padding:2px 6px;font-size:9px;font-weight:700;margin-top:6px;">&#8987; Queuing</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;align-items:end;padding:6px 12px 8px;background:#fff;box-shadow:0 -4px 14px rgba(14,20,32,0.06);flex-shrink:0;">
+            <div style="display:flex;flex-direction:column;align-items:center;">
+              <div style="width:40px;height:40px;border-radius:50%;background:#319A3F;color:#fff;display:flex;align-items:center;justify-content:center;font-size:17px;margin-top:-22px;box-shadow:0 8px 16px rgba(49,154,63,0.45);">&#9673;</div>
+              <div style="font-size:9px;font-weight:700;margin-top:4px;">Map</div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#8B9389;"><div style="font-size:17px;">&#9968;</div><div style="font-size:9px;font-weight:600;">Kits</div></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#8B9389;position:relative;"><div style="font-size:17px;">&#128172;</div><div style="position:absolute;top:-2px;right:8px;width:7px;height:7px;border-radius:50%;background:#E5484D;"></div><div style="font-size:9px;font-weight:600;">Community</div></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#8B9389;"><div style="font-size:17px;">&#128100;</div><div style="font-size:9px;font-weight:600;">Profile</div></div>
+          </div>
+        </div>
+      </div>
+      <figcaption style="margin-top:16px;">
+        <div style="font-family:'Urbanist',sans-serif;font-weight:700;font-size:15px;">Map — home tab</div>
+        <div style="font-size:13px;color:#5C6B60;margin-top:4px;line-height:1.5;">Photo-pin markers, horizontal station cards, floating active tab in the nav. Sheet still supports collapsed / standard / expanded.</div>
+      </figcaption>
+    </figure>
+
+    <!-- Filters -->
+    <figure style="margin:0;width:336px;">
+      <div style="background:#05070C;border-radius:46px;padding:8px;box-shadow:0 30px 60px -20px rgba(14,20,32,0.45),0 8px 24px -8px rgba(14,20,32,0.25);position:relative;">
+        <div style="position:absolute;top:18px;left:50%;transform:translateX(-50%);width:8px;height:8px;border-radius:50%;background:#1c1f2b;z-index:2;"></div>
+        <div style="width:320px;height:692px;background:#fff;border-radius:38px;overflow:hidden;position:relative;display:flex;flex-direction:column;padding:26px 22px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div style="font-weight:700;font-size:16px;">Filters</div>
+            <div style="font-size:12px;color:#319A3F;font-weight:600;">Reset</div>
+          </div>
+          <div style="margin-top:24px;">
+            <div style="font-size:11px;font-weight:700;color:#8B9389;text-transform:uppercase;letter-spacing:0.04em;">Distance</div>
+            <div style="display:flex;gap:8px;margin-top:10px;">
+              <div style="background:#F6F5EF;color:#5C6B60;border-radius:999px;padding:8px 14px;font-size:12px;font-weight:600;">1 km</div>
+              <div style="background:#1F2923;color:#fff;border-radius:999px;padding:8px 14px;font-size:12px;font-weight:600;">5 km</div>
+              <div style="background:#F6F5EF;color:#5C6B60;border-radius:999px;padding:8px 14px;font-size:12px;font-weight:600;">15 km</div>
+              <div style="background:#F6F5EF;color:#5C6B60;border-radius:999px;padding:8px 14px;font-size:12px;font-weight:600;">30 km</div>
+            </div>
+          </div>
+          <div style="margin-top:24px;">
+            <div style="font-size:11px;font-weight:700;color:#8B9389;text-transform:uppercase;letter-spacing:0.04em;">Status</div>
+            <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px;">
+              <div style="display:flex;align-items:center;gap:8px;background:#E3F5E6;border:1.5px solid #319A3F;border-radius:12px;padding:10px 12px;"><div style="width:8px;height:8px;border-radius:50%;background:#319A3F;"></div><div style="font-size:13px;font-weight:600;flex:1;">Available</div><div style="color:#319A3F;">&#10003;</div></div>
+              <div style="display:flex;align-items:center;gap:8px;background:#F1EFE6;border-radius:12px;padding:10px 12px;"><div style="width:8px;height:8px;border-radius:50%;background:#F5A623;"></div><div style="font-size:13px;font-weight:600;flex:1;">Queuing</div></div>
+              <div style="display:flex;align-items:center;gap:8px;background:#F1EFE6;border-radius:12px;padding:10px 12px;"><div style="width:8px;height:8px;border-radius:50%;background:#F85B23;"></div><div style="font-size:13px;font-weight:600;flex:1;">Low pressure</div></div>
+            </div>
+          </div>
+          <div style="margin-top:24px;">
+            <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:700;color:#8B9389;text-transform:uppercase;letter-spacing:0.04em;"><div>Pump pressure</div><div style="color:#319A3F;">100&#8211;220 bar</div></div>
+            <div style="height:6px;background:#E7EAF0;border-radius:3px;margin-top:12px;position:relative;"><div style="position:absolute;left:20%;right:15%;height:6px;background:#319A3F;border-radius:3px;"></div></div>
+          </div>
+          <div style="flex:1;"></div>
+          <div style="background:#319A3F;color:#fff;border-radius:999px;padding:15px;text-align:center;font-weight:700;font-size:14px;">Show 12 stations</div>
+        </div>
+      </div>
+      <figcaption style="margin-top:16px;">
+        <div style="font-family:'Urbanist',sans-serif;font-weight:700;font-size:15px;">Filters</div>
+        <div style="font-size:13px;color:#5C6B60;margin-top:4px;line-height:1.5;">Distance, status, and pressure range in one sheet; results count updates on the CTA.</div>
+      </figcaption>
+    </figure>
+
+    <!-- Map desktop -->
+    <figure style="margin:0;width:820px;">
+      <div style="background:#E7EAF0;border-radius:18px;padding:0;box-shadow:0 30px 60px -20px rgba(14,20,32,0.3);overflow:hidden;">
+        <div style="height:34px;display:flex;align-items:center;gap:8px;padding:0 14px;">
+          <div style="width:10px;height:10px;border-radius:50%;background:#DAD7CB;"></div>
+          <div style="width:10px;height:10px;border-radius:50%;background:#DAD7CB;"></div>
+          <div style="width:10px;height:10px;border-radius:50%;background:#DAD7CB;"></div>
+          <div style="margin-left:12px;background:#fff;border-radius:999px;padding:4px 14px;font-size:11px;color:#8B9389;">cngconnect.app/map</div>
+        </div>
+        <div style="display:flex;height:480px;background:#fff;">
+          <div style="width:320px;border-right:1px solid #E7E4D9;padding:20px;overflow:hidden;">
+            <div style="background:#F6F5EF;border-radius:999px;padding:10px 16px;font-size:13px;color:#8B9389;margin-bottom:14px;">Search stations, city, state</div>
+            <div style="font-family:'Urbanist',sans-serif;font-weight:700;font-size:14px;margin-bottom:10px;">18 stations · Lagos</div>
+            <div style="background:#F1EFE6;border-radius:14px;padding:12px;margin-bottom:8px;">
+              <div style="font-weight:700;font-size:13px;">Total Energies — Ikeja</div>
+              <div style="font-size:11px;color:#8B9389;margin-top:2px;">1.2 km · 180 bar</div>
+              <div style="display:inline-flex;gap:4px;background:#E7F6ED;color:#319A3F;border-radius:8px;padding:2px 7px;font-size:10px;font-weight:700;margin-top:6px;">&#10003; Available</div>
+            </div>
+            <div style="background:#F1EFE6;border-radius:14px;padding:12px;margin-bottom:8px;">
+              <div style="font-weight:700;font-size:13px;">NIPCO — Yaba</div>
+              <div style="font-size:11px;color:#8B9389;margin-top:2px;">2.6 km · 60 bar</div>
+              <div style="display:inline-flex;gap:4px;background:#FFF3DF;color:#B4740A;border-radius:8px;padding:2px 7px;font-size:10px;font-weight:700;margin-top:6px;">&#8987; Queuing</div>
+            </div>
+            <div style="background:#F1EFE6;border-radius:14px;padding:12px;">
+              <div style="font-weight:700;font-size:13px;">NNPC — Surulere</div>
+              <div style="font-size:11px;color:#8B9389;margin-top:2px;">3.1 km · no recent report</div>
+              <div style="display:inline-flex;gap:4px;background:#FCE8E9;color:#C82A30;border-radius:8px;padding:2px 7px;font-size:10px;font-weight:700;margin-top:6px;">&#10007; Out of service</div>
+            </div>
+          </div>
+          <div style="flex:1;background:repeating-linear-gradient(135deg,#E7E4DA 0px,#E7E4DA 14px,#F0EEE3 14px,#F0EEE3 28px);position:relative;">
+            <div style="position:absolute;top:80px;left:120px;width:18px;height:18px;border-radius:50% 50% 50% 0;background:#319A3F;transform:rotate(-45deg);"></div>
+            <div style="position:absolute;top:200px;left:260px;width:18px;height:18px;border-radius:50% 50% 50% 0;background:#F5A623;transform:rotate(-45deg);"></div>
+            <div style="position:absolute;top:150px;left:380px;width:18px;height:18px;border-radius:50% 50% 50% 0;background:#E5484D;transform:rotate(-45deg);"></div>
+            <div style="position:absolute;top:20px;right:20px;width:40px;height:40px;border-radius:50%;background:#fff;box-shadow:0 4px 10px rgba(0,0,0,0.15);display:flex;align-items:center;justify-content:center;font-size:16px;">&#9733;</div>
+          </div>
+        </div>
+      </div>
+      <figcaption style="margin-top:16px;">
+        <div style="font-family:'Urbanist',sans-serif;font-weight:700;font-size:15px;">Map — desktop</div>
+        <div style="font-size:13px;color:#5C6B60;margin-top:4px;line-height:1.5;">Persistent list panel + map, not a stretched phone view.</div>
+      </figcaption>
+    </figure>
+
+    <!-- Station detail -->
+    <figure style="margin:0;width:336px;">
+      <div style="background:#05070C;border-radius:46px;padding:8px;box-shadow:0 30px 60px -20px rgba(14,20,32,0.45),0 8px 24px -8px rgba(14,20,32,0.25);position:relative;">
+        <div style="position:absolute;top:18px;left:50%;transform:translateX(-50%);width:8px;height:8px;border-radius:50%;background:#1c1f2b;z-index:2;"></div>
+        <div style="width:320px;height:692px;background:#fff;border-radius:38px;overflow:hidden;position:relative;display:flex;flex-direction:column;">
+          <div style="height:150px;background:repeating-linear-gradient(135deg,#E6E2D6 0px,#E6E2D6 12px,#F1EEE3 12px,#F1EEE3 24px);position:relative;flex-shrink:0;">
+            <div style="position:absolute;top:16px;left:16px;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.85);display:flex;align-items:center;justify-content:center;">&#8592;</div>
+            <div style="position:absolute;top:16px;right:16px;display:flex;gap:8px;">
+              <div style="width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.85);display:flex;align-items:center;justify-content:center;font-size:13px;">&#9825;</div>
+              <div style="width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.85);display:flex;align-items:center;justify-content:center;font-size:13px;">&#8599;</div>
+            </div>
+            <div style="position:absolute;bottom:0;left:0;right:0;height:26px;background:linear-gradient(transparent,rgba(0,0,0,0.5));display:flex;align-items:center;justify-content:flex-end;padding:0 12px;"><div style="font-size:9px;color:#fff;font-weight:600;">CNG station</div></div>
+          </div>
+          <div style="padding:16px 20px 0;flex:1;overflow:hidden;display:flex;flex-direction:column;">
+            <div style="font-family:'Urbanist',sans-serif;font-weight:800;font-size:17px;letter-spacing:-0.01em;">NNPC filling station Ushafa</div>
+            <div style="font-size:11px;color:#8B9389;margin-top:3px;">Dutse-Bwari Road, Abuja</div>
+            <div style="display:flex;align-items:center;gap:6px;margin-top:12px;">
+              <div style="width:7px;height:7px;border-radius:50%;background:#319A3F;flex-shrink:0;"></div>
+              <div style="font-size:12px;font-weight:700;color:#1F2923;">Available</div>
+              <div style="font-size:11px;color:#8B9389;">&middot; updated just now</div>
+            </div>
+            <div style="display:flex;gap:24px;margin-top:16px;">
+              <div style="flex:1;">
+                <div style="font-size:9px;color:#8B9389;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;">CNG price</div>
+                <div style="font-family:'Urbanist',sans-serif;font-weight:800;font-size:16px;color:#B8C2BB;margin-top:4px;">Unreported</div>
+              </div>
+              <div style="flex:1;">
+                <div style="font-size:9px;color:#8B9389;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;">Pump pressure</div>
+                <div style="font-family:'Urbanist',sans-serif;font-weight:800;font-size:16px;color:#B8C2BB;margin-top:4px;">No data</div>
+              </div>
+            </div>
+            <div style="font-size:10px;color:#5C6B60;margin-top:6px;">No reports yet — be the first to add one</div>
+            <div style="display:flex;gap:22px;margin-top:18px;border-bottom:1px solid #EEF0EA;flex-shrink:0;">
+              <div style="text-align:center;color:#8B9389;padding-bottom:9px;font-size:11px;font-weight:600;">Chat</div>
+              <div style="text-align:center;color:#1F2923;padding-bottom:8px;font-size:11px;font-weight:700;border-bottom:2px solid #319A3F;">Reports &middot; 2</div>
+              <div style="text-align:center;color:#8B9389;padding-bottom:9px;font-size:11px;font-weight:600;">Photos</div>
+            </div>
+            <div style="flex:1;overflow:visible;margin-top:14px;margin-bottom:10px;">
+              <div style="display:flex;gap:10px;align-items:flex-start;">
+                <div style="width:34px;height:34px;border-radius:50%;background:#D8D2C4;flex-shrink:0;position:relative;">
+                  <div style="position:absolute;bottom:-2px;right:-2px;width:14px;height:14px;border-radius:50%;background:#319A3F;border:2px solid #fff;color:#fff;font-size:8px;display:flex;align-items:center;justify-content:center;">&#10003;</div>
+                </div>
+                <div style="flex:1;">
+                  <div style="display:flex;justify-content:space-between;align-items:baseline;">
+                    <div style="font-weight:700;font-size:12px;">Idoko Emmanuel</div>
+                    <div style="font-size:10px;color:#8B9389;">Just now</div>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:5px;margin-top:6px;"><div style="width:6px;height:6px;border-radius:50%;background:#4CD164;"></div><div style="font-weight:700;font-size:12px;">Full stock &middot; 5m wait</div></div>
+                  <div style="font-size:11px;color:#5C6B60;margin-top:4px;line-height:1.5;">"Queue moving fast, worth the stop."</div>
+                  <div style="display:flex;align-items:center;gap:4px;margin-top:8px;color:#8B9389;font-size:10px;"><span>&#128077;</span><span>1</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="padding:12px 20px 8px;background:#fff;box-shadow:0 -6px 18px rgba(14,20,32,0.06);flex-shrink:0;">
+            <div style="background:#F85B23;color:#fff;border-radius:999px;padding:13px;text-align:center;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;gap:7px;box-shadow:0 8px 18px rgba(248,91,35,0.3);">&#9998; Report Status</div>
+            <div style="display:flex;gap:8px;margin-top:8px;">
+              <div style="flex:1;border:1.5px solid #E3E7E4;color:#1F2923;border-radius:999px;padding:9px;text-align:center;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px;">&#8593; Directions</div>
+              <div style="flex:1;border:1.5px solid #E3E7E4;color:#1F2923;border-radius:999px;padding:9px;text-align:center;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px;">&#8599; Share</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:8px;background:#F1EFE6;border-radius:999px;padding:9px 14px;">
+              <div style="flex:1;font-size:11px;color:#8B9389;">Post message to this station...</div>
+              <div style="width:24px;height:24px;border-radius:50%;background:#319A3F;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;">&#10148;</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <figcaption style="margin-top:16px;">
+        <div style="font-family:'Urbanist',sans-serif;font-weight:700;font-size:15px;">Station detail</div>
+        <div style="font-size:13px;color:#5C6B60;margin-top:4px;line-height:1.5;">Decluttered: verification is a single check badge on the avatar, freshness is a plain timestamp, tabs are underlined text — one visual signal per fact, not a pill per fact.</div>
+      </figcaption>
+    </figure>
+
+    <!-- Report flow -->
+    <figure style="margin:0;width:336px;">
+      <div style="background:#05070C;border-radius:46px;padding:8px;box-shadow:0 30px 60px -20px rgba(14,20,32,0.45),0 8px 24px -8px rgba(14,20,32,0.25);position:relative;">
+        <div style="position:absolute;top:18px;left:50%;transform:translateX(-50%);width:8px;height:8px;border-radius:50%;background:#1c1f2b;z-index:2;"></div>
+        <div style="width:320px;height:692px;background:#fff;border-radius:38px;overflow:hidden;position:relative;display:flex;flex-direction:column;padding:24px 20px;">
+          <div style="display:flex;align-items:center;gap:14px;">
+            <div style="font-size:18px;">&#8592;</div>
+            <div>
+              <div style="font-weight:700;font-size:15px;">Report Status</div>
+              <div style="font-size:11px;color:#8B9389;">Total Energies — Ikeja</div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;margin-top:18px;">
+            <div style="display:flex;align-items:center;gap:12px;background:#319A3F;border-radius:18px;padding:14px 16px;box-shadow:0 8px 20px rgba(49,154,63,0.35);">
+              <div style="width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.2);color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;">&#10003;</div>
+              <div style="font-weight:800;font-size:15px;flex:1;color:#fff;letter-spacing:-0.01em;">Available — full stock</div>
+              <div style="color:#fff;font-size:18px;">&#10003;</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;background:#F1EFE6;border-radius:18px;padding:14px 16px;box-shadow:0 2px 8px rgba(14,20,32,0.05);">
+              <div style="width:34px;height:34px;border-radius:50%;background:#F5A623;color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;">&#8987;</div>
+              <div style="font-weight:600;font-size:14px;">Queuing / busy</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;background:#F1EFE6;border-radius:18px;padding:14px 16px;box-shadow:0 2px 8px rgba(14,20,32,0.05);">
+              <div style="width:34px;height:34px;border-radius:50%;background:#F85B23;color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;">&#9888;</div>
+              <div style="font-weight:600;font-size:14px;">Low pressure</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;background:#F1EFE6;border-radius:18px;padding:14px 16px;box-shadow:0 2px 8px rgba(14,20,32,0.05);">
+              <div style="width:34px;height:34px;border-radius:50%;background:#E5484D;color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;">&#10007;</div>
+              <div style="font-weight:600;font-size:14px;">Out of service</div>
+            </div>
+          </div>
+          <div style="margin-top:18px;background:#F1EFE6;border-radius:16px;padding:14px;">
+            <div style="font-size:11px;font-weight:700;color:#8B9389;text-transform:uppercase;letter-spacing:0.04em;">Wait time (optional)</div>
+            <div style="display:flex;gap:6px;margin-top:8px;">
+              <div style="background:#1F2923;color:#fff;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:600;">0-5m</div>
+              <div style="background:#fff;color:#5C6B60;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:600;">5-15m</div>
+              <div style="background:#fff;color:#5C6B60;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:600;">15-30m</div>
+              <div style="background:#fff;color:#5C6B60;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:600;">30m+</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:14px;background:#fff;border-radius:10px;padding:10px;">
+              <div style="font-size:15px;">&#128247;</div>
+              <div style="font-size:12px;font-weight:600;flex:1;">Add live photo</div>
+              <div style="font-size:10px;color:#8B9389;">Gallery blocked</div>
+            </div>
+          </div>
+          <div style="flex:1;"></div>
+          <div style="background:#319A3F;color:#fff;border-radius:999px;padding:15px;text-align:center;font-weight:700;font-size:15px;">Submit Report</div>
+        </div>
+      </div>
+      <figcaption style="margin-top:16px;">
+        <div style="font-family:'Urbanist',sans-serif;font-weight:700;font-size:15px;">Report status</div>
+        <div style="font-size:13px;color:#5C6B60;margin-top:4px;line-height:1.5;">4 full-width buttons, single tap to select — the core speed interaction.</div>
+      </figcaption>
+    </figure>
+
+    <!-- Live camera -->
+    <figure style="margin:0;width:336px;">
+      <div style="background:#05070C;border-radius:46px;padding:8px;box-shadow:0 30px 60px -20px rgba(14,20,32,0.45),0 8px 24px -8px rgba(14,20,32,0.25);position:relative;">
+        <div style="position:absolute;top:18px;left:50%;transform:translateX(-50%);width:8px;height:8px;border-radius:50%;background:#1c1f2b;z-index:2;"></div>
+        <div style="width:320px;height:692px;background:#111;border-radius:38px;overflow:hidden;position:relative;display:flex;flex-direction:column;">
+          <div style="flex:1;background:repeating-linear-gradient(135deg,#181A1F 0px,#181A1F 12px,#1E2026 12px,#1E2026 24px);display:flex;align-items:center;justify-content:center;">
+            <div style="font-family:monospace;font-size:11px;color:#666;">LIVE CAMERA VIEWFINDER</div>
+          </div>
+          <div style="position:absolute;top:40px;left:20px;right:20px;display:flex;justify-content:space-between;">
+            <div style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.15);color:#fff;display:flex;align-items:center;justify-content:center;">&#10005;</div>
+            <div style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.15);color:#fff;display:flex;align-items:center;justify-content:center;">&#8635;</div>
+          </div>
+          <div style="position:absolute;bottom:130px;left:20px;background:rgba(0,0,0,0.55);color:#8FD98F;font-family:monospace;font-size:10px;padding:6px 10px;border-radius:6px;">Verified live snapshot &middot; 18 Sep 2026, 14:32</div>
+          <div style="position:absolute;bottom:36px;left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:10px;">
+            <div style="display:flex;align-items:center;gap:6px;color:#DAD7CB;font-size:11px;"><span>&#128274;</span>Gallery access disabled</div>
+            <div style="width:64px;height:64px;border-radius:50%;background:#fff;border:4px solid rgba(255,255,255,0.3);"></div>
+          </div>
+        </div>
+      </div>
+      <figcaption style="margin-top:16px;">
+        <div style="font-family:'Urbanist',sans-serif;font-weight:700;font-size:15px;">Live camera capture</div>
+        <div style="font-size:13px;color:#5C6B60;margin-top:4px;line-height:1.5;">No gallery access anywhere in this flow; timestamp watermark burns into the photo itself.</div>
+      </figcaption>
+    </figure>
+
+    <!-- Proximity alert -->
+    <figure style="margin:0;width:336px;">
+      <div style="background:#05070C;border-radius:46px;padding:8px;box-shadow:0 30px 60px -20px rgba(14,20,32,0.45),0 8px 24px -8px rgba(14,20,32,0.25);position:relative;">
+        <div style="position:absolute;top:18px;left:50%;transform:translateX(-50%);width:8px;height:8px;border-radius:50%;background:#1c1f2b;z-index:2;"></div>
+        <div style="width:320px;height:692px;background:#0F1712;border-radius:38px;overflow:hidden;position:relative;">
+          <div style="position:absolute;inset:0;background:repeating-linear-gradient(135deg,#171C10 0px,#171C10 12px,#1C2214 12px,#1C2214 24px);"></div>
+          <div style="position:absolute;bottom:0;left:0;right:0;background:#fff;border-radius:24px 24px 0 0;padding:10px 22px 26px;box-shadow:0 -14px 40px rgba(0,0,0,0.35);">
+            <div style="width:40px;height:4px;background:#E3E7E4;border-radius:2px;margin:0 auto 16px;"></div>
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+              <div>
+                <div style="font-family:'Urbanist',sans-serif;font-weight:800;font-size:17px;color:#1F2923;line-height:1.3;">Arrived near NNPC filling station Ushafa</div>
+                <div style="display:flex;align-items:center;gap:6px;margin-top:6px;">
+                  <div style="width:7px;height:7px;border-radius:50%;background:#319A3F;animation:livePulse 2s infinite;"></div>
+                  <div style="font-size:12px;color:#267A32;font-weight:600;">Share what you see</div>
+                </div>
+              </div>
+              <div style="font-size:14px;color:#8B9389;flex-shrink:0;">&#10005;</div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:18px;">
+              <div style="display:flex;align-items:center;gap:8px;background:#F1EFE6;border-radius:14px;padding:12px;"><div style="width:26px;height:26px;border-radius:50%;background:#319A3F;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;">&#10003;</div><div style="font-size:12px;font-weight:600;">Full Stock (Fast)</div></div>
+              <div style="display:flex;align-items:center;gap:8px;background:#F1EFE6;border-radius:14px;padding:12px;"><div style="width:26px;height:26px;border-radius:50%;background:#F5A623;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;">&#8987;</div><div style="font-size:12px;font-weight:600;">Queuing (&lt;15m)</div></div>
+              <div style="display:flex;align-items:center;gap:8px;background:#F1EFE6;border-radius:14px;padding:12px;"><div style="width:26px;height:26px;border-radius:50%;background:#F85B23;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;">&#9888;</div><div style="font-size:12px;font-weight:600;">Low Pressure</div></div>
+              <div style="display:flex;align-items:center;gap:8px;background:#F1EFE6;border-radius:14px;padding:12px;"><div style="width:26px;height:26px;border-radius:50%;background:#8B9389;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;">&#10007;</div><div style="font-size:12px;font-weight:600;">Out of Gas</div></div>
+            </div>
+            <div style="height:1px;background:#EEF0EA;margin-top:18px;"></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;">
+              <div style="font-size:13px;color:#267A32;font-weight:700;display:flex;align-items:center;gap:6px;">Add pressure &amp; photo report <span>&#8594;</span></div>
+              <div style="font-size:13px;color:#8B9389;font-weight:600;">Not now</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <figcaption style="margin-top:16px;">
+        <div style="font-family:'Urbanist',sans-serif;font-weight:700;font-size:15px;">Proximity alert</div>
+        <div style="font-size:13px;color:#5C6B60;margin-top:4px;line-height:1.5;">Now uses the same light-sheet-over-dark-map pattern as Map and Filters, and the same colored icon-circle rows as Report Status — one visual system, not a one-off dark card.</div>
+      </figcaption>
+    </figure>
+
+  </div>
+</div>
+
+<!-- ===== SECTION: Profile & Growth ===== -->
+<div style="max-width:1400px;margin:0 auto 88px;">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:28px;">
+    <div style="width:10px;height:10px;border-radius:2px;background:#319A3F;"></div>
+    <div style="font-family:'Urbanist',sans-serif;font-weight:700;font-size:13px;letter-spacing:0.08em;text-transform:uppercase;color:#5C6B60;">Profile &amp; Growth</div>
+  </div>
+  <div style="display:flex;gap:40px;flex-wrap:wrap;align-items:flex-start;">
+
+    <!-- Profile -->
+    <figure style="margin:0;width:336px;">
+      <div style="background:#05070C;border-radius:46px;padding:8px;box-shadow:0 30px 60px -20px rgba(14,20,32,0.45),0 8px 24px -8px rgba(14,20,32,0.25);position:relative;">
+        <div style="position:absolute;top:18px;left:50%;transform:translateX(-50%);width:8px;height:8px;border-radius:50%;background:#1c1f2b;z-index:2;"></div>
+        <div style="width:320px;height:692px;background:#F1EFE6;border-radius:38px;overflow:hidden;position:relative;display:flex;flex-direction:column;">
+          <div style="background:#1F2923;padding:46px 22px 22px;color:#fff;">
+            <div style="display:flex;align-items:center;gap:14px;">
+              <div style="width:56px;height:56px;border-radius:50%;background:#2A362B;position:relative;">
+                <div style="position:absolute;bottom:-2px;right:-2px;width:18px;height:18px;border-radius:50%;background:#319A3F;border:2px solid #1F2923;"></div>
+              </div>
+              <div>
+                <div style="font-weight:700;font-size:16px;">Chidi Okafor</div>
+                <div style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#B7CBB9;margin-top:2px;">Toyota Corolla &middot; Taxi &#8250;</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:20px;">
+              <div style="flex:1;background:rgba(255,255,255,0.06);border-radius:14px;padding:10px;text-align:center;">
+                <div style="font-family:'Urbanist',sans-serif;font-weight:800;font-size:23px;letter-spacing:-0.02em;">1,240</div>
+                <div style="font-size:10px;color:#9FB8A3;margin-top:2px;">Points</div>
+              </div>
+              <div style="flex:1;background:rgba(255,255,255,0.06);border-radius:14px;padding:10px;text-align:center;">
+                <div style="font-family:'Urbanist',sans-serif;font-weight:800;font-size:19px;">86</div>
+                <div style="font-size:10px;color:#9FB8A3;margin-top:2px;">Reports</div>
+              </div>
+              <div style="flex:1;background:rgba(255,255,255,0.06);border-radius:14px;padding:10px;text-align:center;">
+                <div style="font-family:'Urbanist',sans-serif;font-weight:800;font-size:19px;">4.9</div>
+                <div style="font-size:10px;color:#9FB8A3;margin-top:2px;">Rating</div>
+              </div>
+            </div>
+          </div>
+          <div style="padding:18px 22px;flex:1;overflow:hidden;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div style="font-weight:700;font-size:13px;">Gold Driver</div>
+              <div style="font-size:11px;color:#8B9389;">260 pts to Platinum</div>
+            </div>
+            <div style="height:6px;background:#E7EAF0;border-radius:3px;margin-top:8px;overflow:hidden;"><div style="width:72%;height:100%;background:#319A3F;"></div></div>
+            <div style="display:flex;gap:8px;margin-top:14px;">
+              <div style="width:44px;height:44px;border-radius:12px;background:#E3F5E6;"></div>
+              <div style="width:44px;height:44px;border-radius:12px;background:#E3F5E6;"></div>
+              <div style="width:44px;height:44px;border-radius:12px;background:#FDF6E3;"></div>
+              <div style="width:44px;height:44px;border-radius:12px;background:#E7E4D9;opacity:0.5;display:flex;align-items:center;justify-content:center;font-size:12px;">&#128274;</div>
+              <div style="width:44px;height:44px;border-radius:12px;background:#E7E4D9;opacity:0.5;display:flex;align-items:center;justify-content:center;font-size:12px;">&#128274;</div>
+            </div>
+            <div style="background:#fff;border-radius:16px;padding:14px;margin-top:16px;box-shadow:0 4px 14px rgba(14,20,32,0.05);">
+              <div style="font-size:11px;color:#8B9389;font-weight:600;">Estimated savings</div>
+              <div style="font-family:'Urbanist',sans-serif;font-weight:800;font-size:20px;color:#319A3F;margin-top:2px;">&#8358;36,000/mo</div>
+              <div style="font-size:11px;color:#267A32;margin-top:4px;font-weight:600;">Open full calculator &#8594;</div>
+            </div>
+            <div style="margin-top:14px;display:flex;flex-direction:column;gap:12px;">
+              <div style="display:flex;justify-content:space-between;font-size:13px;"><div>Home state</div><div style="color:#8B9389;">Lagos &#8250;</div></div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;"><div>Proximity alerts</div><div style="width:34px;height:20px;border-radius:10px;background:#319A3F;position:relative;"><div style="width:16px;height:16px;border-radius:50%;background:#fff;position:absolute;top:2px;right:2px;"></div></div></div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;"><div>Sign out</div><div style="color:#8B9389;">&#8250;</div></div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;align-items:end;padding:10px 12px 10px;background:#fff;box-shadow:0 -4px 14px rgba(14,20,32,0.06);flex-shrink:0;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#8B9389;"><div style="font-size:17px;">&#9678;</div><div style="font-size:9px;font-weight:600;">Map</div></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#8B9389;"><div style="font-size:17px;">&#9968;</div><div style="font-size:9px;font-weight:600;">Kits</div></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#8B9389;position:relative;"><div style="font-size:17px;">&#128172;</div><div style="position:absolute;top:-2px;right:8px;width:7px;height:7px;border-radius:50%;background:#E5484D;"></div><div style="font-size:9px;font-weight:600;">Community</div></div>
+            <div style="display:flex;flex-direction:column;align-items:center;">
+              <div style="width:44px;height:44px;border-radius:50%;background:#1F2923;color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;margin-top:-26px;box-shadow:0 8px 16px rgba(14,20,32,0.3);">&#128100;</div>
+              <div style="font-size:9px;font-weight:700;margin-top:4px;">Profile</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <figcaption style="margin-top:16px;">
+        <div style="font-family:'Urbanist',sans-serif;font-weight:700;font-size:15px;">Profile</div>
+        <div style="font-size:13px;color:#5C6B60;margin-top:4px;line-height:1.5;">Locked tiers stay visible (greyed), not hidden — airline-status-style aspiration.</div>
+      </figcaption>
+    </figure>
+
+    <!-- ROI calculator -->
+    <figure style="margin:0;width:336px;">
+      <div style="background:#05070C;border-radius:46px;padding:8px;box-shadow:0 30px 60px -20px rgba(14,20,32,0.45),0 8px 24px -8px rgba(14,20,32,0.25);position:relative;">
+        <div style="position:absolute;top:18px;left:50%;transform:translateX(-50%);width:8px;height:8px;border-radius:50%;background:#1c1f2b;z-index:2;"></div>
+        <div style="width:320px;height:692px;background:#fff;border-radius:38px;overflow:hidden;position:relative;display:flex;flex-direction:column;">
+          <div style="background:#1F2923;padding:26px 22px 24px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div style="font-weight:700;font-size:14px;color:#fff;">Fuel Savings Calculator</div>
+              <div style="font-size:14px;color:#9FB8A3;">&#10005;</div>
+            </div>
+            <div style="text-align:center;margin-top:18px;">
+              <div style="font-size:10px;color:#9FB8A3;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;">You'd save</div>
+              <div style="font-family:'Urbanist',sans-serif;font-weight:800;font-size:50px;letter-spacing:-0.03em;color:#fff;margin-top:6px;">{{ monthlySavingsFmt }}<span style="font-size:14px;color:#9FB8A3;font-weight:600;">/mo</span></div>
+            </div>
+          </div>
+          <div style="padding:22px 22px 26px;flex:1;">
+          <div style="margin-top:0;">
+            <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:600;"><div>Daily distance</div><div style="color:#319A3F;">{{ distance }} km</div></div>
+            <input type="range" min="20" max="400" step="10" value="{{ distance }}" onChange="{{ setDistance }}" style="width:100%;margin-top:8px;accent-color:#319A3F;">
+          </div>
+          <div style="margin-top:14px;">
+            <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:600;"><div>Vehicle mileage</div><div style="color:#319A3F;">{{ mileage }} km/l</div></div>
+            <input type="range" min="4" max="20" step="1" value="{{ mileage }}" onChange="{{ setMileage }}" style="width:100%;margin-top:8px;accent-color:#319A3F;">
+          </div>
+          <div style="display:flex;gap:4px;margin-top:18px;background:#F6F5EF;border-radius:999px;padding:4px;">
+            <div style="{{ grantOnStyle }}" onClick="{{ setGrantTrue }}">Government grant</div>
+            <div style="{{ grantOffStyle }}" onClick="{{ setGrantFalse }}">Self-funded kit</div>
+          </div>
+          <div style="display:flex;gap:10px;margin-top:16px;">
+            <div style="flex:1;background:#F1EFE6;border-radius:14px;padding:12px;">
+              <div style="font-size:10px;color:#8B9389;font-weight:600;">Payback</div>
+              <div style="font-family:'Urbanist',sans-serif;font-weight:700;font-size:15px;margin-top:2px;">{{ paybackLabel }}</div>
+            </div>
+            <div style="flex:1;background:#F1EFE6;border-radius:14px;padding:12px;">
+              <div style="font-size:10px;color:#8B9389;font-weight:600;">CO&#8322; avoided</div>
+              <div style="font-family:'Urbanist',sans-serif;font-weight:700;font-size:15px;margin-top:2px;">{{ co2Fmt }}</div>
+            </div>
+          </div>
+          </div>
+        </div>
+      </div>
+      <figcaption style="margin-top:16px;">
+        <div style="font-family:'Urbanist',sans-serif;font-weight:700;font-size:15px;">ROI calculator — live</div>
+        <div style="font-size:13px;color:#5C6B60;margin-top:4px;line-height:1.5;">Drag the sliders — the headline number recomputes instantly. One canonical version, linked from Profile.</div>
+      </figcaption>
+    </figure>
+
+    <!-- Level up -->
+    <figure style="margin:0;width:336px;">
+      <div style="background:#05070C;border-radius:46px;padding:8px;box-shadow:0 30px 60px -20px rgba(14,20,32,0.45),0 8px 24px -8px rgba(14,20,32,0.25);position:relative;">
+        <div style="position:absolute;top:18px;left:50%;transform:translateX(-50%);width:8px;height:8px;border-radius:50%;background:#1c1f2b;z-index:2;"></div>
+        <div style="width:320px;height:692px;background:#1F2923;border-radius:38px;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;padding:30px;">
+          <div style="background:#fff;border-radius:26px;padding:32px 26px;text-align:center;box-shadow:0 20px 40px rgba(0,0,0,0.3);">
+            <div style="width:76px;height:76px;border-radius:50%;background:#FDF6E3;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:32px;color:#C9A227;">&#9733;</div>
+            <div style="font-family:'Urbanist',sans-serif;font-weight:800;font-size:20px;margin-top:16px;">You've reached<br>Gold Driver</div>
+            <div style="font-size:13px;color:#8B9389;margin-top:8px;">1,240 total points</div>
+            <div style="font-size:13px;color:#5C6B60;margin-top:12px;line-height:1.5;">Unlocks priority support and a Gold badge on your reports.</div>
+            <div style="background:#319A3F;color:#fff;border-radius:999px;padding:13px;font-weight:700;font-size:14px;margin-top:20px;">View Profile</div>
+            <div style="font-size:12px;color:#8B9389;margin-top:12px;font-weight:600;">Keep going</div>
+          </div>
+        </div>
+      </div>
+      <figcaption style="margin-top:16px;">
+        <div style="font-family:'Urbanist',sans-serif;font-weight:700;font-size:15px;">Reputation level-up</div>
+        <div style="font-size:13px;color:#5C6B60;margin-top:4px;line-height:1.5;">Brief, celebratory, easy to dismiss — earned-status framing, not gamey.</div>
+      </figcaption>
+    </figure>
+
+  </div>
+</div>
+
+<!-- ===== SECTION: Community & Kits ===== -->
+<div style="max-width:1400px;margin:0 auto 88px;">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:28px;">
+    <div style="width:10px;height:10px;border-radius:2px;background:#319A3F;"></div>
+    <div style="font-family:'Urbanist',sans-serif;font-weight:700;font-size:13px;letter-spacing:0.08em;text-transform:uppercase;color:#5C6B60;">Community &amp; Kits</div>
+  </div>
+  <div style="display:flex;gap:40px;flex-wrap:wrap;align-items:flex-start;">
+
+    <!-- Community -->
+    <figure style="margin:0;width:336px;">
+      <div style="background:#05070C;border-radius:46px;padding:8px;box-shadow:0 30px 60px -20px rgba(14,20,32,0.45),0 8px 24px -8px rgba(14,20,32,0.25);position:relative;">
+        <div style="position:absolute;top:18px;left:50%;transform:translateX(-50%);width:8px;height:8px;border-radius:50%;background:#1c1f2b;z-index:2;"></div>
+        <div style="width:320px;height:692px;background:#fff;border-radius:38px;overflow:hidden;position:relative;display:flex;flex-direction:column;">
+          <div style="padding:44px 20px 14px;display:flex;justify-content:space-between;align-items:center;">
+            <div style="font-family:'Urbanist',sans-serif;font-weight:700;font-size:19px;">Community</div>
+            <div style="display:flex;gap:10px;font-size:15px;color:#5C6B60;"><span>&#128269;</span><span>&#128276;</span></div>
+          </div>
+          <div style="display:flex;gap:4px;padding:0 16px 14px;background:#fff;">
+            <div style="{{ tabGroupsStyle }}" onClick="{{ setTabGroups }}">Groups</div>
+            <div style="{{ tabHubStyle }}" onClick="{{ setTabHub }}">Hub</div>
+            <div style="{{ tabLeaderboardStyle }}" onClick="{{ setTabLeaderboard }}">Leaderboard</div>
+          </div>
+          <div style="flex:1;padding:0 20px 20px;overflow:hidden;background:#F1EFE6;">
+            <sc-if value="{{ isHub }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;gap:6px;padding:14px 0 10px;overflow:hidden;">
+                <div style="background:#E3F5E6;color:#267A32;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:600;white-space:nowrap;">Maintenance</div>
+                <div style="background:#fff;color:#5C6B60;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:600;white-space:nowrap;">Parts</div>
+                <div style="background:#fff;color:#5C6B60;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:600;white-space:nowrap;">Deals</div>
+              </div>
+              <div style="background:#fff;border-radius:16px;padding:14px;margin-bottom:10px;">
+                <div style="display:flex;justify-content:space-between;"><div style="font-weight:600;font-size:13px;">Emeka A.</div><div style="font-size:10px;color:#8B9389;">Maintenance</div></div>
+                <div style="font-weight:700;font-size:14px;margin-top:6px;">Best injector cleaner for CNG?</div>
+                <div style="font-size:12px;color:#8B9389;margin-top:4px;">Been getting rough idle after 3 months...</div>
+                <div style="font-size:11px;color:#8B9389;margin-top:8px;">12 likes &middot; 4 replies</div>
+              </div>
+              <div style="background:#fff;border-radius:16px;padding:14px;">
+                <div style="display:flex;justify-content:space-between;"><div style="font-weight:600;font-size:13px;">Blessing O.</div><div style="font-size:10px;color:#8B9389;">Deals</div></div>
+                <div style="font-weight:700;font-size:14px;margin-top:6px;">Selling CNG tank, 60L — &#8358;180,000</div>
+                <div style="font-size:11px;color:#8B9389;margin-top:8px;">6 likes &middot; 2 replies</div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ isGroups }}" hint-placeholder-val="{{ false }}">
+              <div style="background:#fff;border-radius:16px;padding:14px;margin-top:14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;">
+                <div><div style="font-weight:700;font-size:13px;">Total Energies — Ikeja</div><div style="font-size:11px;color:#8B9389;margin-top:4px;">"Pumping well right now"</div></div>
+                <div style="background:#319A3F;color:#fff;border-radius:999px;width:20px;height:20px;font-size:10px;display:flex;align-items:center;justify-content:center;">3</div>
+              </div>
+              <div style="background:#fff;border-radius:16px;padding:14px;display:flex;justify-content:space-between;align-items:center;">
+                <div><div style="font-weight:700;font-size:13px;">NIPCO — Yaba</div><div style="font-size:11px;color:#8B9389;margin-top:4px;">"Long queue since morning"</div></div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ isLeaderboard }}" hint-placeholder-val="{{ false }}">
+              <div style="background:#fff;border-radius:16px;padding:14px;margin-top:14px;display:flex;flex-direction:column;gap:12px;">
+                <div style="display:flex;align-items:center;gap:10px;"><div style="font-family:'Urbanist',sans-serif;font-weight:800;color:#C9A227;">1</div><div style="width:28px;height:28px;border-radius:50%;background:#E3F5E6;"></div><div style="flex:1;font-weight:600;font-size:13px;">Amaka N.</div><div style="font-size:12px;color:#8B9389;">2,410</div></div>
+                <div style="display:flex;align-items:center;gap:10px;"><div style="font-family:'Urbanist',sans-serif;font-weight:800;color:#8B9389;">2</div><div style="width:28px;height:28px;border-radius:50%;background:#E3F5E6;"></div><div style="flex:1;font-weight:600;font-size:13px;">Tunde B.</div><div style="font-size:12px;color:#8B9389;">2,190</div></div>
+                <div style="display:flex;align-items:center;gap:10px;"><div style="font-family:'Urbanist',sans-serif;font-weight:800;color:#8B9389;">3</div><div style="width:28px;height:28px;border-radius:50%;background:#E3F5E6;"></div><div style="flex:1;font-weight:600;font-size:13px;">Chidi O.</div><div style="font-size:12px;color:#8B9389;">1,240</div></div>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+      </div>
+      <figcaption style="margin-top:16px;">
+        <div style="font-family:'Urbanist',sans-serif;font-weight:700;font-size:15px;">Community — tap the tabs</div>
+        <div style="font-size:13px;color:#5C6B60;margin-top:4px;line-height:1.5;">Gas talk stays in Groups; everything else lives in Hub. One tab, real segmentation.</div>
+      </figcaption>
+    </figure>
+
+    <!-- Kits directory -->
+    <figure style="margin:0;width:336px;">
+      <div style="background:#05070C;border-radius:46px;padding:8px;box-shadow:0 30px 60px -20px rgba(14,20,32,0.45),0 8px 24px -8px rgba(14,20,32,0.25);position:relative;">
+        <div style="position:absolute;top:18px;left:50%;transform:translateX(-50%);width:8px;height:8px;border-radius:50%;background:#1c1f2b;z-index:2;"></div>
+        <div style="width:320px;height:692px;background:#F1EFE6;border-radius:38px;overflow:hidden;position:relative;display:flex;flex-direction:column;">
+          <div style="padding:44px 20px 16px;background:#fff;">
+            <div style="font-family:'Urbanist',sans-serif;font-weight:700;font-size:19px;">Conversion Centres</div>
+            <div style="display:flex;gap:8px;margin-top:12px;">
+              <div style="flex:1;background:#F6F5EF;border-radius:12px;padding:10px;text-align:center;"><div style="font-family:'Urbanist',sans-serif;font-weight:800;font-size:16px;">142</div><div style="font-size:9px;color:#8B9389;">Centres</div></div>
+              <div style="flex:1;background:#F6F5EF;border-radius:12px;padding:10px;text-align:center;"><div style="font-family:'Urbanist',sans-serif;font-weight:800;font-size:16px;">36</div><div style="font-size:9px;color:#8B9389;">States</div></div>
+              <div style="flex:1;background:#F6F5EF;border-radius:12px;padding:10px;text-align:center;"><div style="font-family:'Urbanist',sans-serif;font-weight:800;font-size:16px;">4h</div><div style="font-size:9px;color:#8B9389;">Avg install</div></div>
+            </div>
+          </div>
+          <div style="padding:16px 20px;flex:1;overflow:hidden;">
+            <div style="background:#fff;border-radius:16px;padding:14px;box-shadow:0 4px 14px rgba(14,20,32,0.05);margin-bottom:10px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div style="display:flex;align-items:center;gap:6px;"><div style="font-weight:700;font-size:14px;">GreenGas Auto</div><div style="background:#FDF6E3;color:#B4890B;border-radius:6px;padding:2px 6px;font-size:9px;font-weight:700;">Accredited</div></div>
+                <div style="font-size:12px;color:#8B9389;">&#9733; 4.8</div>
+              </div>
+              <div style="font-size:11px;color:#8B9389;margin-top:4px;">Yaba, Lagos &middot; 3.4 km</div>
+              <div style="display:flex;gap:6px;margin-top:8px;">
+                <div style="background:#F6F5EF;border-radius:6px;padding:3px 8px;font-size:10px;">Installation</div>
+                <div style="background:#F6F5EF;border-radius:6px;padding:3px 8px;font-size:10px;">Inspection</div>
+              </div>
+              <div style="display:flex;justify-content:space-between;margin-top:10px;font-size:11px;color:#5C6B60;"><div>&#8358;180k&#8211;250k</div><div>~4 hrs</div></div>
+              <div style="display:flex;gap:6px;margin-top:10px;">
+                <div style="flex:1;text-align:center;background:#F6F5EF;border-radius:999px;padding:8px;font-size:11px;font-weight:600;">Call</div>
+                <div style="flex:1;text-align:center;background:#F6F5EF;border-radius:999px;padding:8px;font-size:11px;font-weight:600;">Directions</div>
+                <div style="flex:1;text-align:center;background:#319A3F;color:#fff;border-radius:999px;padding:8px;font-size:11px;font-weight:600;">Book</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <figcaption style="margin-top:16px;">
+        <div style="font-family:'Urbanist',sans-serif;font-weight:700;font-size:15px;">Kits — conversion directory</div>
+        <div style="font-size:13px;color:#5C6B60;margin-top:4px;line-height:1.5;">Accreditation badge distinct from rating; call/directions/book always three-up.</div>
+      </figcaption>
+    </figure>
+
+    <!-- AI assistant -->
+    <figure style="margin:0;width:336px;">
+      <div style="background:#05070C;border-radius:46px;padding:8px;box-shadow:0 30px 60px -20px rgba(14,20,32,0.45),0 8px 24px -8px rgba(14,20,32,0.25);position:relative;">
+        <div style="position:absolute;top:18px;left:50%;transform:translateX(-50%);width:8px;height:8px;border-radius:50%;background:#1c1f2b;z-index:2;"></div>
+        <div style="width:320px;height:692px;background:#fff;border-radius:38px;overflow:hidden;position:relative;display:flex;flex-direction:column;">
+          <div style="padding:44px 20px 14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #F0F2F7;">
+            <div style="font-weight:700;font-size:15px;">Ask CNG Assistant</div>
+            <div style="font-size:14px;color:#8B9389;">&#10005;</div>
+          </div>
+          <div style="flex:1;padding:16px 20px;overflow:hidden;display:flex;flex-direction:column;gap:12px;">
+            <div style="display:flex;gap:8px;">
+              <div style="width:26px;height:26px;border-radius:50%;background:#1F2923;flex-shrink:0;"></div>
+              <div style="background:#F6F5EF;border-radius:14px;padding:10px 12px;font-size:13px;line-height:1.5;max-width:220px;">I can check live prices and pressure near you. What do you need?</div>
+            </div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;padding-left:34px;">
+              <div style="background:#E3F5E6;color:#267A32;border-radius:999px;padding:6px 12px;font-size:11px;font-weight:600;">Nearest station now</div>
+              <div style="background:#E3F5E6;color:#267A32;border-radius:999px;padding:6px 12px;font-size:11px;font-weight:600;">Savings if I convert</div>
+            </div>
+            <div style="align-self:flex-end;background:#319A3F;color:#fff;border-radius:14px;padding:10px 12px;font-size:13px;max-width:220px;">Nearest station now</div>
+            <div style="display:flex;gap:8px;">
+              <div style="width:26px;height:26px;border-radius:50%;background:#1F2923;flex-shrink:0;"></div>
+              <div style="background:#F6F5EF;border-radius:14px;padding:10px 12px;font-size:12px;color:#8B9389;display:flex;gap:4px;">
+                <div style="width:5px;height:5px;border-radius:50%;background:#8B9389;animation:dotFade 1.2s infinite;"></div>
+                <div style="width:5px;height:5px;border-radius:50%;background:#8B9389;animation:dotFade 1.2s infinite 0.2s;"></div>
+                <div style="width:5px;height:5px;border-radius:50%;background:#8B9389;animation:dotFade 1.2s infinite 0.4s;"></div>
+              </div>
+            </div>
+          </div>
+          <div style="padding:14px 20px;display:flex;gap:8px;align-items:center;box-shadow:0 -6px 18px rgba(14,20,32,0.05);">
+            <div style="flex:1;background:#F6F5EF;border-radius:999px;padding:10px 14px;font-size:13px;color:#8B9389;">Ask anything...</div>
+            <div style="width:36px;height:36px;border-radius:50%;background:#319A3F;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;">&#8594;</div>
+          </div>
+        </div>
+      </div>
+      <figcaption style="margin-top:16px;">
+        <div style="font-family:'Urbanist',sans-serif;font-weight:700;font-size:15px;">AI assistant</div>
+        <div style="font-size:13px;color:#5C6B60;margin-top:4px;line-height:1.5;">Grounded in live station data — quick chips over generic chatbot filler.</div>
+      </figcaption>
+    </figure>
+
+  </div>
+</div>
+
+<!-- ===== SECTION: System chrome ===== -->
+<div style="max-width:1400px;margin:0 auto;">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:28px;">
+    <div style="width:10px;height:10px;border-radius:2px;background:#319A3F;"></div>
+    <div style="font-family:'Urbanist',sans-serif;font-weight:700;font-size:13px;letter-spacing:0.08em;text-transform:uppercase;color:#5C6B60;">System chrome</div>
+  </div>
+  <div style="display:flex;gap:20px;flex-wrap:wrap;max-width:400px;">
+    <div style="width:100%;background:#1F2923;color:#fff;border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 20px rgba(14,20,32,0.15);">
+      <div style="font-size:16px;">&#8681;</div>
+      <div style="flex:1;font-size:12px;line-height:1.4;">Install CNG&#8209;Connect for one-tap access</div>
+      <div style="background:#319A3F;border-radius:999px;padding:6px 12px;font-size:11px;font-weight:600;">Install</div>
+    </div>
+    <div style="width:100%;background:#fff;border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 20px rgba(14,20,32,0.08);">
+      <div style="font-size:16px;">&#128246;</div>
+      <div style="font-size:12px;line-height:1.4;">You're offline — showing cached station data</div>
+    </div>
+    <div style="width:100%;background:#fff;border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 20px rgba(14,20,32,0.08);">
+      <div style="font-size:16px;color:#319A3F;">&#8635;</div>
+      <div style="flex:1;font-size:12px;line-height:1.4;">New version available</div>
+      <div style="color:#319A3F;font-size:12px;font-weight:700;">Reload</div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { distance: 120, mileage: 10, grantOn: true, communityTab: 'hub' };
+
+  renderVals() {
+    const litresPerMonth = (this.state.distance / this.state.mileage) * 30;
+    const petrolPrice = 1200, cngPrice = 230;
+    const monthlySavings = Math.max(0, Math.round(litresPerMonth * (petrolPrice - cngPrice)));
+    const kitCost = 350000;
+    const paybackMonths = monthlySavings > 0 ? Math.round(kitCost / monthlySavings) : 0;
+    const co2Kg = Math.round(litresPerMonth * 2.3 * 0.4);
+
+    const activeSeg = "background:#1F2923;color:#fff;border-radius:999px;padding:10px 6px;font-weight:600;font-size:12px;flex:1;text-align:center;cursor:pointer;";
+    const inactiveSeg = "background:transparent;color:#5C6B60;border-radius:999px;padding:10px 6px;font-weight:600;font-size:12px;flex:1;text-align:center;cursor:pointer;";
+    const activeTab = "background:#1F2923;color:#fff;border-radius:999px;padding:8px 4px;font-weight:600;font-size:11px;flex:1;text-align:center;cursor:pointer;";
+    const inactiveTab = "background:#F6F5EF;color:#5C6B60;border-radius:999px;padding:8px 4px;font-weight:600;font-size:11px;flex:1;text-align:center;cursor:pointer;";
+
+    return {
+      distance: this.state.distance,
+      mileage: this.state.mileage,
+      monthlySavingsFmt: '\u20a6' + monthlySavings.toLocaleString(),
+      paybackLabel: this.state.grantOn ? 'Free (grant)' : (paybackMonths + ' months'),
+      co2Fmt: co2Kg.toLocaleString() + ' kg/mo',
+      grantOnStyle: this.state.grantOn ? activeSeg : inactiveSeg,
+      grantOffStyle: !this.state.grantOn ? activeSeg : inactiveSeg,
+      setDistance: (e) => this.setState({ distance: Number(e.target.value) }),
+      setMileage: (e) => this.setState({ mileage: Number(e.target.value) }),
+      setGrantTrue: () => this.setState({ grantOn: true }),
+      setGrantFalse: () => this.setState({ grantOn: false }),
+      isHub: this.state.communityTab === 'hub',
+      isGroups: this.state.communityTab === 'groups',
+      isLeaderboard: this.state.communityTab === 'leaderboard',
+      tabHubStyle: this.state.communityTab === 'hub' ? activeTab : inactiveTab,
+      tabGroupsStyle: this.state.communityTab === 'groups' ? activeTab : inactiveTab,
+      tabLeaderboardStyle: this.state.communityTab === 'leaderboard' ? activeTab : inactiveTab,
+      setTabHub: () => this.setState({ communityTab: 'hub' }),
+      setTabGroups: () => this.setState({ communityTab: 'groups' }),
+      setTabLeaderboard: () => this.setState({ communityTab: 'leaderboard' }),
+    };
+  }
+}
+</script>
+</body>
+</html>

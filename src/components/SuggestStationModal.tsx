@@ -100,7 +100,7 @@ export const SuggestStationModal: React.FC<SuggestStationModalProps> = ({
               <label className="block text-caption font-bold text-on-surface mb-1.5">
                 Station Type *
               </label>
-              <div className="grid grid-cols-2 gap-2 p-1 bg-surface-container-high rounded-2xl border border-outline-variant">
+              <div className="grid grid-cols-2 gap-2 p-1 bg-surface-container-high rounded-2xl">
                 <button
                   type="button"
                   onClick={() => setStationType('cng')}
@@ -139,7 +139,7 @@ export const SuggestStationModal: React.FC<SuggestStationModalProps> = ({
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder={stationType === 'ev_charging' ? "e.g., Qoray EV Hub - Victoria Island" : "e.g., NIPCO CNG Station - Ikeja"}
-                className="w-full px-4 py-3 rounded-2xl bg-surface-container border border-outline-variant text-body font-medium text-on-surface outline-none focus:border-primary"
+                className="w-full px-4 py-3 rounded-2xl bg-surface-container text-body font-medium text-on-surface outline-none focus:border-primary"
               />
             </div>
 
@@ -154,7 +154,7 @@ export const SuggestStationModal: React.FC<SuggestStationModalProps> = ({
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
                 placeholder="e.g., Adeola Odeku St, opposite Eko Hotel, Lagos"
-                className="w-full px-4 py-3 rounded-2xl bg-surface-container border border-outline-variant text-body font-medium text-on-surface outline-none focus:border-primary"
+                className="w-full px-4 py-3 rounded-2xl bg-surface-container text-body font-medium text-on-surface outline-none focus:border-primary"
               />
             </div>
 
@@ -170,7 +170,7 @@ export const SuggestStationModal: React.FC<SuggestStationModalProps> = ({
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
                   placeholder="e.g., Victoria Island"
-                  className="w-full px-4 py-3 rounded-2xl bg-surface-container border border-outline-variant text-body font-medium text-on-surface outline-none focus:border-primary"
+                  className="w-full px-4 py-3 rounded-2xl bg-surface-container text-body font-medium text-on-surface outline-none focus:border-primary"
                 />
               </div>
 
@@ -181,7 +181,7 @@ export const SuggestStationModal: React.FC<SuggestStationModalProps> = ({
                 <select
                   value={state}
                   onChange={(e) => setState(e.target.value)}
-                  className="w-full px-4 py-3 rounded-2xl bg-surface-container border border-outline-variant text-body font-medium text-on-surface outline-none focus:border-primary"
+                  className="w-full px-4 py-3 rounded-2xl bg-surface-container text-body font-medium text-on-surface outline-none focus:border-primary"
                 >
                   <option value="Lagos">Lagos</option>
                   <option value="FCT Abuja">FCT Abuja</option>
@@ -207,7 +207,7 @@ export const SuggestStationModal: React.FC<SuggestStationModalProps> = ({
                 value={operator}
                 onChange={(e) => setOperator(e.target.value)}
                 placeholder={stationType === 'ev_charging' ? "e.g., Qoray Mobility, SAGLEV, NNPC" : "e.g., NIPCO, Bovas, NNPC Retail"}
-                className="w-full px-4 py-3 rounded-2xl bg-surface-container border border-outline-variant text-body font-medium text-on-surface outline-none focus:border-primary"
+                className="w-full px-4 py-3 rounded-2xl bg-surface-container text-body font-medium text-on-surface outline-none focus:border-primary"
               />
             </div>
 
@@ -246,7 +246,7 @@ export const SuggestStationModal: React.FC<SuggestStationModalProps> = ({
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder={stationType === 'ev_charging' ? "e.g., 2x 120kW CCS2 Fast Chargers located inside hotel basement" : "e.g., Station has high pressure dispensers near gate 2"}
-                className="w-full px-4 py-3 rounded-2xl bg-surface-container border border-outline-variant text-body font-medium text-on-surface outline-none focus:border-primary resize-none"
+                className="w-full px-4 py-3 rounded-2xl bg-surface-container text-body font-medium text-on-surface outline-none focus:border-primary resize-none"
               />
             </div>
 

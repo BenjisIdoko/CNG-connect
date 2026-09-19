@@ -18,8 +18,8 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-headline: 'Plus Jakarta Sans', sans-serif;
+  --font-sans: 'Urbanist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-headline: 'Urbanist', sans-serif;
   
   /* Type Scale Utility Tokens */
   --text-micro: 0.75rem;         /* 12px - badges, timestamps, micro tags */
@@ -37,71 +37,122 @@
   --text-display: 1.75rem;       /* 28px - hero headers, splash display text */
   --text-display--line-height: 1.2;
 
-  --color-primary: #006c50;
-  --color-primary-container: #00ffc2;
-  --color-on-primary-container: #007255;
+  /* ---- Redesign palette (see docs/redesign) ----
+     Fruit Salad green = brand/available, International Orange = the one
+     primary action (Report Status), Heavy Metal = dark surfaces,
+     Spring Wood = warm page ground. */
+  --color-primary: #319A3F;
+  --color-primary-container: #E3F5E6;
+  --color-on-primary-container: #1F6129;
   --color-on-primary: #ffffff;
-  --color-deep-teal: #004D40;
-  
-  --color-secondary: #8c5000;
-  --color-secondary-container: #fe9400;
-  --color-on-secondary-container: #633700;
+  --color-deep-teal: #1F2923;
+  --color-accent: #F85B23;
+  --color-accent-container: #FFF0EA;
+  --color-on-accent: #ffffff;
+
+  --color-secondary: #8B6B1F;
+  --color-secondary-container: #FDF6E3;
+  --color-on-secondary-container: #6B520F;
   --color-on-secondary: #ffffff;
-  
-  --color-tertiary: #6d5e00;
-  --color-tertiary-container: #ffe149;
-  --color-on-tertiary-container: #746300;
-  --color-electric-amber: #FFB800;
-  
-  --color-status-green: #00E676;
-  --color-status-green-container: #ecfdf5;
-  --color-status-orange: #FF6D00;
-  --color-status-orange-container: #fff7ed;
-  --color-status-red: #FF3D00;
-  --color-status-red-container: #fef2f2;
-  --color-live-pulse: #00c853;
+
+  --color-tertiary: #B4890B;
+  --color-tertiary-container: #FDF6E3;
+  --color-on-tertiary-container: #8A6809;
+  --color-electric-amber: #F5A623;
+
+  /* Status: green = available, amber = queuing, orange = low pressure, red = out */
+  --color-status-green: #319A3F;
+  --color-status-green-container: #E7F6ED;
+  --color-status-amber: #F5A623;
+  --color-status-amber-container: #FFF3DF;
+  --color-status-orange: #F85B23;
+  --color-status-orange-container: #FFF0EA;
+  --color-status-red: #E5484D;
+  --color-status-red-container: #FCE8E9;
+  --color-live-pulse: #319A3F;
   --color-whatsapp: #25D366;
   --color-whatsapp-hover: #1ebd59;
-  
-  --color-surface: #f2fcf5;
-  --color-background: #f2fcf5;
-  --color-surface-container: #e6f0e9;
-  --color-surface-container-low: #ecf6ef;
-  --color-surface-container-high: #e0ebe4;
-  --color-surface-container-highest: #dbe5de;
+
+  --color-surface: #F6F5EF;
+  --color-background: #F6F5EF;
+  --color-surface-container: #F1EFE6;
+  --color-surface-container-low: #F6F5EF;
+  --color-surface-container-high: #E9E7DC;
+  --color-surface-container-highest: #E4E2D8;
   --color-surface-container-lowest: #ffffff;
-  --color-surface-bright: #f2fcf5;
-  --color-surface-variant: #dbe5de;
-  --color-surface-dim: #d2dcd6;
-  --color-surface-neutral: #F8FAFB;
-  
-  --color-on-surface: #141d19;
-  --color-on-surface-variant: #3a4a43;
-  --color-on-background: #141d19;
-  --color-outline: #66776e;
-  --color-outline-variant: #b9cbc1;
-  --color-inverse-surface: #29322e;
-  --color-inverse-on-surface: #e9f3ec;
-  --color-error: #ba1a1a;
-  --color-error-container: #ffdad6;
-  --color-on-error-container: #93000a;
+  --color-surface-bright: #FBFAF6;
+  --color-surface-variant: #E4E2D8;
+  --color-surface-dim: #DAD7CB;
+  --color-surface-neutral: #FAF9F5;
+
+  --color-on-surface: #1F2923;
+  --color-on-surface-variant: #5C6B60;
+  --color-on-background: #1F2923;
+  --color-outline: #8B9389;
+  --color-outline-variant: #E4E2D8;
+  --color-inverse-surface: #1F2923;
+  --color-inverse-on-surface: #F6F5EF;
+  --color-error: #E5484D;
+  --color-error-container: #FCE8E9;
+  --color-on-error-container: #A82228;
+
+  /* Remap Tailwind's raw palettes so the many `emerald-*` / `slate-*` classes
+     across the app pick up the brand green and warm neutrals too. */
+  --color-emerald-50: #F0FAF1;
+  --color-emerald-100: #E3F5E6;
+  --color-emerald-200: #BAE9C0;
+  --color-emerald-300: #8AD897;
+  --color-emerald-400: #57C06A;
+  --color-emerald-500: #3EAC4E;
+  --color-emerald-600: #319A3F;
+  --color-emerald-700: #267A32;
+  --color-emerald-800: #1F6129;
+  --color-emerald-900: #1A4E23;
+  --color-emerald-950: #14261A;
+
+  --color-slate-50: #F6F5EF;
+  --color-slate-100: #F1EFE6;
+  --color-slate-200: #E4E2D8;
+  --color-slate-300: #CBCFC4;
+  --color-slate-400: #8B9389;
+  --color-slate-500: #5C6B60;
+  --color-slate-600: #4A574E;
+  --color-slate-700: #36423A;
+  --color-slate-800: #27322B;
+  --color-slate-900: #1F2923;
+  --color-slate-950: #141A16;
 }
 
 @layer base {
   * {
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-family: 'Urbanist', sans-serif;
   }
   body {
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-family: 'Urbanist', sans-serif;
     -webkit-tap-highlight-color: transparent;
     user-select: none;
     overscroll-behavior-y: none;
   }
   input, textarea {
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-family: 'Urbanist', sans-serif;
     user-select: text;
   }
+  h1, h2 {
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+  }
+  p, li {
+    line-height: 1.55;
+    letter-spacing: -0.011em;
+  }
 }
+
+/* UI micro-labels (tags, tabs, overlines) */
+.label-caps {
+  line-height: 1;
+  letter-spacing: 0.06em;
+}
+
 
 .material-symbols-outlined {
   font-family: 'Material Symbols Outlined' !important;
@@ -149,4 +200,5 @@
     background: rgba(255, 255, 255, 0.96);
   }
 }
+
 

@@ -104,15 +104,15 @@ export const AiAssistantModal: React.FC<AiAssistantModalProps> = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="CNG-Connect AI Assistant" className="h-[85vh] sm:h-[620px] flex flex-col">
       {/* Header */}
-      <div className="bg-gradient-to-r from-deep-teal to-primary text-white p-4 flex items-center justify-between shadow-md">
+      <div className="bg-deep-teal text-white p-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-white/15 backdrop-blur-md flex items-center justify-center border border-white/20">
-            <span className="material-symbols-outlined text-[20px] text-status-green">auto_awesome</span>
+          <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center">
+            <span className="material-symbols-outlined text-[20px] text-white">auto_awesome</span>
           </div>
           <div>
             <h3 className="font-bold text-[16px] text-white flex items-center gap-1.5">
               CNG-Connect AI Assistant
-              <span className="bg-status-green text-deep-teal text-[9.5px] font-semibold uppercase px-2 py-0.5 rounded-full">
+              <span className="bg-primary text-white text-[9.5px] font-semibold uppercase px-2 py-0.5 rounded-full">
                 Live
               </span>
             </h3>
@@ -142,8 +142,8 @@ export const AiAssistantModal: React.FC<AiAssistantModalProps> = ({
             <div
               className={`max-w-[85%] rounded-2xl p-3.5 text-[14px] leading-relaxed shadow-xs ${
                 m.role === 'user'
-                  ? 'bg-primary text-white rounded-br-none font-medium'
-                  : 'bg-white border border-surface-container-highest text-on-surface rounded-bl-none font-normal'
+                  ? 'bg-primary text-white rounded-br-md font-medium'
+                  : 'bg-white text-on-surface rounded-bl-md font-normal'
               }`}
             >
               {m.text}
@@ -152,7 +152,7 @@ export const AiAssistantModal: React.FC<AiAssistantModalProps> = ({
         ))}
 
         {loading && (
-          <div className="flex items-center gap-2 text-primary text-[13px] font-semibold p-2 bg-emerald-50 rounded-xl w-fit border border-emerald-200">
+          <div className="flex items-center gap-2 text-primary text-[13px] font-semibold px-3 py-2 bg-white rounded-2xl w-fit shadow-xs">
             <span className="w-2 h-2 rounded-full bg-live-pulse animate-ping" />
             <span>Checking live station status...</span>
           </div>
@@ -160,7 +160,7 @@ export const AiAssistantModal: React.FC<AiAssistantModalProps> = ({
       </div>
 
       {/* Quick Suggestion Chips */}
-      <div className="p-2 px-3 bg-white border-t border-surface-container-highest/70 flex items-center gap-2 overflow-x-auto hide-scrollbar">
+      <div className="p-2 px-3 bg-white flex items-center gap-2 overflow-x-auto hide-scrollbar">
         {['Lowest CNG Price', 'Zero Wait Queue', '220 Bar Gauge'].map((prompt) => (
           <button
             key={prompt}
@@ -168,7 +168,7 @@ export const AiAssistantModal: React.FC<AiAssistantModalProps> = ({
               setQuery(prompt);
               handleSend(prompt);
             }}
-            className="px-3 py-2 bg-surface-container hover:bg-surface-container-high text-deep-teal text-[12px] font-semibold rounded-full whitespace-nowrap border border-surface-container-highest active:scale-95 transition-all shrink-0 min-h-[44px] flex items-center"
+            className="px-3 py-2 bg-surface-container hover:bg-surface-container-high text-deep-teal text-[12px] font-semibold rounded-full whitespace-nowrap active:scale-95 transition-all shrink-0 min-h-[44px] flex items-center"
           >
             {prompt}
           </button>
@@ -181,20 +181,20 @@ export const AiAssistantModal: React.FC<AiAssistantModalProps> = ({
           e.preventDefault();
           handleSend(query);
         }}
-        className="p-3 bg-white border-t border-surface-container-highest flex items-center gap-2"
+        className="p-3 bg-white flex items-center gap-2"
       >
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Ask CNG-Connect AI..."
-          className="flex-1 bg-surface-container border border-surface-container-highest rounded-full px-4 py-2.5 text-[14px] font-normal text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary/30"
+          className="flex-1 bg-surface-container rounded-full px-4 py-2.5 text-[14px] font-normal text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary/30"
         />
         <button
           type="submit"
           disabled={!query.trim() || loading}
           aria-label="Send query to AI"
-          className="w-11 h-11 rounded-full bg-primary hover:bg-deep-teal disabled:opacity-40 text-white flex items-center justify-center shadow-md active:scale-95 transition-all shrink-0"
+          className="w-11 h-11 rounded-full bg-deep-teal disabled:opacity-40 text-white flex items-center justify-center active:scale-95 transition-all shrink-0"
         >
           <span className="material-symbols-outlined text-[20px]">send</span>
         </button>
