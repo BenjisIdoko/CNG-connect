@@ -38,167 +38,100 @@ export const CngRoiCalculatorModal: React.FC<CngRoiCalculatorModalProps> = ({
 
   const paybackMonths =
     effectiveKitCost === 0
-      ? '0 (Instant Grant)'
+      ? 'Free (grant)'
       : monthlySavings > 0
-      ? (effectiveKitCost / monthlySavings).toFixed(1) + ' Months'
+      ? Math.round(effectiveKitCost / monthlySavings) + ' months'
       : 'N/A';
 
   // CO2 Reduction (approx 2.31kg CO2 per liter of petrol replaced)
   const annualCo2SavedTons = ((dailyPetrolLiters * 365 * 2.31 * 0.25) / 1000).toFixed(1);
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="CNG Conversion ROI & Savings Calculator" className="max-w-lg">
-      <div className="flex flex-col gap-4 text-on-surface font-['Urbanist',sans-serif]">
-        {/* Header Hero Banner */}
-        <div className="bg-gradient-to-r from-deep-teal via-primary to-emerald-900 rounded-2xl p-4 text-white shadow-xs">
+    <Modal isOpen={isOpen} onClose={onClose} title="Fuel Savings Calculator" bare className="max-w-lg">
+      <div className="flex flex-col text-on-surface font-['Urbanist',sans-serif]">
+        <div className="bg-deep-teal text-white px-5 pt-5 pb-6">
           <div className="flex items-center justify-between">
-            <span className="bg-status-green/20 border border-status-green/40 text-status-green text-[10.5px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-              Fuel Cost Savings Simulator
-            </span>
-            <span className="text-[11px] font-semibold text-emerald-100/90">
-              Pi-CNG Standard Rate
-            </span>
+            <span className="font-bold text-body">Fuel Savings Calculator</span>
+            <button onClick={onClose} aria-label="Close" className="text-[#9FB8A3] p-1 -mr-1">
+              <span className="material-symbols-outlined text-[20px]">close</span>
+            </button>
           </div>
-
-          <div className="mt-2">
-            <span className="text-[12px] text-emerald-100/80 font-medium">Estimated Monthly Savings</span>
-            <div className="flex items-baseline gap-1 mt-0.5">
-              <span className="text-[32px] sm:text-[36px] font-extrabold text-white leading-none">
-                ₦{monthlySavings.toLocaleString()}
-              </span>
-              <span className="text-[13px] font-bold text-status-green">/ month ({savingsPercent}% saved)</span>
+          <div className="text-center mt-5">
+            <div className="text-[10px] font-bold uppercase tracking-[0.06em] text-[#9FB8A3]">You&apos;d save</div>
+            <div className="font-extrabold text-[44px] leading-none tracking-tight mt-2">
+              ₦{monthlySavings.toLocaleString()}
+              <span className="text-[14px] font-semibold text-[#9FB8A3]">/mo</span>
             </div>
+            <div className="text-caption text-[#9FB8A3] mt-2">{savingsPercent}% less than petrol</div>
           </div>
         </div>
 
-        {/* Interactive Sliders & Inputs */}
-        <div className="bg-white rounded-2xl p-4 border border-surface-container-highest shadow-2xs flex flex-col gap-4">
-          <h3 className="font-bold text-[14px] text-slate-900 flex items-center gap-1.5">
-            <span className="material-symbols-outlined text-primary text-[18px]">tune</span>
-            <span>Customize Your Driving Parameters</span>
-          </h3>
-
-          {/* Daily Distance Slider */}
+        <div className="px-5 py-5 flex flex-col gap-4">
           <div>
-            <div className="flex justify-between items-center text-[12.5px] font-semibold text-slate-700 mb-1">
-              <span>Daily Driving Distance</span>
-              <span className="text-primary font-extrabold">{dailyKm} km / day</span>
+            <div className="flex justify-between text-caption font-semibold">
+              <span>Daily distance</span>
+              <span className="text-primary">{dailyKm} km</span>
             </div>
-            <input
-              type="range"
-              min="20"
-              max="300"
-              step="5"
-              value={dailyKm}
-              onChange={(e) => setDailyKm(Number(e.target.value))}
-              className="w-full accent-primary h-2 bg-surface-container rounded-lg cursor-pointer"
-            />
-            <div className="flex justify-between text-[10px] text-slate-400 font-medium mt-1">
-              <span>20 km (Short commute)</span>
-              <span>150 km (Intercity)</span>
-              <span>300 km (Taxi/Fleet)</span>
-            </div>
+            <input type="range" min={20} max={400} step={10} value={dailyKm}
+              onChange={(e) => setDailyKm(Number(e.target.value))} className="w-full mt-2 accent-primary" />
           </div>
-
-          {/* Fuel Efficiency */}
           <div>
-            <div className="flex justify-between items-center text-[12.5px] font-semibold text-slate-700 mb-1">
-              <span>Vehicle Mileage / Efficiency</span>
-              <span className="text-primary font-extrabold">{kmPerLiter} km / liter</span>
+            <div className="flex justify-between text-caption font-semibold">
+              <span>Vehicle mileage</span>
+              <span className="text-primary">{kmPerLiter} km/l</span>
             </div>
-            <input
-              type="range"
-              min="6"
-              max="18"
-              step="1"
-              value={kmPerLiter}
-              onChange={(e) => setKmPerLiter(Number(e.target.value))}
-              className="w-full accent-primary h-2 bg-surface-container rounded-lg cursor-pointer"
-            />
+            <input type="range" min={4} max={20} step={1} value={kmPerLiter}
+              onChange={(e) => setKmPerLiter(Number(e.target.value))} className="w-full mt-2 accent-primary" />
           </div>
 
-          {/* Price Comparisons */}
-          <div className="grid grid-cols-2 gap-3 pt-2 border-t border-slate-100">
-            <div>
-              <label className="block text-[11.5px] font-bold text-slate-600 mb-1">Petrol Price (₦/Liter)</label>
-              <input
-                type="number"
-                value={petrolPrice}
-                onChange={(e) => setPetrolPrice(Number(e.target.value))}
-                className="w-full bg-surface border border-surface-container-highest rounded-xl px-3 py-2 text-[13px] font-bold text-slate-900 outline-none focus:border-primary"
-              />
-            </div>
-            <div>
-              <label className="block text-[11.5px] font-bold text-slate-600 mb-1">CNG Price (₦/kg)</label>
-              <input
-                type="number"
-                value={cngPrice}
-                onChange={(e) => setCngPrice(Number(e.target.value))}
-                className="w-full bg-surface border border-surface-container-highest rounded-xl px-3 py-2 text-[13px] font-bold text-slate-900 outline-none focus:border-primary"
-              />
-            </div>
+          <div className="grid grid-cols-2 gap-3">
+            <label className="block">
+              <span className="text-micro font-semibold text-outline">Petrol (₦/L)</span>
+              <input type="number" value={petrolPrice} onChange={(e) => setPetrolPrice(Number(e.target.value))}
+                className="mt-1 w-full bg-surface rounded-xl px-3 py-2 text-caption font-bold outline-none focus:ring-2 focus:ring-primary/30" />
+            </label>
+            <label className="block">
+              <span className="text-micro font-semibold text-outline">CNG (₦/kg)</span>
+              <input type="number" value={cngPrice} onChange={(e) => setCngPrice(Number(e.target.value))}
+                className="mt-1 w-full bg-surface rounded-xl px-3 py-2 text-caption font-bold outline-none focus:ring-2 focus:ring-primary/30" />
+            </label>
           </div>
 
-          {/* Conversion Kit Cost Option */}
-          <div className="pt-2 border-t border-slate-100">
-            <span className="block text-[11.5px] font-bold text-slate-600 mb-1.5">Conversion Kit Cost Option</span>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => setIsCommercialGrant(true)}
-                className={`py-2 px-3 rounded-xl text-[12px] font-bold transition-all text-center border ${
-                  isCommercialGrant
-                    ? 'bg-emerald-50 text-primary border-primary'
-                    : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
-                }`}
-              >
-                Pi-CNG Free Grant (₦0)
+          <div className="flex gap-1 bg-surface rounded-full p-1">
+            {[
+              { on: true, label: 'Government grant' },
+              { on: false, label: 'Self-funded kit' },
+            ].map((opt) => (
+              <button key={String(opt.on)} type="button" onClick={() => setIsCommercialGrant(opt.on)}
+                className={`flex-1 rounded-full py-2.5 text-caption font-semibold transition-colors ${
+                  isCommercialGrant === opt.on ? 'bg-slate-900 text-white' : 'text-slate-500'
+                }`}>
+                {opt.label}
               </button>
-              <button
-                type="button"
-                onClick={() => setIsCommercialGrant(false)}
-                className={`py-2 px-3 rounded-xl text-[12px] font-bold transition-all text-center border ${
-                  !isCommercialGrant
-                    ? 'bg-emerald-50 text-primary border-primary'
-                    : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
-                }`}
-              >
-                Private Kit (₦750k)
-              </button>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-2 gap-2.5">
+            <div className="bg-surface-container rounded-2xl p-3">
+              <div className="text-micro font-semibold text-outline">Payback</div>
+              <div className="font-bold text-body mt-0.5">{paybackMonths}</div>
+            </div>
+            <div className="bg-surface-container rounded-2xl p-3">
+              <div className="text-micro font-semibold text-outline">CO₂ avoided</div>
+              <div className="font-bold text-body mt-0.5">{annualCo2SavedTons} t/yr</div>
             </div>
           </div>
-        </div>
 
-        {/* Detailed Financial & Environmental Breakdown */}
-        <div className="grid grid-cols-3 gap-2.5 text-center">
-          <div className="bg-surface rounded-xl p-3 border border-surface-container-highest">
-            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Annual Savings</span>
-            <span className="text-[15px] font-extrabold text-primary block mt-0.5">₦{annualSavings.toLocaleString()}</span>
-          </div>
-
-          <div className="bg-surface rounded-xl p-3 border border-surface-container-highest">
-            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Payback Period</span>
-            <span className="text-[13.5px] font-extrabold text-slate-900 block mt-0.5">{paybackMonths}</span>
-          </div>
-
-          <div className="bg-surface rounded-xl p-3 border border-surface-container-highest">
-            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">CO₂ Cut / Year</span>
-            <span className="text-[13.5px] font-extrabold text-primary block mt-0.5">{annualCo2SavedTons} Tons</span>
-          </div>
-        </div>
-
-        {/* Bottom CTA Action Button */}
-        <div className="flex items-center gap-2 pt-1">
           {onOpenConversions && (
             <button
               onClick={() => {
                 onClose();
                 onOpenConversions();
               }}
-              className="w-full h-12 bg-primary hover:bg-deep-teal text-white font-extrabold text-[13.5px] rounded-full flex items-center justify-center gap-2 shadow-md active:scale-[0.98] transition-all"
+              className="w-full py-3.5 bg-primary text-white font-bold text-body rounded-full flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
             >
-              <span className="material-symbols-outlined text-[18px]">build_circle</span>
-              <span>Find &amp; Book Accredited Conversion Center</span>
+              Find an accredited centre
+              <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
             </button>
           )}
         </div>

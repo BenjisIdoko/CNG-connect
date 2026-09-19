@@ -11,6 +11,8 @@ export interface ModalProps {
   className?: string;
   overlayClassName?: string;
   showCloseButton?: boolean;
+  /** No built-in header/padding — the caller draws its own (must render its own close control). */
+  bare?: boolean;
 }
 
 export const Modal: React.FC<ModalProps> = ({
@@ -22,6 +24,7 @@ export const Modal: React.FC<ModalProps> = ({
   className = '',
   overlayClassName = '',
   showCloseButton = false,
+  bare = false,
 }) => {
   return (
     <DialogPrimitive.Root open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
@@ -34,26 +37,38 @@ export const Modal: React.FC<ModalProps> = ({
         />
         <DialogPrimitive.Content
           aria-label={title || ariaLabel || 'Modal Dialog'}
+          aria-describedby={undefined}
           className={cn(
-            "fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] z-[101] bg-white w-[92%] max-w-lg rounded-3xl shadow-2xl overflow-y-auto max-h-[88vh] focus:outline-none p-4 sm:p-6",
+            "fixed z-[101] bg-white focus:outline-none overflow-y-auto shadow-2xl",
+            // phone: bottom sheet; sm+: centered dialog
+            "inset-x-0 bottom-0 max-h-[90vh] rounded-t-[28px]",
+            "sm:inset-x-auto sm:bottom-auto sm:left-[50%] sm:top-[50%] sm:translate-x-[-50%] sm:translate-y-[-50%] sm:w-[92%] sm:max-w-lg sm:max-h-[88vh] sm:rounded-3xl",
+            bare ? "p-0" : "px-5 pt-3 pb-6 sm:p-6",
             className
           )}
         >
-          <div className="flex items-center justify-between pb-3 mb-2 border-b border-slate-100">
-            {title ? (
-              <DialogPrimitive.Title className="font-extrabold text-[16px] sm:text-[17px] text-slate-900 pr-6 truncate">
-                {title}
-              </DialogPrimitive.Title>
-            ) : (
-              <div />
-            )}
-            <DialogPrimitive.Close
-              aria-label="Close modal"
-              className="w-8 h-8 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center justify-center transition-colors shrink-0 active:scale-95"
-            >
-              <span className="material-symbols-outlined text-[18px]">close</span>
-            </DialogPrimitive.Close>
-          </div>
+          {bare ? (
+            <DialogPrimitive.Title className="sr-only">{title || ariaLabel || 'Dialog'}</DialogPrimitive.Title>
+          ) : (
+            <>
+              <div className="sm:hidden w-10 h-1 bg-surface-container-highest rounded-full mx-auto mb-3" />
+              <div className="flex items-center justify-between pb-3">
+                {title ? (
+                  <DialogPrimitive.Title className="font-extrabold text-body-lg text-slate-900 pr-6 truncate">
+                    {title}
+                  </DialogPrimitive.Title>
+                ) : (
+                  <div />
+                )}
+                <DialogPrimitive.Close
+                  aria-label="Close modal"
+                  className="w-8 h-8 rounded-full bg-surface-container text-slate-600 hover:bg-surface-container-high flex items-center justify-center transition-colors shrink-0 active:scale-95"
+                >
+                  <span className="material-symbols-outlined text-[18px]">close</span>
+                </DialogPrimitive.Close>
+              </div>
+            </>
+          )}
           {children}
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>

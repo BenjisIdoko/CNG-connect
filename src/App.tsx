@@ -688,6 +688,7 @@ export const App: React.FC = () => {
   }
 
   const isMapHome = activeTab === 'map' && !activeDetailStation && !activeDiscussionPost && !activeChatPost;
+  const isProfileHome = activeTab === 'profile' && !activeDetailStation && !activeDiscussionPost && !activeChatPost;
 
   // Determine current view title and back button
   let headerTitle: string | undefined;
@@ -756,14 +757,14 @@ export const App: React.FC = () => {
           showBack={showHeaderBack}
           onBack={onHeaderBack}
           onOpenAiAssistant={() => setIsAiModalOpen(true)}
-          mobileHidden={isMapHome}
+          mobileHidden={isMapHome || isProfileHome}
         />
       )}
 
       {/* Main Content Area — top pad clears the 56px header bar plus the safe-area inset it sits under */}
       <main
         className={`flex-1 overflow-y-auto relative lg:pt-[calc(3.5rem_+_max(env(safe-area-inset-top,0px),0.75rem))] lg:pb-24 lg:pl-64 ${
-          isMapHome ? 'pt-0 pb-0' : 'pt-[calc(3.5rem_+_max(env(safe-area-inset-top,0px),0.75rem))] pb-24'
+          isMapHome ? 'pt-0 pb-0' : isProfileHome ? 'pt-0 pb-24' : 'pt-[calc(3.5rem_+_max(env(safe-area-inset-top,0px),0.75rem))] pb-24'
         }`}
       >
         {!isOnline && (
