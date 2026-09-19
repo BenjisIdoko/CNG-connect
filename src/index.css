@@ -137,7 +137,22 @@
     font-family: 'Urbanist', sans-serif;
     user-select: text;
   }
+  h1, h2 {
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+  }
+  p, li {
+    line-height: 1.55;
+    letter-spacing: -0.011em;
+  }
 }
+
+/* UI micro-labels (tags, tabs, overlines) */
+.label-caps {
+  line-height: 1;
+  letter-spacing: 0.06em;
+}
+
 
 .material-symbols-outlined {
   font-family: 'Material Symbols Outlined' !important;
