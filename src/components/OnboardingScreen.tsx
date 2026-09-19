@@ -17,9 +17,9 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
   const slides = [
     {
       id: 'stations',
-      title: 'Find CNG Refilling Stations',
+      title: 'Live pressure and queue status, before you drive there.',
       description:
-        'Locate CNG stations across Nigeria. Check live pump pressure (bar), queue wait times, and verified gas-availability updates reported directly by drivers.',
+        'See which stations actually have gas right now — reported by drivers who are there.',
       image: '/onboarding/slide-stations.jpg',
     },
     {
@@ -61,119 +61,103 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
     }
   };
 
+  const isLast = currentSlide === slides.length - 1;
+
   return (
-    <div className="fixed inset-0 z-50 bg-[#0c1411] text-white flex flex-col justify-between overflow-hidden font-['Urbanist',sans-serif] selection:bg-status-green selection:text-deep-teal">
-      {/* Dynamic Background Image with Smooth Gradient Overlay */}
-      <div className="absolute inset-0 z-0">
+    <div className="fixed inset-0 z-50 bg-white text-slate-900 flex flex-col overflow-hidden font-['Urbanist',sans-serif]">
+      {/* Hero photo */}
+      <div className="relative h-[55%] min-h-[300px] shrink-0 bg-surface-container-high">
         <img
+          key={activeSlide.id}
           src={activeSlide.image}
           alt={activeSlide.title}
-          className="w-full h-full object-cover transform scale-105 transition-all duration-700 filter brightness-[0.45]"
+          className="w-full h-full object-cover animate-fade-in"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0c1411] via-[#0c1411]/80 to-black/60" />
-      </div>
-
-      {/* Top Header Bar */}
-      <div className="relative z-10 p-4 pt-8 max-w-xl mx-auto w-full flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2 shrink-0 whitespace-nowrap">
-          <div className="w-8 h-8 rounded-xl bg-white/90 p-1 shadow-md flex items-center justify-center shrink-0">
-            <img src={ASSETS.logo} alt="CNG-Connect Logo" className="w-full h-full object-contain" />
-          </div>
-          <span className="text-[20px] font-extrabold text-white tracking-tight">
-            CNG-<span className="text-status-green">Connect</span>
+        <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/45 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/20 to-transparent" />
+        <div className="absolute top-0 inset-x-0 pt-[max(env(safe-area-inset-top,0px),1.25rem)] px-6 flex items-center justify-between max-w-xl mx-auto">
+          <span className="text-[17px] font-extrabold text-white tracking-tight [text-shadow:0_1px_4px_rgba(0,0,0,0.4)]">
+            CNG&#8209;Connect
           </span>
+          <button
+            onClick={onStartLogin}
+            className="text-[13px] font-semibold text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.5)] active:opacity-70"
+          >
+            Log in
+          </button>
         </div>
-
-        <button
-          onClick={onStartLogin}
-          className="shrink-0 h-9 px-4 text-[12.5px] font-semibold text-white/90 hover:text-white bg-white/10 hover:bg-white/20 rounded-full backdrop-blur-md transition-all active:scale-95 border border-white/15 flex items-center justify-center gap-1 whitespace-nowrap"
-        >
-          <span>Log In</span>
-          <span className="material-symbols-outlined text-[15px]">login</span>
-        </button>
       </div>
 
-      {/* Main Slide Content Card */}
-      <div className="relative z-10 max-w-xl mx-auto w-full px-6 flex-1 flex flex-col justify-end pb-8">
-        <div className="animate-fade-in space-y-3">
-          <h1 className="text-[24px] sm:text-[28px] font-bold text-white leading-tight tracking-tight">
-            {activeSlide.title}
-          </h1>
+      {/* Copy + controls */}
+      <div className="flex-1 flex flex-col px-6 pt-6 pb-[max(env(safe-area-inset-bottom,0px),1.5rem)] max-w-xl mx-auto w-full">
+        <h1 key={`t-${activeSlide.id}`} className="text-[24px] leading-[1.25] font-bold tracking-tight animate-fade-in">
+          {activeSlide.title}
+        </h1>
+        <p className="mt-2.5 text-[14px] text-on-surface-variant leading-relaxed">{activeSlide.description}</p>
 
-          <p className="text-[14px] font-normal text-slate-300 leading-relaxed max-w-md">
-            {activeSlide.description}
-          </p>
+        <div className="flex-1" />
 
-          {/* Slide Indicator Dots */}
-          <div className="flex items-center gap-2 pt-1">
-            {slides.map((s, idx) => (
-              <button
-                key={s.id}
-                onClick={() => setCurrentSlide(idx)}
-                aria-label={`Go to slide ${idx + 1}`}
-                className={`h-2 rounded-full transition-all duration-300 ${currentSlide === idx ? 'w-8 bg-status-green' : 'w-2 bg-white/30 hover:bg-white/50'
-                  }`}
-              />
-            ))}
-          </div>
+        <div className="flex items-center gap-1.5 my-5">
+          {slides.map((s, idx) => (
+            <button
+              key={s.id}
+              onClick={() => setCurrentSlide(idx)}
+              aria-label={`Go to slide ${idx + 1}`}
+              className={`h-1.5 rounded-full transition-all duration-300 ${
+                currentSlide === idx ? 'w-[22px] bg-primary' : 'w-1.5 bg-surface-dim'
+              }`}
+            />
+          ))}
         </div>
 
-        {/* Bottom Action Controls */}
-        <div className="pt-6 space-y-3">
-          {currentSlide === slides.length - 1 ? (
-            /* Final Slide: Primary Registration & Login Buttons */
-            <div className="flex flex-col gap-2.5">
-              <button
-                onClick={onStartSignUp}
-                className="w-full h-13 bg-status-green hover:opacity-95 text-on-surface font-extrabold text-[15px] rounded-full flex items-center justify-center gap-2 shadow-xl active:scale-[0.98] transition-all"
-              >
-                <span className="whitespace-nowrap">Sign Up</span>
-                <span className="material-symbols-outlined text-[20px] shrink-0">arrow_forward</span>
+        {isLast ? (
+          <div className="flex flex-col gap-3">
+            <button
+              onClick={onStartSignUp}
+              className="w-full py-4 bg-primary text-white font-bold text-[15px] rounded-full flex items-center justify-center gap-2 shadow-[0_8px_18px_rgba(49,154,63,0.3)] active:scale-[0.98] transition-transform"
+            >
+              Sign Up
+              <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
+            </button>
+            <div className="flex items-center justify-center gap-8">
+              <button onClick={onStartLogin} className="text-[14px] font-semibold text-slate-900 py-1">
+                Log in
               </button>
-
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  onClick={onStartLogin}
-                  className="w-full h-11 bg-white/10 hover:bg-white/20 text-white font-bold text-[13.5px] rounded-full border border-white/20 backdrop-blur-md flex items-center justify-center gap-1.5 active:scale-[0.98] transition-all whitespace-nowrap"
-                >
-                  <span>Log In</span>
+              {onExploreAsGuest && (
+                <button onClick={onExploreAsGuest} className="text-[14px] font-semibold text-outline py-1">
+                  Explore as guest
                 </button>
-
-                {onExploreAsGuest && (
-                  <button
-                    onClick={onExploreAsGuest}
-                    className="w-full h-11 bg-white/5 hover:bg-white/15 text-slate-300 font-bold text-[13.5px] rounded-full border border-white/10 backdrop-blur-md flex items-center justify-center gap-1 active:scale-[0.98] transition-all whitespace-nowrap"
-                  >
-                    <span>Explore</span>
-                  </button>
-                )}
-              </div>
+              )}
             </div>
-          ) : (
-            /* Navigation Buttons */
-            <div className="flex items-center justify-between gap-3">
-              {currentSlide > 0 ? (
+          </div>
+        ) : (
+          <div className="flex items-center justify-between">
+            <button
+              onClick={() => setCurrentSlide(slides.length - 1)}
+              className="text-[14px] font-semibold text-on-surface-variant py-2 pr-4"
+            >
+              Skip
+            </button>
+            <div className="flex items-center gap-3">
+              {currentSlide > 0 && (
                 <button
                   onClick={handlePrev}
-                  className="w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center border border-white/15 backdrop-blur-md active:scale-95 transition-all"
                   aria-label="Previous slide"
+                  className="w-12 h-12 rounded-full bg-surface-container text-slate-900 flex items-center justify-center active:scale-95 transition-transform"
                 >
                   <span className="material-symbols-outlined text-[20px]">arrow_back</span>
                 </button>
-              ) : (
-                <div className="w-12" />
               )}
-
               <button
                 onClick={handleNext}
-                className="flex-1 h-12 bg-primary hover:opacity-95 text-on-primary font-extrabold text-[14px] rounded-full flex items-center justify-center gap-2 shadow-lg active:scale-[0.98] transition-all"
+                aria-label="Continue"
+                className="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center active:scale-95 transition-transform shadow-[0_6px_14px_rgba(49,154,63,0.35)]"
               >
-                <span>Continue</span>
-                <span className="material-symbols-outlined text-[18px]">chevron_right</span>
+                <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
               </button>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -151,151 +151,141 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
 
   const isBusy = isSendingCode || isVerifyingCode || isSavingProfile;
 
+  const codeBoxes = Math.min(10, Math.max(6, userCodeInput.length));
+  const fmtCooldown = `0:${String(resendCooldown).padStart(2, '0')}`;
+
   return (
-    <div className="min-h-screen bg-surface text-on-surface font-['Urbanist',sans-serif] flex flex-col justify-between p-4 max-w-xl mx-auto animate-fade-in">
-      {/* Top Bar */}
-      <div className="flex items-center justify-between pt-3 pb-2">
-        <div className="flex items-center gap-2">
-          <img src={ASSETS.logo} alt="CNG-Connect Logo" className="h-7 w-auto object-contain" />
-          <span className="font-extrabold text-[19px] text-primary">CNG-Connect</span>
-        </div>
-        {onCancel && (
-          <button
-            onClick={onCancel}
-            aria-label="Close"
-            className="w-9 h-9 rounded-full bg-surface-container hover:bg-surface-container-high flex items-center justify-center text-on-surface-variant transition-colors"
-          >
-            <span className="material-symbols-outlined text-[20px]">close</span>
+    <div className="min-h-screen bg-white text-on-surface font-['Urbanist',sans-serif] flex flex-col p-6 pt-[max(env(safe-area-inset-top,0px),1.75rem)] max-w-xl mx-auto animate-fade-in">
+      {/* Top bar: back / step */}
+      <div className="flex items-center gap-3.5 min-h-[36px]">
+        {step === 2 ? (
+          <button type="button" onClick={() => setStep(1)} aria-label="Back" className="text-slate-900 -ml-1 p-1">
+            <span className="material-symbols-outlined text-[22px]">arrow_back</span>
           </button>
-        )}
+        ) : onCancel ? (
+          <button type="button" onClick={onCancel} aria-label="Close" className="text-slate-900 -ml-1 p-1">
+            <span className="material-symbols-outlined text-[22px]">close</span>
+          </button>
+        ) : null}
+        <span className="text-[12px] font-semibold text-outline">
+          {step === 3 ? 'Almost there' : `Step ${step} of 2`}
+        </span>
       </div>
 
-      {/* Main Card Container */}
-      <div className="bg-white rounded-3xl shadow-xl border border-outline-variant p-6 flex flex-col gap-5 my-2">
-        {/* Step Indicator */}
-        <div className="flex items-center justify-between border-b border-outline-variant/40 pb-3">
-          <div>
-            <span className="text-[11px] font-semibold uppercase text-primary tracking-wider">
-              {step === 3 ? 'Almost there' : 'Sign in or create your account'}
-            </span>
-            <h1 className="text-[20px] font-bold text-on-surface leading-tight">
-              {step === 1 ? 'Enter your email' : step === 2 ? 'Check your email' : 'Complete your profile'}
-            </h1>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <div className={`w-3 h-3 rounded-full ${step >= 1 ? 'bg-primary' : 'bg-surface-container-high'}`} />
-            <div className={`w-3 h-3 rounded-full ${step >= 2 ? 'bg-primary' : 'bg-surface-container-high'}`} />
-            {step === 3 && <div className="w-3 h-3 rounded-full bg-primary" />}
-          </div>
-        </div>
+      <h1 className="text-[26px] font-bold tracking-tight mt-6">
+        {step === 1 ? 'Sign in or sign up' : step === 2 ? 'Enter code' : 'Complete your profile'}
+      </h1>
+      {step === 1 && (
+        <p className="text-[14px] text-on-surface-variant leading-relaxed mt-2">
+          No password needed — we&apos;ll email you a code. New here? The same code creates your account.
+        </p>
+      )}
+      {step === 2 && (
+        <p className="text-[14px] text-on-surface-variant leading-relaxed mt-2">
+          We sent a code to
+          <br />
+          <strong className="text-slate-900">{email}</strong>
+        </p>
+      )}
+      {step === 3 && (
+        <p className="text-[14px] text-on-surface-variant leading-relaxed mt-2">
+          Just a few details so other drivers know who&apos;s reporting.
+        </p>
+      )}
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <div className="flex-1 flex flex-col mt-6">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4 flex-1">
           {step === 1 && (
-            <>
-              <p className="text-[13px] text-on-surface-variant font-medium leading-relaxed">
-                No password needed — we'll email you a verification code. New here? The same code creates your account.
-              </p>
-              <div>
-                <label className="block text-[12.5px] font-semibold text-on-surface-variant mb-1">
-                  Email Address
-                </label>
-                <div className={`flex items-center bg-surface border rounded-2xl px-3.5 h-12 transition-all ${
-                  emailError ? 'border-status-red ring-2 ring-status-red/20' : 'border-outline-variant focus-within:ring-2 focus-within:ring-primary/30 focus-within:border-primary'
-                }`}>
-                  <span className="material-symbols-outlined text-outline text-[20px] mr-2">mail</span>
-                  <input
-                    type="email"
-                    required
-                    autoComplete="email"
-                    autoFocus
-                    value={email}
-                    onChange={(e) => {
-                      setEmail(e.target.value);
-                      if (emailError) setEmailError(null);
-                    }}
-                    placeholder="tunde.drives@gmail.com"
-                    className="flex-1 bg-transparent text-[14.5px] font-medium text-on-surface outline-none"
-                  />
-                </div>
-                {emailError && (
-                  <p className="text-[11.5px] font-medium text-status-red mt-1 flex items-center gap-1">
-                    <span className="material-symbols-outlined text-[14px]">error</span>
-                    <span>{emailError}</span>
-                  </p>
-                )}
+            <div>
+              <div className={`flex items-center bg-surface rounded-2xl px-4 h-14 transition-all ${
+                emailError ? 'ring-2 ring-status-red/40' : 'focus-within:ring-2 focus-within:ring-primary/40'
+              }`}>
+                <span className="material-symbols-outlined text-outline text-[20px] mr-2.5">mail</span>
+                <input
+                  type="email"
+                  required
+                  autoComplete="email"
+                  autoFocus
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    if (emailError) setEmailError(null);
+                  }}
+                  placeholder="Email address"
+                  className="flex-1 bg-transparent text-[15px] font-medium text-on-surface outline-none placeholder:text-outline"
+                />
               </div>
-            </>
+              {emailError && (
+                <p className="text-[12px] font-medium text-status-red mt-2 flex items-center gap-1">
+                  <span className="material-symbols-outlined text-[14px]">error</span>
+                  <span>{emailError}</span>
+                </p>
+              )}
+            </div>
           )}
 
           {step === 2 && (
-            <div className="flex flex-col gap-4 py-2">
-              <div className="bg-surface-container border border-outline-variant rounded-2xl p-4 flex flex-col gap-1.5">
-                <span className="text-[12px] font-black uppercase text-primary tracking-wider flex items-center gap-1">
-                  <span className="material-symbols-outlined text-[16px]">mail</span>
-                  Email Verification
-                </span>
-                <p className="text-[13px] text-on-surface-variant font-medium leading-relaxed">
-                  We sent a verification code to <strong>{email}</strong>. Enter it below.
-                </p>
-                <p className="text-[12px] text-outline font-medium leading-relaxed">
-                  Got a confirmation link instead of a code? Open it, come back here, then tap
-                  <strong> Resend Code</strong>.
-                </p>
-              </div>
-
-              <div>
-                <label className="block text-[13px] font-bold text-on-surface-variant mb-1.5">
-                  Enter Verification Code
-                </label>
-                <div className={`flex items-center bg-surface border rounded-2xl px-4 h-14 transition-all ${
-                  codeError ? 'border-status-red ring-2 ring-status-red/20' : 'border-outline-variant focus-within:ring-2 focus-within:ring-primary/30 focus-within:border-primary'
-                }`}>
-                  <span className="material-symbols-outlined text-primary text-[24px] mr-3">verified_user</span>
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    autoComplete="one-time-code"
-                    maxLength={10}
-                    required
-                    autoFocus
-                    value={userCodeInput}
-                    onChange={(e) => {
-                      setUserCodeInput(e.target.value.replace(/\D/g, ''));
-                      if (codeError) setCodeError(null);
-                    }}
-                    placeholder="Enter code"
-                    className="flex-1 bg-transparent text-[22px] font-extrabold tracking-[0.3em] text-primary outline-none placeholder:tracking-normal placeholder:text-outline placeholder:text-[15px]"
-                  />
+            <div className="flex flex-col">
+              <label className="relative block cursor-text">
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  maxLength={10}
+                  required
+                  autoFocus
+                  value={userCodeInput}
+                  onChange={(e) => {
+                    setUserCodeInput(e.target.value.replace(/\D/g, ''));
+                    if (codeError) setCodeError(null);
+                  }}
+                  aria-label="Verification code"
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-text"
+                />
+                <div className="flex gap-2">
+                  {Array.from({ length: codeBoxes }).map((_, i) => {
+                    const ch = userCodeInput[i];
+                    const isActive = i === userCodeInput.length;
+                    return (
+                      <div
+                        key={i}
+                        className={`flex-1 max-w-[46px] h-[54px] rounded-xl flex items-center justify-center text-[22px] font-bold transition-colors ${
+                          ch
+                            ? 'bg-primary-container text-slate-900'
+                            : isActive
+                            ? 'bg-surface border-2 border-primary'
+                            : 'bg-surface'
+                        }`}
+                      >
+                        {ch}
+                      </div>
+                    );
+                  })}
                 </div>
-                {codeError && (
-                  <p className="text-[12px] font-bold text-status-red mt-1.5 flex items-center gap-1">
-                    <span className="material-symbols-outlined text-[16px]">gpp_bad</span>
-                    <span>{codeError}</span>
-                  </p>
-                )}
-              </div>
-
-              <div className="flex items-center justify-between text-[12.5px] pt-1">
-                <span className="text-outline font-medium">Didn't receive the email?</span>
+              </label>
+              {codeError && (
+                <p className="text-[12px] font-bold text-status-red mt-3 flex items-center gap-1">
+                  <span className="material-symbols-outlined text-[16px]">gpp_bad</span>
+                  <span>{codeError}</span>
+                </p>
+              )}
+              <div className="mt-5 text-[13px] text-outline">
+                Didn&apos;t get a code?{' '}
                 <button
                   type="button"
                   onClick={handleResendCode}
                   disabled={resendCooldown > 0 || isSendingCode}
-                  className="text-primary font-extrabold hover:underline disabled:opacity-50 disabled:no-underline flex items-center gap-1"
+                  className="font-bold text-primary disabled:text-outline disabled:font-medium"
                 >
-                  <span className="material-symbols-outlined text-[16px]">refresh</span>
-                  <span>{resendCooldown > 0 ? `Resend Code in ${resendCooldown}s` : 'Resend Code'}</span>
+                  {resendCooldown > 0 ? `Resend in ${fmtCooldown}` : 'Resend code'}
                 </button>
               </div>
+              <p className="mt-1.5 text-[12px] text-outline italic">A confirmation link may arrive instead, in some cases.</p>
             </div>
           )}
 
           {step === 3 && (
             <>
-              <p className="text-[13px] text-on-surface-variant font-medium leading-relaxed -mt-1">
-                Just a few details so other drivers know who's reporting.
-              </p>
-
               <div>
                 <label className="block text-[12.5px] font-semibold text-on-surface-variant mb-1">Full Name</label>
                 <div className="flex items-center bg-surface border border-outline-variant rounded-2xl px-3.5 h-12 focus-within:ring-2 focus-within:ring-primary/30 focus-within:border-primary transition-all">
@@ -453,36 +443,20 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
             </>
           )}
 
-          {/* Action Buttons */}
-          <div className="flex items-center gap-3 mt-2">
-            {step === 2 && (
-              <button
-                type="button"
-                onClick={() => setStep(1)}
-                className="py-3.5 px-5 bg-surface-container hover:bg-surface-container-high text-on-surface-variant font-bold text-[14px] rounded-full transition-all"
-              >
-                Back
-              </button>
-            )}
+          {/* Action button */}
+          <div className="mt-auto pt-6">
             <button
               type="submit"
               disabled={isBusy}
-              className="flex-1 py-3.5 bg-primary hover:opacity-95 text-on-primary font-extrabold text-[15px] rounded-full shadow-md active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+              className="w-full py-4 bg-slate-900 text-white font-semibold text-[15px] rounded-full active:scale-[0.98] transition-transform flex items-center justify-center gap-2 disabled:opacity-50"
             >
               {isBusy ? (
                 <div className="flex items-center gap-2">
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  <span>{isSendingCode ? 'Sending code...' : isVerifyingCode ? 'Verifying...' : 'Saving...'}</span>
+                  <span>{isSendingCode ? 'Sending code…' : isVerifyingCode ? 'Verifying…' : 'Saving…'}</span>
                 </div>
               ) : (
-                <>
-                  <span className="whitespace-nowrap truncate">
-                    {step === 1 ? 'Send Code' : step === 2 ? 'Verify & Continue' : 'Finish Setup'}
-                  </span>
-                  <span className="material-symbols-outlined text-[20px] shrink-0">
-                    {step === 3 ? 'check_circle' : 'arrow_forward'}
-                  </span>
-                </>
+                <span>{step === 1 ? 'Send code' : step === 2 ? 'Verify & continue' : 'Finish setup'}</span>
               )}
             </button>
           </div>
