@@ -223,8 +223,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       attributionControl: false,
     });
 
-    // Standard OpenStreetMap public tiles (free, no API key). The phone layout
-    // darkens them to a "night mode" look with a CSS filter (see .dark-map).
+    // Standard OpenStreetMap public tiles (free, no API key), light style.
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -236,7 +235,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       iconCreateFunction: (cluster: any) => {
         const childCount = cluster.getChildCount();
         return L.divIcon({
-          html: `<div class="w-9 h-9 rounded-full bg-primary text-white font-extrabold text-[13px] flex items-center justify-center border-[3px] border-[#14180F] shadow-[0_0_0_4px_rgba(49,154,63,0.35)] transition-transform hover:scale-110"><span>${childCount}</span></div>`,
+          html: `<div class="w-9 h-9 rounded-full bg-primary text-white font-extrabold text-[13px] flex items-center justify-center border-[3px] border-white shadow-[0_2px_8px_rgba(31,41,35,0.35),0_0_0_4px_rgba(49,154,63,0.3)] transition-transform hover:scale-110"><span>${childCount}</span></div>`,
           className: 'custom-cluster-icon',
           iconSize: [36, 36],
         });
@@ -279,8 +278,8 @@ export const MapScreen: React.FC<MapScreenProps> = ({
         className: 'custom-leaflet-marker',
         html: `
           <div class="relative flex items-center justify-center" style="width:40px;height:40px;" title="${isApprox ? 'Approximate location' : ''}">
-            ${isApprox ? '<div style="position:absolute;inset:0;border:1.5px dashed rgba(255,255,255,0.4);border-radius:9999px"></div>' : ''}
-            <div class="rounded-full flex items-center justify-center transition-transform ${isSelected ? 'scale-125' : ''}" style="width:30px;height:30px;background:${isApprox ? '#14180F' : colorClass};border:${isApprox ? '2.5px dashed rgba(255,255,255,0.65)' : '3px solid #14180F'};box-shadow:0 0 0 4px ${colorClass}${isApprox ? '00' : '59'}${isSelected ? ', 0 0 0 7px rgba(255,255,255,0.9)' : ''};">
+            ${isApprox ? '<div style="position:absolute;inset:0;border:1.5px dashed ${colorClass}99;border-radius:9999px"></div>' : ''}
+            <div class="rounded-full flex items-center justify-center transition-transform ${isSelected ? 'scale-125' : ''}" style="width:30px;height:30px;background:${isApprox ? '#ffffff' : colorClass};border:${isApprox ? '2.5px dashed ' + colorClass : '3px solid #ffffff'};box-shadow:0 2px 8px rgba(31,41,35,0.35), 0 0 0 4px ${colorClass}${isApprox ? '00' : '44'}${isSelected ? ', 0 0 0 7px rgba(31,41,35,0.85)' : ''};">
               <span class="material-symbols-outlined" style="font-size:15px;color:${isApprox ? colorClass : '#fff'}">${iconSymbol}</span>
             </div>
           </div>
@@ -455,9 +454,9 @@ export const MapScreen: React.FC<MapScreenProps> = ({
     (stationTypeFilter !== 'all' ? 1 : 0);
 
   return (
-    <div className="relative w-full h-[100dvh] lg:h-[calc(100vh-4rem)] overflow-hidden bg-[#14180F] lg:bg-surface-container-low lg:flex lg:flex-row">
+    <div className="relative w-full h-[100dvh] lg:h-[calc(100vh-4rem)] overflow-hidden bg-surface-container-low lg:flex lg:flex-row">
       {/* Leaflet Map Container (Flex-1 on Desktop) */}
-      <div ref={mapContainerRef} className="dark-map absolute inset-0 z-0 lg:flex-1 lg:relative lg:h-full" />
+      <div ref={mapContainerRef} className="absolute inset-0 z-0 lg:flex-1 lg:relative lg:h-full" />
 
       {/* Toast Notification */}
       {toastMessage && (
@@ -469,7 +468,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       {/* Mobile top overlay: wordmark, search, filter chips */}
       <div className="lg:hidden absolute top-0 inset-x-0 z-30 pointer-events-none pt-safe px-5">
         <div className="flex items-center justify-between pt-2 pointer-events-auto">
-          <span className="font-extrabold text-white text-[19px] tracking-tight drop-shadow">CNG&#8209;Connect</span>
+          <span className="font-extrabold text-slate-900 text-[19px] tracking-tight [text-shadow:0_1px_6px_rgba(255,255,255,0.9)]">CNG&#8209;Connect</span>
           {onOpenAiAssistant && (
             <button
               onClick={onOpenAiAssistant}
@@ -481,7 +480,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
           )}
         </div>
 
-        <div className="mt-3 flex items-center bg-white rounded-full shadow-[0_8px_20px_rgba(0,0,0,0.25)] px-4 gap-2 pointer-events-auto focus-within:ring-2 focus-within:ring-primary/40">
+        <div className="mt-3 flex items-center bg-white rounded-full shadow-[0_8px_20px_rgba(31,41,35,0.18)] px-4 gap-2 pointer-events-auto focus-within:ring-2 focus-within:ring-primary/40">
           <span className="material-symbols-outlined text-slate-400 text-[20px] shrink-0">search</span>
           <input
             type="text"
@@ -511,7 +510,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
               key={chip.label}
               onClick={() => setIsFilterModalOpen(true)}
               className={`shrink-0 rounded-full px-3.5 py-1.5 text-micro font-bold flex items-center gap-1 shadow-sm active:scale-95 transition-transform ${
-                chip.active ? 'bg-primary text-white' : 'bg-white/90 text-slate-900'
+                chip.active ? 'bg-primary text-white' : 'bg-white text-slate-900'
               }`}
             >
               {chip.icon && <span className="material-symbols-outlined text-[13px]">{chip.icon}</span>}
@@ -528,7 +527,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                 setMaxDistanceKm(0);
                 setStationTypeFilter('all');
               }}
-              className="shrink-0 rounded-full px-3 py-1.5 text-micro font-bold text-white/90 underline underline-offset-2"
+              className="shrink-0 rounded-full px-3 py-1.5 text-micro font-bold text-slate-700 underline underline-offset-2"
             >
               Reset
             </button>

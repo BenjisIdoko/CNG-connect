@@ -187,10 +187,3 @@
 }
 
 
-/* Night-mode map on phones: darken free OSM tiles (markers live in a separate pane, so they stay vivid). */
-@media (max-width: 1023px) {
-  .dark-map .leaflet-tile-pane {
-    filter: invert(1) hue-rotate(180deg) brightness(0.78) contrast(0.95) saturate(0.45);
-  }
-  .dark-map.leaflet-container { background: #14180F; }
-}
