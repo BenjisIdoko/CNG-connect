@@ -81,7 +81,7 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
           </span>
           <button
             onClick={onStartLogin}
-            className="text-[13px] font-semibold text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.5)] active:opacity-70"
+            className="text-[14px] font-semibold text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.5)] active:opacity-70"
           >
             Log in
           </button>
@@ -93,7 +93,7 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
         <h1 key={`t-${activeSlide.id}`} className="text-[24px] leading-[1.25] font-bold tracking-tight animate-fade-in">
           {activeSlide.title}
         </h1>
-        <p className="mt-2.5 text-[14px] text-on-surface-variant leading-relaxed">{activeSlide.description}</p>
+        <p className="mt-2.5 text-[15px] text-on-surface-variant leading-relaxed">{activeSlide.description}</p>
 
         <div className="flex-1" />
 
@@ -120,11 +120,11 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
               <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
             </button>
             <div className="flex items-center justify-center gap-8">
-              <button onClick={onStartLogin} className="text-[14px] font-semibold text-slate-900 py-1">
+              <button onClick={onStartLogin} className="text-[15px] font-semibold text-slate-900 py-1">
                 Log in
               </button>
               {onExploreAsGuest && (
-                <button onClick={onExploreAsGuest} className="text-[14px] font-semibold text-outline py-1">
+                <button onClick={onExploreAsGuest} className="text-[15px] font-semibold text-outline py-1">
                   Explore as guest
                 </button>
               )}
@@ -134,7 +134,7 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
           <div className="flex items-center justify-between">
             <button
               onClick={() => setCurrentSlide(slides.length - 1)}
-              className="text-[14px] font-semibold text-on-surface-variant py-2 pr-4"
+              className="text-[15px] font-semibold text-on-surface-variant py-2 pr-4"
             >
               Skip
             </button>

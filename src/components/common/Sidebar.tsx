@@ -35,7 +35,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <h1 className="font-extrabold text-[17px] text-slate-900 leading-tight">
             CNG-Connect
           </h1>
-          <span className="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+          <span className="text-[12px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
             🇳🇬 Clean Mobility
           </span>
         </div>
@@ -53,7 +53,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
-              className={`w-full py-3 px-3.5 rounded-2xl font-extrabold text-[14px] flex items-center justify-between transition-all active:scale-98 ${
+              className={`w-full py-3 px-3.5 rounded-2xl font-extrabold text-[15px] flex items-center justify-between transition-all active:scale-98 ${
                 isActive
                   ? 'bg-primary text-white shadow-md shadow-primary/20'
                   : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
@@ -80,7 +80,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {onOpenRoiCalculator && (
           <button
             onClick={onOpenRoiCalculator}
-            className="w-full py-2.5 px-3.5 rounded-2xl font-extrabold text-[13px] bg-slate-50 hover:bg-slate-100 text-slate-800 border border-slate-200 flex items-center gap-3 transition-all"
+            className="w-full py-2.5 px-3.5 rounded-2xl font-extrabold text-[14px] bg-slate-50 hover:bg-slate-100 text-slate-800 border border-slate-200 flex items-center gap-3 transition-all"
           >
             <span className="material-symbols-outlined text-[20px] text-emerald-600">calculate</span>
             <span>CNG & EV Savings</span>
@@ -90,7 +90,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {onOpenAiAssistant && (
           <button
             onClick={onOpenAiAssistant}
-            className="w-full py-2.5 px-3.5 rounded-2xl font-extrabold text-[13px] bg-gradient-to-r from-emerald-50 to-sky-50 hover:from-emerald-100 hover:to-sky-100 text-primary border border-emerald-200 flex items-center gap-3 transition-all mt-1"
+            className="w-full py-2.5 px-3.5 rounded-2xl font-extrabold text-[14px] bg-gradient-to-r from-emerald-50 to-sky-50 hover:from-emerald-100 hover:to-sky-100 text-primary border border-emerald-200 flex items-center gap-3 transition-all mt-1"
           >
             <span className="material-symbols-outlined text-[20px] text-primary">smart_toy</span>
             <span>CNG Copilot AI</span>
@@ -107,10 +107,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
             className="w-10 h-10 rounded-full object-cover border-2 border-primary"
           />
           <div className="flex-1 min-w-0">
-            <h4 className="font-extrabold text-[13px] text-slate-900 truncate leading-tight">
+            <h4 className="font-extrabold text-[14px] text-slate-900 truncate leading-tight">
               {userProfile.name}
             </h4>
-            <p className="text-[11px] font-semibold text-slate-500 truncate">
+            <p className="text-[12px] font-semibold text-slate-500 truncate">
               {userProfile.vehicle || 'Verified Driver'}
             </p>
           </div>

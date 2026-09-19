@@ -149,7 +149,7 @@ export const LiveCameraCaptureModal: React.FC<LiveCameraCaptureModalProps> = ({
               <span className="material-symbols-outlined text-[36px]">videocam_off</span>
             </div>
             <h3 className="font-bold text-[18px] text-white">Enable Camera Access</h3>
-            <p className="text-[13px] mt-1 text-slate-300 font-normal leading-relaxed mb-5">
+            <p className="text-[14px] mt-1 text-slate-300 font-normal leading-relaxed mb-5">
               {cameraError}
             </p>
 
@@ -183,7 +183,7 @@ export const LiveCameraCaptureModal: React.FC<LiveCameraCaptureModalProps> = ({
             </div>
 
             {/* Live Watermark Preview Pill */}
-            <div className="absolute bottom-4 left-4 bg-black/70 backdrop-blur-md text-white text-[11px] font-medium px-3 py-1.5 rounded-full border border-status-green/40 flex items-center gap-2">
+            <div className="absolute bottom-4 left-4 bg-black/70 backdrop-blur-md text-white text-[12px] font-medium px-3 py-1.5 rounded-full border border-status-green/40 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-status-green animate-ping" />
               <span>LIVE CAMERA ACTIVE • Gallery Uploads Blocked</span>
             </div>

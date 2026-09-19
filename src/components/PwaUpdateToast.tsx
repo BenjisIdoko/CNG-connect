@@ -59,7 +59,7 @@ export const PwaUpdateToast: React.FC = () => {
   };
 
   return (
-    <aside className="fixed bottom-20 left-4 right-4 sm:left-auto sm:right-6 sm:bottom-6 z-[120] flex flex-col gap-2 max-w-md w-full pointer-events-none">
+    <aside className="fixed bottom-20 left-4 right-4 sm:left-auto sm:right-6 sm:bottom-6 z-[120] flex flex-col gap-2 max-w-md sm:w-full pointer-events-none">
       {/* 1. App Update Banner */}
       {needRefresh && (
         <div className="pointer-events-auto flex items-center justify-between gap-3 p-4 rounded-2xl bg-deep-teal text-white shadow-[0_10px_30px_rgba(31,41,35,0.3)] animate-in slide-in-from-bottom-4 duration-300">
@@ -114,7 +114,7 @@ export const PwaUpdateToast: React.FC = () => {
             <WifiOff className="w-5 h-5 text-status-amber shrink-0" />
             <div>
               <p className="text-xs font-semibold text-slate-900">You are offline</p>
-              <p className="text-[11px] text-outline">Showing cached station map and data.</p>
+              <p className="text-[12px] text-outline">Showing cached station map and data.</p>
             </div>
           </div>
           <button

@@ -86,7 +86,7 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
             ].map((t) => (
               <div key={t.l} className="flex-1 bg-surface rounded-xl py-2.5 text-center">
                 <div className="font-extrabold text-body-lg">{t.v}</div>
-                <div className="text-[10px] text-outline">{t.l}</div>
+                <div className="text-[12px] text-outline">{t.l}</div>
               </div>
             ))}
           </div>
@@ -170,7 +170,7 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
                     <div className="flex items-center gap-1.5 flex-wrap">
                       <h3 className="font-bold text-body text-slate-900 truncate">{center.name}</h3>
                       {center.isPiCngAccredited && (
-                        <span className="bg-[#FDF6E3] text-[#B4890B] rounded-md px-1.5 py-0.5 text-[9px] font-bold shrink-0">
+                        <span className="bg-[#FDF6E3] text-[#B4890B] rounded-md px-1.5 py-0.5 text-[12px] font-bold shrink-0">
                           Accredited
                         </span>
                       )}
@@ -181,7 +181,7 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
                   </div>
                   {center.reviewsCount > 0 && center.rating > 0 && (
                     <span className="text-caption text-outline shrink-0 flex items-center gap-0.5">
-                      <span className="material-symbols-outlined text-[14px] text-[#F5A623] material-symbols-fill">star</span>
+                      <span className="material-symbols-outlined text-[15px] text-[#F5A623] material-symbols-fill">star</span>
                       {center.rating}
                     </span>
                   )}
@@ -190,7 +190,7 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
                 {center.services.length > 0 && (
                   <div className="flex flex-wrap gap-1.5 mt-2.5">
                     {center.services.slice(0, 3).map((srv, idx) => (
-                      <span key={idx} className="bg-surface rounded-md px-2 py-0.5 text-[10px] text-slate-600">
+                      <span key={idx} className="bg-surface rounded-md px-2 py-0.5 text-[12px] text-slate-600">
                         {srv}
                       </span>
                     ))}

@@ -699,7 +699,7 @@ export const AdminPinsScreen: React.FC<{ onExit: () => void }> = ({ onExit }) =>
                   />
                   <span className="text-xs font-semibold text-slate-900 truncate">{r.name}</span>
                 </div>
-                <p className="text-[11px] text-slate-500 truncate mt-0.5">
+                <p className="text-[12px] text-slate-500 truncate mt-0.5">
                   {r.location_precision || '—'} · {r.city}, {r.state}
                 </p>
               </div>
@@ -903,7 +903,7 @@ export const AdminPinsScreen: React.FC<{ onExit: () => void }> = ({ onExit }) =>
                   {!d.current && <p className="text-rose-600 mt-0.5">Unknown station id "{d.id}" — will be skipped.</p>}
                   {Object.entries(d.changes).map(([k, v]) => (
                     <p key={k} className="text-slate-600 mt-0.5">
-                      <span className="font-mono text-[11px] text-slate-400">{k}</span>: {v.from || '(empty)'} →{' '}
+                      <span className="font-mono text-[12px] text-slate-400">{k}</span>: {v.from || '(empty)'} →{' '}
                       <span className="font-semibold text-emerald-700">{v.to}</span>
                     </p>
                   ))}

@@ -282,7 +282,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                       {STATUS_OPTIONS.find((o) => o.id === statusFilter)?.label}
                     </span>
                   )}
-                  <span className="material-symbols-outlined text-[14px]">
+                  <span className="material-symbols-outlined text-[15px]">
                     {showStatusMenu ? 'expand_less' : 'expand_more'}
                   </span>
                 </button>

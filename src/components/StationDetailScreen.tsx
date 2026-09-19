@@ -223,7 +223,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
     <div className="min-h-screen bg-surface text-on-surface pb-44 font-['Urbanist',sans-serif]">
       {/* Toast Notification */}
       {copiedNotification && (
-        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-on-surface text-white text-[13px] font-bold px-4 py-2 rounded-full shadow-lg">
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-on-surface text-white text-[14px] font-bold px-4 py-2 rounded-full shadow-lg">
           Station Group link copied!
         </div>
       )}
@@ -347,13 +347,13 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
         {station.stationType === 'ev_charging' ? (
           <div className="flex gap-6">
             <div className="flex-1">
-              <div className="text-[10px] font-bold text-outline uppercase tracking-wider">Rate</div>
+              <div className="text-[12px] font-bold text-outline uppercase tracking-wider">Rate</div>
               <div className={`font-extrabold mt-1 ${station.pricePerKwh ? 'text-heading text-slate-900' : 'text-body-lg text-slate-300'}`}>
                 {station.pricePerKwh ? `₦${station.pricePerKwh}/kWh` : 'Unreported'}
               </div>
             </div>
             <div className="flex-1">
-              <div className="text-[10px] font-bold text-outline uppercase tracking-wider">Power</div>
+              <div className="text-[12px] font-bold text-outline uppercase tracking-wider">Power</div>
               <div className="font-extrabold mt-1 text-heading text-slate-900">
                 {station.chargingSpeedKw ? `${station.chargingSpeedKw} kW` : '—'}
               </div>
@@ -366,7 +366,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
           <div>
             <div className="flex gap-6">
               <div className="flex-1">
-                <div className="text-[10px] font-bold text-outline uppercase tracking-wider">CNG price</div>
+                <div className="text-[12px] font-bold text-outline uppercase tracking-wider">CNG price</div>
                 <div
                   className={`font-extrabold mt-1 ${
                     station.cngPrice ? 'text-heading text-slate-900' : 'text-body-lg text-slate-300'
@@ -383,7 +383,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                 </div>
               </div>
               <div className="flex-1">
-                <div className="text-[10px] font-bold text-outline uppercase tracking-wider">Pump pressure</div>
+                <div className="text-[12px] font-bold text-outline uppercase tracking-wider">Pump pressure</div>
                 <div
                   className={`font-extrabold mt-1 ${
                     station.pumpPressure ? 'text-heading text-slate-900' : 'text-body-lg text-slate-300'
@@ -425,9 +425,9 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
             onClick={() => openGoogleMapsPin(station)}
             className="self-start -mt-2 text-micro font-semibold text-outline hover:text-slate-900 flex items-center gap-1"
           >
-            <span className="material-symbols-outlined text-[14px]">map</span>
+            <span className="material-symbols-outlined text-[15px]">map</span>
             View map pin
-            <span className="material-symbols-outlined text-[12px]">open_in_new</span>
+            <span className="material-symbols-outlined text-[13px]">open_in_new</span>
           </button>
         )}
 
@@ -526,7 +526,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                             className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-primary border-2 border-surface text-white flex items-center justify-center"
                             title="Photo verified"
                           >
-                            <span className="material-symbols-outlined text-[10px] material-symbols-fill">check</span>
+                            <span className="material-symbols-outlined text-[12px] material-symbols-fill">check</span>
                           </span>
                         )}
                       </div>

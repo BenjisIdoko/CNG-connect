@@ -42,18 +42,18 @@ export const BookConversionModal: React.FC<BookConversionModalProps> = ({
             </div>
 
             <div>
-              <span className="bg-surface-container text-primary text-[11px] font-semibold px-3 py-1 rounded-full uppercase tracking-wider">
+              <span className="bg-surface-container text-primary text-[12px] font-semibold px-3 py-1 rounded-full uppercase tracking-wider">
                 Pi-CNG Booking Confirmed
               </span>
               <h3 className="text-[20px] font-bold text-on-surface mt-2">
                 Conversion Appointment Booked!
               </h3>
-              <p className="text-[13px] text-on-surface-variant font-normal mt-1">
+              <p className="text-[14px] text-on-surface-variant font-normal mt-1">
                 Your kit inspection slot at <strong className="text-on-surface font-semibold">{center.name}</strong> is reserved.
               </p>
             </div>
 
-            <div className="bg-surface-container rounded-2xl p-4 text-left space-y-2 text-[13px]">
+            <div className="bg-surface-container rounded-2xl p-4 text-left space-y-2 text-[14px]">
               <div className="flex justify-between">
                 <span className="text-on-surface-variant font-medium">Booking Reference:</span>
                 <span className="font-bold text-primary">{bookingSuccessRef}</span>
@@ -72,7 +72,7 @@ export const BookConversionModal: React.FC<BookConversionModalProps> = ({
               </div>
             </div>
 
-            <div className="bg-surface rounded-2xl p-3 text-primary text-[12px] font-semibold flex items-center gap-2">
+            <div className="bg-surface rounded-2xl p-3 text-primary text-[13px] font-semibold flex items-center gap-2">
               <span className="material-symbols-outlined text-[18px]">stars</span>
               <span>+100 Driver Reward Points added to your profile!</span>
             </div>
@@ -86,31 +86,31 @@ export const BookConversionModal: React.FC<BookConversionModalProps> = ({
                 });
                 onClose();
               }}
-              className="w-full py-3.5 bg-primary text-on-primary font-bold text-[14px] rounded-full shadow-md hover:opacity-95 transition-all"
+              className="w-full py-3.5 bg-primary text-on-primary font-bold text-[15px] rounded-full shadow-md hover:opacity-95 transition-all"
             >
               Done & Return
             </button>
           </div>
         ) : (
           <div>
-            <span className="inline-block text-[11px] font-semibold text-primary bg-primary-container px-2.5 py-0.5 rounded-full uppercase mb-3">
+            <span className="inline-block text-[12px] font-semibold text-primary bg-primary-container px-2.5 py-0.5 rounded-full uppercase mb-3">
               Accredited Workshop
             </span>
 
             {/* Selected Center Summary Card */}
             <div className="bg-surface-container rounded-2xl p-3.5 mb-4 space-y-1">
-              <span className="text-[10.5px] font-semibold text-primary uppercase tracking-wider block">
+              <span className="text-[12px] font-semibold text-primary uppercase tracking-wider block">
                 Selected Workshop ({center.code})
               </span>
-              <p className="font-bold text-[14px] text-on-surface leading-snug">
+              <p className="font-bold text-[15px] text-on-surface leading-snug">
                 {center.name}
               </p>
-              <p className="text-[12px] font-normal text-on-surface-variant truncate">
+              <p className="text-[13px] font-normal text-on-surface-variant truncate">
                 {center.address}
               </p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-3.5 text-[13px]">
+            <form onSubmit={handleSubmit} className="space-y-3.5 text-[14px]">
               <div>
                 <label className="block font-semibold text-on-surface-variant mb-1">
                   Vehicle Make &amp; Year
@@ -194,7 +194,7 @@ export const BookConversionModal: React.FC<BookConversionModalProps> = ({
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full py-3.5 bg-primary text-on-primary font-bold text-[14px] rounded-full shadow-lg hover:opacity-95 active:scale-98 transition-all flex items-center justify-center gap-2"
+                  className="w-full py-3.5 bg-primary text-on-primary font-bold text-[15px] rounded-full shadow-lg hover:opacity-95 active:scale-98 transition-all flex items-center justify-center gap-2"
                 >
                   {isSubmitting ? (
                     <>

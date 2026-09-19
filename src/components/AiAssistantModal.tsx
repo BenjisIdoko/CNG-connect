@@ -116,7 +116,7 @@ export const AiAssistantModal: React.FC<AiAssistantModalProps> = ({
                 Live
               </span>
             </h3>
-            <p className="text-[11.5px] text-emerald-100/90 font-normal">
+            <p className="text-[12.5px] text-emerald-100/90 font-normal">
               Station queue advisor &amp; CNG calculator
             </p>
           </div>
@@ -140,7 +140,7 @@ export const AiAssistantModal: React.FC<AiAssistantModalProps> = ({
             }`}
           >
             <div
-              className={`max-w-[85%] rounded-2xl p-3.5 text-[14px] leading-relaxed shadow-xs ${
+              className={`max-w-[85%] rounded-2xl p-3.5 text-[15px] leading-relaxed shadow-xs ${
                 m.role === 'user'
                   ? 'bg-primary text-white rounded-br-md font-medium'
                   : 'bg-white text-on-surface rounded-bl-md font-normal'
@@ -152,7 +152,7 @@ export const AiAssistantModal: React.FC<AiAssistantModalProps> = ({
         ))}
 
         {loading && (
-          <div className="flex items-center gap-2 text-primary text-[13px] font-semibold px-3 py-2 bg-white rounded-2xl w-fit shadow-xs">
+          <div className="flex items-center gap-2 text-primary text-[14px] font-semibold px-3 py-2 bg-white rounded-2xl w-fit shadow-xs">
             <span className="w-2 h-2 rounded-full bg-live-pulse animate-ping" />
             <span>Checking live station status...</span>
           </div>
@@ -168,7 +168,7 @@ export const AiAssistantModal: React.FC<AiAssistantModalProps> = ({
               setQuery(prompt);
               handleSend(prompt);
             }}
-            className="px-3 py-2 bg-surface-container hover:bg-surface-container-high text-deep-teal text-[12px] font-semibold rounded-full whitespace-nowrap active:scale-95 transition-all shrink-0 min-h-[44px] flex items-center"
+            className="px-3 py-2 bg-surface-container hover:bg-surface-container-high text-deep-teal text-[13px] font-semibold rounded-full whitespace-nowrap active:scale-95 transition-all shrink-0 min-h-[44px] flex items-center"
           >
             {prompt}
           </button>
@@ -188,7 +188,7 @@ export const AiAssistantModal: React.FC<AiAssistantModalProps> = ({
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Ask CNG-Connect AI..."
-          className="flex-1 bg-surface-container rounded-full px-4 py-2.5 text-[14px] font-normal text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary/30"
+          className="flex-1 bg-surface-container rounded-full px-4 py-2.5 text-[15px] font-normal text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary/30"
         />
         <button
           type="submit"

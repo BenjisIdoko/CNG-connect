@@ -64,7 +64,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
       {/* Bottom Hero Typography & AutoGo-Style CTA Pill */}
       <div className="relative z-10 p-6 pb-12 max-w-md mx-auto w-full space-y-6 animate-fade-in">
         <div className="space-y-2 text-left">
-          <span className="text-[11px] font-bold text-status-green bg-status-green/20 px-3 py-1 rounded-full uppercase tracking-widest backdrop-blur-md border border-status-green/30 inline-block">
+          <span className="text-[12px] font-bold text-status-green bg-status-green/20 px-3 py-1 rounded-full uppercase tracking-widest backdrop-blur-md border border-status-green/30 inline-block">
             Official CNG Network
           </span>
 

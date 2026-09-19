@@ -22,9 +22,9 @@
   --font-headline: 'Urbanist', sans-serif;
   
   /* Type Scale Utility Tokens */
-  --text-micro: 0.75rem;         /* 12px - badges, timestamps, micro tags */
+  --text-micro: 0.8125rem;       /* 13px - badges, timestamps, micro tags */
   --text-micro--line-height: 1.35;
-  --text-caption: 0.8125rem;     /* 13px - secondary text, meta info, captions */
+  --text-caption: 0.875rem;      /* 14px - secondary text, meta info, captions */
   --text-caption--line-height: 1.4;
   --text-body: 1rem;             /* 16px - default body text, inputs, descriptions */
   --text-body--line-height: 1.5;

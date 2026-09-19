@@ -19,7 +19,7 @@ export const ImageWithFallback: React.FC<ImageWithFallbackProps> = ({
     return (
       <div className={`bg-surface-container text-slate-500 flex flex-col items-center justify-center p-3 text-center ${className}`}>
         <span className="material-symbols-outlined text-[24px] text-slate-400 mb-1">{fallbackIcon}</span>
-        {fallbackText && <span className="text-[11px] font-semibold text-slate-600">{fallbackText}</span>}
+        {fallbackText && <span className="text-[12px] font-semibold text-slate-600">{fallbackText}</span>}
       </div>
     );
   }

@@ -163,7 +163,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                     aria-label="Change profile photo"
                     className="absolute -bottom-0.5 -right-0.5 w-[22px] h-[22px] rounded-full bg-primary text-white border-2 border-deep-teal flex items-center justify-center active:scale-90 transition-transform disabled:opacity-60"
                   >
-                    <span className="material-symbols-outlined text-[12px]">
+                    <span className="material-symbols-outlined text-[13px]">
                       {isUploadingAvatar ? 'progress_activity' : 'photo_camera'}
                     </span>
                   </button>
@@ -178,7 +178,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
               <PopoverPrimitive.Root>
                 <PopoverPrimitive.Trigger className="flex items-center gap-1 mt-0.5 text-micro text-[#B7CBB9] cursor-pointer text-left max-w-full">
                   <span className="truncate">{user.vehicle || 'Add your vehicle'}</span>
-                  <span className="material-symbols-outlined text-[14px] shrink-0">chevron_right</span>
+                  <span className="material-symbols-outlined text-[15px] shrink-0">chevron_right</span>
                 </PopoverPrimitive.Trigger>
                 <PopoverPrimitive.Portal>
                   <PopoverPrimitive.Content
@@ -204,7 +204,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                         }`}
                       >
                         <span className="truncate">{v}</span>
-                        {user.vehicle === v && <span className="material-symbols-outlined text-[14px] text-primary">check</span>}
+                        {user.vehicle === v && <span className="material-symbols-outlined text-[15px] text-primary">check</span>}
                       </button>
                     ))}
                   </PopoverPrimitive.Content>
@@ -228,7 +228,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
             ].map((t) => (
               <div key={t.l} className="flex-1 bg-white/[0.06] rounded-[14px] py-2.5 text-center">
                 <div className={`font-extrabold tracking-tight ${t.big ? 'text-[23px]' : 'text-[19px]'}`}>{t.v}</div>
-                <div className="text-[10px] text-[#9FB8A3] mt-0.5">{t.l}</div>
+                <div className="text-[12px] text-[#9FB8A3] mt-0.5">{t.l}</div>
               </div>
             ))}
           </div>

@@ -31,7 +31,7 @@ export const LiveNavigationModal: React.FC<LiveNavigationModalProps> = ({
             <h2 className="font-bold text-[19px] text-on-surface leading-snug truncate">
               {station.name}
             </h2>
-            <p className="text-[13px] text-slate-500 font-normal mt-0.5 flex items-center gap-1">
+            <p className="text-[14px] text-slate-500 font-normal mt-0.5 flex items-center gap-1">
               <span className="material-symbols-outlined text-[16px] text-outline">
                 location_on
               </span>
@@ -39,8 +39,8 @@ export const LiveNavigationModal: React.FC<LiveNavigationModalProps> = ({
             </p>
 
             {station.lat && station.lng && (
-              <p className="text-[11.5px] text-primary font-medium mt-1 flex items-center gap-1">
-                <span className="material-symbols-outlined text-[14px]">
+              <p className="text-[12.5px] text-primary font-medium mt-1 flex items-center gap-1">
+                <span className="material-symbols-outlined text-[15px]">
                   {station.locationPrecision === 'gps_confirmed' ? 'my_location' : 'pin_drop'}
                 </span>
                 <span>
@@ -52,11 +52,11 @@ export const LiveNavigationModal: React.FC<LiveNavigationModalProps> = ({
           </div>
 
           <div className="flex flex-wrap items-center gap-2 pt-2">
-            <span className="bg-primary-container text-on-primary-container text-[11.5px] font-semibold px-3 py-1 rounded-full">
+            <span className="bg-primary-container text-on-primary-container text-[12.5px] font-semibold px-3 py-1 rounded-full">
               {station.statusLabel} {station.pumpPressure ? `• ${station.pumpPressure} bar` : ''}
             </span>
             {station.cngPrice && (
-              <span className="bg-white text-slate-700 text-[11.5px] font-medium px-3 py-1 rounded-full">
+              <span className="bg-white text-slate-700 text-[12.5px] font-medium px-3 py-1 rounded-full">
                 ₦{station.cngPrice}/kg
               </span>
             )}
@@ -66,7 +66,7 @@ export const LiveNavigationModal: React.FC<LiveNavigationModalProps> = ({
         {/* Real Distance & Drive Time Summary Grid */}
         <div className="grid grid-cols-2 gap-3">
           <div className="bg-surface-container rounded-2xl p-3.5 text-center">
-            <span className="text-[10.5px] font-semibold uppercase text-outline block mb-0.5">
+            <span className="text-[12px] font-semibold uppercase text-outline block mb-0.5">
               Estimated Distance
             </span>
             <span className="text-[20px] font-bold text-on-surface">
@@ -75,7 +75,7 @@ export const LiveNavigationModal: React.FC<LiveNavigationModalProps> = ({
           </div>
 
           <div className="bg-surface-container rounded-2xl p-3.5 text-center">
-            <span className="text-[10.5px] font-semibold uppercase text-outline block mb-0.5">
+            <span className="text-[12px] font-semibold uppercase text-outline block mb-0.5">
               Drive Time ETA
             </span>
             <span className="text-[20px] font-bold text-primary">
@@ -104,7 +104,7 @@ export const LiveNavigationModal: React.FC<LiveNavigationModalProps> = ({
 
           <button
             onClick={onClose}
-            className="w-full py-2.5 text-outline hover:text-slate-900 font-bold text-[13px] rounded-full active:scale-[0.98] transition-all"
+            className="w-full py-2.5 text-outline hover:text-slate-900 font-bold text-[14px] rounded-full active:scale-[0.98] transition-all"
           >
             Close Summary
           </button>

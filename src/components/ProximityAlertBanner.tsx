@@ -105,7 +105,7 @@ export const ProximityAlertBanner: React.FC<ProximityAlertBannerProps> = ({
                   className="flex items-center gap-2 bg-surface-container rounded-[14px] p-3 text-left active:scale-95 transition-transform"
                 >
                   <span className={`w-[26px] h-[26px] rounded-full text-white flex items-center justify-center shrink-0 ${opt.dot}`}>
-                    <span className="material-symbols-outlined text-[14px] material-symbols-fill">{opt.icon}</span>
+                    <span className="material-symbols-outlined text-[15px] material-symbols-fill">{opt.icon}</span>
                   </span>
                   <span className="text-caption font-semibold text-slate-900">{opt.label}</span>
                 </button>

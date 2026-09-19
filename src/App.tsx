@@ -768,7 +768,7 @@ export const App: React.FC = () => {
         }`}
       >
         {!isOnline && (
-          <div className="fixed top-3 left-1/2 -translate-x-1/2 z-50 bg-deep-teal text-white text-[11.5px] font-extrabold px-4 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 animate-pulse pointer-events-none">
+          <div className="fixed top-3 left-1/2 -translate-x-1/2 z-50 bg-deep-teal text-white text-[12.5px] font-extrabold px-4 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 animate-pulse pointer-events-none">
             <span className="material-symbols-outlined text-[16px] text-amber-400">wifi_off</span>
             <span>No network. Showing last known stations.</span>
           </div>

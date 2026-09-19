@@ -210,7 +210,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ post, onBack }) => {
                   <span>{msg.time}</span>
                   {isMe && (
                     <span
-                      className="material-symbols-outlined text-[14px] text-primary"
+                      className="material-symbols-outlined text-[15px] text-primary"
                       style={{ fontVariationSettings: "'FILL' 1" }}
                     >
                       done_all

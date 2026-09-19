@@ -235,7 +235,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       iconCreateFunction: (cluster: any) => {
         const childCount = cluster.getChildCount();
         return L.divIcon({
-          html: `<div class="w-9 h-9 rounded-full bg-primary text-white font-extrabold text-[13px] flex items-center justify-center border-[3px] border-white shadow-[0_2px_8px_rgba(31,41,35,0.35),0_0_0_4px_rgba(49,154,63,0.3)] transition-transform hover:scale-110"><span>${childCount}</span></div>`,
+          html: `<div class="w-9 h-9 rounded-full bg-primary text-white font-extrabold text-[14px] flex items-center justify-center border-[3px] border-white shadow-[0_2px_8px_rgba(31,41,35,0.35),0_0_0_4px_rgba(49,154,63,0.3)] transition-transform hover:scale-110"><span>${childCount}</span></div>`,
           className: 'custom-cluster-icon',
           iconSize: [36, 36],
         });
@@ -513,7 +513,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                 chip.active ? 'bg-primary text-white' : 'bg-white text-slate-900'
               }`}
             >
-              {chip.icon && <span className="material-symbols-outlined text-[13px]">{chip.icon}</span>}
+              {chip.icon && <span className="material-symbols-outlined text-[14px]">{chip.icon}</span>}
               {chip.label}
             </button>
           ))}
@@ -714,7 +714,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
             <h3 className="font-extrabold text-[16px] text-slate-900 flex items-center gap-2">
               <span>Stations & Chargers</span>
             </h3>
-            <span className="text-[11px] font-bold text-primary bg-primary-container px-3 py-1 rounded-full">
+            <span className="text-[12px] font-bold text-primary bg-primary-container px-3 py-1 rounded-full">
               {filteredStations.length} Results
             </span>
           </div>
@@ -727,7 +727,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search station, city, state..."
-              className="flex-1 bg-transparent border-none outline-none text-[13px] font-medium text-slate-900 placeholder:text-slate-400"
+              className="flex-1 bg-transparent border-none outline-none text-[14px] font-medium text-slate-900 placeholder:text-slate-400"
             />
             {searchQuery && (
               <button onClick={() => setSearchQuery('')} className="text-slate-400 hover:text-slate-600">
@@ -752,7 +752,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                 stationTypeFilter === 'cng' ? 'bg-deep-teal text-white' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              <span className="material-symbols-outlined text-[13px]">local_gas_station</span>
+              <span className="material-symbols-outlined text-[14px]">local_gas_station</span>
               <span>CNG</span>
             </button>
           </div>
@@ -769,7 +769,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
         {/* Desktop Station List Container */}
         <div className="flex-1 overflow-y-auto p-4 space-y-3">
           {filteredStations.length === 0 ? (
-            <div className="p-8 text-center text-slate-500 font-medium text-[13px]">
+            <div className="p-8 text-center text-slate-500 font-medium text-[14px]">
               No stations match your criteria.
             </div>
           ) : (
@@ -799,12 +799,12 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                     </span>
                   </div>
 
-                  <p className="text-[12px] font-normal text-slate-500 truncate mt-1">
+                  <p className="text-[13px] font-normal text-slate-500 truncate mt-1">
                     {station.address}
                   </p>
 
                   <div className="flex items-center justify-between mt-3">
-                    <span className={`text-[11px] font-bold px-2 py-1 rounded-full ${statusInfo.badgeBg}`}>
+                    <span className={`text-[12px] font-bold px-2 py-1 rounded-full ${statusInfo.badgeBg}`}>
                       {station.statusLabel}
                     </span>
                     <button
@@ -815,7 +815,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                       className="text-micro font-extrabold text-primary hover:underline flex items-center gap-1"
                     >
                       <span>Group Chat & Specs</span>
-                      <span className="material-symbols-outlined text-[13px]">chevron_right</span>
+                      <span className="material-symbols-outlined text-[14px]">chevron_right</span>
                     </button>
                   </div>
                 </div>

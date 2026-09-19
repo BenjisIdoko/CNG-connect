@@ -57,10 +57,10 @@ export const CngRoiCalculatorModal: React.FC<CngRoiCalculatorModalProps> = ({
             </button>
           </div>
           <div className="text-center mt-5">
-            <div className="text-[10px] font-bold uppercase tracking-[0.06em] text-[#9FB8A3]">You&apos;d save</div>
+            <div className="text-[12px] font-bold uppercase tracking-[0.06em] text-[#9FB8A3]">You&apos;d save</div>
             <div className="font-extrabold text-[44px] leading-none tracking-tight mt-2">
               ₦{monthlySavings.toLocaleString()}
-              <span className="text-[14px] font-semibold text-[#9FB8A3]">/mo</span>
+              <span className="text-[15px] font-semibold text-[#9FB8A3]">/mo</span>
             </div>
             <div className="text-caption text-[#9FB8A3] mt-2">{savingsPercent}% less than petrol</div>
           </div>

@@ -155,7 +155,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
   const fmtCooldown = `0:${String(resendCooldown).padStart(2, '0')}`;
 
   return (
-    <div className="min-h-screen bg-white text-on-surface font-['Urbanist',sans-serif] flex flex-col p-6 pt-[max(env(safe-area-inset-top,0px),1.75rem)] max-w-xl mx-auto animate-fade-in">
+    <div className="min-h-[100dvh] bg-white text-on-surface font-['Urbanist',sans-serif] flex flex-col p-6 pt-[max(env(safe-area-inset-top,0px),1.75rem)] max-w-xl mx-auto animate-fade-in">
       {/* Top bar: back / step */}
       <div className="flex items-center gap-3.5 min-h-[36px]">
         {step === 2 ? (
@@ -167,7 +167,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
             <span className="material-symbols-outlined text-[22px]">close</span>
           </button>
         ) : null}
-        <span className="text-[12px] font-semibold text-outline">
+        <span className="text-[13px] font-semibold text-outline">
           {step === 3 ? 'Almost there' : `Step ${step} of 2`}
         </span>
       </div>
@@ -176,19 +176,19 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
         {step === 1 ? 'Sign in or sign up' : step === 2 ? 'Enter code' : 'Complete your profile'}
       </h1>
       {step === 1 && (
-        <p className="text-[14px] text-on-surface-variant leading-relaxed mt-2">
+        <p className="text-[15px] text-on-surface-variant leading-relaxed mt-2">
           No password needed — we&apos;ll email you a code. New here? The same code creates your account.
         </p>
       )}
       {step === 2 && (
-        <p className="text-[14px] text-on-surface-variant leading-relaxed mt-2">
+        <p className="text-[15px] text-on-surface-variant leading-relaxed mt-2">
           We sent a code to
           <br />
           <strong className="text-slate-900">{email}</strong>
         </p>
       )}
       {step === 3 && (
-        <p className="text-[14px] text-on-surface-variant leading-relaxed mt-2">
+        <p className="text-[15px] text-on-surface-variant leading-relaxed mt-2">
           Just a few details so other drivers know who&apos;s reporting.
         </p>
       )}
@@ -216,8 +216,8 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
                 />
               </div>
               {emailError && (
-                <p className="text-[12px] font-medium text-status-red mt-2 flex items-center gap-1">
-                  <span className="material-symbols-outlined text-[14px]">error</span>
+                <p className="text-[13px] font-medium text-status-red mt-2 flex items-center gap-1">
+                  <span className="material-symbols-outlined text-[15px]">error</span>
                   <span>{emailError}</span>
                 </p>
               )}
@@ -264,12 +264,12 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
                 </div>
               </label>
               {codeError && (
-                <p className="text-[12px] font-bold text-status-red mt-3 flex items-center gap-1">
+                <p className="text-[13px] font-bold text-status-red mt-3 flex items-center gap-1">
                   <span className="material-symbols-outlined text-[16px]">gpp_bad</span>
                   <span>{codeError}</span>
                 </p>
               )}
-              <div className="mt-5 text-[13px] text-outline">
+              <div className="mt-5 text-[14px] text-outline">
                 Didn&apos;t get a code?{' '}
                 <button
                   type="button"
@@ -280,7 +280,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
                   {resendCooldown > 0 ? `Resend in ${fmtCooldown}` : 'Resend code'}
                 </button>
               </div>
-              <p className="mt-1.5 text-[12px] text-outline italic">A confirmation link may arrive instead, in some cases.</p>
+              <p className="mt-1.5 text-[13px] text-outline italic">A confirmation link may arrive instead, in some cases.</p>
             </div>
           )}
 
@@ -324,8 +324,8 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
                   />
                 </div>
                 {phoneError && (
-                  <p className="text-[11.5px] font-medium text-status-red mt-1 flex items-center gap-1">
-                    <span className="material-symbols-outlined text-[14px]">error</span>
+                  <p className="text-[12.5px] font-medium text-status-red mt-1 flex items-center gap-1">
+                    <span className="material-symbols-outlined text-[15px]">error</span>
                     <span>{phoneError}</span>
                   </p>
                 )}
@@ -338,7 +338,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
                 <select
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
-                  className="w-full bg-surface border border-outline-variant rounded-2xl px-3.5 h-12 text-[14px] font-medium text-on-surface outline-none focus:ring-2 focus:ring-primary/30"
+                  className="w-full bg-surface border border-outline-variant rounded-2xl px-3.5 h-12 text-[15px] font-medium text-on-surface outline-none focus:ring-2 focus:ring-primary/30"
                 >
                   <option value="Abuja FCT">Abuja FCT</option>
                   <option value="Lagos State">Lagos State</option>
@@ -369,7 +369,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
                       }`}
                     >
                       <p className="font-bold text-[13.5px]">{v.label}</p>
-                      <p className={`text-[11px] mt-0.5 ${vehicleType === v.id ? 'text-emerald-100' : 'text-outline'}`}>{v.sub}</p>
+                      <p className={`text-[12px] mt-0.5 ${vehicleType === v.id ? 'text-emerald-100' : 'text-outline'}`}>{v.sub}</p>
                     </button>
                   ))}
                 </div>
@@ -384,7 +384,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
                     value={vehicleMake}
                     onChange={(e) => setVehicleMake(e.target.value)}
                     placeholder="e.g. Toyota Camry"
-                    className="w-full bg-surface border border-outline-variant rounded-2xl px-3.5 h-12 text-[14px] font-bold text-on-surface outline-none"
+                    className="w-full bg-surface border border-outline-variant rounded-2xl px-3.5 h-12 text-[15px] font-bold text-on-surface outline-none"
                   />
                 </div>
                 <div>
@@ -395,7 +395,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
                     value={vehicleYear}
                     onChange={(e) => setVehicleYear(e.target.value)}
                     placeholder="2018"
-                    className="w-full bg-surface border border-outline-variant rounded-2xl px-3.5 h-12 text-[14px] font-bold text-on-surface outline-none"
+                    className="w-full bg-surface border border-outline-variant rounded-2xl px-3.5 h-12 text-[15px] font-bold text-on-surface outline-none"
                   />
                 </div>
               </div>
@@ -418,8 +418,8 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
                           : 'bg-surface text-on-surface border-outline-variant hover:bg-surface-container'
                       }`}
                     >
-                      <p className="font-bold text-[13px]">{st.label}</p>
-                      <p className={`text-[11px] ${cngStatus === st.id ? 'text-emerald-100' : 'text-outline'}`}>{st.desc}</p>
+                      <p className="font-bold text-[14px]">{st.label}</p>
+                      <p className={`text-[12px] ${cngStatus === st.id ? 'text-emerald-100' : 'text-outline'}`}>{st.desc}</p>
                     </button>
                   ))}
                 </div>
@@ -431,7 +431,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
                   <select
                     value={tankSize}
                     onChange={(e) => setTankSize(e.target.value)}
-                    className="w-full bg-surface border border-outline-variant rounded-2xl px-3.5 h-12 text-[14px] font-bold text-on-surface outline-none"
+                    className="w-full bg-surface border border-outline-variant rounded-2xl px-3.5 h-12 text-[15px] font-bold text-on-surface outline-none"
                   >
                     <option value="12kg">12kg Cylinder</option>
                     <option value="15kg">15kg Cylinder (Standard Sedan)</option>
@@ -444,7 +444,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
           )}
 
           {/* Action button */}
-          <div className="mt-auto pt-6">
+          <div className="pt-2">
             <button
               type="submit"
               disabled={isBusy}

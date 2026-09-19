@@ -94,7 +94,7 @@ export const EditStationLocationModal: React.FC<EditStationLocationModalProps> =
   return (
     <Modal isOpen={true} onClose={onClose} title="Update Station Location Pin">
       <form onSubmit={handleSubmit} className="flex flex-col gap-4 p-1">
-        <div className="flex items-center gap-2 bg-emerald-50 text-emerald-900 border border-emerald-200 p-3 rounded-2xl text-[13px]">
+        <div className="flex items-center gap-2 bg-emerald-50 text-emerald-900 border border-emerald-200 p-3 rounded-2xl text-[14px]">
           <span className="material-symbols-outlined text-emerald-600 text-[20px] shrink-0">edit_location</span>
           <span>Help the driver community by setting the exact GPS pin for <strong>{station.name}</strong>.</span>
         </div>

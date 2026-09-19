@@ -199,7 +199,7 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
             {/* Optional details */}
             <div className="bg-surface-container rounded-2xl p-3.5 flex flex-col gap-3.5">
               <div>
-                <p className="text-[11px] font-bold text-outline uppercase tracking-wider">Wait time (optional)</p>
+                <p className="text-[12px] font-bold text-outline uppercase tracking-wider">Wait time (optional)</p>
                 <div className="flex gap-1.5 mt-2">
                   {[
                     { label: '0–5m', v: 5 },
@@ -231,8 +231,8 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
                 {attachedPhoto ? (
                   <div className="relative rounded-xl overflow-hidden bg-black/10">
                     <img src={attachedPhoto} alt="Verified meter snapshot" className="w-full h-32 object-cover" />
-                    <div className="absolute bottom-2 left-2 bg-slate-900/85 text-white text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
-                      <span className="material-symbols-outlined text-[13px] text-status-green">verified</span>
+                    <div className="absolute bottom-2 left-2 bg-slate-900/85 text-white text-[12px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
+                      <span className="material-symbols-outlined text-[14px] text-status-green">verified</span>
                       Live camera verified
                     </div>
                     <button
@@ -255,7 +255,7 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
                   >
                     <span className="material-symbols-outlined text-[20px] text-slate-700">photo_camera</span>
                     <span className="text-caption font-semibold flex-1">Add live photo</span>
-                    <span className="text-[10px] text-outline">Gallery blocked</span>
+                    <span className="text-[12px] text-outline">Gallery blocked</span>
                   </button>
                 )}
               </div>
