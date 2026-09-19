@@ -288,6 +288,42 @@ export const App: React.FC = () => {
     };
   }, []);
 
+  // Keep live data fresh while the app is open: without this the station list,
+  // statuses and posts only load once at launch, so a driver sitting on the app
+  // (or coming back to an installed PWA) never sees other drivers' reports.
+  const refreshLiveRef = useRef<() => void>(() => {});
+  const lastLiveRefreshRef = useRef(0);
+  refreshLiveRef.current = () => {
+    if (!navigator.onLine) return;
+    lastLiveRefreshRef.current = Date.now();
+    apiService.fetchStations().then((data) => {
+      if (data.length === 0) return;
+      updateStationsWithAlerts(data);
+      const byId = new Map(data.map((st) => [st.id, st]));
+      setSelectedStation((prev) => byId.get(prev.id) ?? prev);
+      setActiveDetailStation((prev) => (prev ? byId.get(prev.id) ?? prev : prev));
+    });
+    const key = userProfile.email || userProfile.phone || 'default_driver';
+    apiService.fetchPosts(key).then((data) => {
+      if (data.length > 0) setPosts(data);
+    });
+  };
+  useEffect(() => {
+    const onVisible = () => {
+      if (document.visibilityState === 'visible' && Date.now() - lastLiveRefreshRef.current > 60_000) {
+        refreshLiveRef.current();
+      }
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    const timer = setInterval(() => {
+      if (document.visibilityState === 'visible') refreshLiveRef.current();
+    }, 3 * 60_000);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisible);
+      clearInterval(timer);
+    };
+  }, []);
+
   // Deep link: open a station's detail view when arriving via ?stationId= / ?station=
   // (e.g. a tapped push notification or a shared station link). Runs once a match loads.
   //

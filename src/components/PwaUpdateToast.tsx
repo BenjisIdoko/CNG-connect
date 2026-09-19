@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useRegisterSW } from 'virtual:pwa-register/react';
+import { checkForAppUpdate } from '../utils/appUpdate';
 import { RefreshCw, WifiOff, CheckCircle2, X } from 'lucide-react';
 
 export const PwaUpdateToast: React.FC = () => {
@@ -18,6 +19,7 @@ export const PwaUpdateToast: React.FC = () => {
         // otherwise slow to notice a new deploy).
         const check = () => {
           r.update().catch(console.error);
+          void checkForAppUpdate();
         };
         setInterval(check, 15 * 60 * 1000);
         document.addEventListener('visibilitychange', () => {

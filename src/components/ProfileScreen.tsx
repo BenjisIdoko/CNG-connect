@@ -1,3 +1,4 @@
+import { BUILD_ID, checkForAppUpdate } from '../utils/appUpdate';
 import React, { useState } from 'react';
 import * as PopoverPrimitive from '@radix-ui/react-popover';
 import { UserProfile } from '../types';
@@ -350,6 +351,17 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
           <Row icon="help" label="Help & FAQ" onClick={() => showToast('Help Center')} />
           <Row icon="slideshow" label="Replay onboarding" onClick={onOpenOnboarding} />
           {onOpenSignUp && <Row icon="person_add" label="Sign up / switch account" onClick={onOpenSignUp} />}
+          <Row
+            icon="sync"
+            label="Check for updates"
+            hint={`Version ${BUILD_ID}`}
+            onClick={async () => {
+              showToast('Checking for updates…');
+              const r = await checkForAppUpdate();
+              if (r === 'current') showToast('You have the latest version');
+              else if (r === 'unknown') showToast('Could not check right now');
+            }}
+          />
           <Row icon="logout" label="Sign out" danger onClick={onSignOut || onOpenOnboarding} />
         </div>
       </div>

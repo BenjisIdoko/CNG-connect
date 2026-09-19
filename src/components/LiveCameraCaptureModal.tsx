@@ -82,8 +82,12 @@ export const LiveCameraCaptureModal: React.FC<LiveCameraCaptureModalProps> = ({
 
     const video = videoRef.current;
     const canvas = canvasRef.current;
-    canvas.width = video.videoWidth || 640;
-    canvas.height = video.videoHeight || 480;
+    // Cap the snapshot at 1280px on the long side (phone cameras give 1080p+).
+    const vw = video.videoWidth || 640;
+    const vh = video.videoHeight || 480;
+    const s = Math.min(1, 1280 / Math.max(vw, vh));
+    canvas.width = Math.round(vw * s);
+    canvas.height = Math.round(vh * s);
 
     const ctx = canvas.getContext('2d');
     if (ctx) {
@@ -104,7 +108,7 @@ export const LiveCameraCaptureModal: React.FC<LiveCameraCaptureModalProps> = ({
       ctx.font = '11px sans-serif';
       ctx.fillText(`${dateStr} ${timestamp} • Live Verified`, 25, canvas.height - 20);
 
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.88);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.75);
 
       captureTimerRef.current = setTimeout(() => {
         setIsCapturing(false);

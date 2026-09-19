@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ChatMessage, CommunityPost } from '../types';
 import { ASSETS, INITIAL_CHAT_MESSAGES } from '../data/mockData';
+import { compressImageToDataUrl } from '../utils/compressImage';
 
 interface ChatScreenProps {
   post?: CommunityPost;
@@ -73,9 +74,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ post, onBack }) => {
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const photoUrl = event.target?.result as string;
+      compressImageToDataUrl(file).then((photoUrl) => {
         const newMsg: ChatMessage = {
           id: `msg-${Date.now()}`,
           sender: 'user',
@@ -87,8 +86,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ post, onBack }) => {
           status: 'sent',
         };
         setMessages((prev) => [...prev, newMsg]);
-      };
-      reader.readAsDataURL(file);
+      });
     }
   };
 

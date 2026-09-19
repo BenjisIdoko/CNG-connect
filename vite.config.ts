@@ -5,6 +5,23 @@ import path from 'path';
 import { defineConfig, Plugin } from 'vite';
 import { GoogleGenAI } from '@google/genai';
 
+// Unique per build. Baked into the app (__BUILD_ID__) and published as
+// /version.json so a running/installed copy can tell it is out of date.
+const BUILD_ID = Date.now().toString(36);
+
+function versionFilePlugin(): Plugin {
+  return {
+    name: 'version-file',
+    generateBundle() {
+      this.emitFile({
+        type: 'asset',
+        fileName: 'version.json',
+        source: JSON.stringify({ id: BUILD_ID, builtAt: new Date().toISOString() }),
+      });
+    },
+  };
+}
+
 function apiChatPlugin(): Plugin {
   return {
     name: 'api-chat-plugin',
@@ -76,6 +93,9 @@ Give a friendly, concise, and helpful response. Mention specific stations, price
 
 export default defineConfig(() => {
   return {
+    define: {
+      __BUILD_ID__: JSON.stringify(BUILD_ID),
+    },
     plugins: [
       react(),
       tailwindcss(),
@@ -115,7 +135,15 @@ export default defineConfig(() => {
         },
         workbox: {
           globPatterns: ['**/*.{js,css,html,ico,png,jpg,svg,json,woff,woff2}'],
-          globIgnores: ['sw-custom.js'],
+          // version.json must always come from the network; admin-only chunks are
+          // not worth precaching for every driver.
+          globIgnores: [
+            'sw-custom.js',
+            'version.json',
+            '**/AdminPinsScreen-*.js',
+            '**/FullStationEditorModal-*.js',
+            '**/StationManagerScreen-*.js',
+          ],
           importScripts: ['sw-custom.js'],
           runtimeCaching: [
             {
@@ -164,6 +192,7 @@ export default defineConfig(() => {
           ]
         }
       }),
+      versionFilePlugin(),
       apiChatPlugin()
     ],
     resolve: {

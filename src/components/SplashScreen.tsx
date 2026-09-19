@@ -33,7 +33,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
     >
       {/* Full-Bleed Nigerian Filling Station Photography Background */}
       <img
-        src="/onboarding/splash-hero.jpg"
+        src="/onboarding/splash-hero.webp"
         alt="CNG filling station in Nigeria"
         className="absolute inset-0 w-full h-full object-cover transform scale-105 transition-transform duration-[4000ms] ease-out pointer-events-none"
       />

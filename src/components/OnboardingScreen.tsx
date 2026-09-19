@@ -20,28 +20,28 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
       title: 'Live pressure and queue status, before you drive there.',
       description:
         'See which stations actually have gas right now — reported by drivers who are there.',
-      image: '/onboarding/slide-stations.jpg',
+      image: '/onboarding/slide-stations.webp',
     },
     {
       id: 'gps',
       title: 'Accurate GPS & Live Distances',
       description:
         'Get real-time distances (km) and drive times to the nearest stations and conversion centres.',
-      image: '/onboarding/slide-gps.jpg',
+      image: '/onboarding/slide-gps.webp',
     },
     {
       id: 'community',
       title: 'State Alerts & Proximity Chat',
       description:
         'Get instant alerts when nearby stations restock, and chat with other drivers refilling alongside you.',
-      image: '/onboarding/slide-community.jpg',
+      image: '/onboarding/slide-community.webp',
     },
     {
       id: 'workshops',
       title: 'Access CNG Conversion Centres',
       description:
         'Browse CNG-accredited conversion centres in all 36 states. Verify registration codes, call technicians directly, and schedule cylinder inspections.',
-      image: '/onboarding/slide-workshops.jpg',
+      image: '/onboarding/slide-workshops.webp',
     },
   ];
 

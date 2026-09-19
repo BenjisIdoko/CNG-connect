@@ -5,6 +5,7 @@ import { LiveCameraCaptureModal } from './LiveCameraCaptureModal';
 import { checkLiveUpdatePermission } from '../utils/permissionManager';
 import { StationGroupInfoSheet } from './StationGroupInfoSheet';
 import { Modal } from './common/Modal';
+import { compressImageToDataUrl } from '../utils/compressImage';
 
 interface ReportStatusModalProps {
   station: GasStation;
@@ -56,9 +57,7 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
         return;
       }
 
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const dataUrl = event.target?.result as string;
+      compressImageToDataUrl(file).then((dataUrl) => {
         const urlVerification = verifyImageMetadata(undefined, dataUrl);
         if (!urlVerification.isValid) {
           setPhotoError(urlVerification.reason || 'Duplicate old photo detected.');
@@ -68,8 +67,7 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
 
         setPhotoError(null);
         setAttachedPhoto(dataUrl);
-      };
-      reader.readAsDataURL(file);
+      });
     }
   };
 

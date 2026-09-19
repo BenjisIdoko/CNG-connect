@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Modal } from './common/Modal';
 import { StationSuggestion } from '../types';
+import { compressImageToDataUrl } from '../utils/compressImage';
 
 interface SuggestStationModalProps {
   isOpen: boolean;
@@ -29,11 +30,7 @@ export const SuggestStationModal: React.FC<SuggestStationModalProps> = ({
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPhoto(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+      compressImageToDataUrl(file).then(setPhoto);
     }
   };
 
