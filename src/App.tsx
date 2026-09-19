@@ -165,17 +165,6 @@ export const App: React.FC = () => {
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
 
-    // Purge stale Carto tile caches from browser CacheStorage
-    if (typeof window !== 'undefined' && 'caches' in window) {
-      caches.keys().then((names) => {
-        names.forEach((name) => {
-          if (name === 'cng-map-tiles' || name.includes('carto')) {
-            caches.delete(name).catch(() => {});
-          }
-        });
-      }).catch(() => {});
-    }
-
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
@@ -698,6 +687,8 @@ export const App: React.FC = () => {
     );
   }
 
+  const isMapHome = activeTab === 'map' && !activeDetailStation && !activeDiscussionPost && !activeChatPost;
+
   // Determine current view title and back button
   let headerTitle: string | undefined;
   let showHeaderBack = false;
@@ -765,11 +756,16 @@ export const App: React.FC = () => {
           showBack={showHeaderBack}
           onBack={onHeaderBack}
           onOpenAiAssistant={() => setIsAiModalOpen(true)}
+          mobileHidden={isMapHome}
         />
       )}
 
       {/* Main Content Area — top pad clears the 56px header bar plus the safe-area inset it sits under */}
-      <main className="flex-1 overflow-y-auto relative pt-[calc(3.5rem_+_max(env(safe-area-inset-top,0px),0.75rem))] pb-24 lg:pl-64">
+      <main
+        className={`flex-1 overflow-y-auto relative lg:pt-[calc(3.5rem_+_max(env(safe-area-inset-top,0px),0.75rem))] lg:pb-24 lg:pl-64 ${
+          isMapHome ? 'pt-0 pb-0' : 'pt-[calc(3.5rem_+_max(env(safe-area-inset-top,0px),0.75rem))] pb-24'
+        }`}
+      >
         {!isOnline && (
           <div className="fixed top-3 left-1/2 -translate-x-1/2 z-50 bg-[#004D40]/95 text-white text-[11.5px] font-extrabold px-4 py-1.5 rounded-full shadow-lg border border-emerald-400/40 backdrop-blur-md flex items-center gap-1.5 animate-pulse pointer-events-none">
             <span className="material-symbols-outlined text-[16px] text-amber-400">wifi_off</span>
@@ -820,6 +816,7 @@ export const App: React.FC = () => {
               onNavigate={handleNavigate}
               gpsStatus={gpsStatus}
               userGps={userCoords}
+              onOpenAiAssistant={() => setIsAiModalOpen(true)}
               onGpsStatusChange={(status, coords) => {
                 setGpsStatus(status);
                 if (coords) setUserCoords(coords);

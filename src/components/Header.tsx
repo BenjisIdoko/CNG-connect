@@ -8,6 +8,8 @@ interface HeaderProps {
   onOpenAiAssistant?: () => void;
   /** Replaces the default single action button when provided. */
   rightAction?: React.ReactNode;
+  /** Hide on phone widths (the map screen draws its own overlay header). */
+  mobileHidden?: boolean;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -16,9 +18,10 @@ export const Header: React.FC<HeaderProps> = ({
   onBack,
   onOpenAiAssistant,
   rightAction,
+  mobileHidden = false,
 }) => {
   return (
-    <header className="fixed top-0 w-full z-50 bg-white/95 backdrop-blur-xl border-b border-outline-variant/80 shadow-[0_1px_6px_rgba(0,0,0,0.03)] pt-safe lg:pl-64">
+    <header className={`${mobileHidden ? 'hidden lg:block ' : ''}fixed top-0 w-full z-50 bg-white/95 backdrop-blur-xl border-b border-outline-variant/80 shadow-[0_1px_6px_rgba(0,0,0,0.03)] pt-safe lg:pl-64`}>
       <div className="h-14 px-4 md:px-8 max-w-7xl mx-auto flex items-center justify-between gap-3">
         {showBack ? (
           <div className="flex items-center gap-2 min-w-0 flex-1">
