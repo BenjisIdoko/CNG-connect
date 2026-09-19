@@ -6,6 +6,9 @@ import type { LeaderboardDriver } from '../utils/reputationEngine';
 import { apiService } from '../services/apiService';
 import { isSameState } from '../utils/proximityAlertEngine';
 
+// Legends leaderboard is built but hidden for now; flip to true to bring the tab back.
+const SHOW_LEADERBOARD = false;
+
 const STATUS_OPTIONS: { id: string; label: string; dotColor?: string }[] = [
   { id: 'all', label: 'All Statuses' },
   { id: 'full', label: 'Full Stock', dotColor: 'bg-status-green' },
@@ -60,6 +63,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
   }, []);
 
   useEffect(() => {
+    if (!SHOW_LEADERBOARD) return;
     let active = true;
     apiService.fetchLeaderboard().then((rows) => {
       if (active) setLeaderboard(rows);
@@ -181,16 +185,18 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
             <span className="whitespace-nowrap">General Hub</span>
           </button>
 
-          <button
-            onClick={() => setActiveMainTab('leaderboard')}
-            className={`flex-1 py-2.5 rounded-full text-caption font-bold transition-all text-center flex items-center justify-center gap-1 ${
-              activeMainTab === 'leaderboard'
-                ? 'bg-deep-teal text-white shadow-xs'
-                : 'text-on-surface-variant hover:text-on-surface'
-            }`}
-          >
-            <span className="whitespace-nowrap">🏆 Legends</span>
-          </button>
+          {SHOW_LEADERBOARD && (
+            <button
+              onClick={() => setActiveMainTab('leaderboard')}
+              className={`flex-1 py-2.5 rounded-full text-caption font-bold transition-all text-center flex items-center justify-center gap-1 ${
+                activeMainTab === 'leaderboard'
+                  ? 'bg-deep-teal text-white shadow-xs'
+                  : 'text-on-surface-variant hover:text-on-surface'
+              }`}
+            >
+              <span className="whitespace-nowrap">🏆 Legends</span>
+            </button>
+          )}
         </div>
 
         {/* Search Bar & Notification Button */}
