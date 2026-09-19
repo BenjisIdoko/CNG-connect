@@ -658,9 +658,9 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
           /* MAIN TAB 3: Top Gas Finder Legends Leaderboard */
           <div className="flex flex-col gap-4">
             {/* Header Banner */}
-            <div className="bg-gradient-to-r from-[#004D40] via-primary to-emerald-950 rounded-3xl p-6 text-white shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border border-emerald-500/20">
+            <div className="bg-deep-teal rounded-3xl p-6 text-white shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#00FFC2]/20 text-[#00FFC2] border border-[#00FFC2]/30 text-xs font-extrabold mb-2">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/30 text-white text-xs font-extrabold mb-2">
                   <span>🏆 Nationwide Driver Leaderboard</span>
                 </div>
                 <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight">
