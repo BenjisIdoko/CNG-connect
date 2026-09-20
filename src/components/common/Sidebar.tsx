@@ -1,7 +1,7 @@
 import React from 'react';
 import { UserProfile } from '../../types';
 import { ASSETS } from '../../data/mockData';
-import { Leaf } from '@phosphor-icons/react';
+import { Icon } from './Icon';
 
 interface SidebarProps {
   activeTab: 'map' | 'conversions' | 'community' | 'profile';
@@ -37,7 +37,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             CNG-Connect
           </h1>
           <span className="text-[0.75rem] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-            <span className="inline-flex items-center gap-1"><Leaf size={12} weight="fill" /> Clean Mobility</span>
+            <span className="inline-flex items-center gap-1"><Icon name="eco" size={12} fill /> Clean Mobility</span>
           </span>
         </div>
       </div>

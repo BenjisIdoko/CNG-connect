@@ -79,10 +79,10 @@ import { apiService } from './services/apiService';
 import { ScreenSkeleton } from './components/common/Skeleton';
 import { PullToRefresh } from './components/common/PullToRefresh';
 import { useBackLayer } from './utils/backLayer';
-import { BellRinging, CheckCircle, Clock, MapPin, Warning, WarningOctagon } from '@phosphor-icons/react';
+import { Icon } from './components/common/Icon';
 
 type ToastTone = 'bell' | 'warn' | 'ok' | 'alert' | 'pin' | 'wait';
-const TOAST_ICONS = { bell: BellRinging, warn: Warning, ok: CheckCircle, alert: WarningOctagon, pin: MapPin, wait: Clock };
+const TOAST_ICONS: Record<ToastTone, string> = { bell: 'notifications_active', warn: 'warning', ok: 'check_circle', alert: 'error', pin: 'location_on', wait: 'schedule' };
 const TOAST_COLORS: Record<ToastTone, string> = {
   bell: 'text-status-amber',
   warn: 'text-status-amber',
@@ -774,7 +774,7 @@ export const App: React.FC = () => {
       {globalToast && (
         <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-[#141d19]/95 text-white text-[0.8438rem] font-bold px-5 py-2.5 rounded-full shadow-2xl backdrop-blur-md animate-fade-in border border-white/10 text-center max-w-sm pointer-events-none">
           <span className="inline-flex items-center gap-2 justify-center">
-            {globalToast.tone && (() => { const T = TOAST_ICONS[globalToast.tone]; return <T size={18} weight="fill" className={TOAST_COLORS[globalToast.tone]} />; })()}
+            {globalToast.tone && <Icon name={TOAST_ICONS[globalToast.tone]} size={18} fill className={TOAST_COLORS[globalToast.tone]} />}
             <span>{globalToast.msg}</span>
           </span>
         </div>

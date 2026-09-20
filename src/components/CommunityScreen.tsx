@@ -5,7 +5,7 @@ import { EmptyState } from './common/EmptyState';
 import type { LeaderboardDriver } from '../utils/reputationEngine';
 import { apiService } from '../services/apiService';
 import { isSameState } from '../utils/proximityAlertEngine';
-import { Trophy } from '@phosphor-icons/react';
+import { Icon } from './common/Icon';
 
 // Legends leaderboard is built but hidden for now; flip to true to bring the tab back.
 const SHOW_LEADERBOARD = false;
@@ -195,7 +195,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                   : 'text-on-surface-variant hover:text-on-surface'
               }`}
             >
-              <span className="whitespace-nowrap inline-flex items-center gap-1"><Trophy size={16} weight="fill" /> Legends</span>
+              <span className="whitespace-nowrap inline-flex items-center gap-1"><Icon name="emoji_events" size={16} fill /> Legends</span>
             </button>
           )}
         </div>
@@ -668,7 +668,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
             <div className="bg-deep-teal rounded-3xl p-6 text-white shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/30 text-white text-xs font-extrabold mb-2">
-                  <span className="inline-flex items-center gap-1.5"><Trophy size={14} weight="fill" /> Nationwide Driver Leaderboard</span>
+                  <span className="inline-flex items-center gap-1.5"><Icon name="emoji_events" size={14} fill /> Nationwide Driver Leaderboard</span>
                 </div>
                 <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight">
                   Gas Finder Legends of Nigeria

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { supabase } from '../services/supabaseClient';
-import { X } from '@phosphor-icons/react';
+import { Icon } from './common/Icon';
 
 export interface FullStationRow {
   id: string;
@@ -289,7 +289,7 @@ export const FullStationEditorModal: React.FC<Props> = ({ station, onClose, onSa
                     className="absolute top-1 right-1 w-6 h-6 rounded-full bg-black/60 text-white text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                     aria-label="Remove photo"
                   >
-                    <X size={12} weight="bold" />
+                    <Icon name="close" size={12} />
                   </button>
                 </div>
               ))}

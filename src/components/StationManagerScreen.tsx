@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { supabase } from '../services/supabaseClient';
 import { useAuth } from '../context/AuthContext';
 import { FullStationEditorModal, FullStationRow } from './FullStationEditorModal';
-import { ArrowLeft, ArrowRight } from '@phosphor-icons/react';
+import { Icon } from './common/Icon';
 
 type ManagedStation = FullStationRow & {
   lat: number;
@@ -118,7 +118,7 @@ export const StationManagerScreen: React.FC<{ onExit: () => void }> = ({ onExit 
           )}
           {authErr && <p className="text-xs text-rose-600 font-semibold">{authErr}</p>}
           <button onClick={onExit} className="text-xs text-slate-400 hover:text-slate-600 mt-1">
-            <span className="inline-flex items-center gap-1"><ArrowLeft size={14} weight="bold" /> Back to app</span>
+            <span className="inline-flex items-center gap-1"><Icon name="arrow_back" size={14} /> Back to app</span>
           </button>
         </div>
       </div>
@@ -159,7 +159,7 @@ export const StationManagerScreen: React.FC<{ onExit: () => void }> = ({ onExit 
           >
             <p className="font-extrabold text-slate-900 text-sm">{s.name}</p>
             <p className="text-xs text-slate-500 mt-0.5 truncate">{s.address}</p>
-            <p className="text-xs text-emerald-700 font-semibold mt-1.5"><span className="inline-flex items-center gap-1">Edit details <ArrowRight size={12} weight="bold" /></span></p>
+            <p className="text-xs text-emerald-700 font-semibold mt-1.5"><span className="inline-flex items-center gap-1">Edit details <Icon name="arrow_forward" size={12} /></span></p>
           </button>
         ))}
       </div>

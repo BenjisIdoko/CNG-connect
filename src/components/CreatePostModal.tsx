@@ -4,7 +4,7 @@ import { LiveCameraCaptureModal } from './LiveCameraCaptureModal';
 import { StationGroupInfoSheet } from './StationGroupInfoSheet';
 import { Modal } from './common/Modal';
 import { verifyImageMetadata, registerSharedImageHash } from '../utils/imageMetadataVerifier';
-import { Lock } from '@phosphor-icons/react';
+import { Icon } from './common/Icon';
 
 interface CreatePostModalProps {
   isOpen: boolean;
@@ -268,7 +268,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
                   <span className="whitespace-nowrap">Take Live Photo</span>
                 </button>
                 <p className="text-[0.75rem] font-normal text-outline text-center">
-                  <Lock size={13} weight="fill" className="inline -mt-0.5 mr-1" />Photo gallery access is disabled to prevent old/fake queue posts.
+                  <Icon name="lock" size={13} fill className="inline -mt-0.5 mr-1" />Photo gallery access is disabled to prevent old/fake queue posts.
                 </p>
               </div>
             )}

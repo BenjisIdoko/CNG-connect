@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ArrowClockwise } from '@phosphor-icons/react';
+import { Icon } from './Icon';
 
 const THRESHOLD = 64;
 
@@ -78,9 +78,9 @@ export const PullToRefresh: React.FC<{ onRefresh: () => Promise<unknown>; disabl
       aria-live="polite"
     >
       <div className="w-10 h-10 rounded-full bg-white shadow-[0_6px_18px_rgba(31,41,35,0.18)] flex items-center justify-center text-primary">
-        <ArrowClockwise
-          size={20}
-          weight="bold"
+        <Icon
+          name="refresh"
+          size={22}
           className={busy ? 'animate-spin' : ''}
           style={busy ? undefined : { transform: `rotate(${pull * 3}deg)` }}
         />
