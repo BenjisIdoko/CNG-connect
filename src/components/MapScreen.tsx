@@ -468,7 +468,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       {/* Mobile top overlay: wordmark, search, filter chips */}
       <div className="lg:hidden absolute top-0 inset-x-0 z-30 pointer-events-none pt-safe px-5">
         <div className="flex items-center justify-between pt-2 pointer-events-auto">
-          <span className="font-extrabold text-slate-900 text-[19px] tracking-tight [text-shadow:0_1px_6px_rgba(255,255,255,0.9)]">CNG&#8209;Connect</span>
+          <span className="font-extrabold text-slate-900 text-[1.1875rem] tracking-tight [text-shadow:0_1px_6px_rgba(255,255,255,0.9)]">CNG&#8209;Connect</span>
           {onOpenAiAssistant && (
             <button
               onClick={onOpenAiAssistant}
@@ -711,10 +711,10 @@ export const MapScreen: React.FC<MapScreenProps> = ({
         {/* Right Panel Header: Search & Filter */}
         <div className="p-4 flex flex-col gap-3 bg-white shadow-[0_2px_10px_rgba(31,41,35,0.05)]">
           <div className="flex items-center justify-between">
-            <h3 className="font-extrabold text-[16px] text-slate-900 flex items-center gap-2">
+            <h3 className="font-extrabold text-[1rem] text-slate-900 flex items-center gap-2">
               <span>Stations & Chargers</span>
             </h3>
-            <span className="text-[12px] font-bold text-primary bg-primary-container px-3 py-1 rounded-full">
+            <span className="text-[0.75rem] font-bold text-primary bg-primary-container px-3 py-1 rounded-full">
               {filteredStations.length} Results
             </span>
           </div>
@@ -727,7 +727,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search station, city, state..."
-              className="flex-1 bg-transparent border-none outline-none text-[14px] font-medium text-slate-900 placeholder:text-slate-400"
+              className="flex-1 bg-transparent border-none outline-none text-[0.875rem] font-medium text-slate-900 placeholder:text-slate-400"
             />
             {searchQuery && (
               <button onClick={() => setSearchQuery('')} className="text-slate-400 hover:text-slate-600">
@@ -769,7 +769,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
         {/* Desktop Station List Container */}
         <div className="flex-1 overflow-y-auto p-4 space-y-3">
           {filteredStations.length === 0 ? (
-            <div className="p-8 text-center text-slate-500 font-medium text-[14px]">
+            <div className="p-8 text-center text-slate-500 font-medium text-[0.875rem]">
               No stations match your criteria.
             </div>
           ) : (
@@ -799,12 +799,12 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                     </span>
                   </div>
 
-                  <p className="text-[13px] font-normal text-slate-500 truncate mt-1">
+                  <p className="text-[0.8125rem] font-normal text-slate-500 truncate mt-1">
                     {station.address}
                   </p>
 
                   <div className="flex items-center justify-between mt-3">
-                    <span className={`text-[12px] font-bold px-2 py-1 rounded-full ${statusInfo.badgeBg}`}>
+                    <span className={`text-[0.75rem] font-bold px-2 py-1 rounded-full ${statusInfo.badgeBg}`}>
                       {station.statusLabel}
                     </span>
                     <button

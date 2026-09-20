@@ -230,8 +230,8 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
               { v: String(user.reputationScore), l: 'Rating' },
             ].map((t) => (
               <div key={t.l} className="flex-1 bg-white/[0.06] rounded-[14px] py-2.5 text-center">
-                <div className={`font-extrabold tracking-tight ${t.big ? 'text-[23px]' : 'text-[19px]'}`}>{t.v}</div>
-                <div className="text-[12px] text-[#9FB8A3] mt-0.5">{t.l}</div>
+                <div className={`font-extrabold tracking-tight ${t.big ? 'text-[1.4375rem]' : 'text-[1.1875rem]'}`}>{t.v}</div>
+                <div className="text-[0.75rem] text-[#9FB8A3] mt-0.5">{t.l}</div>
               </div>
             ))}
           </div>
@@ -264,7 +264,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                 <div
                   key={t.id}
                   title={`${t.title} · ${t.minPoints}+ pts`}
-                  className={`w-11 h-11 rounded-xl flex items-center justify-center text-[20px] ${
+                  className={`w-11 h-11 rounded-xl flex items-center justify-center text-[1.25rem] ${
                     unlocked ? 'bg-primary-container' : 'bg-surface-dim/60 opacity-60 grayscale'
                   }`}
                 >
@@ -281,7 +281,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
           className={`bg-white rounded-2xl p-4 shadow-[0_4px_14px_rgba(14,20,32,0.05)] ${onOpenRoiCalculator ? 'cursor-pointer active:scale-[0.99] transition-transform' : ''}`}
         >
           <div className="text-micro font-semibold text-outline">Estimated savings</div>
-          <div className="font-extrabold text-[22px] text-primary mt-0.5 tracking-tight">
+          <div className="font-extrabold text-[1.375rem] text-primary mt-0.5 tracking-tight">
             ₦{monthlySavings.toLocaleString()}
             <span className="text-caption font-semibold text-outline">/mo</span>
           </div>

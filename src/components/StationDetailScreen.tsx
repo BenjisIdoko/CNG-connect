@@ -223,7 +223,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
     <div className="min-h-screen bg-surface text-on-surface pb-44">
       {/* Toast Notification */}
       {copiedNotification && (
-        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-on-surface text-white text-[14px] font-bold px-4 py-2 rounded-full shadow-lg">
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-on-surface text-white text-[0.875rem] font-bold px-4 py-2 rounded-full shadow-lg">
           Station Group link copied!
         </div>
       )}
@@ -347,13 +347,13 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
         {station.stationType === 'ev_charging' ? (
           <div className="flex gap-6">
             <div className="flex-1">
-              <div className="text-[12px] font-bold text-outline uppercase tracking-wider">Rate</div>
+              <div className="text-[0.75rem] font-bold text-outline uppercase tracking-wider">Rate</div>
               <div className={`font-extrabold mt-1 ${station.pricePerKwh ? 'text-heading text-slate-900' : 'text-body-lg text-slate-300'}`}>
                 {station.pricePerKwh ? `₦${station.pricePerKwh}/kWh` : 'Unreported'}
               </div>
             </div>
             <div className="flex-1">
-              <div className="text-[12px] font-bold text-outline uppercase tracking-wider">Power</div>
+              <div className="text-[0.75rem] font-bold text-outline uppercase tracking-wider">Power</div>
               <div className="font-extrabold mt-1 text-heading text-slate-900">
                 {station.chargingSpeedKw ? `${station.chargingSpeedKw} kW` : '—'}
               </div>
@@ -366,7 +366,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
           <div>
             <div className="flex gap-6">
               <div className="flex-1">
-                <div className="text-[12px] font-bold text-outline uppercase tracking-wider">CNG price</div>
+                <div className="text-[0.75rem] font-bold text-outline uppercase tracking-wider">CNG price</div>
                 <div
                   className={`font-extrabold mt-1 ${
                     station.cngPrice ? 'text-heading text-slate-900' : 'text-body-lg text-slate-300'
@@ -383,7 +383,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                 </div>
               </div>
               <div className="flex-1">
-                <div className="text-[12px] font-bold text-outline uppercase tracking-wider">Pump pressure</div>
+                <div className="text-[0.75rem] font-bold text-outline uppercase tracking-wider">Pump pressure</div>
                 <div
                   className={`font-extrabold mt-1 ${
                     station.pumpPressure ? 'text-heading text-slate-900' : 'text-body-lg text-slate-300'

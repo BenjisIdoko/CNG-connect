@@ -21,7 +21,7 @@ export const ReputationLevelModal: React.FC<ReputationLevelModalProps> = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Level up" bare className="max-w-sm">
       <div className="flex flex-col items-center text-center px-6 pt-8 pb-6">
-        <div className="w-[76px] h-[76px] rounded-full bg-[#FDF6E3] flex items-center justify-center text-[34px]">
+        <div className="w-[76px] h-[76px] rounded-full bg-[#FDF6E3] flex items-center justify-center text-[2.125rem]">
           <TierBadge tierId={tier.id} size={40} />
         </div>
         <h3 className="font-extrabold text-heading leading-tight mt-4">

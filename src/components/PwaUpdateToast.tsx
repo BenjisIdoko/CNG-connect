@@ -116,7 +116,7 @@ export const PwaUpdateToast: React.FC = () => {
             <WifiOff className="w-5 h-5 text-status-amber shrink-0" />
             <div>
               <p className="text-xs font-semibold text-slate-900">You are offline</p>
-              <p className="text-[12px] text-outline">Showing cached station map and data.</p>
+              <p className="text-[0.75rem] text-outline">Showing cached station map and data.</p>
             </div>
           </div>
           <button

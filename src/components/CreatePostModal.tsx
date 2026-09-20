@@ -108,7 +108,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
 
         {/* Station Group Policy Notice */}
         <div className="bg-surface-container rounded-2xl p-2.5 mb-4 flex items-center justify-between">
-          <span className="text-[13px] font-medium text-primary">
+          <span className="text-[0.8125rem] font-medium text-primary">
             Gas availability posts belong in Station Groups
           </span>
           <button
@@ -125,7 +125,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           {/* Category Selector */}
           <div>
-            <label className="block text-[14px] font-semibold text-on-surface-variant mb-1.5">
+            <label className="block text-[0.875rem] font-semibold text-on-surface-variant mb-1.5">
               Select Category
             </label>
             <div className="grid grid-cols-2 gap-2">
@@ -139,7 +139,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
                   key={c.id}
                   type="button"
                   onClick={() => setCategory(c.id as any)}
-                  className={`p-2.5 rounded-xl text-[14px] font-semibold flex items-center justify-center gap-1.5 border transition-all ${
+                  className={`p-2.5 rounded-xl text-[0.875rem] font-semibold flex items-center justify-center gap-1.5 border transition-all ${
                     category === c.id
                       ? 'bg-primary text-on-primary border-primary shadow-xs'
                       : 'bg-surface-container text-on-surface border-outline-variant hover:bg-surface-container-high'
@@ -156,7 +156,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
 
           {/* Title */}
           <div>
-            <label className="block text-[14px] font-semibold text-on-surface-variant mb-1">
+            <label className="block text-[0.875rem] font-semibold text-on-surface-variant mb-1">
               Title
             </label>
             <input
@@ -165,14 +165,14 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g. Best place for sequential CNG kit calibration?"
-              className="w-full bg-surface-container rounded-2xl p-3 text-[15px] font-medium text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary/30"
+              className="w-full bg-surface-container rounded-2xl p-3 text-[0.9375rem] font-medium text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary/30"
             />
           </div>
 
           {/* If Deals, Price field */}
           {category === 'deals' && (
             <div>
-              <label className="block text-[14px] font-semibold text-on-surface-variant mb-1" htmlFor="post-price">
+              <label className="block text-[0.875rem] font-semibold text-on-surface-variant mb-1" htmlFor="post-price">
                 Asking Price (Naira)
               </label>
               <div className="relative">
@@ -186,11 +186,11 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
                   value={price}
                   onChange={(e) => setPrice(e.target.value)}
                   placeholder="8,500,000"
-                  className="w-full bg-surface-container rounded-2xl p-3 pl-8 text-[15px] font-medium text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  className="w-full bg-surface-container rounded-2xl p-3 pl-8 text-[0.9375rem] font-medium text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary/30"
                 />
               </div>
               {priceError && (
-                <p role="alert" className="mt-1.5 text-[12.5px] font-semibold text-status-red">
+                <p role="alert" className="mt-1.5 text-[0.7812rem] font-semibold text-status-red">
                   {priceError}
                 </p>
               )}
@@ -199,7 +199,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
 
           {/* Content Body */}
           <div>
-            <label className="block text-[14px] font-semibold text-on-surface-variant mb-1">
+            <label className="block text-[0.875rem] font-semibold text-on-surface-variant mb-1">
               Details &amp; Description
             </label>
             <textarea
@@ -208,24 +208,24 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
               value={content}
               onChange={(e) => setContent(e.target.value)}
               placeholder="Provide more context, location, vehicle specs or symptoms..."
-              className="w-full bg-surface-container rounded-2xl p-3 text-[15px] font-normal text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary/30"
+              className="w-full bg-surface-container rounded-2xl p-3 text-[0.9375rem] font-normal text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary/30"
             />
           </div>
 
           {/* Image Upload (Live Camera Enforcement & Freshness Verified) */}
           <div>
             <div className="flex items-center justify-between mb-1">
-              <label className="block text-[14px] font-semibold text-on-surface-variant">
+              <label className="block text-[0.875rem] font-semibold text-on-surface-variant">
                 Attach Photo (Live Camera Only)
               </label>
-              <span className="text-[12px] font-semibold text-primary bg-surface-container px-2 py-0.5 rounded-full flex items-center gap-1">
+              <span className="text-[0.75rem] font-semibold text-primary bg-surface-container px-2 py-0.5 rounded-full flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-status-green animate-pulse" />
                 Anti-Misinformation Verified
               </span>
             </div>
 
             {imageError && (
-              <div className="mb-2 p-2.5 bg-status-red-container border rounded-xl text-status-red text-[12.5px] font-medium flex items-start gap-2">
+              <div className="mb-2 p-2.5 bg-status-red-container border rounded-xl text-status-red text-[0.7812rem] font-medium flex items-start gap-2">
                 <span className="material-symbols-outlined text-[16px] shrink-0 text-status-red">
                   gpp_bad
                 </span>
@@ -240,7 +240,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
                   alt="Verified live snapshot"
                   className="w-full h-32 object-cover"
                 />
-                <div className="absolute bottom-2 left-2 bg-primary/90 text-status-green text-[12px] font-bold px-2.5 py-1 rounded-full backdrop-blur-md flex items-center gap-1 border border-status-green/40">
+                <div className="absolute bottom-2 left-2 bg-primary/90 text-status-green text-[0.75rem] font-bold px-2.5 py-1 rounded-full backdrop-blur-md flex items-center gap-1 border border-status-green/40">
                   <span className="material-symbols-outlined text-[13px]">verified</span>
                   Fresh Camera Verified
                 </div>
@@ -262,12 +262,12 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
                 <button
                   type="button"
                   onClick={() => setShowLiveCamera(true)}
-                  className="w-full py-3.5 px-3 bg-primary hover:opacity-95 text-on-primary rounded-full font-bold text-[14px] shadow-xs flex items-center justify-center gap-2 active:scale-95 transition-all"
+                  className="w-full py-3.5 px-3 bg-primary hover:opacity-95 text-on-primary rounded-full font-bold text-[0.875rem] shadow-xs flex items-center justify-center gap-2 active:scale-95 transition-all"
                 >
                   <span className="material-symbols-outlined text-[20px] text-status-green shrink-0">photo_camera</span>
                   <span className="whitespace-nowrap">Take Live Photo</span>
                 </button>
-                <p className="text-[12px] font-normal text-outline text-center">
+                <p className="text-[0.75rem] font-normal text-outline text-center">
                   <Lock size={13} weight="fill" className="inline -mt-0.5 mr-1" />Photo gallery access is disabled to prevent old/fake queue posts.
                 </p>
               </div>
@@ -277,7 +277,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
           {/* Submit */}
           <button
             type="submit"
-            className="w-full h-13 mt-2 bg-primary hover:opacity-95 text-on-primary font-bold text-[15px] rounded-full shadow-md active:scale-[0.98] transition-all"
+            className="w-full h-13 mt-2 bg-primary hover:opacity-95 text-on-primary font-bold text-[0.9375rem] rounded-full shadow-md active:scale-[0.98] transition-all"
           >
             <span className="whitespace-nowrap">Publish Post</span>
           </button>

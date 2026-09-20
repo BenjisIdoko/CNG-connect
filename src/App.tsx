@@ -76,6 +76,9 @@ import {
 import { getDriverTier, DriverTier } from './utils/reputationEngine';
 import { ReputationLevelModal } from './components/ReputationLevelModal';
 import { apiService } from './services/apiService';
+import { ScreenSkeleton } from './components/common/Skeleton';
+import { PullToRefresh } from './components/common/PullToRefresh';
+import { useBackLayer } from './utils/backLayer';
 import { BellRinging, CheckCircle, Clock, MapPin, Warning, WarningOctagon } from '@phosphor-icons/react';
 
 type ToastTone = 'bell' | 'warn' | 'ok' | 'alert' | 'pin' | 'wait';
@@ -303,12 +306,12 @@ export const App: React.FC = () => {
   // Keep live data fresh while the app is open: without this the station list,
   // statuses and posts only load once at launch, so a driver sitting on the app
   // (or coming back to an installed PWA) never sees other drivers' reports.
-  const refreshLiveRef = useRef<() => void>(() => {});
+  const refreshLiveRef = useRef<() => Promise<unknown>>(() => Promise.resolve());
   const lastLiveRefreshRef = useRef(0);
   refreshLiveRef.current = () => {
-    if (!navigator.onLine) return;
+    if (!navigator.onLine) return Promise.resolve();
     lastLiveRefreshRef.current = Date.now();
-    apiService.fetchStations().then((data) => {
+    const stationsP = apiService.fetchStations().then((data) => {
       if (data.length === 0) return;
       updateStationsWithAlerts(data);
       const byId = new Map(data.map((st) => [st.id, st]));
@@ -316,9 +319,10 @@ export const App: React.FC = () => {
       setActiveDetailStation((prev) => (prev ? byId.get(prev.id) ?? prev : prev));
     });
     const key = userProfile.email || userProfile.phone || 'default_driver';
-    apiService.fetchPosts(key).then((data) => {
+    const postsP = apiService.fetchPosts(key).then((data) => {
       if (data.length > 0) setPosts(data);
     });
+    return Promise.all([stationsP, postsP]);
   };
   useEffect(() => {
     const onVisible = () => {
@@ -464,6 +468,12 @@ export const App: React.FC = () => {
       navigator.geolocation.clearWatch(watchId);
     };
   }, [userProfile, proximityAlertStation]);
+
+  // System back gesture / browser back closes the top-most screen instead of exiting the app.
+  useBackLayer(!!activeDetailStation, () => setActiveDetailStation(null));
+  useBackLayer(!!activeDiscussionPost, () => setActiveDiscussionPost(null));
+  useBackLayer(!!activeChatPost, () => setActiveChatPost(null));
+  useBackLayer(authMode === 'signup', () => setAuthMode(isAuthenticated ? null : 'onboarding'));
 
   const showToast = (msg: string, tone?: ToastTone) => {
     setGlobalToast({ msg, tone });
@@ -762,7 +772,7 @@ export const App: React.FC = () => {
 
       {/* Global Toast Notification */}
       {globalToast && (
-        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-[#141d19]/95 text-white text-[13.5px] font-bold px-5 py-2.5 rounded-full shadow-2xl backdrop-blur-md animate-fade-in border border-white/10 text-center max-w-sm pointer-events-none">
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-[#141d19]/95 text-white text-[0.8438rem] font-bold px-5 py-2.5 rounded-full shadow-2xl backdrop-blur-md animate-fade-in border border-white/10 text-center max-w-sm pointer-events-none">
           <span className="inline-flex items-center gap-2 justify-center">
             {globalToast.tone && (() => { const T = TOAST_ICONS[globalToast.tone]; return <T size={18} weight="fill" className={TOAST_COLORS[globalToast.tone]} />; })()}
             <span>{globalToast.msg}</span>
@@ -813,26 +823,23 @@ export const App: React.FC = () => {
       )}
 
       {/* Main Content Area — top pad clears the 56px header bar plus the safe-area inset it sits under */}
+      <PullToRefresh
+        onRefresh={() => refreshLiveRef.current()}
+        disabled={!(activeTab === 'community' || activeDetailStation)}
+      />
       <main
         className={`flex-1 overflow-y-auto relative lg:pt-[calc(3.5rem_+_max(env(safe-area-inset-top,0px),0.75rem))] lg:pb-24 lg:pl-64 ${
           isMapHome ? 'pt-0 pb-0' : isProfileHome ? 'pt-0 pb-24' : 'pt-[calc(3.5rem_+_max(env(safe-area-inset-top,0px),0.75rem))] pb-24'
         }`}
       >
         {!isOnline && (
-          <div className="fixed top-3 left-1/2 -translate-x-1/2 z-50 bg-deep-teal text-white text-[12.5px] font-extrabold px-4 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 animate-pulse pointer-events-none">
+          <div className="fixed top-3 left-1/2 -translate-x-1/2 z-50 bg-deep-teal text-white text-[0.7812rem] font-extrabold px-4 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 animate-pulse pointer-events-none">
             <span className="material-symbols-outlined text-[16px] text-amber-400">wifi_off</span>
             <span>No network. Showing last known stations.</span>
           </div>
         )}
         <Suspense
-          fallback={
-            <div className="flex-1 flex items-center justify-center p-12 min-h-[60vh]">
-              <div className="flex flex-col items-center gap-3">
-                <span className="w-9 h-9 border-3 border-primary border-t-transparent rounded-full animate-spin"></span>
-                <span className="text-xs font-semibold text-outline">Loading view...</span>
-              </div>
-            </div>
-          }
+          fallback={<ScreenSkeleton />}
         >
           {activeChatPost ? (
             <ChatScreen

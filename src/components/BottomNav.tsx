@@ -44,12 +44,12 @@ export const BottomNav: React.FC<BottomNavProps> = ({
               </span>
             </span>
             {tab.id === 'community' && unreadNotifications > 0 && (
-              <span className="absolute top-0 right-[22%] min-w-[16px] h-4 px-1 bg-status-red text-white text-[12px] font-bold rounded-full flex items-center justify-center border-2 border-white">
+              <span className="absolute top-0 right-[22%] min-w-[16px] h-4 px-1 bg-status-red text-white text-[0.75rem] font-bold rounded-full flex items-center justify-center border-2 border-white">
                 {unreadNotifications}
               </span>
             )}
             <span
-              className={`text-[12px] leading-none mt-1 ${
+              className={`text-[0.75rem] leading-none mt-1 ${
                 active ? 'font-extrabold text-slate-900' : 'font-semibold text-slate-400'
               }`}
             >

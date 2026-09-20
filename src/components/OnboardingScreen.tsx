@@ -76,12 +76,12 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
         <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/45 to-transparent" />
         <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/20 to-transparent" />
         <div className="absolute top-0 inset-x-0 pt-[max(env(safe-area-inset-top,0px),1.25rem)] px-6 flex items-center justify-between max-w-xl mx-auto">
-          <span className="text-[17px] font-extrabold text-white tracking-tight [text-shadow:0_1px_4px_rgba(0,0,0,0.4)]">
+          <span className="text-[1.0625rem] font-extrabold text-white tracking-tight [text-shadow:0_1px_4px_rgba(0,0,0,0.4)]">
             CNG&#8209;Connect
           </span>
           <button
             onClick={onStartLogin}
-            className="text-[14px] font-semibold text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.5)] active:opacity-70"
+            className="text-[0.875rem] font-semibold text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.5)] active:opacity-70"
           >
             Log in
           </button>
@@ -90,10 +90,10 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
 
       {/* Copy + controls */}
       <div className="flex-1 flex flex-col px-6 pt-6 pb-[max(env(safe-area-inset-bottom,0px),1.5rem)] max-w-xl mx-auto w-full">
-        <h1 key={`t-${activeSlide.id}`} className="text-[24px] leading-[1.25] font-bold tracking-tight animate-fade-in">
+        <h1 key={`t-${activeSlide.id}`} className="text-[1.5rem] leading-[1.25] font-bold tracking-tight animate-fade-in">
           {activeSlide.title}
         </h1>
-        <p className="mt-2.5 text-[15px] text-on-surface-variant leading-relaxed">{activeSlide.description}</p>
+        <p className="mt-2.5 text-[0.9375rem] text-on-surface-variant leading-relaxed">{activeSlide.description}</p>
 
         <div className="flex-1" />
 
@@ -114,17 +114,17 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
           <div className="flex flex-col gap-3">
             <button
               onClick={onStartSignUp}
-              className="w-full py-4 bg-primary text-white font-bold text-[15px] rounded-full flex items-center justify-center gap-2 shadow-[0_8px_18px_rgba(49,154,63,0.3)] active:scale-[0.98] transition-transform"
+              className="w-full py-4 bg-primary text-white font-bold text-[0.9375rem] rounded-full flex items-center justify-center gap-2 shadow-[0_8px_18px_rgba(49,154,63,0.3)] active:scale-[0.98] transition-transform"
             >
               Sign Up
               <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
             </button>
             <div className="flex items-center justify-center gap-8">
-              <button onClick={onStartLogin} className="text-[15px] font-semibold text-slate-900 py-1">
+              <button onClick={onStartLogin} className="text-[0.9375rem] font-semibold text-slate-900 py-1">
                 Log in
               </button>
               {onExploreAsGuest && (
-                <button onClick={onExploreAsGuest} className="text-[15px] font-semibold text-outline py-1">
+                <button onClick={onExploreAsGuest} className="text-[0.9375rem] font-semibold text-outline py-1">
                   Explore as guest
                 </button>
               )}
@@ -134,7 +134,7 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
           <div className="flex items-center justify-between">
             <button
               onClick={() => setCurrentSlide(slides.length - 1)}
-              className="text-[15px] font-semibold text-on-surface-variant py-2 pr-4"
+              className="text-[0.9375rem] font-semibold text-on-surface-variant py-2 pr-4"
             >
               Skip
             </button>

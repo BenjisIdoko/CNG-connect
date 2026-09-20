@@ -74,7 +74,7 @@ export const SuggestStationModal: React.FC<SuggestStationModalProps> = ({
             <div className="w-14 h-14 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center">
               <span className="material-symbols-outlined text-[36px]">verified</span>
             </div>
-            <h3 className="text-[20px] font-extrabold text-on-surface">Submission Received!</h3>
+            <h3 className="text-[1.25rem] font-extrabold text-on-surface">Submission Received!</h3>
             <p className="text-body font-medium text-outline max-w-sm">
               Thank you for contributing! Your suggested {stationType === 'ev_charging' ? 'EV charging point' : 'CNG station'} has been submitted for admin verification.
             </p>

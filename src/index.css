@@ -41,12 +41,12 @@
      Fruit Salad green = brand/available, International Orange = the one
      primary action (Report Status), Heavy Metal = dark surfaces,
      Spring Wood = warm page ground. */
-  --color-primary: #319A3F;
+  --color-primary: #288435; /* AA-adjusted from #319A3F so white text passes 4.5:1 */
   --color-primary-container: #E3F5E6;
   --color-on-primary-container: #1F6129;
   --color-on-primary: #ffffff;
   --color-deep-teal: #1F2923;
-  --color-accent: #F85B23;
+  --color-accent: #D0420C; /* AA-adjusted from #F85B23 so white text passes 4.5:1 */
   --color-accent-container: #FFF0EA;
   --color-on-accent: #ffffff;
 
@@ -88,7 +88,7 @@
   --color-on-surface: #1F2923;
   --color-on-surface-variant: #5C6B60;
   --color-on-background: #1F2923;
-  --color-outline: #8B9389;
+  --color-outline: #666F67; /* AA on white and cream for helper text */
   --color-outline-variant: #E4E2D8;
   --color-inverse-surface: #1F2923;
   --color-inverse-on-surface: #F6F5EF;
@@ -104,7 +104,7 @@
   --color-emerald-300: #8AD897;
   --color-emerald-400: #57C06A;
   --color-emerald-500: #3EAC4E;
-  --color-emerald-600: #319A3F;
+  --color-emerald-600: #288435;
   --color-emerald-700: #267A32;
   --color-emerald-800: #1F6129;
   --color-emerald-900: #1A4E23;
@@ -114,7 +114,7 @@
   --color-slate-100: #F1EFE6;
   --color-slate-200: #E4E2D8;
   --color-slate-300: #CBCFC4;
-  --color-slate-400: #8B9389;
+  --color-slate-400: #666F67;
   --color-slate-500: #5C6B60;
   --color-slate-600: #4A574E;
   --color-slate-700: #36423A;
@@ -205,3 +205,41 @@
 }
 
 
+
+/* ---- Accessibility & touch ---- */
+
+/* Respect the OS "Reduce motion" setting. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Let the OS / browser text-size setting scale rem-based text. */
+html {
+  font-size: 100%;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* Minimum 44x44 touch target (iOS HIG 44pt, M3 48dp) without changing how
+   small buttons look: the invisible hit area grows, the visible size doesn't. */
+@media (pointer: coarse) {
+  button, [role='button'], [role='tab'], summary {
+    position: relative;
+  }
+  button::after, [role='button']::after, [role='tab']::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    min-width: 44px;
+    min-height: 44px;
+    transform: translate(-50%, -50%);
+  }
+}
