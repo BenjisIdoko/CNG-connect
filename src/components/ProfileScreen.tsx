@@ -5,6 +5,8 @@ import { UserProfile } from '../types';
 import { ASSETS } from '../data/mockData';
 import { Modal } from './common/Modal';
 import { getDriverTier, DRIVER_TIERS } from '../utils/reputationEngine';
+import { ArrowRight } from '@phosphor-icons/react';
+import { TierBadge } from './common/TierBadge';
 
 interface ProfileScreenProps {
   user: UserProfile;
@@ -266,7 +268,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                     unlocked ? 'bg-primary-container' : 'bg-surface-dim/60 opacity-60 grayscale'
                   }`}
                 >
-                  {unlocked ? t.badgeIcon : <span className="material-symbols-outlined text-[16px] text-slate-500">lock</span>}
+                  {unlocked ? <TierBadge tierId={t.id} size={24} /> : <span className="material-symbols-outlined text-[16px] text-slate-500">lock</span>}
                 </div>
               );
             })}
@@ -284,7 +286,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
             <span className="text-caption font-semibold text-outline">/mo</span>
           </div>
           {onOpenRoiCalculator && (
-            <div className="text-micro font-bold text-emerald-700 mt-1">Open full calculator →</div>
+            <div className="text-micro font-bold text-emerald-700 mt-1"><span className="inline-flex items-center gap-1">Open full calculator <ArrowRight size={14} weight="bold" /></span></div>
           )}
         </div>
 

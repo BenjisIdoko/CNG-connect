@@ -120,7 +120,7 @@ export const SuggestStationModal: React.FC<SuggestStationModalProps> = ({
                   }`}
                 >
                   <span className="material-symbols-outlined text-[18px]">ev_charger</span>
-                  <span>⚡ EV Charger</span>
+                  <span>EV Charger</span>
                 </button>
               </div>
             </div>

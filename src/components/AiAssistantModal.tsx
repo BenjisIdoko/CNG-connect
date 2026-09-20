@@ -9,6 +9,10 @@ interface AiAssistantModalProps {
   onSelectStation?: (station: GasStation) => void;
 }
 
+// Minimal **bold** support so replies don't show raw asterisks.
+const renderRich = (text: string) =>
+  text.split(/\*\*(.+?)\*\*/g).map((part, i) => (i % 2 ? <strong key={i}>{part}</strong> : part));
+
 export const AiAssistantModal: React.FC<AiAssistantModalProps> = ({
   isOpen,
   onClose,
@@ -35,18 +39,18 @@ export const AiAssistantModal: React.FC<AiAssistantModalProps> = ({
       const sorted = [...safeStations].sort((a, b) => (b.pumpPressure || 0) - (a.pumpPressure || 0));
       const best = sorted[0];
       if (!best) return `No station pressure data currently available.`;
-      return `⚡ **${best.name}** currently has the highest pressure at **${best.pumpPressure} bar** (${best.statusLabel}). High pressure ensures your tank fills to 100% capacity faster!`;
+      return `**${best.name}** currently has the highest pressure at **${best.pumpPressure} bar** (${best.statusLabel}). High pressure ensures your tank fills to 100% capacity faster!`;
     } else if (lower.includes('save') || lower.includes('cost') || lower.includes('converting')) {
-      return `💰 **CNG Savings Estimate:**\n• Petrol price: ~₦1,100/liter\n• CNG price: **₦230/kg** at CNG stations\n• An average driver using 15kg/week saves approximately **₦78,500 monthly** (over **₦940,000 yearly**)!`;
+      return `**CNG Savings Estimate:**\n• Petrol price: ~₦1,100/liter\n• CNG price: **₦230/kg** at CNG stations\n• An average driver using 15kg/week saves approximately **₦78,500 monthly** (over **₦940,000 yearly**)!`;
     } else if (lower.includes('wuse') || lower.includes('best time')) {
-      return `🕒 **Total CNG - Wuse 2 Tip:** The queue is lightest between **7:00 AM - 8:30 AM** and **2:00 PM - 4:00 PM**. Current wait time is around **4 minutes** with 215 bar pressure.`;
+      return `**Total CNG - Wuse 2 Tip:** The queue is lightest between **7:00 AM - 8:30 AM** and **2:00 PM - 4:00 PM**. Current wait time is around **4 minutes** with 215 bar pressure.`;
     } else if (lower.includes('lagos')) {
       const lagosStations = safeStations.filter((s) => s.state && s.state.toLowerCase().includes('lagos'));
       if (lagosStations.length === 0) {
         return `No CNG stations currently listed in Lagos.`;
       }
       return (
-        `🇳🇬 Found **${lagosStations.length} CNG stations** in Lagos:\n` +
+        `Found **${lagosStations.length} CNG stations** in Lagos:\n` +
         lagosStations.map((s) => `• **${s.name}** (${s.city}) - ${s.statusLabel}, ₦${s.cngPrice}/kg`).join('\n')
       );
     } else {
@@ -140,13 +144,13 @@ export const AiAssistantModal: React.FC<AiAssistantModalProps> = ({
             }`}
           >
             <div
-              className={`max-w-[85%] rounded-2xl p-3.5 text-[15px] leading-relaxed shadow-xs ${
+              className={`max-w-[85%] whitespace-pre-line rounded-2xl p-3.5 text-[15px] leading-relaxed shadow-xs ${
                 m.role === 'user'
                   ? 'bg-primary text-white rounded-br-md font-medium'
                   : 'bg-white text-on-surface rounded-bl-md font-normal'
               }`}
             >
-              {m.text}
+              {renderRich(m.text)}
             </div>
           </div>
         ))}

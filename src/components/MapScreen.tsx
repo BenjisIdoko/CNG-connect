@@ -398,7 +398,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
           badgeBg: 'bg-emerald-50 border-emerald-200 text-primary',
           dotColor: 'bg-status-green',
           solidBg: 'bg-status-green',
-          shortLabel: '✓ Available',
+          shortLabel: 'Available',
           label: 'Full stock',
         };
       case 'queue':

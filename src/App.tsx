@@ -76,6 +76,18 @@ import {
 import { getDriverTier, DriverTier } from './utils/reputationEngine';
 import { ReputationLevelModal } from './components/ReputationLevelModal';
 import { apiService } from './services/apiService';
+import { BellRinging, CheckCircle, Clock, MapPin, Warning, WarningOctagon } from '@phosphor-icons/react';
+
+type ToastTone = 'bell' | 'warn' | 'ok' | 'alert' | 'pin' | 'wait';
+const TOAST_ICONS = { bell: BellRinging, warn: Warning, ok: CheckCircle, alert: WarningOctagon, pin: MapPin, wait: Clock };
+const TOAST_COLORS: Record<ToastTone, string> = {
+  bell: 'text-status-amber',
+  warn: 'text-status-amber',
+  ok: 'text-emerald-400',
+  alert: 'text-status-red',
+  pin: 'text-emerald-400',
+  wait: 'text-white/70',
+};
 
 const AdminPinsScreen = lazy(() =>
   import('./components/AdminPinsScreen').then((m) => ({ default: m.AdminPinsScreen }))
@@ -126,7 +138,7 @@ export const App: React.FC = () => {
   const [isRoiModalOpen, setIsRoiModalOpen] = useState(false);
   const [unlockedTierModal, setUnlockedTierModal] = useState<DriverTier | null>(null);
   const [proximityAlertStation, setProximityAlertStation] = useState<GasStation | null>(null);
-  const [globalToast, setGlobalToast] = useState<string | null>(null);
+  const [globalToast, setGlobalToast] = useState<{ msg: string; tone?: ToastTone } | null>(null);
   const [gpsStatus, setGpsStatus] = useState<GpsStatus>('unavailable');
 
   // Auth-Gated Onboarding & Registration State. Real identity (session +
@@ -214,10 +226,10 @@ export const App: React.FC = () => {
     const permission = await requestNotificationPermission();
     if (permission === 'granted') {
       setIsPushGranted(true);
-      showToast('🔔 Push alerts active for favorite & nearby stations!');
+      showToast('Push alerts active for favorite & nearby stations!', 'bell');
     } else if (permission === 'denied') {
       setIsPushGranted(false);
-      showToast('⚠️ Push notification permission blocked in browser settings.');
+      showToast('Push notification permission blocked in browser settings.', 'warn');
     }
   }, []);
 
@@ -244,9 +256,9 @@ export const App: React.FC = () => {
           if (evalResult.notify) {
             sendStationPushAlert(st, transition, evalResult.distanceKm);
             if (transition === 'recovered') {
-              showToast(`🟢 Pump Online: ${st.name} is back at Full Stock!`);
+              showToast(`Pump Online: ${st.name} is back at Full Stock!`, 'ok');
             } else {
-              showToast(`🔴 Alert: ${st.name} reported Out of Gas / Low Pressure!`);
+              showToast(`Alert: ${st.name} reported Out of Gas / Low Pressure!`, 'alert');
             }
           }
         }
@@ -416,7 +428,7 @@ export const App: React.FC = () => {
       if (nearbyStaleStation && (!proximityAlertStation || proximityAlertStation.id !== nearbyStaleStation.id)) {
         setProximityAlertStation(nearbyStaleStation);
         setStationCooldown(userKey, nearbyStaleStation.id);
-        showToast(`📍 Geofence Nudge: You arrived near ${nearbyStaleStation.name}`);
+        showToast(`Geofence Nudge: You arrived near ${nearbyStaleStation.name}`, 'pin');
       }
     };
 
@@ -453,8 +465,8 @@ export const App: React.FC = () => {
     };
   }, [userProfile, proximityAlertStation]);
 
-  const showToast = (msg: string) => {
-    setGlobalToast(msg);
+  const showToast = (msg: string, tone?: ToastTone) => {
+    setGlobalToast({ msg, tone });
     setTimeout(() => setGlobalToast(null), 3500);
   };
 
@@ -482,18 +494,18 @@ export const App: React.FC = () => {
     const onCooldown = isStationOnCooldown(userKey, candidate.id, 2);
 
     if (!stale) {
-      showToast(`⚠️ Nudge skipped for ${candidate.name}: Status is fresh (${candidate.lastUpdated}). Nudges require >30m staleness.`);
+      showToast(`Nudge skipped for ${candidate.name}: Status is fresh (${candidate.lastUpdated}). Nudges require >30m staleness.`, 'warn');
       return;
     }
 
     if (onCooldown) {
-      showToast(`⏳ Nudge skipped for ${candidate.name}: 2-hour user cooldown active.`);
+      showToast(`Nudge skipped for ${candidate.name}: 2-hour user cooldown active.`, 'wait');
       return;
     }
 
     setProximityAlertStation(candidate);
     setStationCooldown(userKey, candidate.id);
-    showToast(`📍 Geofence Alert: Arrived near ${candidate.name}`);
+    showToast(`Geofence Alert: Arrived near ${candidate.name}`, 'pin');
   };
 
   // Handlers
@@ -751,7 +763,10 @@ export const App: React.FC = () => {
       {/* Global Toast Notification */}
       {globalToast && (
         <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-[#141d19]/95 text-white text-[13.5px] font-bold px-5 py-2.5 rounded-full shadow-2xl backdrop-blur-md animate-fade-in border border-white/10 text-center max-w-sm pointer-events-none">
-          {globalToast}
+          <span className="inline-flex items-center gap-2 justify-center">
+            {globalToast.tone && (() => { const T = TOAST_ICONS[globalToast.tone]; return <T size={18} weight="fill" className={TOAST_COLORS[globalToast.tone]} />; })()}
+            <span>{globalToast.msg}</span>
+          </span>
         </div>
       )}
 

@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { loadGoogleMaps, hasGoogleMapsKey } from '../utils/googleMaps';
 import { parseCsv, toCsv } from '../utils/csv';
 import { FullStationEditorModal } from './FullStationEditorModal';
+import { ArrowLeft, ArrowRight, ArrowUpRight } from '@phosphor-icons/react';
 
 type Tier = 'source_exact' | 'rooftop' | 'street' | 'area' | 'city';
 const TIERS: Tier[] = ['rooftop', 'street', 'area', 'source_exact', 'city'];
@@ -583,7 +584,7 @@ export const AdminPinsScreen: React.FC<{ onExit: () => void }> = ({ onExit }) =>
           )}
           {authErr && <p className="text-xs text-rose-600 font-semibold">{authErr}</p>}
           <button onClick={onExit} className="text-xs text-slate-400 hover:text-slate-600 mt-1">
-            ← Back to app
+            <span className="inline-flex items-center gap-1"><ArrowLeft size={14} weight="bold" /> Back to app</span>
           </button>
         </div>
       </div>
@@ -787,7 +788,7 @@ export const AdminPinsScreen: React.FC<{ onExit: () => void }> = ({ onExit }) =>
                   rel="noreferrer"
                   className="font-semibold text-emerald-700 hover:underline"
                 >
-                  find on Google Maps ↗
+                  find on Google Maps <ArrowUpRight size={12} weight="bold" className="inline" />
                 </a>
                 <span className="text-slate-400">or drag the green pin</span>
               </div>
@@ -903,7 +904,7 @@ export const AdminPinsScreen: React.FC<{ onExit: () => void }> = ({ onExit }) =>
                   {!d.current && <p className="text-rose-600 mt-0.5">Unknown station id "{d.id}" — will be skipped.</p>}
                   {Object.entries(d.changes).map(([k, v]) => (
                     <p key={k} className="text-slate-600 mt-0.5">
-                      <span className="font-mono text-[12px] text-slate-400">{k}</span>: {v.from || '(empty)'} →{' '}
+                      <span className="font-mono text-[12px] text-slate-400">{k}</span>: {v.from || '(empty)'} <ArrowRight size={12} weight="bold" className="inline" />{' '}
                       <span className="font-semibold text-emerald-700">{v.to}</span>
                     </p>
                   ))}

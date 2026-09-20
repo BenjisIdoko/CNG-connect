@@ -3,6 +3,7 @@ import { ASSETS } from '../data/mockData';
 import { validatePhoneNumber } from '../utils/phoneValidator';
 import { validateEmail } from '../utils/emailValidator';
 import { useAuth } from '../context/AuthContext';
+import { Car, CheckCircle, Circle, Clock, Taxi, Truck, Van } from '@phosphor-icons/react';
 
 interface SignUpScreenProps {
   /** Called once the driver is fully signed in — for a returning driver this fires right after OTP verification; for a new driver, after they complete their profile. */
@@ -353,10 +354,10 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
                 <label className="block text-[12.5px] font-bold text-on-surface-variant mb-2">Vehicle Category</label>
                 <div className="grid grid-cols-2 gap-2">
                   {[
-                    { id: 'private', label: '🚗 Private Car', sub: 'Personal drive' },
-                    { id: 'taxi', label: '🚕 Taxi / E-Hailing', sub: 'Uber / Bolt / InDrive' },
-                    { id: 'keke', label: '🛺 Keke / Minibus', sub: 'Commercial transit' },
-                    { id: 'truck', label: '🚚 Heavy Truck / Bus', sub: 'Logistics' },
+                    { id: 'private', Icon: Car, label: 'Private Car', sub: 'Personal drive' },
+                    { id: 'taxi', Icon: Taxi, label: 'Taxi / E-Hailing', sub: 'Uber / Bolt / InDrive' },
+                    { id: 'keke', Icon: Van, label: 'Keke / Minibus', sub: 'Commercial transit' },
+                    { id: 'truck', Icon: Truck, label: 'Heavy Truck / Bus', sub: 'Logistics' },
                   ].map((v) => (
                     <button
                       key={v.id}
@@ -368,7 +369,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
                           : 'bg-surface text-on-surface border-outline-variant hover:bg-surface-container'
                       }`}
                     >
-                      <p className="font-bold text-[13.5px]">{v.label}</p>
+                      <p className="font-bold text-[13.5px] flex items-center gap-1.5"><v.Icon size={18} weight="duotone" className="shrink-0" />{v.label}</p>
                       <p className={`text-[12px] mt-0.5 ${vehicleType === v.id ? 'text-emerald-100' : 'text-outline'}`}>{v.sub}</p>
                     </button>
                   ))}
@@ -404,9 +405,9 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
                 <label className="block text-[12.5px] font-bold text-on-surface-variant mb-1.5">CNG Conversion Status</label>
                 <div className="flex flex-col gap-2">
                   {[
-                    { id: 'installed', label: '🟢 CNG Kit Already Installed', desc: 'Active AutoCNG driver' },
-                    { id: 'planning', label: '🟡 Planning to Convert Soon', desc: 'Looking for Pi-CNG conversion center' },
-                    { id: 'interested', label: '⚪ Interested in Conversion Grant', desc: 'Exploring presidential subsidy' },
+                    { id: 'installed', Icon: CheckCircle, label: 'CNG Kit Already Installed', desc: 'Active AutoCNG driver' },
+                    { id: 'planning', Icon: Clock, label: 'Planning to Convert Soon', desc: 'Looking for Pi-CNG conversion center' },
+                    { id: 'interested', Icon: Circle, label: 'Interested in Conversion Grant', desc: 'Exploring presidential subsidy' },
                   ].map((st) => (
                     <button
                       key={st.id}
@@ -418,7 +419,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
                           : 'bg-surface text-on-surface border-outline-variant hover:bg-surface-container'
                       }`}
                     >
-                      <p className="font-bold text-[14px]">{st.label}</p>
+                      <p className="font-bold text-[14px] flex items-center gap-1.5"><st.Icon size={18} weight="fill" className="shrink-0" />{st.label}</p>
                       <p className={`text-[12px] ${cngStatus === st.id ? 'text-emerald-100' : 'text-outline'}`}>{st.desc}</p>
                     </button>
                   ))}
