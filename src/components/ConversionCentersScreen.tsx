@@ -160,10 +160,11 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
               </button>
             </div>
           ) : (
-            filteredCenters.map((center) => (
+            filteredCenters.map((center, idx) => (
               <div
                 key={center.id}
-                className="bg-white rounded-2xl p-4 shadow-[0_4px_14px_rgba(14,20,32,0.05)] flex flex-col"
+                className={`bg-white rounded-2xl p-4 shadow-[0_4px_14px_rgba(14,20,32,0.05)] flex flex-col${idx < 8 ? ' rise-in' : ''}`}
+                style={idx < 8 ? ({ '--d': `${idx * 35}ms` } as React.CSSProperties) : undefined}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">

@@ -7,6 +7,7 @@ import { Modal } from './common/Modal';
 import { getDriverTier, DRIVER_TIERS } from '../utils/reputationEngine';
 import { Icon } from './common/Icon';
 import { TierBadge } from './common/TierBadge';
+import { CountUp } from './common/CountUp';
 
 interface ProfileScreenProps {
   user: UserProfile;
@@ -225,8 +226,8 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
 
           <div className="flex gap-2.5 mt-5">
             {[
-              { v: points.toLocaleString(), l: 'Points', big: true },
-              { v: String(user.reportsCount), l: 'Reports' },
+              { v: <CountUp value={points} format={(n) => n.toLocaleString()} />, l: 'Points', big: true },
+              { v: <CountUp value={user.reportsCount} />, l: 'Reports' },
               { v: String(user.reputationScore), l: 'Rating' },
             ].map((t) => (
               <div key={t.l} className="flex-1 bg-white/[0.06] rounded-[14px] py-2.5 text-center">

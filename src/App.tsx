@@ -79,6 +79,8 @@ import { apiService } from './services/apiService';
 import { ScreenSkeleton } from './components/common/Skeleton';
 import { PullToRefresh } from './components/common/PullToRefresh';
 import { formatRelativeTime, isIsoTimestamp } from './utils/timeUtils';
+import { SuccessBurst } from './components/common/SuccessBurst';
+import { haptic } from './utils/haptics';
 import { useBackLayer } from './utils/backLayer';
 import { Icon } from './components/common/Icon';
 
@@ -249,10 +251,25 @@ export const App: React.FC = () => {
   // Previous Station Status Map Ref for push notification transitions
   const prevStationStatusMapRef = useRef<Map<string, StationStatus>>(new Map());
 
+  // Stations whose status just changed pulse briefly on the map/list so a live
+  // update is noticeable. Cleared automatically.
+  const [flashIds, setFlashIds] = useState<Set<string>>(new Set());
+  const flashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const flashStations = useCallback((ids: string[]) => {
+    if (ids.length === 0) return;
+    setFlashIds((prev) => new Set([...prev, ...ids]));
+    if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
+    flashTimerRef.current = setTimeout(() => setFlashIds(new Set()), 2600);
+  }, []);
+  // "Report sent" confirmation after a driver submits.
+  const [burst, setBurst] = useState<{ status: StationStatus; key: number } | null>(null);
+
   // Helper function to update stations and evaluate status transition push alerts
   const updateStationsWithAlerts = useCallback((newStations: GasStation[]) => {
+    const changed: string[] = [];
     newStations.forEach((st) => {
       const prevStatus = prevStationStatusMapRef.current.get(st.id);
+      if (prevStatus && prevStatus !== st.status) changed.push(st.id);
       if (prevStatus && prevStatus !== st.status) {
         const transition = detectStatusTransition(prevStatus, st.status);
         if (transition) {
@@ -270,7 +287,8 @@ export const App: React.FC = () => {
       prevStationStatusMapRef.current.set(st.id, st.status);
     });
     setStations(newStations);
-  }, [userProfile, userCoords, favoriteStationIds]);
+    flashStations(changed);
+  }, [userProfile, userCoords, favoriteStationIds, flashStations]);
 
   // State-Level Scoping: Driver sees stations in their current/registered state
   const scopedStations = useMemo(() => {
@@ -544,6 +562,10 @@ export const App: React.FC = () => {
   const handleSubmitReport = async (newReport: DriverReport, newStatus: StationStatus) => {
     if (!reportingStation) return;
 
+    setBurst({ status: newStatus, key: Date.now() });
+    haptic(15);
+    flashStations([reportingStation.id]);
+
     const updatedStations = await apiService.submitReport(reportingStation.id, newReport, newStatus);
     updateStationsWithAlerts(updatedStations);
 
@@ -780,6 +802,8 @@ export const App: React.FC = () => {
       {showSplash && <SplashScreen onFinish={() => setShowSplash(false)} />}
 
       {/* Global Toast Notification */}
+      {burst && <SuccessBurst key={burst.key} status={burst.status} onDone={() => setBurst(null)} />}
+
       {globalToast && (
         <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-[#141d19]/95 text-white text-[0.8438rem] font-bold px-5 py-2.5 rounded-full shadow-2xl backdrop-blur-md animate-fade-in border border-white/10 text-center max-w-sm pointer-events-none">
           <span className="inline-flex items-center gap-2 justify-center">
@@ -876,6 +900,7 @@ export const App: React.FC = () => {
             />
           ) : activeTab === 'map' ? (
             <MapScreen
+              flashIds={flashIds}
               stations={stations}
               homeState={userProfile.state}
               selectedStation={selectedStation}

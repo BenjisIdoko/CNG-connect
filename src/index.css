@@ -280,3 +280,64 @@ html {
     transform: translate(-50%, -50%);
   }
 }
+
+/* ---- Motion ----
+   Only transform/opacity are animated (cheap on low-end phones); the global
+   prefers-reduced-motion rule above collapses all of these. */
+
+/* Whole marker layer eases in the first time markers are drawn */
+.markers-intro .leaflet-marker-pane { animation: rise-in 520ms cubic-bezier(0.2, 0.8, 0.3, 1) both; }
+
+@keyframes marker-bounce {
+  0% { transform: translateY(0) scale(1); }
+  35% { transform: translateY(-9px) scale(1.12); }
+  65% { transform: translateY(1px) scale(0.98); }
+  100% { transform: translateY(0) scale(1); }
+}
+.marker-bounce { animation: marker-bounce 420ms cubic-bezier(0.3, 0.7, 0.4, 1); }
+
+/* Expanding ring behind a marker whose status just changed */
+@keyframes ring-out {
+  0% { transform: scale(0.8); opacity: 0.85; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+.marker-ring {
+  position: absolute;
+  inset: 5px;
+  border-radius: 9999px;
+  border: 3px solid var(--ring, #319a3f);
+  animation: ring-out 1100ms ease-out 2;
+  pointer-events: none;
+}
+
+/* One-shot highlight on a station card whose status just changed */
+@keyframes card-flash {
+  0% { box-shadow: 0 0 0 0 var(--flash, rgba(40, 132, 53, 0.55)); transform: scale(1); }
+  40% { transform: scale(1.02); }
+  100% { box-shadow: 0 0 0 14px rgba(40, 132, 53, 0); transform: scale(1); }
+}
+.flash-ring { animation: card-flash 1100ms ease-out 2; }
+
+/* Report-sent confirmation */
+@keyframes burst-pop {
+  0% { transform: scale(0.4); opacity: 0; }
+  55% { transform: scale(1.12); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes burst-out {
+  to { opacity: 0; transform: translateY(-8px); }
+}
+@keyframes check-draw {
+  from { stroke-dashoffset: 30; }
+  to { stroke-dashoffset: 0; }
+}
+.burst-pop { animation: burst-pop 380ms cubic-bezier(0.2, 0.9, 0.3, 1.2) both; }
+.burst-out { animation: burst-out 220ms ease-in forwards; }
+.check-draw { stroke-dasharray: 30; animation: check-draw 320ms 160ms ease-out both; }
+
+/* Staggered fade-in for the first few list items */
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.rise-in { animation: rise-in 260ms ease-out both; animation-delay: var(--d, 0ms); }

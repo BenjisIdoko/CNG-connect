@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef, useMemo } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet.markercluster/dist/MarkerCluster.css';
@@ -12,6 +12,7 @@ import { ASSETS } from '../data/mockData';
 import { Modal } from './common/Modal';
 import { SuggestStationModal } from './SuggestStationModal';
 import { formatStationAge } from '../utils/timeUtils';
+import { prefersReducedMotion } from '../utils/haptics';
 import { openWhatsAppShare } from '../utils/shareMessageBuilder';
 import { getPinConfidence, getAccuracyRadiusM } from '../utils/locationPrecision';
 import { isSameState } from '../utils/proximityAlertEngine';
@@ -41,6 +42,8 @@ interface MapScreenProps {
   onGpsStatusChange?: (status: GpsStatus, coords?: { lat: number; lng: number }) => void;
   onSuggestStation?: (suggestion: Omit<StationSuggestion, 'id' | 'createdAt' | 'status'>) => void;
   onOpenAiAssistant?: () => void;
+  /** Stations whose status just changed — they pulse briefly. */
+  flashIds?: Set<string>;
 }
 
 export const MapScreen: React.FC<MapScreenProps> = ({
@@ -55,6 +58,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
   onGpsStatusChange,
   onSuggestStation,
   onOpenAiAssistant,
+  flashIds,
 }) => {
   const [activeFilter, setActiveFilter] = useState<string>('all');
   const [stationTypeFilter, setStationTypeFilter] = useState<'all' | 'cng' | 'ev_charging'>('all');
@@ -67,6 +71,77 @@ export const MapScreen: React.FC<MapScreenProps> = ({
   const [maxDistanceKm, setMaxDistanceKm] = useState<number>(0); // 0 = any distance
   const [sheetMode, setSheetMode] = useState<'standard' | 'expanded' | 'collapsed'>('standard');
   const toggleSheetMode = () => setSheetMode((prev) => (prev === 'expanded' ? 'standard' : 'expanded'));
+
+  // ---- Bottom sheet: drag to collapse / expand, with a FLIP slide between heights ----
+  const sheetRef = useRef<HTMLDivElement | null>(null);
+  const sheetHeightRef = useRef(0);
+  const lastModeRef = useRef(sheetMode);
+  const dragOffsetRef = useRef(0);
+  const dragRef = useRef<{ startY: number; t: number; moved: boolean } | null>(null);
+
+  useLayoutEffect(() => {
+    const el = sheetRef.current;
+    if (!el) return;
+    const newH = el.offsetHeight;
+    if (lastModeRef.current !== sheetMode && sheetHeightRef.current && !prefersReducedMotion()) {
+      // The layout already jumped to the new height; start visually where the old top edge
+      // was (plus any drag offset), then glide to the resting position.
+      const start = newH - sheetHeightRef.current + dragOffsetRef.current;
+      el.style.transition = 'none';
+      el.style.transform = `translateY(${start}px)`;
+      void el.offsetHeight; // commit the start position
+      el.style.transition = 'transform 320ms cubic-bezier(0.2, 0.8, 0.2, 1)';
+      el.style.transform = '';
+    }
+    lastModeRef.current = sheetMode;
+    dragOffsetRef.current = 0;
+    sheetHeightRef.current = newH;
+  }, [sheetMode]);
+
+  const nextSheetMode = (dir: 'up' | 'down') => {
+    if (dir === 'down') return sheetMode === 'expanded' ? 'standard' : 'collapsed';
+    return sheetMode === 'collapsed' ? 'standard' : 'expanded';
+  };
+  const onSheetPointerDown = (e: React.PointerEvent<HTMLButtonElement>) => {
+    dragRef.current = { startY: e.clientY, t: Date.now(), moved: false };
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {
+      /* synthetic/unsupported pointer: dragging still works while over the handle */
+    }
+    if (sheetRef.current) sheetRef.current.style.transition = 'none';
+  };
+  const onSheetPointerMove = (e: React.PointerEvent<HTMLButtonElement>) => {
+    const d = dragRef.current;
+    if (!d || !sheetRef.current) return;
+    const dy = e.clientY - d.startY;
+    if (Math.abs(dy) > 6) d.moved = true;
+    // 1:1 downward, rubber-banded upward
+    const offset = dy > 0 ? dy : Math.max(-80, dy * 0.4);
+    dragOffsetRef.current = offset;
+    sheetRef.current.style.transform = `translateY(${offset}px)`;
+  };
+  const onSheetPointerEnd = (e: React.PointerEvent<HTMLButtonElement>) => {
+    const d = dragRef.current;
+    dragRef.current = null;
+    if (!d) return;
+    const dy = e.clientY - d.startY;
+    const fast = Math.abs(dy) / Math.max(1, Date.now() - d.t) > 0.5;
+    if (!d.moved) {
+      dragOffsetRef.current = 0;
+      if (sheetRef.current) sheetRef.current.style.transform = '';
+      toggleSheetMode();
+      return;
+    }
+    if (dy > 70 || (fast && dy > 25)) setSheetMode(nextSheetMode('down'));
+    else if (dy < -50 || (fast && dy < -25)) setSheetMode(nextSheetMode('up'));
+    else if (sheetRef.current) {
+      // not far enough: spring back
+      dragOffsetRef.current = 0;
+      sheetRef.current.style.transition = 'transform 260ms cubic-bezier(0.2, 0.8, 0.2, 1)';
+      sheetRef.current.style.transform = '';
+    }
+  };
   const [isRecentering, setIsRecentering] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [visibleCount, setVisibleCount] = useState(25);
@@ -252,6 +327,16 @@ export const MapScreen: React.FC<MapScreenProps> = ({
     };
   }, []);
 
+  // Which marker should bounce (set when the selection changes) and whether the intro
+  // fade has played. Computed during render so the marker effect below can read it.
+  const bounceIdRef = useRef<string | null>(null);
+  const prevSelectedIdRef = useRef<string | undefined>(undefined);
+  if (prevSelectedIdRef.current !== selectedStation?.id) {
+    if (prevSelectedIdRef.current !== undefined) bounceIdRef.current = selectedStation?.id ?? null;
+    prevSelectedIdRef.current = selectedStation?.id;
+  }
+  const markersIntroDoneRef = useRef(false);
+
   useEffect(() => {
     if (!mapInstanceRef.current || !markersLayerRef.current) return;
     markersLayerRef.current.clearLayers();
@@ -279,7 +364,8 @@ export const MapScreen: React.FC<MapScreenProps> = ({
         html: `
           <div class="relative flex items-center justify-center" style="width:40px;height:40px;" title="${isApprox ? 'Approximate location' : ''}">
             ${isApprox ? '<div style="position:absolute;inset:0;border:1.5px dashed ${colorClass}99;border-radius:9999px"></div>' : ''}
-            <div class="rounded-full flex items-center justify-center transition-transform ${isSelected ? 'scale-125' : ''}" style="width:30px;height:30px;background:${isApprox ? '#ffffff' : colorClass};border:${isApprox ? '2.5px dashed ' + colorClass : '3px solid #ffffff'};box-shadow:0 2px 8px rgba(31,41,35,0.35), 0 0 0 4px ${colorClass}${isApprox ? '00' : '44'}${isSelected ? ', 0 0 0 7px rgba(31,41,35,0.85)' : ''};">
+            ${flashIds?.has(st.id) ? `<div class="marker-ring" style="--ring:${colorClass}"></div>` : ''}
+            <div class="rounded-full flex items-center justify-center transition-transform ${isSelected ? 'scale-125' : ''} ${bounceIdRef.current === st.id ? 'marker-bounce' : ''}" style="width:30px;height:30px;background:${isApprox ? '#ffffff' : colorClass};border:${isApprox ? '2.5px dashed ' + colorClass : '3px solid #ffffff'};box-shadow:0 2px 8px rgba(31,41,35,0.35), 0 0 0 4px ${colorClass}${isApprox ? '00' : '44'}${isSelected ? ', 0 0 0 7px rgba(31,41,35,0.85)' : ''};">
               <span class="material-symbols-outlined" style="font-size:15px;color:${isApprox ? colorClass : '#fff'}">${iconSymbol}</span>
             </div>
           </div>
@@ -298,6 +384,15 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       markersLayerRef.current?.addLayer(marker);
     });
 
+    bounceIdRef.current = null;
+    if (!markersIntroDoneRef.current && filteredStations.length > 0) {
+      // One-time fade/rise of the whole marker layer on first render.
+      markersIntroDoneRef.current = true;
+      const container = mapInstanceRef.current.getContainer();
+      container.classList.add('markers-intro');
+      window.setTimeout(() => container.classList.remove('markers-intro'), 800);
+    }
+
     if (userGps) {
       const gpsMarker = L.circleMarker([userGps.lat, userGps.lng], {
         radius: 9,
@@ -308,7 +403,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       });
       markersLayerRef.current?.addLayer(gpsMarker);
     }
-  }, [filteredStations, selectedStation, userGps]);
+  }, [filteredStations, selectedStation, userGps, flashIds]);
 
   useEffect(() => {
     if (!mapInstanceRef.current || !selectedStation) return;
@@ -555,13 +650,22 @@ export const MapScreen: React.FC<MapScreenProps> = ({
         </button>
 
         <div
-          className={`w-full bg-surface-container rounded-t-[24px] shadow-[0_-8px_24px_rgba(0,0,0,0.25)] pointer-events-auto transition-all duration-300 flex flex-col overflow-hidden ${
-            sheetMode === 'expanded' ? 'h-[calc(100dvh-8rem)]' : ''
+          ref={sheetRef}
+          className={`w-full bg-surface-container rounded-t-[24px] shadow-[0_-8px_24px_rgba(0,0,0,0.25),0_100vh_0_0_#F1EFE6] pointer-events-auto flex flex-col overflow-hidden will-change-transform ${
+            sheetMode === 'expanded' ? 'h-[calc(100dvh-8rem)]' : sheetMode === 'collapsed' ? 'pb-24' : ''
           }`}
         >
           <button
-            onClick={toggleSheetMode}
-            aria-label="Toggle station list size"
+            onPointerDown={onSheetPointerDown}
+            onPointerMove={onSheetPointerMove}
+            onPointerUp={onSheetPointerEnd}
+            onPointerCancel={onSheetPointerEnd}
+            onClick={(e) => {
+              // keyboard activation only; pointer taps are handled on pointer-up
+              if (e.detail === 0) toggleSheetMode();
+            }}
+            style={{ touchAction: 'none' }}
+            aria-label="Station list size — drag or tap to change"
             className="w-full pt-2.5 pb-1 px-5 flex flex-col items-center shrink-0"
           >
             <div className="w-10 h-1.5 bg-slate-900/15 rounded-full mb-2.5" />
@@ -577,7 +681,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
             </div>
           </button>
 
-          {filteredStations.length === 0 ? (
+          {sheetMode === 'collapsed' ? null : filteredStations.length === 0 ? (
             <div className="px-5 pt-4 pb-28 text-center flex flex-col items-center gap-2">
               <h4 className="font-extrabold text-on-surface text-body-lg">No stations found</h4>
               <p className="text-caption text-on-surface-variant max-w-xs">
@@ -608,7 +712,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                       onSelectStation(st);
                       onOpenStationDetails(st);
                     }}
-                    className="w-40 shrink-0 bg-white rounded-2xl overflow-hidden text-left shadow-[0_4px_14px_rgba(14,20,32,0.07)] active:scale-[0.98] transition-transform"
+                    className={`w-40 shrink-0 bg-white rounded-2xl overflow-hidden text-left shadow-[0_4px_14px_rgba(14,20,32,0.07)] active:scale-[0.98] transition-transform ${flashIds?.has(st.id) ? 'flash-ring' : ''}`}
                   >
                     <div className="h-20 bg-surface-container-high">
                       <img src={st.images?.[0] || ASSETS.stationWide} alt="" className="w-full h-full object-cover" />
@@ -631,7 +735,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
             </div>
           ) : (
             <div className="px-5 pt-2 pb-28 overflow-y-auto flex-1 hide-scrollbar flex flex-col gap-2">
-              {filteredStations.slice(0, visibleCount).map((station) => {
+              {filteredStations.slice(0, visibleCount).map((station, idx) => {
                 const info = getStatusIndicator(station.status);
                 const isUnknown = station.status === 'unknown';
                 const age = formatStationAge(station).replace(/^Updated /, '');
@@ -647,7 +751,8 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                       onSelectStation(station);
                       onOpenStationDetails(station);
                     }}
-                    className="bg-white rounded-2xl p-3 flex items-center gap-3 shadow-[0_4px_14px_rgba(14,20,32,0.05)] cursor-pointer active:scale-[0.99] transition-transform"
+                    className={`bg-white rounded-2xl p-3 flex items-center gap-3 shadow-[0_4px_14px_rgba(14,20,32,0.05)] cursor-pointer active:scale-[0.99] transition-transform ${flashIds?.has(station.id) ? 'flash-ring' : ''}${idx < 8 ? ' rise-in' : ''}`}
+                    style={idx < 8 ? ({ '--d': `${idx * 35}ms` } as React.CSSProperties) : undefined}
                   >
                     <div className="w-12 h-12 rounded-xl overflow-hidden bg-surface-container-high shrink-0">
                       <img src={station.images?.[0] || ASSETS.stationWide} alt="" className="w-full h-full object-cover" />
@@ -781,7 +886,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                 <div
                   key={`desktop-${station.id}`}
                   onClick={() => onSelectStation(station)}
-                  className={`p-4 rounded-2xl transition-all cursor-pointer ${
+                  className={`p-4 rounded-2xl transition-all cursor-pointer ${flashIds?.has(station.id) ? 'flash-ring ' : ''}${
                     isSelected
                       ? 'bg-white ring-2 ring-primary shadow-[0_6px_18px_rgba(49,154,63,0.18)]'
                       : 'bg-white shadow-[0_4px_14px_rgba(31,41,35,0.05)] hover:shadow-[0_6px_18px_rgba(31,41,35,0.1)]'

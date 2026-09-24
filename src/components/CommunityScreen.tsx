@@ -163,12 +163,21 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
       {/* Sticky Top Bar: Main Segment Control + Search */}
       <div className="sticky top-0 z-30 bg-surface/95 backdrop-blur-md py-3 px-4 md:px-6 shadow-[0_2px_10px_rgba(31,41,35,0.04)] max-w-4xl mx-auto flex flex-col gap-2">
         {/* Main Section Tab Switcher */}
-        <div className="flex bg-surface-container p-1 rounded-full">
+        <div className="relative flex bg-surface-container p-1 rounded-full">
+          {/* Sliding pill behind the active tab */}
+          <span
+            aria-hidden
+            className="absolute top-1 bottom-1 left-1 rounded-full bg-deep-teal shadow-xs transition-transform duration-300 ease-[cubic-bezier(0.3,1,0.4,1)]"
+            style={{
+              width: `calc((100% - 8px) / ${SHOW_LEADERBOARD ? 3 : 2})`,
+              transform: `translateX(${['station_groups', 'general', 'leaderboard'].indexOf(activeMainTab) * 100}%)`,
+            }}
+          />
           <button
             onClick={() => setActiveMainTab('station_groups')}
-            className={`flex-1 py-2.5 rounded-full text-caption font-bold transition-all text-center ${
+            className={`relative z-10 flex-1 py-2.5 rounded-full text-caption font-bold transition-colors text-center ${
               activeMainTab === 'station_groups'
-                ? 'bg-deep-teal text-white shadow-xs'
+                ? 'text-white'
                 : 'text-on-surface-variant hover:text-on-surface'
             }`}
           >
@@ -177,9 +186,9 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
 
           <button
             onClick={() => setActiveMainTab('general')}
-            className={`flex-1 py-2.5 rounded-full text-caption font-bold transition-all text-center ${
+            className={`relative z-10 flex-1 py-2.5 rounded-full text-caption font-bold transition-colors text-center ${
               activeMainTab === 'general'
-                ? 'bg-deep-teal text-white shadow-xs'
+                ? 'text-white'
                 : 'text-on-surface-variant hover:text-on-surface'
             }`}
           >
@@ -189,9 +198,9 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
           {SHOW_LEADERBOARD && (
             <button
               onClick={() => setActiveMainTab('leaderboard')}
-              className={`flex-1 py-2.5 rounded-full text-caption font-bold transition-all text-center flex items-center justify-center gap-1 ${
+              className={`relative z-10 flex-1 py-2.5 rounded-full text-caption font-bold transition-colors text-center flex items-center justify-center gap-1 ${
                 activeMainTab === 'leaderboard'
-                  ? 'bg-deep-teal text-white shadow-xs'
+                  ? 'text-white'
                   : 'text-on-surface-variant hover:text-on-surface'
               }`}
             >

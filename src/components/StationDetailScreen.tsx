@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as TabsPrimitive from '@radix-ui/react-tabs';
+import { TabUnderline } from './common/TabUnderline';
 import { GasStation, CommentItem, UserProfile } from '../types';
 import { ASSETS } from '../data/mockData';
 import { openExternalMaps, openGoogleMapsPin } from '../utils/navigationHelper';
@@ -54,6 +55,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
   const [copiedNotification, setCopiedNotification] = useState(false);
   const copiedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [activeTab, setActiveTab] = useState<'feed' | 'reports' | 'photos'>('reports');
+  const tabListRef = useRef<HTMLDivElement | null>(null);
   const [isPresenceActiveState, setIsPresenceActiveState] = useState<boolean>(isPresenceActive);
   const [showInfoSheet, setShowInfoSheet] = useState(false);
   const [showFullTitle, setShowFullTitle] = useState(false);
@@ -437,25 +439,26 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
 
         {/* Radix Accessible 3-Way Tabs Switcher */}
         <TabsPrimitive.Root value={activeTab} onValueChange={(val) => setActiveTab(val as 'feed' | 'reports' | 'photos')} className="w-full">
-          <TabsPrimitive.List className="flex gap-6 border-b border-surface-container-highest">
+          <TabsPrimitive.List ref={tabListRef} className="relative flex gap-6 border-b border-surface-container-highest">
             <TabsPrimitive.Trigger
               value="feed"
-              className="pb-2.5 -mb-px text-caption font-semibold text-outline border-b-2 border-transparent transition-colors data-[state=active]:text-slate-900 data-[state=active]:font-extrabold data-[state=active]:border-primary focus:outline-none"
+              className="pb-2.5 -mb-px text-caption font-semibold text-outline border-b-2 border-transparent transition-colors data-[state=active]:text-slate-900 data-[state=active]:font-extrabold focus:outline-none"
             >
               Chat{comments.length > 0 ? ` · ${comments.length}` : ''}
             </TabsPrimitive.Trigger>
             <TabsPrimitive.Trigger
               value="reports"
-              className="pb-2.5 -mb-px text-caption font-semibold text-outline border-b-2 border-transparent transition-colors data-[state=active]:text-slate-900 data-[state=active]:font-extrabold data-[state=active]:border-primary focus:outline-none"
+              className="pb-2.5 -mb-px text-caption font-semibold text-outline border-b-2 border-transparent transition-colors data-[state=active]:text-slate-900 data-[state=active]:font-extrabold focus:outline-none"
             >
               Reports{reports.length > 0 ? ` · ${reports.length}` : ''}
             </TabsPrimitive.Trigger>
             <TabsPrimitive.Trigger
               value="photos"
-              className="pb-2.5 -mb-px text-caption font-semibold text-outline border-b-2 border-transparent transition-colors data-[state=active]:text-slate-900 data-[state=active]:font-extrabold data-[state=active]:border-primary focus:outline-none"
+              className="pb-2.5 -mb-px text-caption font-semibold text-outline border-b-2 border-transparent transition-colors data-[state=active]:text-slate-900 data-[state=active]:font-extrabold focus:outline-none"
             >
               Photos{images.length > 0 ? ` · ${images.length}` : ''}
             </TabsPrimitive.Trigger>
+            <TabUnderline listRef={tabListRef} active={activeTab} deps={[comments.length, reports.length, images.length]} />
           </TabsPrimitive.List>
 
           {/* TAB CONTENT 1: Station Group Chat Feed & Discussion */}
