@@ -111,7 +111,7 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
       authorAvatar: user?.avatar || '',
       verified: isPhotoVerified,
       isPhotoVerified: isPhotoVerified,
-      timestamp: 'Just now',
+      timestamp: new Date().toISOString(),
       status: selectedStatus,
       statusLabel: statusLabels[selectedStatus],
       waitMinutes: waitTime,

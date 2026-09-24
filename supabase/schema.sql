@@ -520,7 +520,7 @@ BEGIN
   UPDATE stations
      SET status = p_status,
          status_label = p_status_label,
-         last_updated = 'Just now'
+         last_updated = to_char(now() AT TIME ZONE 'utc', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')
    WHERE id = p_station_id;
 
   IF NOT FOUND THEN

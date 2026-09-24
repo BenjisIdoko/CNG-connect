@@ -43,7 +43,7 @@ export const ProximityAlertBanner: React.FC<ProximityAlertBannerProps> = ({
       authorAvatar: '',
       verified: false,
       isPhotoVerified: false,
-      timestamp: 'Just now',
+      timestamp: new Date().toISOString(),
       status: status,
       statusLabel: statusLabels[status],
       comment: `1-tap geofence update near ${station.name}`,

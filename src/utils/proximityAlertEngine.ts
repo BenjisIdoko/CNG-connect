@@ -9,6 +9,7 @@
 
 export function isStationStale(lastUpdated?: string, thresholdMinutes: number = 30): boolean {
   if (!lastUpdated) return true;
+  if (isIsoTimestamp(lastUpdated)) return minutesSince(lastUpdated) >= thresholdMinutes;
   const str = lastUpdated.toLowerCase().trim();
 
   if (str === 'just now' || str === '1 min ago' || str === '2 min ago' || str === '3 min ago') {
@@ -71,6 +72,7 @@ export function getDistanceInKm(lat1: number, lon1: number, lat2: number, lon2: 
 }
 
 import { normalizeStateName } from './permissionManager';
+import { isIsoTimestamp, minutesSince } from './timeUtils';
 
 export { normalizeStateName };
 

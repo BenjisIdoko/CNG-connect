@@ -83,7 +83,9 @@ describe('Verification Weighting & Level Calculation', () => {
     expect(updatedTarget).toBeDefined();
     expect(updatedTarget?.status).toBe('out');
     expect(updatedTarget?.statusLabel).toBe('Out of gas');
-    expect(updatedTarget?.lastUpdated).toBe('Just now');
+    // A real timestamp (not the literal 'Just now', which never ages).
+    expect(Number.isNaN(Date.parse(updatedTarget?.lastUpdated ?? ''))).toBe(false);
+    expect(Date.now() - Date.parse(updatedTarget!.lastUpdated)).toBeLessThan(5000);
     expect(updatedTarget?.reports.some((r) => r.id === testReport.id)).toBe(true);
 
     // Simulate page reload (re-querying fetchStations)

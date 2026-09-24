@@ -78,6 +78,7 @@ import { ReputationLevelModal } from './components/ReputationLevelModal';
 import { apiService } from './services/apiService';
 import { ScreenSkeleton } from './components/common/Skeleton';
 import { PullToRefresh } from './components/common/PullToRefresh';
+import { formatRelativeTime, isIsoTimestamp } from './utils/timeUtils';
 import { useBackLayer } from './utils/backLayer';
 import { Icon } from './components/common/Icon';
 
@@ -512,7 +513,7 @@ export const App: React.FC = () => {
     const onCooldown = isStationOnCooldown(userKey, candidate.id, 2);
 
     if (!stale) {
-      showToast(`Nudge skipped for ${candidate.name}: Status is fresh (${candidate.lastUpdated}). Nudges require >30m staleness.`, 'warn');
+      showToast(`Nudge skipped for ${candidate.name}: Status is fresh (${isIsoTimestamp(candidate.lastUpdated) ? formatRelativeTime(candidate.lastUpdated) : candidate.lastUpdated}). Nudges require >30m staleness.`, 'warn');
       return;
     }
 

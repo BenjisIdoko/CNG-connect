@@ -106,6 +106,20 @@ function applyStationTypeVisibility(stations: GasStation[]): GasStation[] {
   return SHOW_EV_STATIONS ? stations : stations.filter((s) => s.stationType !== 'ev_charging');
 }
 
+// Older builds cached the literal text 'Just now' as a station/report time. It can
+// never age, so treat it as "unknown time" instead of showing it as fresh forever.
+function dropLegacyJustNow(stations: GasStation[]): GasStation[] {
+  return stations.map((st) => {
+    const needsFix = st.lastUpdated === 'Just now' || st.reports?.some((r) => r.timestamp === 'Just now');
+    if (!needsFix) return st;
+    return {
+      ...st,
+      lastUpdated: st.lastUpdated === 'Just now' ? '' : st.lastUpdated,
+      reports: st.reports?.map((r) => (r.timestamp === 'Just now' ? { ...r, timestamp: '' } : r)),
+    };
+  });
+}
+
 function getLocalStations(): GasStation[] {
   purgeStaleLocalStorage();
   try {
@@ -115,7 +129,7 @@ function getLocalStations(): GasStation[] {
     if (!Array.isArray(parsed) || parsed.length === 0) {
       return applyStationTypeVisibility(deduplicateStations(INITIAL_STATIONS));
     }
-    return applyStationTypeVisibility(deduplicateStations(parsed));
+    return applyStationTypeVisibility(deduplicateStations(dropLegacyJustNow(parsed)));
   } catch {
     return applyStationTypeVisibility(deduplicateStations(INITIAL_STATIONS));
   }
@@ -189,7 +203,9 @@ export const apiService = {
               isPhotoVerified: r.is_photo_verified,
               verificationLevel: r.verification_level as VerificationLevel,
               verificationWeight: Number(r.verification_weight || 0.5),
-              timestamp: r.timestamp,
+              // `timestamp` is stored as the literal text 'Just now' (never advances), so
+              // derive the real time from created_at.
+              timestamp: r.created_at || (r.timestamp === 'Just now' ? '' : r.timestamp),
               status: r.status as StationStatus,
               statusLabel: r.status_label,
               waitMinutes: r.wait_minutes,
@@ -238,7 +254,10 @@ export const apiService = {
             priceTrend: s.price_trend || undefined,
             pumpPressure: s.pump_pressure != null ? Number(s.pump_pressure) : undefined,
             busyEstimate: s.busy_estimate || undefined,
-            lastUpdated: s.last_updated || '',
+            // stations.last_updated is also the literal 'Just now' after any report; the
+            // newest report's real time is the truth.
+            lastUpdated:
+              stationReports[0]?.timestamp || (s.last_updated === 'Just now' ? '' : s.last_updated || ''),
             verifiedByCommunity: s.verified_by_community ?? false,
             isPiCngAccredited: s.is_picng_accredited ?? false,
             operator: s.operator,
@@ -316,7 +335,7 @@ export const apiService = {
           ...st,
           status: newStatus,
           statusLabel: statusLabels[newStatus],
-          lastUpdated: 'Just now',
+          lastUpdated: new Date().toISOString(),
           reports: [enrichedReport, ...filteredReports],
         };
       }
@@ -412,7 +431,7 @@ export const apiService = {
                 ...st,
                 status: newStatus,
                 statusLabel: statusLabels[newStatus],
-                lastUpdated: 'Just now',
+                lastUpdated: new Date().toISOString(),
                 reports,
               };
             }

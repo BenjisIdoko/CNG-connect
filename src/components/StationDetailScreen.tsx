@@ -4,7 +4,7 @@ import { GasStation, CommentItem, UserProfile } from '../types';
 import { ASSETS } from '../data/mockData';
 import { openExternalMaps, openGoogleMapsPin } from '../utils/navigationHelper';
 import { StationGroupInfoSheet } from './StationGroupInfoSheet';
-import { formatStationAge } from '../utils/timeUtils';
+import { formatStationAge, formatRelativeTime, isIsoTimestamp, minutesSince } from '../utils/timeUtils';
 import { openWhatsAppShare } from '../utils/shareMessageBuilder';
 import { describeLocationPrecision } from '../utils/locationPrecision';
 import { EditStationLocationModal } from './EditStationLocationModal';
@@ -97,11 +97,15 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
     setIsPresenceActiveState(isPresenceActive);
   }, [isPresenceActive]);
 
-  const getFreshnessBadgeInfo = (timeAgo: string) => {
+  const getFreshnessBadgeInfo = (raw: string) => {
+    const iso = isIsoTimestamp(raw);
+    const timeAgo = iso ? formatRelativeTime(raw) : raw;
     const lower = timeAgo.toLowerCase();
-    let minutes = 999;
+    let minutes = iso ? minutesSince(raw) : 999;
 
-    if (lower.includes('min') || lower.includes('m ago')) {
+    if (iso) {
+      // minutes already exact
+    } else if (lower.includes('min') || lower.includes('m ago')) {
       const match = lower.match(/\d+/);
       if (match) minutes = parseInt(match[0], 10);
       else minutes = 15;

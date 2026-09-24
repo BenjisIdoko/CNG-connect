@@ -55,6 +55,16 @@ export function formatStationAge(station?: GasStation | null): string {
   return 'No recent report';
 }
 
+/** True for ISO-8601 timestamps like 2026-09-14T12:00:00.000Z (what we now store). */
+export function isIsoTimestamp(value?: string | null): boolean {
+  return !!value && /^\d{4}-\d{2}-\d{2}T/.test(value) && !isNaN(Date.parse(value));
+}
+
+/** Minutes since an ISO timestamp (never negative). */
+export function minutesSince(iso: string): number {
+  return Math.max(0, Math.floor((Date.now() - Date.parse(iso)) / 60000));
+}
+
 /**
  * Generic "time ago" copy for a timestamp (e.g. a comment's created_at),
  * independent of station status. Used wherever we need to turn a Supabase

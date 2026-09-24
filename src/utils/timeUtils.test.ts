@@ -73,3 +73,36 @@ describe('formatRelativeTime Utility', () => {
     );
   });
 });
+
+describe('report age from real timestamps (regression: reports stayed "Just now" forever)', () => {
+  const ago = (ms: number) => new Date(Date.now() - ms).toISOString();
+  const base = {
+    id: 's1',
+    name: 'Test',
+    status: 'full',
+    statusLabel: 'Full stock',
+  } as unknown as GasStation;
+
+  it('shows minutes for a recent ISO timestamp', () => {
+    const s = { ...base, lastUpdated: ago(5 * 60_000), reports: [{ timestamp: ago(5 * 60_000) }] } as unknown as GasStation;
+    expect(formatStationAge(s)).toBe('Updated 5 min ago');
+  });
+
+  it('reports "No recent report" once the last report is over a day old', () => {
+    const s = { ...base, lastUpdated: ago(8 * 86_400_000), reports: [{ timestamp: ago(8 * 86_400_000) }] } as unknown as GasStation;
+    expect(formatStationAge(s)).toBe('No recent report');
+  });
+
+  it('isIsoTimestamp / minutesSince behave', async () => {
+    const { isIsoTimestamp, minutesSince } = await import('./timeUtils');
+    expect(isIsoTimestamp(ago(1000))).toBe(true);
+    expect(isIsoTimestamp('Just now')).toBe(false);
+    expect(minutesSince(ago(90 * 60_000))).toBe(90);
+  });
+
+  it('isStationStale treats an old ISO time as stale and a fresh one as not', async () => {
+    const { isStationStale } = await import('./proximityAlertEngine');
+    expect(isStationStale(ago(8 * 86_400_000), 30)).toBe(true);
+    expect(isStationStale(ago(5 * 60_000), 30)).toBe(false);
+  });
+});
