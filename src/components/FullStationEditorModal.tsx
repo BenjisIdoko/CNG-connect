@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { supabase } from '../services/supabaseClient';
+import { useSupabaseClient } from '../hooks/useSupabaseClient';
 import { Icon } from './common/Icon';
 
 export interface FullStationRow {
@@ -49,6 +49,7 @@ const inputCls =
 const labelCls = 'text-xs font-semibold text-slate-500 mb-1 block';
 
 export const FullStationEditorModal: React.FC<Props> = ({ station, onClose, onSaved, isAdmin = false }) => {
+  const supabase = useSupabaseClient();
   const isEv = station.station_type === 'ev_charging';
 
   const [name, setName] = useState(station.name);
@@ -119,7 +120,7 @@ export const FullStationEditorModal: React.FC<Props> = ({ station, onClose, onSa
     return () => {
       cancelled = true;
     };
-  }, [isAdmin, station.id]);
+  }, [isAdmin, station.id, supabase]);
 
   const addManager = async () => {
     if (!supabase || !newManagerEmail.trim()) return;

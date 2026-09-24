@@ -290,13 +290,13 @@ export const App: React.FC = () => {
         setSelectedStation(data[0]);
       }
       if (isMounted) setLiveStationsSettled(true);
-    });
-
-    const mountUserKey = userProfile.email || userProfile.phone || 'default_driver';
-    apiService.fetchPosts(mountUserKey).then((data) => {
-      if (isMounted && data.length > 0) {
-        setPosts(data);
-      }
+      // Posts (Community tab) load after the station list so they don't compete for bandwidth.
+      const mountUserKey = userProfile.email || userProfile.phone || 'default_driver';
+      apiService.fetchPosts(mountUserKey).then((posts) => {
+        if (isMounted && posts.length > 0) {
+          setPosts(posts);
+        }
+      });
     });
 
     return () => {

@@ -1,6 +1,6 @@
 /// <reference types="google.maps" />
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { supabase } from '../services/supabaseClient';
+import { useSupabaseClient } from '../hooks/useSupabaseClient';
 import { useAuth } from '../context/AuthContext';
 import { loadGoogleMaps, hasGoogleMapsKey } from '../utils/googleMaps';
 import { parseCsv, toCsv } from '../utils/csv';
@@ -183,6 +183,7 @@ const dot = (color: string, r: number): google.maps.Symbol => ({
 });
 
 export const AdminPinsScreen: React.FC<{ onExit: () => void }> = ({ onExit }) => {
+  const supabase = useSupabaseClient();
   const { session, driverProfile, isAuthLoading, sendLoginCode, verifyLoginCode, signOut } = useAuth();
 
   // sign-in gate
@@ -244,7 +245,7 @@ export const AdminPinsScreen: React.FC<{ onExit: () => void }> = ({ onExit }) =>
       .order('name');
     if (!error && data) setRows(data as Row[]);
     setLoading(false);
-  }, []);
+  }, [supabase]);
 
   useEffect(() => {
     if (session && isAdmin) void load();

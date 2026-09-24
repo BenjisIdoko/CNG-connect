@@ -1,6 +1,6 @@
 import { GasStation, DriverReport, CommunityPost, StationStatus, VerificationLevel, StationMedia, StationSuggestion, CommentItem } from '../types';
 import { INITIAL_STATIONS, INITIAL_POSTS, deduplicateStations, SHOW_EV_STATIONS } from '../data/mockData';
-import { supabase, isSupabaseConfigured } from './supabaseClient';
+import { getSupabase, isSupabaseConfigured, restSelect } from './supabaseClient';
 import { checkNotificationPermission } from '../utils/permissionManager';
 import { formatRelativeTime } from '../utils/timeUtils';
 import { buildLeaderboard, LeaderboardDriver, LeaderboardProfileRow } from '../utils/reputationEngine';
@@ -160,36 +160,52 @@ function saveLocalPosts(posts: CommunityPost[]) {
   }
 }
 
+/**
+ * The four tables behind the station list. Tries a plain REST read first (fast, no
+ * supabase-js download); falls back to the full client if any request is refused.
+ */
+async function loadStationTables(): Promise<{
+  stationsData: any[];
+  reportsData: any[];
+  mediaData: any[];
+  commentsData: any[];
+} | null> {
+  const [stationsData, reportsData, mediaData, commentsData] = await Promise.all([
+    restSelect('stations', 'select=*&order=name.asc'),
+    restSelect('station_reports', 'select=*&order=created_at.desc'),
+    restSelect('station_media', 'select=*'),
+    restSelect('station_comments', 'select=*&order=created_at.desc'),
+  ]);
+  if (stationsData && reportsData && mediaData && commentsData) {
+    return { stationsData, reportsData, mediaData, commentsData };
+  }
+
+  const supabase = await getSupabase();
+  if (!supabase) return null;
+  const { data: stations, error: stationsError } = await supabase
+    .from('stations')
+    .select('*')
+    .order('name', { ascending: true });
+  if (stationsError || !stations) {
+    console.warn('Supabase fetch stations error, using local fallback:', stationsError);
+    return null;
+  }
+  const { data: reports } = await supabase.from('station_reports').select('*').order('created_at', { ascending: false });
+  const { data: media } = await supabase.from('station_media').select('*');
+  const { data: comments } = await supabase.from('station_comments').select('*').order('created_at', { ascending: false });
+  return { stationsData: stations, reportsData: reports || [], mediaData: media || [], commentsData: comments || [] };
+}
+
 export const apiService = {
   /**
    * Fetch all stations with driver reports, station media, and group information.
    */
   async fetchStations(): Promise<GasStation[]> {
-    if (isSupabaseConfigured && supabase) {
+    if (isSupabaseConfigured) {
       try {
-        const { data: stationsData, error: stationsError } = await supabase
-          .from('stations')
-          .select('*')
-          .order('name', { ascending: true });
-
-        if (stationsError || !stationsData) {
-          console.warn('Supabase fetch stations error, using local fallback:', stationsError);
-          return getLocalStations();
-        }
-
-        const { data: reportsData } = await supabase
-          .from('station_reports')
-          .select('*')
-          .order('created_at', { ascending: false });
-
-        const { data: mediaData } = await supabase
-          .from('station_media')
-          .select('*');
-
-        const { data: commentsData } = await supabase
-          .from('station_comments')
-          .select('*')
-          .order('created_at', { ascending: false });
+        const tables = await loadStationTables();
+        if (!tables) return getLocalStations();
+        const { stationsData, reportsData, mediaData, commentsData } = tables;
 
         // Map Supabase snake_case records to frontend GasStation objects
         const stations: GasStation[] = stationsData.map((s: any) => {
@@ -345,7 +361,8 @@ export const apiService = {
     saveLocalStations(updatedLocalStations);
 
     // 2. Sync to Supabase if configured (log errors clearly; never fail silently)
-    if (isSupabaseConfigured && supabase) {
+    const supabase = isSupabaseConfigured ? await getSupabase() : null;
+    if (supabase) {
       try {
         // A. Insert into station_reports table
         const { error: reportError } = await supabase.from('station_reports').insert({
@@ -464,7 +481,8 @@ export const apiService = {
     isPhotoVerified: boolean
   ): Promise<{ pointsAwarded: number; communityPoints?: number; reportsCount?: number }> {
     const fallback = { pointsAwarded: isPhotoVerified ? 100 : 50 };
-    if (!isSupabaseConfigured || !supabase) return fallback;
+    const supabase = isSupabaseConfigured ? await getSupabase() : null;
+    if (!supabase) return fallback;
     try {
       const { data, error } = await supabase.rpc('award_report_points', { p_report_id: reportId });
       if (error || !data) {
@@ -488,7 +506,8 @@ export const apiService = {
    * of truth for that; community_posts.likes is just the cached count).
    */
   async fetchPosts(userKey?: string): Promise<CommunityPost[]> {
-    if (isSupabaseConfigured && supabase) {
+    const supabase = isSupabaseConfigured ? await getSupabase() : null;
+    if (supabase) {
       try {
         const { data, error } = await supabase
           .from('community_posts')
@@ -556,7 +575,8 @@ export const apiService = {
    * Create a new community post.
    */
   async createPost(newPost: CommunityPost): Promise<CommunityPost[]> {
-    if (isSupabaseConfigured && supabase) {
+    const supabase = isSupabaseConfigured ? await getSupabase() : null;
+    if (supabase) {
       try {
         const { error: insertError } = await supabase.from('community_posts').insert({
           id: newPost.id,
@@ -601,7 +621,9 @@ export const apiService = {
     const expiresAt = new Date(now.getTime() + ttlMinutes * 60 * 1000).toISOString();
     const nowIso = now.toISOString();
 
-    if (isSupabaseConfigured && supabase) {
+    const supabase = isSupabaseConfigured ? await getSupabase() : null;
+
+    if (supabase) {
       try {
         // onConflict must target the table's real UNIQUE constraint
         // (station_id, user_key) — the primary key is a separate uuid `id`
@@ -647,7 +669,9 @@ export const apiService = {
   async hasActivePresence(stationId: string, userKey: string): Promise<boolean> {
     const nowIso = new Date().toISOString();
 
-    if (isSupabaseConfigured && supabase) {
+    const supabase = isSupabaseConfigured ? await getSupabase() : null;
+
+    if (supabase) {
       try {
         const { data } = await supabase
           .from('station_presence')
@@ -713,40 +737,6 @@ export const apiService = {
   },
 
   /**
-   * Subscribe to live station status reports across all connected devices using Supabase Realtime.
-   */
-  subscribeToLiveStationUpdates(
-    onUpdate: (payload: { stationId: string; newStatus: StationStatus; statusLabel: string }) => void
-  ): () => void {
-    if (!isSupabaseConfigured || !supabase) {
-      return () => {};
-    }
-
-    const channel = supabase
-      .channel('public:station_reports')
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'station_reports' },
-        (payload: any) => {
-          if (payload.new && payload.new.station_id) {
-            onUpdate({
-              stationId: payload.new.station_id,
-              newStatus: payload.new.status as StationStatus,
-              statusLabel: payload.new.status_label || payload.new.status,
-            });
-          }
-        }
-      )
-      .subscribe();
-
-    return () => {
-      if (supabase) {
-        supabase.removeChannel(channel);
-      }
-    };
-  },
-
-  /**
    * Updates and persists exact GPS location coordinates for a station.
    */
   async updateStationLocation(
@@ -777,7 +767,9 @@ export const apiService = {
 
     saveLocalStations(updatedStations);
 
-    if (isSupabaseConfigured && supabase) {
+    const supabase = isSupabaseConfigured ? await getSupabase() : null;
+
+    if (supabase) {
       try {
         // Anon clients have no direct UPDATE grant on `stations` (see RLS in
         // supabase/schema.sql) — pin corrections go through this
@@ -811,7 +803,9 @@ export const apiService = {
       createdAt: new Date().toISOString(),
     };
 
-    if (isSupabaseConfigured && supabase) {
+    const supabase = isSupabaseConfigured ? await getSupabase() : null;
+
+    if (supabase) {
       try {
         const { error } = await supabase.from('station_suggestions').insert({
           id: newSuggestion.id,
@@ -875,7 +869,9 @@ export const apiService = {
     );
     saveLocalStations(updatedLocalStations);
 
-    if (isSupabaseConfigured && supabase) {
+    const supabase = isSupabaseConfigured ? await getSupabase() : null;
+
+    if (supabase) {
       try {
         const { error } = await supabase.from('station_comments').insert({
           id: newComment.id,
@@ -925,7 +921,9 @@ export const apiService = {
     );
     saveLocalPosts(updatedLocalPosts);
 
-    if (isSupabaseConfigured && supabase) {
+    const supabase = isSupabaseConfigured ? await getSupabase() : null;
+
+    if (supabase) {
       try {
         const { error } = await supabase.from('post_comments').insert({
           id: newComment.id,
@@ -959,7 +957,8 @@ export const apiService = {
    * returns null (caller falls back to its own optimistic toggle) otherwise.
    */
   async togglePostLike(postId: string): Promise<{ liked: boolean; likeCount: number } | null> {
-    if (isSupabaseConfigured && supabase) {
+    const supabase = isSupabaseConfigured ? await getSupabase() : null;
+    if (supabase) {
       try {
         const { data, error } = await supabase
           .rpc('toggle_post_like', { p_post_id: postId })
@@ -985,7 +984,8 @@ export const apiService = {
    * — there is no seed/mock fallback.
    */
   async fetchLeaderboard(): Promise<LeaderboardDriver[]> {
-    if (!isSupabaseConfigured || !supabase) return [];
+    const supabase = isSupabaseConfigured ? await getSupabase() : null;
+    if (!supabase) return [];
     try {
       const { data, error } = await supabase
         .from('profiles')

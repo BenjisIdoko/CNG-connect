@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { supabase } from '../services/supabaseClient';
+import { useSupabaseClient } from '../hooks/useSupabaseClient';
 import { useAuth } from '../context/AuthContext';
 import { FullStationEditorModal, FullStationRow } from './FullStationEditorModal';
 import { Icon } from './common/Icon';
@@ -20,6 +20,7 @@ type ManagedStation = FullStationRow & {
  * review, bulk CSV, bulk delete, or visibility into any other station.
  */
 export const StationManagerScreen: React.FC<{ onExit: () => void }> = ({ onExit }) => {
+  const supabase = useSupabaseClient();
   const { session, driverProfile, isAuthLoading, sendLoginCode, verifyLoginCode, signOut } = useAuth();
 
   const [email, setEmail] = useState('');
@@ -50,7 +51,7 @@ export const StationManagerScreen: React.FC<{ onExit: () => void }> = ({ onExit 
       return;
     }
     setStations((data || []) as ManagedStation[]);
-  }, []);
+  }, [supabase]);
 
   useEffect(() => {
     if (session) void load();

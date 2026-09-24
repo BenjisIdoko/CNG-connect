@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import type { Session } from '@supabase/supabase-js';
-import { supabase, isSupabaseConfigured } from '../services/supabaseClient';
+import { getSupabase, isSupabaseConfigured } from '../services/supabaseClient';
 import { UserProfile } from '../types';
 import { INITIAL_USER } from '../data/mockData';
 import { resizeToSquareJpeg } from '../utils/resizeImage';
@@ -72,6 +72,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isNewDriver, setIsNewDriver] = useState(false);
 
   const loadProfile = useCallback(async (userId: string, fallbackEmail: string): Promise<boolean> => {
+    const supabase = await getSupabase();
     if (!supabase) return false;
     const { data, error } = await supabase.from('profiles').select('*').eq('id', userId).single();
     if (error || !data) {
@@ -89,30 +90,48 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   useEffect(() => {
-    if (!isSupabaseConfigured || !supabase) {
+    if (!isSupabaseConfigured) {
       setIsAuthLoading(false);
       return;
     }
 
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      if (data.session) {
-        loadProfile(data.session.user.id, data.session.user.email || '');
+    // The Supabase client is a separate ~200 KB chunk, fetched here (after the app
+    // shell has painted) rather than in the startup bundle.
+    let cancelled = false;
+    let unsubscribe: (() => void) | undefined;
+
+    getSupabase().then((supabase) => {
+      if (cancelled) return;
+      if (!supabase) {
+        setIsAuthLoading(false);
+        return;
       }
-      setIsAuthLoading(false);
+
+      supabase.auth.getSession().then(({ data }) => {
+        if (cancelled) return;
+        setSession(data.session);
+        if (data.session) {
+          loadProfile(data.session.user.id, data.session.user.email || '');
+        }
+        setIsAuthLoading(false);
+      });
+
+      const { data: listener } = supabase.auth.onAuthStateChange((_event, newSession) => {
+        setSession(newSession);
+        if (newSession) {
+          loadProfile(newSession.user.id, newSession.user.email || '');
+        } else {
+          setDriverProfile(INITIAL_USER);
+          setIsNewDriver(false);
+        }
+      });
+      unsubscribe = () => listener.subscription.unsubscribe();
     });
 
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, newSession) => {
-      setSession(newSession);
-      if (newSession) {
-        loadProfile(newSession.user.id, newSession.user.email || '');
-      } else {
-        setDriverProfile(INITIAL_USER);
-        setIsNewDriver(false);
-      }
-    });
-
-    return () => listener.subscription.unsubscribe();
+    return () => {
+      cancelled = true;
+      unsubscribe?.();
+    };
   }, [loadProfile]);
 
   /**
@@ -127,6 +146,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
    * the sign-in UI doesn't assume a fixed length, so this works either way.
    */
   const sendLoginCode = useCallback(async (email: string): Promise<AuthResult> => {
+    const supabase = await getSupabase();
     if (!supabase) return { success: false, error: 'Backend not configured.' };
     const { error } = await supabase.auth.signInWithOtp({ email, options: { shouldCreateUser: true } });
     if (error) return { success: false, error: error.message };
@@ -134,6 +154,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const verifyLoginCode = useCallback(async (email: string, code: string): Promise<VerifyResult> => {
+    const supabase = await getSupabase();
     if (!supabase) return { success: false, error: 'Backend not configured.' };
     const { data, error } = await supabase.auth.verifyOtp({ email, token: code, type: 'email' });
     if (error || !data.session) {
@@ -146,7 +167,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const updateProfile = useCallback(
     async (updater: Partial<UserProfile> | ((prev: UserProfile) => UserProfile)) => {
-      if (!session || !supabase) return;
+      if (!session) return;
+      const supabase = await getSupabase();
+      if (!supabase) return;
 
       let computed: UserProfile | null = null;
       setDriverProfile((prev) => {
@@ -173,7 +196,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const uploadAvatar = useCallback(
     async (file: File): Promise<{ url?: string; error?: string }> => {
-      if (!session || !supabase) return { error: 'You need to be signed in.' };
+      if (!session) return { error: 'You need to be signed in.' };
+      const supabase = await getSupabase();
+      if (!supabase) return { error: 'You need to be signed in.' };
       if (!file.type.startsWith('image/')) return { error: 'Please choose an image file.' };
 
       let blob: Blob;
@@ -205,6 +230,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   );
 
   const signOut = useCallback(async () => {
+    const supabase = await getSupabase();
     if (supabase) await supabase.auth.signOut();
     setSession(null);
     setDriverProfile(INITIAL_USER);
