@@ -326,7 +326,7 @@ export const FullStationEditorModal: React.FC<Props> = ({ station, onClose, onSa
             <div className="grid grid-cols-2 gap-3 items-end">
               <div>
                 <label className={labelCls}>Station type</label>
-                <select className={inputCls} value={stationType} onChange={(e) => setStationType(e.target.value)}>
+                <select aria-label="Station type" className={inputCls} value={stationType} onChange={(e) => setStationType(e.target.value)}>
                   <option value="cng">CNG</option>
                   <option value="ev_charging">EV charging</option>
                 </select>

@@ -20,7 +20,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   return (
     <div className={`bg-white rounded-3xl p-6 text-center border border-slate-200/80 shadow-xs flex flex-col items-center gap-2 my-2 ${className}`}>
       <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-primary flex items-center justify-center font-bold">
-        <span className="material-symbols-outlined text-[28px]">{icon}</span>
+        <span aria-hidden="true" className="material-symbols-outlined text-[28px]">{icon}</span>
       </div>
       <h4 className="font-extrabold text-slate-900 text-body-lg">{title}</h4>
       <p className="text-caption text-slate-500 font-normal max-w-xs">{message}</p>

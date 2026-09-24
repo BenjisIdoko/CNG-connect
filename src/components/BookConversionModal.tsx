@@ -38,7 +38,7 @@ export const BookConversionModal: React.FC<BookConversionModalProps> = ({
       {bookingSuccessRef ? (
           <div className="py-6 text-center space-y-4">
             <div className="w-16 h-16 rounded-full bg-surface-container text-primary flex items-center justify-center mx-auto">
-              <span className="material-symbols-outlined text-[36px]">verified</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[36px]">verified</span>
             </div>
 
             <div>
@@ -73,7 +73,7 @@ export const BookConversionModal: React.FC<BookConversionModalProps> = ({
             </div>
 
             <div className="bg-surface rounded-2xl p-3 text-primary text-[0.8125rem] font-semibold flex items-center gap-2">
-              <span className="material-symbols-outlined text-[18px]">stars</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[18px]">stars</span>
               <span>+100 Driver Reward Points added to your profile!</span>
             </div>
 
@@ -129,7 +129,7 @@ export const BookConversionModal: React.FC<BookConversionModalProps> = ({
                 <label className="block font-semibold text-on-surface-variant mb-1">
                   CNG Kit Tank Capacity
                 </label>
-                <select
+                <select aria-label="CNG Kit Tank Capacity"
                   value={tankSize}
                   onChange={(e) => setTankSize(e.target.value)}
                   className="w-full bg-surface-container/90 rounded-2xl px-4 py-2.5 outline-none font-medium text-on-surface focus:ring-2 focus:ring-primary/30"
@@ -203,7 +203,7 @@ export const BookConversionModal: React.FC<BookConversionModalProps> = ({
                     </>
                   ) : (
                     <>
-                      <span className="material-symbols-outlined text-[18px]">verified</span>
+                      <span aria-hidden="true" className="material-symbols-outlined text-[18px]">verified</span>
                       Confirm Conversion Appointment (+100 PTS)
                     </>
                   )}

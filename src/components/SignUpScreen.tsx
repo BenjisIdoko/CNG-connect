@@ -130,7 +130,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
     await updateProfile({
       name: fullName.trim() || 'CNG Driver',
       phone: phoneValidation.formatted || phone.trim(),
-      avatar: ASSETS.userAvatar,
+      avatar: '',
       vehicle: `${vehicleYear} ${vehicleMake} (${cngStatus === 'installed' ? `CNG ${tankSize}` : 'Petrol'})`,
       cngInstalledDate: cngStatus === 'installed' ? 'Recently Installed' : 'Planning',
       monthlySavings: cngStatus === 'installed' ? 78500 : 0,
@@ -161,11 +161,11 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
       <div className="flex items-center gap-3.5 min-h-[36px]">
         {step === 2 ? (
           <button type="button" onClick={() => setStep(1)} aria-label="Back" className="text-slate-900 -ml-1 p-1">
-            <span className="material-symbols-outlined text-[22px]">arrow_back</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[22px]">arrow_back</span>
           </button>
         ) : onCancel ? (
           <button type="button" onClick={onCancel} aria-label="Close" className="text-slate-900 -ml-1 p-1">
-            <span className="material-symbols-outlined text-[22px]">close</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[22px]">close</span>
           </button>
         ) : null}
         <span className="text-[0.8125rem] font-semibold text-outline">
@@ -201,7 +201,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
               <div className={`flex items-center bg-surface rounded-2xl px-4 h-14 transition-all ${
                 emailError ? 'ring-2 ring-status-red/40' : 'focus-within:ring-2 focus-within:ring-primary/40'
               }`}>
-                <span className="material-symbols-outlined text-outline text-[20px] mr-2.5">mail</span>
+                <span aria-hidden="true" className="material-symbols-outlined text-outline text-[20px] mr-2.5">mail</span>
                 <input
                   type="email"
                   required
@@ -218,7 +218,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
               </div>
               {emailError && (
                 <p className="text-[0.8125rem] font-medium text-status-red mt-2 flex items-center gap-1">
-                  <span className="material-symbols-outlined text-[15px]">error</span>
+                  <span aria-hidden="true" className="material-symbols-outlined text-[15px]">error</span>
                   <span>{emailError}</span>
                 </p>
               )}
@@ -266,7 +266,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
               </label>
               {codeError && (
                 <p className="text-[0.8125rem] font-bold text-status-red mt-3 flex items-center gap-1">
-                  <span className="material-symbols-outlined text-[16px]">gpp_bad</span>
+                  <span aria-hidden="true" className="material-symbols-outlined text-[16px]">gpp_bad</span>
                   <span>{codeError}</span>
                 </p>
               )}
@@ -290,7 +290,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
               <div>
                 <label className="block text-[0.7812rem] font-semibold text-on-surface-variant mb-1">Full Name</label>
                 <div className="flex items-center bg-surface border border-outline-variant rounded-2xl px-3.5 h-12 focus-within:ring-2 focus-within:ring-primary/30 focus-within:border-primary transition-all">
-                  <span className="material-symbols-outlined text-outline text-[20px] mr-2">person</span>
+                  <span aria-hidden="true" className="material-symbols-outlined text-outline text-[20px] mr-2">person</span>
                   <input
                     type="text"
                     required
@@ -310,7 +310,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
                 <div className={`flex items-center bg-surface border rounded-2xl px-3.5 h-12 transition-all ${
                   phoneError ? 'border-status-red ring-2 ring-status-red/20' : 'border-outline-variant focus-within:ring-2 focus-within:ring-primary/30 focus-within:border-primary'
                 }`}>
-                  <span className="material-symbols-outlined text-outline text-[20px] mr-2">call</span>
+                  <span aria-hidden="true" className="material-symbols-outlined text-outline text-[20px] mr-2">call</span>
                   <input
                     type="tel"
                     required
@@ -326,7 +326,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
                 </div>
                 {phoneError && (
                   <p className="text-[0.7812rem] font-medium text-status-red mt-1 flex items-center gap-1">
-                    <span className="material-symbols-outlined text-[15px]">error</span>
+                    <span aria-hidden="true" className="material-symbols-outlined text-[15px]">error</span>
                     <span>{phoneError}</span>
                   </p>
                 )}
@@ -336,7 +336,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
                 <label className="block text-[0.7812rem] font-semibold text-on-surface-variant mb-1">
                   Primary Location / State
                 </label>
-                <select
+                <select aria-label="Primary Location / State"
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
                   className="w-full bg-surface border border-outline-variant rounded-2xl px-3.5 h-12 text-[0.9375rem] font-medium text-on-surface outline-none focus:ring-2 focus:ring-primary/30"
@@ -429,7 +429,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
               {cngStatus === 'installed' && (
                 <div>
                   <label className="block text-[0.7812rem] font-bold text-on-surface-variant mb-1">CNG Cylinder Tank Size</label>
-                  <select
+                  <select aria-label="CNG Cylinder Tank Size"
                     value={tankSize}
                     onChange={(e) => setTankSize(e.target.value)}
                     className="w-full bg-surface border border-outline-variant rounded-2xl px-3.5 h-12 text-[0.9375rem] font-bold text-on-surface outline-none"

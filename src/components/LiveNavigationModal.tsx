@@ -32,7 +32,7 @@ export const LiveNavigationModal: React.FC<LiveNavigationModalProps> = ({
               {station.name}
             </h2>
             <p className="text-[0.875rem] text-slate-500 font-normal mt-0.5 flex items-center gap-1">
-              <span className="material-symbols-outlined text-[16px] text-outline">
+              <span aria-hidden="true" className="material-symbols-outlined text-[16px] text-outline">
                 location_on
               </span>
               <span>{station.address}</span>
@@ -40,7 +40,7 @@ export const LiveNavigationModal: React.FC<LiveNavigationModalProps> = ({
 
             {station.lat && station.lng && (
               <p className="text-[0.7812rem] text-primary font-medium mt-1 flex items-center gap-1">
-                <span className="material-symbols-outlined text-[15px]">
+                <span aria-hidden="true" className="material-symbols-outlined text-[15px]">
                   {station.locationPrecision === 'gps_confirmed' ? 'my_location' : 'pin_drop'}
                 </span>
                 <span>
@@ -90,7 +90,7 @@ export const LiveNavigationModal: React.FC<LiveNavigationModalProps> = ({
             onClick={handleLaunchPin}
             className="w-full py-3.5 bg-surface-container hover:bg-surface-container-high text-on-surface font-bold text-[0.9062rem] rounded-full flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
           >
-            <span className="material-symbols-outlined text-[20px] shrink-0">pin_drop</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[20px] shrink-0">pin_drop</span>
             <span>Open Location Pin on Google Maps</span>
           </button>
 
@@ -98,7 +98,7 @@ export const LiveNavigationModal: React.FC<LiveNavigationModalProps> = ({
             onClick={handleLaunchMaps}
             className="w-full py-3.5 bg-primary hover:opacity-95 text-white font-bold text-[0.9062rem] rounded-full flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
           >
-            <span className="material-symbols-outlined text-[20px] shrink-0">turn_right</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[20px] shrink-0">turn_right</span>
             <span>Turn-by-Turn Navigation</span>
           </button>
 

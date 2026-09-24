@@ -118,7 +118,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
             className="w-11 h-11 rounded-full bg-surface-container-high text-primary flex items-center justify-center transition-all shrink-0 ml-2"
             title="Policy Info"
           >
-            <span className="material-symbols-outlined text-[16px]">info</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[16px]">info</span>
           </button>
         </div>
 
@@ -145,7 +145,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
                       : 'bg-surface-container text-on-surface border-outline-variant hover:bg-surface-container-high'
                   }`}
                 >
-                  <span className="material-symbols-outlined text-[16px]">
+                  <span aria-hidden="true" className="material-symbols-outlined text-[16px]">
                     {c.icon}
                   </span>
                   <span>{c.label}</span>
@@ -226,7 +226,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
 
             {imageError && (
               <div className="mb-2 p-2.5 bg-status-red-container border rounded-xl text-status-red text-[0.7812rem] font-medium flex items-start gap-2">
-                <span className="material-symbols-outlined text-[16px] shrink-0 text-status-red">
+                <span aria-hidden="true" className="material-symbols-outlined text-[16px] shrink-0 text-status-red">
                   gpp_bad
                 </span>
                 <span>{imageError}</span>
@@ -241,7 +241,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
                   className="w-full h-32 object-cover"
                 />
                 <div className="absolute bottom-2 left-2 bg-primary/90 text-status-green text-[0.75rem] font-bold px-2.5 py-1 rounded-full backdrop-blur-md flex items-center gap-1 border border-status-green/40">
-                  <span className="material-symbols-outlined text-[13px]">verified</span>
+                  <span aria-hidden="true" className="material-symbols-outlined text-[13px]">verified</span>
                   Fresh Camera Verified
                 </div>
                 <button
@@ -252,7 +252,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
                   }}
                   className="absolute top-2 right-2 bg-black/70 text-white p-1 rounded-full hover:bg-black"
                 >
-                  <span className="material-symbols-outlined text-[16px]">
+                  <span aria-hidden="true" className="material-symbols-outlined text-[16px]">
                     close
                   </span>
                 </button>
@@ -264,7 +264,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
                   onClick={() => setShowLiveCamera(true)}
                   className="w-full py-3.5 px-3 bg-primary hover:opacity-95 text-on-primary rounded-full font-bold text-[0.875rem] shadow-xs flex items-center justify-center gap-2 active:scale-95 transition-all"
                 >
-                  <span className="material-symbols-outlined text-[20px] text-status-green shrink-0">photo_camera</span>
+                  <span aria-hidden="true" className="material-symbols-outlined text-[20px] text-status-green shrink-0">photo_camera</span>
                   <span className="whitespace-nowrap">Take Live Photo</span>
                 </button>
                 <p className="text-[0.75rem] font-normal text-outline text-center">

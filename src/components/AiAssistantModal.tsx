@@ -102,12 +102,12 @@ export const AiAssistantModal: React.FC<AiAssistantModalProps> = ({
       <div className="bg-deep-teal text-white p-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center">
-            <span className="material-symbols-outlined text-[20px] text-white">auto_awesome</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[20px] text-white">auto_awesome</span>
           </div>
           <div>
             <h3 className="font-bold text-[1rem] text-white flex items-center gap-1.5">
               CNG-Connect AI Assistant
-              <span className="bg-primary text-white text-[0.5938rem] font-semibold uppercase px-2 py-0.5 rounded-full">
+              <span className="bg-primary text-white text-[0.75rem] font-semibold uppercase px-2 py-0.5 rounded-full">
                 Live
               </span>
             </h3>
@@ -121,7 +121,7 @@ export const AiAssistantModal: React.FC<AiAssistantModalProps> = ({
           aria-label="Close assistant modal"
           className="w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors shrink-0"
         >
-          <span className="material-symbols-outlined text-[20px]">close</span>
+          <span aria-hidden="true" className="material-symbols-outlined text-[20px]">close</span>
         </button>
       </div>
 
@@ -191,7 +191,7 @@ export const AiAssistantModal: React.FC<AiAssistantModalProps> = ({
           aria-label="Send query to AI"
           className="w-11 h-11 rounded-full bg-deep-teal disabled:opacity-40 text-white flex items-center justify-center active:scale-95 transition-all shrink-0"
         >
-          <span className="material-symbols-outlined text-[20px]">send</span>
+          <span aria-hidden="true" className="material-symbols-outlined text-[20px]">send</span>
         </button>
       </form>
     </Modal>

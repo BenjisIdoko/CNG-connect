@@ -104,7 +104,7 @@
   --color-status-amber-container: #FFF3DF;
   --color-status-orange: #F85B23;
   --color-status-orange-container: #FFF0EA;
-  --color-status-red: #E5484D;
+  --color-status-red: #C0313A; /* AA on white/cream as text */
   --color-status-red-container: #FCE8E9;
   --color-live-pulse: #319A3F;
   --color-whatsapp: #25D366;
@@ -129,7 +129,7 @@
   --color-outline-variant: #E4E2D8;
   --color-inverse-surface: #1F2923;
   --color-inverse-on-surface: #F6F5EF;
-  --color-error: #E5484D;
+  --color-error: #C0313A;
   --color-error-container: #FCE8E9;
   --color-on-error-container: #A82228;
 
@@ -176,6 +176,11 @@
   /* Urbanist for headings, Inter for everything else */
   h1, h2, h3, h4, h5, h6, .font-headline {
     font-family: 'Urbanist', sans-serif;
+  }
+  /* Visible keyboard focus everywhere (inputs keep their own ring styles) */
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
   }
   h1, h2 {
     line-height: 1.15;

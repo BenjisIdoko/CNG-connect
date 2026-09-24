@@ -795,7 +795,7 @@ export const AdminPinsScreen: React.FC<{ onExit: () => void }> = ({ onExit }) =>
               </div>
 
               <div className="flex items-center gap-2">
-                <select
+                <select aria-label="Pin precision tier"
                   value={tier}
                   onChange={(e) => setTier(e.target.value as Tier)}
                   className="border border-slate-300 rounded-lg px-2 py-1.5 text-xs flex-1"

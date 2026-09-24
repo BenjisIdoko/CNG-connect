@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { ChatMessage, CommunityPost } from '../types';
 import { ASSETS, INITIAL_CHAT_MESSAGES } from '../data/mockData';
 import { compressImageToDataUrl } from '../utils/compressImage';
+import { Avatar } from './common/Avatar';
 
 interface ChatScreenProps {
   post?: CommunityPost;
@@ -94,7 +95,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ post, onBack }) => {
   const listingPrice = post?.price || '₦8,500,000';
   const listingImage = post?.image || ASSETS.toyotaCamryListing;
   const sellerName = post?.author || 'Emeka O.';
-  const sellerAvatar = post?.authorAvatar || ASSETS.userAvatar;
+  const sellerAvatar = post?.authorAvatar || '';
 
   return (
     <div className="min-h-screen bg-surface text-on-surface flex flex-col justify-between pb-24">
@@ -105,18 +106,14 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ post, onBack }) => {
             onClick={onBack}
             className="w-10 h-10 -ml-1 flex items-center justify-center rounded-full text-on-surface hover:bg-surface-container active:scale-95"
           >
-            <span className="material-symbols-outlined text-[24px]">
+            <span aria-hidden="true" className="material-symbols-outlined text-[24px]">
               arrow_back
             </span>
           </button>
 
           <div className="flex items-center gap-3">
             <div className="relative">
-              <img
-                src={sellerAvatar}
-                alt={sellerName}
-                className="w-10 h-10 rounded-full object-cover border border-primary/20"
-              />
+              <Avatar src={sellerAvatar} name={sellerName} className="w-10 h-10" />
               <span className="absolute bottom-0 right-0 w-3 h-3 bg-status-green border-2 border-white rounded-full shadow-xs" />
             </div>
             <div className="min-w-0">
@@ -131,7 +128,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ post, onBack }) => {
         </div>
 
         <button className="w-10 h-10 flex items-center justify-center rounded-full text-outline hover:bg-surface-container">
-          <span className="material-symbols-outlined text-[24px]">
+          <span aria-hidden="true" className="material-symbols-outlined text-[24px]">
             more_vert
           </span>
         </button>
@@ -153,7 +150,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ post, onBack }) => {
             </p>
           </div>
           <button className="w-8 h-8 rounded-full flex items-center justify-center text-outline hover:bg-surface-container">
-            <span className="material-symbols-outlined text-[20px]">
+            <span aria-hidden="true" className="material-symbols-outlined text-[20px]">
               chevron_right
             </span>
           </button>
@@ -207,7 +204,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ post, onBack }) => {
                 >
                   <span>{msg.time}</span>
                   {isMe && (
-                    <span
+                    <span aria-hidden="true"
                       className="material-symbols-outlined text-[15px] text-primary"
                       style={{ fontVariationSettings: "'FILL' 1" }}
                     >
@@ -259,7 +256,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ post, onBack }) => {
             aria-label="Add photo"
             className="w-10 h-10 flex shrink-0 items-center justify-center rounded-full text-outline hover:bg-white hover:text-primary transition-colors mb-0.5"
           >
-            <span className="material-symbols-outlined text-[22px]">
+            <span aria-hidden="true" className="material-symbols-outlined text-[22px]">
               add_a_photo
             </span>
           </button>
@@ -291,7 +288,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ post, onBack }) => {
                 : 'opacity-40 cursor-not-allowed'
             }`}
           >
-            <span
+            <span aria-hidden="true"
               className="material-symbols-outlined text-[18px]"
               style={{ fontVariationSettings: "'FILL' 1" }}
             >

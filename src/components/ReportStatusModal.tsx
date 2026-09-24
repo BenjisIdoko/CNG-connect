@@ -143,7 +143,7 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
                   aria-label="Station Group Policy Info"
                   className="text-outline/70 hover:text-outline"
                 >
-                  <span className="material-symbols-outlined text-[15px]">info</span>
+                  <span aria-hidden="true" className="material-symbols-outlined text-[15px]">info</span>
                 </button>
               </p>
             </div>
@@ -184,10 +184,10 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
                           on ? 'bg-white/20' : opt.dot
                         }`}
                       >
-                        <span className="material-symbols-outlined text-[18px] material-symbols-fill">{opt.icon}</span>
+                        <span aria-hidden="true" className="material-symbols-outlined text-[18px] material-symbols-fill">{opt.icon}</span>
                       </span>
                       <span className={`flex-1 text-left text-body ${on ? 'font-extrabold' : 'font-semibold'}`}>{opt.label}</span>
-                      {on && <span className="material-symbols-outlined text-[20px]">check</span>}
+                      {on && <span aria-hidden="true" className="material-symbols-outlined text-[20px]">check</span>}
                     </button>
                   );
                 });
@@ -222,7 +222,7 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
               <div>
                 {photoError && (
                   <div role="alert" className="mb-2 p-2.5 bg-status-red-container rounded-xl text-rose-700 text-micro font-medium flex items-start gap-2">
-                    <span className="material-symbols-outlined text-[16px] shrink-0 text-status-red">gpp_bad</span>
+                    <span aria-hidden="true" className="material-symbols-outlined text-[16px] shrink-0 text-status-red">gpp_bad</span>
                     <span>{photoError}</span>
                   </div>
                 )}
@@ -230,7 +230,7 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
                   <div className="relative rounded-xl overflow-hidden bg-black/10">
                     <img src={attachedPhoto} alt="Verified meter snapshot" className="w-full h-32 object-cover" />
                     <div className="absolute bottom-2 left-2 bg-slate-900/85 text-white text-[0.75rem] font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
-                      <span className="material-symbols-outlined text-[14px] text-status-green">verified</span>
+                      <span aria-hidden="true" className="material-symbols-outlined text-[14px] text-status-green">verified</span>
                       Live camera verified
                     </div>
                     <button
@@ -242,7 +242,7 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
                       aria-label="Delete attached photo"
                       className="absolute top-2 right-2 w-9 h-9 bg-black/70 text-white rounded-full flex items-center justify-center"
                     >
-                      <span className="material-symbols-outlined text-[16px]">delete</span>
+                      <span aria-hidden="true" className="material-symbols-outlined text-[16px]">delete</span>
                     </button>
                   </div>
                 ) : (
@@ -251,7 +251,7 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
                     onClick={() => setShowLiveCamera(true)}
                     className="w-full flex items-center gap-2 bg-white rounded-xl p-2.5 text-left active:scale-[0.99] transition-transform"
                   >
-                    <span className="material-symbols-outlined text-[20px] text-slate-700">photo_camera</span>
+                    <span aria-hidden="true" className="material-symbols-outlined text-[20px] text-slate-700">photo_camera</span>
                     <span className="text-caption font-semibold flex-1">Add live photo</span>
                     <span className="text-[0.75rem] text-outline">Gallery blocked</span>
                   </button>
@@ -268,7 +268,7 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
 
             {!presenceActive && (
               <div className="bg-status-red-container rounded-2xl p-3.5 text-rose-900 flex items-start gap-2.5">
-                <span className="material-symbols-outlined text-[22px] text-status-red shrink-0">location_off</span>
+                <span aria-hidden="true" className="material-symbols-outlined text-[22px] text-status-red shrink-0">location_off</span>
                 <div className="flex-1 text-caption">
                   <strong className="block font-extrabold mb-0.5">You need to be at the station</strong>
                   <span>Reports need active GPS presence within the station&apos;s geofence.</span>
@@ -278,7 +278,7 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
 
             {formError && (
               <div role="alert" className="bg-status-red-container rounded-2xl p-3 text-rose-700 text-micro font-semibold flex items-start gap-2">
-                <span className="material-symbols-outlined text-[18px] shrink-0 text-status-red">error</span>
+                <span aria-hidden="true" className="material-symbols-outlined text-[18px] shrink-0 text-status-red">error</span>
                 <span>{formError}</span>
               </div>
             )}

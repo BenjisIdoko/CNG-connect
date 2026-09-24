@@ -135,16 +135,6 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
     }
   };
 
-  useEffect(() => {
-    try {
-      const hasSeen = localStorage.getItem('hasSeenGroupPolicy');
-      if (!hasSeen) {
-        setShowInfoSheet(true);
-      }
-    } catch {
-      // Ignore storage errors
-    }
-  }, []);
 
   const images = station.images || [];
   const presenceCount = station.activePresenceCount || 0;
@@ -222,7 +212,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-surface text-on-surface pb-44">
+    <div className="min-h-screen bg-surface text-on-surface pb-36">
       {/* Toast Notification */}
       {copiedNotification && (
         <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-on-surface text-white text-[0.875rem] font-bold px-4 py-2 rounded-full shadow-lg">
@@ -240,7 +230,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
           aria-label="Go back"
           className="absolute top-[max(env(safe-area-inset-top,0px),1rem)] left-4 w-10 h-10 rounded-full bg-white/90 text-slate-900 flex items-center justify-center active:scale-95 transition-transform shadow-sm"
         >
-          <span className="material-symbols-outlined text-[20px]">arrow_back</span>
+          <span aria-hidden="true" className="material-symbols-outlined text-[20px]">arrow_back</span>
         </button>
         <div className="absolute top-[max(env(safe-area-inset-top,0px),1rem)] right-4 flex gap-2">
           <button
@@ -250,7 +240,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
               isFavorite ? 'bg-white text-status-red' : 'bg-white/90 text-slate-900'
             }`}
           >
-            <span className={`material-symbols-outlined text-[20px] ${isFavorite ? 'material-symbols-fill' : ''}`}>
+            <span aria-hidden="true" className={`material-symbols-outlined text-[20px] ${isFavorite ? 'material-symbols-fill' : ''}`}>
               favorite
             </span>
           </button>
@@ -259,7 +249,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
             aria-label="Share Station Group"
             className="w-10 h-10 rounded-full bg-white/90 text-slate-900 flex items-center justify-center active:scale-95 transition-transform shadow-sm"
           >
-            <span className="material-symbols-outlined text-[20px]">ios_share</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[20px]">ios_share</span>
           </button>
         </div>
         <div className="absolute bottom-2.5 inset-x-4 flex items-center justify-between text-white text-micro font-semibold">
@@ -291,19 +281,17 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
               className="shrink-0 text-outline/70 hover:text-outline"
               aria-label="Station group guidelines"
             >
-              <span className="material-symbols-outlined text-[15px]">info</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[15px]">info</span>
             </button>
           </p>
           {describeLocationPrecision(station) && (
-            <p className="text-micro font-medium text-status-orange mt-1">
+            <p className="text-micro font-medium text-[#B5380A] mt-1">
               {describeLocationPrecision(station)}
             </p>
           )}
 
-          <div className="flex items-center gap-2 mt-3 flex-wrap">
-            {station.status === 'unknown' ? (
-              <span className="text-caption text-outline">No driver reports yet</span>
-            ) : (
+          <div className="flex items-center gap-2 mt-3 flex-wrap empty:hidden">
+            {station.status === 'unknown' ? null : (
               <>
                 <span
                   className={`w-2 h-2 rounded-full shrink-0 ${
@@ -342,7 +330,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
           <div className="flex gap-6">
             <div className="flex-1">
               <div className="text-[0.75rem] font-bold text-outline uppercase tracking-wider">Rate</div>
-              <div className={`font-extrabold mt-1 ${station.pricePerKwh ? 'text-heading text-slate-900' : 'text-body-lg text-slate-300'}`}>
+              <div className={`font-extrabold mt-1 ${station.pricePerKwh ? 'text-heading text-slate-900' : 'text-body-lg text-slate-400'}`}>
                 {station.pricePerKwh ? `₦${station.pricePerKwh}/kWh` : 'Unreported'}
               </div>
             </div>
@@ -356,6 +344,16 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
               )}
             </div>
           </div>
+        ) : !station.cngPrice && !station.pumpPressure && station.status === 'unknown' ? (
+          <div className="rounded-2xl bg-white p-4 flex items-center gap-3 shadow-[0_4px_14px_rgba(31,41,35,0.05)]">
+            <span className="w-10 h-10 rounded-full bg-primary-container text-primary flex items-center justify-center shrink-0">
+              <span aria-hidden="true" className="material-symbols-outlined text-[20px]">local_gas_station</span>
+            </span>
+            <div className="min-w-0">
+              <p className="font-bold text-body text-on-surface">No reports yet</p>
+              <p className="text-caption text-outline">Be the first to tell drivers the price and pressure.</p>
+            </div>
+          </div>
         ) : (
           <div>
             <div className="flex gap-6">
@@ -363,7 +361,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                 <div className="text-[0.75rem] font-bold text-outline uppercase tracking-wider">CNG price</div>
                 <div
                   className={`font-extrabold mt-1 ${
-                    station.cngPrice ? 'text-heading text-slate-900' : 'text-body-lg text-slate-300'
+                    station.cngPrice ? 'text-heading text-slate-900' : 'text-body-lg text-slate-400'
                   }`}
                 >
                   {station.cngPrice ? (
@@ -380,7 +378,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                 <div className="text-[0.75rem] font-bold text-outline uppercase tracking-wider">Pump pressure</div>
                 <div
                   className={`font-extrabold mt-1 ${
-                    station.pumpPressure ? 'text-heading text-slate-900' : 'text-body-lg text-slate-300'
+                    station.pumpPressure ? 'text-heading text-slate-900' : 'text-body-lg text-slate-400'
                   }`}
                 >
                   {station.pumpPressure ? (
@@ -419,9 +417,9 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
             onClick={() => openGoogleMapsPin(station)}
             className="self-start -mt-2 text-micro font-semibold text-outline hover:text-slate-900 flex items-center gap-1"
           >
-            <span className="material-symbols-outlined text-[15px]">map</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[15px]">map</span>
             View map pin
-            <span className="material-symbols-outlined text-[13px]">open_in_new</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[13px]">open_in_new</span>
           </button>
         )}
 
@@ -521,7 +519,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                             className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-primary border-2 border-surface text-white flex items-center justify-center"
                             title="Photo verified"
                           >
-                            <span className="material-symbols-outlined text-[12px] material-symbols-fill">check</span>
+                            <span aria-hidden="true" className="material-symbols-outlined text-[12px] material-symbols-fill">check</span>
                           </span>
                         )}
                       </div>
@@ -555,7 +553,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                             report.userVoted === 'up' ? 'text-primary' : 'text-outline'
                           }`}
                         >
-                          <span
+                          <span aria-hidden="true"
                             className="material-symbols-outlined text-[15px]"
                             style={{ fontVariationSettings: report.userVoted === 'up' ? "'FILL' 1" : "'FILL' 0" }}
                           >
@@ -587,7 +585,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
               </div>
             ) : (
               <div className="py-6 text-center flex flex-col items-center gap-2">
-                <span className="material-symbols-outlined text-[32px] text-slate-300">photo_camera</span>
+                <span aria-hidden="true" className="material-symbols-outlined text-[32px] text-slate-300">photo_camera</span>
                 <p className="text-caption text-outline max-w-xs">
                   No photos yet. Only live camera photos taken at the station appear here.
                 </p>
@@ -600,41 +598,15 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
       {/* Sticky bottom actions: one primary CTA, two quiet secondaries */}
       <div className="fixed bottom-0 left-0 right-0 bg-white px-5 pt-3 shadow-[0_-6px_18px_rgba(31,41,35,0.08)] z-40 pb-safe">
         <div className="max-w-xl mx-auto flex flex-col gap-2">
-          <button
-            onClick={() => onOpenReportModal(station)}
-            className="w-full py-3.5 bg-accent text-white rounded-full font-bold text-body flex items-center justify-center gap-2 shadow-[0_8px_18px_rgba(248,91,35,0.3)] active:scale-[0.98] transition-transform"
-          >
-            <span className="material-symbols-outlined text-[18px]">edit</span>
-            Report Status
-          </button>
-          <div className="flex gap-2">
-            <button
-              onClick={() => {
-                openExternalMaps(station);
-                if (onNavigate) onNavigate(station);
-              }}
-              className="flex-1 py-2.5 rounded-full border-[1.5px] border-surface-container-highest text-slate-900 font-semibold text-caption flex items-center justify-center gap-1.5 active:scale-[0.98] transition-transform"
-            >
-              <span className="material-symbols-outlined text-[16px]">navigation</span>
-              Directions
-            </button>
-            <button
-              onClick={() => openWhatsAppShare(station)}
-              className="flex-1 py-2.5 rounded-full border-[1.5px] border-surface-container-highest text-slate-900 font-semibold text-caption flex items-center justify-center gap-1.5 active:scale-[0.98] transition-transform"
-            >
-              <span className="material-symbols-outlined text-[16px]">ios_share</span>
-              Share
-            </button>
-          </div>
-
           {activeTab === 'feed' && (
-            <form onSubmit={handlePostGroupComment} className="flex items-center gap-2 pb-1">
+            <form onSubmit={handlePostGroupComment} className="flex items-center gap-2">
               <div className="flex-1 bg-surface-container rounded-full h-10 flex items-center px-4">
                 <input
                   type="text"
                   value={newCommentText}
                   onChange={(e) => setNewCommentText(e.target.value)}
                   placeholder="Post message to this station…"
+                  aria-label="Message to this station's group"
                   className="w-full bg-transparent border-none outline-none text-caption text-on-surface placeholder:text-outline"
                 />
               </div>
@@ -644,10 +616,39 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                 aria-label="Post comment to station group"
                 className="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center disabled:opacity-40 active:scale-95 transition-all shrink-0"
               >
-                <span className="material-symbols-outlined text-[18px] material-symbols-fill">send</span>
+                <span aria-hidden="true" className="material-symbols-outlined text-[18px] material-symbols-fill">send</span>
               </button>
             </form>
           )}
+
+          <div className="flex items-center gap-2 pb-1">
+            <button
+              onClick={() => onOpenReportModal(station)}
+              className="flex-1 h-12 bg-accent text-white rounded-full font-bold text-body flex items-center justify-center gap-2 shadow-[0_8px_18px_rgba(208,66,12,0.3)] active:scale-[0.98] transition-transform"
+            >
+              <span aria-hidden="true" className="material-symbols-outlined text-[18px]">edit</span>
+              Report Status
+            </button>
+            <button
+              onClick={() => {
+                openExternalMaps(station);
+                if (onNavigate) onNavigate(station);
+              }}
+              aria-label="Directions"
+              title="Directions"
+              className="w-12 h-12 rounded-full bg-surface-container text-slate-900 flex items-center justify-center active:scale-95 transition-transform shrink-0"
+            >
+              <span aria-hidden="true" className="material-symbols-outlined text-[22px]">navigation</span>
+            </button>
+            <button
+              onClick={() => openWhatsAppShare(station)}
+              aria-label="Share station"
+              title="Share"
+              className="w-12 h-12 rounded-full bg-surface-container text-slate-900 flex items-center justify-center active:scale-95 transition-transform shrink-0"
+            >
+              <span aria-hidden="true" className="material-symbols-outlined text-[22px]">ios_share</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -662,7 +663,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
               onClick={() => setSelectedPhoto(null)}
               className="absolute -top-12 right-0 text-white p-2 rounded-full hover:bg-white/20"
             >
-              <span className="material-symbols-outlined text-[32px]">close</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[32px]">close</span>
             </button>
             <img
               src={selectedPhoto}

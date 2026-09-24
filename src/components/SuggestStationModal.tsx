@@ -72,7 +72,7 @@ export const SuggestStationModal: React.FC<SuggestStationModalProps> = ({
         {submitted ? (
           <div className="py-8 flex flex-col items-center justify-center text-center gap-3 animate-fade-in">
             <div className="w-14 h-14 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center">
-              <span className="material-symbols-outlined text-[36px]">verified</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[36px]">verified</span>
             </div>
             <h3 className="text-[1.25rem] font-extrabold text-on-surface">Submission Received!</h3>
             <p className="text-body font-medium text-outline max-w-sm">
@@ -87,7 +87,7 @@ export const SuggestStationModal: React.FC<SuggestStationModalProps> = ({
 
             {formError && (
               <div className="p-3 bg-rose-50 border border-rose-200 rounded-2xl text-rose-700 text-caption font-semibold flex items-center gap-2">
-                <span className="material-symbols-outlined text-[18px]">error</span>
+                <span aria-hidden="true" className="material-symbols-outlined text-[18px]">error</span>
                 <span>{formError}</span>
               </div>
             )}
@@ -107,7 +107,7 @@ export const SuggestStationModal: React.FC<SuggestStationModalProps> = ({
                       : 'text-on-surface-variant hover:bg-surface-container'
                   }`}
                 >
-                  <span className="material-symbols-outlined text-[18px]">local_gas_station</span>
+                  <span aria-hidden="true" className="material-symbols-outlined text-[18px]">local_gas_station</span>
                   <span>CNG Station</span>
                 </button>
                 <button
@@ -119,7 +119,7 @@ export const SuggestStationModal: React.FC<SuggestStationModalProps> = ({
                       : 'text-on-surface-variant hover:bg-surface-container'
                   }`}
                 >
-                  <span className="material-symbols-outlined text-[18px]">ev_charger</span>
+                  <span aria-hidden="true" className="material-symbols-outlined text-[18px]">ev_charger</span>
                   <span>EV Charger</span>
                 </button>
               </div>
@@ -175,7 +175,7 @@ export const SuggestStationModal: React.FC<SuggestStationModalProps> = ({
                 <label className="block text-caption font-bold text-on-surface mb-1">
                   State *
                 </label>
-                <select
+                <select aria-label="State"
                   value={state}
                   onChange={(e) => setState(e.target.value)}
                   className="w-full px-4 py-3 rounded-2xl bg-surface-container text-body font-medium text-on-surface outline-none focus:border-primary"
@@ -221,12 +221,12 @@ export const SuggestStationModal: React.FC<SuggestStationModalProps> = ({
                     onClick={() => setPhoto(undefined)}
                     className="absolute top-2 right-2 w-8 h-8 rounded-full bg-black/70 text-white flex items-center justify-center"
                   >
-                    <span className="material-symbols-outlined text-[16px]">close</span>
+                    <span aria-hidden="true" className="material-symbols-outlined text-[16px]">close</span>
                   </button>
                 </div>
               ) : (
                 <label className="w-full p-4 border-2 border-dashed border-outline-variant hover:border-primary rounded-2xl flex items-center justify-center gap-2 cursor-pointer text-caption font-bold text-primary bg-surface-container-lowest transition-colors">
-                  <span className="material-symbols-outlined text-[20px]">add_a_photo</span>
+                  <span aria-hidden="true" className="material-symbols-outlined text-[20px]">add_a_photo</span>
                   <span>Upload Station / Charger Photo</span>
                   <input type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" />
                 </label>
@@ -260,7 +260,7 @@ export const SuggestStationModal: React.FC<SuggestStationModalProps> = ({
                 type="submit"
                 className="px-6 py-3 rounded-full bg-primary text-on-primary font-extrabold text-caption shadow-md active:scale-95 transition-all flex items-center gap-2"
               >
-                <span className="material-symbols-outlined text-[18px]">send</span>
+                <span aria-hidden="true" className="material-symbols-outlined text-[18px]">send</span>
                 <span>Submit for Verification</span>
               </button>
             </div>

@@ -40,7 +40,7 @@ export const INITIAL_USER: UserProfile = {
   name: '',
   phone: '',
   email: '',
-  avatar: ASSETS.userAvatar,
+  avatar: '',
   vehicle: '',
   cngInstalledDate: '',
   monthlySavings: 0,

@@ -60,7 +60,7 @@ export const DiscussionScreen: React.FC<DiscussionScreenProps> = ({
                   {post.author}
                 </span>
                 {post.verified && (
-                  <span
+                  <span aria-hidden="true"
                     className="material-symbols-outlined text-primary text-[18px]"
                     style={{ fontVariationSettings: "'FILL' 1" }}
                   >
@@ -114,7 +114,7 @@ export const DiscussionScreen: React.FC<DiscussionScreenProps> = ({
                     : 'bg-surface text-on-surface-variant hover:bg-surface-container'
                 }`}
               >
-                <span
+                <span aria-hidden="true"
                   className="material-symbols-outlined text-[20px]"
                   style={{
                     fontVariationSettings: isLiked ? "'FILL' 1" : "'FILL' 0",
@@ -126,7 +126,7 @@ export const DiscussionScreen: React.FC<DiscussionScreenProps> = ({
               </button>
 
               <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface text-on-surface-variant text-body font-medium">
-                <span className="material-symbols-outlined text-[20px]">
+                <span aria-hidden="true" className="material-symbols-outlined text-[20px]">
                   chat_bubble_outline
                 </span>
                 <span>{comments.length}</span>
@@ -145,7 +145,7 @@ export const DiscussionScreen: React.FC<DiscussionScreenProps> = ({
               }}
               className="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container transition-colors"
             >
-              <span className="material-symbols-outlined text-[22px]">
+              <span aria-hidden="true" className="material-symbols-outlined text-[22px]">
                 share
               </span>
             </button>
@@ -155,7 +155,7 @@ export const DiscussionScreen: React.FC<DiscussionScreenProps> = ({
         {/* Comments Feed */}
         <div className="mt-5">
           <div className="flex items-center gap-2 mb-4">
-            <span className="material-symbols-outlined text-primary text-[22px]">
+            <span aria-hidden="true" className="material-symbols-outlined text-primary text-[22px]">
               forum
             </span>
             <h2 className="text-title font-bold text-on-surface">
@@ -267,7 +267,7 @@ export const DiscussionScreen: React.FC<DiscussionScreenProps> = ({
               aria-label="Send comment"
               className="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center shadow-md hover:bg-deep-teal disabled:opacity-40 transition-all active:scale-95 shrink-0"
             >
-              <span
+              <span aria-hidden="true"
                 className="material-symbols-outlined text-[20px]"
                 style={{ fontVariationSettings: "'FILL' 1" }}
               >

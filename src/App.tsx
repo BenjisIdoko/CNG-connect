@@ -18,7 +18,7 @@ import { MapScreen, GpsStatus } from './components/MapScreen';
 import { OnboardingScreen } from './components/OnboardingScreen';
 import { ProximityAlertBanner } from './components/ProximityAlertBanner';
 import { SignUpScreen } from './components/SignUpScreen';
-import { SplashScreen } from './components/SplashScreen';
+import { SplashScreen, shouldShowSplash } from './components/SplashScreen';
 import { PwaUpdateToast } from './components/PwaUpdateToast';
 import { InstallPrompt } from './components/InstallPrompt';
 import { useAuth } from './context/AuthContext';
@@ -124,7 +124,7 @@ export const App: React.FC = () => {
   });
 
   // Animated Splash Screen State
-  const [showSplash, setShowSplash] = useState(true);
+  const [showSplash, setShowSplash] = useState(shouldShowSplash);
 
   // Navigation State
   const [activeTab, setActiveTab] = useState<'map' | 'conversions' | 'community' | 'profile'>('map');
@@ -763,6 +763,8 @@ export const App: React.FC = () => {
 
   const isMapHome = activeTab === 'map' && !activeDetailStation && !activeDiscussionPost && !activeChatPost;
   const isProfileHome = activeTab === 'profile' && !activeDetailStation && !activeDiscussionPost && !activeChatPost;
+  // The station page has its own hero with back / favourite / share, so the app header is redundant on phones.
+  const isStationDetail = !!activeDetailStation && !activeDiscussionPost && !activeChatPost;
 
   // Determine current view title and back button
   let headerTitle: string | undefined;
@@ -814,6 +816,9 @@ export const App: React.FC = () => {
         />
       )}
 
+      {/* The app shell is inert (unreachable by keyboard / screen reader) while the
+          onboarding or sign-up overlay is on top of it. */}
+      <div className="contents" inert={authMode !== null}>
       {/* Desktop Persistent Left Sidebar (Visible at lg: 1024px and above) */}
       {!activeChatPost && (
         <Sidebar
@@ -836,7 +841,7 @@ export const App: React.FC = () => {
           showBack={showHeaderBack}
           onBack={onHeaderBack}
           onOpenAiAssistant={() => setIsAiModalOpen(true)}
-          mobileHidden={isMapHome || isProfileHome}
+          mobileHidden={isMapHome || isProfileHome || isStationDetail}
         />
       )}
 
@@ -847,12 +852,13 @@ export const App: React.FC = () => {
       />
       <main
         className={`flex-1 overflow-y-auto relative lg:pt-[calc(3.5rem_+_max(env(safe-area-inset-top,0px),0.75rem))] lg:pb-24 lg:pl-64 ${
-          isMapHome ? 'pt-0 pb-0' : isProfileHome ? 'pt-0 pb-24' : 'pt-[calc(3.5rem_+_max(env(safe-area-inset-top,0px),0.75rem))] pb-24'
+          isMapHome ? 'pt-0 pb-0' : isStationDetail ? 'pt-0 pb-0' : isProfileHome ? 'pt-0 pb-24' : 'pt-[calc(3.5rem_+_max(env(safe-area-inset-top,0px),0.75rem))] pb-24'
         }`}
       >
+        <h1 className="sr-only lg:hidden">{headerTitle || (activeTab === 'map' ? 'CNG-Connect map' : activeTab === 'conversions' ? 'CNG kit centres' : activeTab === 'community' ? 'Community' : 'Profile')}</h1>
         {!isOnline && (
           <div className="fixed top-3 left-1/2 -translate-x-1/2 z-50 bg-deep-teal text-white text-[0.7812rem] font-extrabold px-4 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 animate-pulse pointer-events-none">
-            <span className="material-symbols-outlined text-[16px] text-amber-400">wifi_off</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[16px] text-amber-400">wifi_off</span>
             <span>No network. Showing last known stations.</span>
           </div>
         )}
@@ -954,13 +960,19 @@ export const App: React.FC = () => {
           )}
         </Suspense>
       </main>
+      </div>
 
       {/* Auth-Gated Onboarding & Registration Screen. There's no separate
           "login" mode anymore — email-OTP sign-in and sign-up are the same
           flow (Supabase creates the account on first verify), so both
           onStartSignUp and onStartLogin below lead to the same screen. */}
       {authMode !== null && (
-        <div className="fixed inset-0 z-[60] bg-[#f2fcf5] overflow-y-auto">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={authMode === 'signup' ? 'Sign in or sign up' : 'Welcome to CNG-Connect'}
+          className="fixed inset-0 z-[60] bg-surface overflow-y-auto"
+        >
           {authMode === 'onboarding' && (
             <OnboardingScreen
               onStartSignUp={() => setAuthMode('signup')}

@@ -77,7 +77,7 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
       {/* Header + stats */}
       <div className="bg-white px-5 pt-5 pb-4 shadow-[0_2px_10px_rgba(14,20,32,0.04)]">
         <div className="max-w-3xl mx-auto">
-          <h1 className="font-bold text-title tracking-tight">Conversion Centres</h1>
+          <h2 className="font-bold text-title tracking-tight">Conversion Centres</h2>
           <div className="flex gap-2 mt-3">
             {[
               { v: centers.length.toLocaleString(), l: 'Centres' },
@@ -92,7 +92,7 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
           </div>
 
           <div className="flex items-center bg-surface rounded-full px-4 gap-2.5 mt-4 focus-within:ring-2 focus-within:ring-primary/30">
-            <span className="material-symbols-outlined text-outline text-[20px]">search</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-outline text-[20px]">search</span>
             <input
               type="text"
               value={searchQuery}
@@ -102,7 +102,7 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
             />
             {searchQuery && (
               <button onClick={() => setSearchQuery('')} aria-label="Clear search" className="text-outline">
-                <span className="material-symbols-outlined text-[18px]">close</span>
+                <span aria-hidden="true" className="material-symbols-outlined text-[18px]">close</span>
               </button>
             )}
           </div>
@@ -125,7 +125,7 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
 
           <div className="flex items-center justify-between mt-3 text-caption font-semibold">
             <span className="flex items-center gap-1.5">
-              <span className="material-symbols-outlined text-[#B4890B] text-[18px]">workspace_premium</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[#7A5C08] text-[18px]">workspace_premium</span>
               Accredited only
             </span>
             <button
@@ -171,7 +171,7 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
                     <div className="flex items-center gap-1.5 flex-wrap">
                       <h3 className="font-bold text-body text-slate-900 truncate">{center.name}</h3>
                       {center.isPiCngAccredited && (
-                        <span className="bg-[#FDF6E3] text-[#B4890B] rounded-md px-1.5 py-0.5 text-[0.75rem] font-bold shrink-0">
+                        <span className="bg-[#FDF6E3] text-[#7A5C08] rounded-md px-1.5 py-0.5 text-[0.75rem] font-bold shrink-0">
                           Accredited
                         </span>
                       )}
@@ -182,7 +182,7 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
                   </div>
                   {center.reviewsCount > 0 && center.rating > 0 && (
                     <span className="text-caption text-outline shrink-0 flex items-center gap-0.5">
-                      <span className="material-symbols-outlined text-[15px] text-[#F5A623] material-symbols-fill">star</span>
+                      <span aria-hidden="true" className="material-symbols-outlined text-[15px] text-[#F5A623] material-symbols-fill">star</span>
                       {center.rating}
                     </span>
                   )}

@@ -91,7 +91,7 @@ export const ProximityAlertBanner: React.FC<ProximityAlertBannerProps> = ({
             aria-label="Close notification"
             className="w-8 h-8 -mr-1 rounded-full text-outline flex items-center justify-center hover:bg-surface-container"
           >
-            <span className="material-symbols-outlined text-[20px]">close</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[20px]">close</span>
           </button>
         </div>
 
@@ -105,7 +105,7 @@ export const ProximityAlertBanner: React.FC<ProximityAlertBannerProps> = ({
                   className="flex items-center gap-2 bg-surface-container rounded-[14px] p-3 text-left active:scale-95 transition-transform"
                 >
                   <span className={`w-[26px] h-[26px] rounded-full text-white flex items-center justify-center shrink-0 ${opt.dot}`}>
-                    <span className="material-symbols-outlined text-[15px] material-symbols-fill">{opt.icon}</span>
+                    <span aria-hidden="true" className="material-symbols-outlined text-[15px] material-symbols-fill">{opt.icon}</span>
                   </span>
                   <span className="text-caption font-semibold text-slate-900">{opt.label}</span>
                 </button>
@@ -119,7 +119,7 @@ export const ProximityAlertBanner: React.FC<ProximityAlertBannerProps> = ({
                 className="text-caption font-bold text-emerald-700 flex items-center gap-1.5"
               >
                 Add pressure &amp; photo report
-                <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+                <span aria-hidden="true" className="material-symbols-outlined text-[16px]">arrow_forward</span>
               </button>
               <button onClick={onDismiss} className="text-caption font-semibold text-outline">
                 Not now
@@ -129,7 +129,7 @@ export const ProximityAlertBanner: React.FC<ProximityAlertBannerProps> = ({
         ) : (
           <div className="py-5 text-center flex flex-col items-center gap-1.5 animate-fade-in">
             <div className="w-11 h-11 rounded-full bg-primary-container text-primary flex items-center justify-center">
-              <span className="material-symbols-outlined text-[26px]">check_circle</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[26px]">check_circle</span>
             </div>
             <p className="font-extrabold text-body-lg text-slate-900">Thanks for the update!</p>
             <p className="text-caption text-emerald-700 font-bold">+50 reputation points earned</p>

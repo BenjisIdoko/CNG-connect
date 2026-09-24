@@ -53,7 +53,7 @@ export const CngRoiCalculatorModal: React.FC<CngRoiCalculatorModalProps> = ({
           <div className="flex items-center justify-between">
             <span className="font-bold text-body">Fuel Savings Calculator</span>
             <button onClick={onClose} aria-label="Close" className="text-[#9FB8A3] p-1 -mr-1">
-              <span className="material-symbols-outlined text-[20px]">close</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[20px]">close</span>
             </button>
           </div>
           <div className="text-center mt-5">
@@ -131,7 +131,7 @@ export const CngRoiCalculatorModal: React.FC<CngRoiCalculatorModalProps> = ({
               className="w-full py-3.5 bg-primary text-white font-bold text-body rounded-full flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
             >
               Find an accredited centre
-              <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[18px]">arrow_forward</span>
             </button>
           )}
         </div>

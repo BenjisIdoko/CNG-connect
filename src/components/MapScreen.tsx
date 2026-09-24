@@ -529,7 +529,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
           barColor: 'bg-slate-400',
           badgeBg: 'bg-slate-100 border-slate-200 text-slate-700',
           dotColor: 'bg-slate-400',
-          solidBg: 'bg-slate-400',
+          solidBg: 'bg-surface-container-high text-outline!',
           shortLabel: 'No recent report',
           label: 'No recent reports',
         };
@@ -570,13 +570,13 @@ export const MapScreen: React.FC<MapScreenProps> = ({
               aria-label="Open AI Assistant"
               className="w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center shadow-[0_4px_12px_rgba(49,154,63,0.5)] active:scale-95 transition-transform"
             >
-              <span className="material-symbols-outlined text-[18px]">auto_awesome</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[18px]">auto_awesome</span>
             </button>
           )}
         </div>
 
         <div className="mt-3 flex items-center bg-white rounded-full shadow-[0_8px_20px_rgba(31,41,35,0.18)] px-4 gap-2 pointer-events-auto focus-within:ring-2 focus-within:ring-primary/40">
-          <span className="material-symbols-outlined text-slate-400 text-[20px] shrink-0">search</span>
+          <span aria-hidden="true" className="material-symbols-outlined text-slate-400 text-[20px] shrink-0">search</span>
           <input
             type="text"
             value={searchQuery}
@@ -590,7 +590,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
               className="p-1 rounded-full text-slate-400 hover:bg-slate-100 shrink-0"
               aria-label="Clear search"
             >
-              <span className="material-symbols-outlined text-[18px]">close</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[18px]">close</span>
             </button>
           )}
         </div>
@@ -608,7 +608,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                 chip.active ? 'bg-primary text-white' : 'bg-white text-slate-900'
               }`}
             >
-              {chip.icon && <span className="material-symbols-outlined text-[14px]">{chip.icon}</span>}
+              {chip.icon && <span aria-hidden="true" className="material-symbols-outlined text-[14px]">{chip.icon}</span>}
               {chip.label}
             </button>
           ))}
@@ -637,6 +637,8 @@ export const MapScreen: React.FC<MapScreenProps> = ({
           aria-label="My Location"
           title={gpsStatusText}
           className={`pointer-events-auto absolute right-4 -top-14 w-11 h-11 rounded-full text-white flex items-center justify-center active:scale-95 transition-all ${
+            sheetMode === 'expanded' ? 'opacity-0 pointer-events-none! scale-75' : ''
+          } ${
             gpsStatus === 'active'
               ? 'bg-primary shadow-[0_6px_16px_rgba(49,154,63,0.5)]'
               : gpsStatus === 'denied'
@@ -644,7 +646,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
               : 'bg-status-amber shadow-[0_6px_16px_rgba(245,166,35,0.4)]'
           }`}
         >
-          <span className="material-symbols-outlined text-[20px]">
+          <span aria-hidden="true" className="material-symbols-outlined text-[20px]">
             {gpsStatus === 'active' ? 'my_location' : gpsStatus === 'denied' ? 'location_disabled' : 'location_searching'}
           </span>
         </button>
@@ -670,12 +672,12 @@ export const MapScreen: React.FC<MapScreenProps> = ({
           >
             <div className="w-10 h-1.5 bg-slate-900/15 rounded-full mb-2.5" />
             <div className="w-full flex items-center justify-between">
-              <h3 className="font-extrabold text-body-lg tracking-tight text-on-surface flex items-center gap-2">
+              <h2 className="font-extrabold text-body-lg tracking-tight text-on-surface flex items-center gap-2">
                 {hasLiveData && <span className="w-2 h-2 rounded-full bg-live-pulse animate-pulse" />}
                 {filteredStations.length}{' '}
-                {filteredStations.length === 1 ? 'station' : 'stations'} near you
-              </h3>
-              <span className="material-symbols-outlined text-slate-400 text-[20px]">
+                {filteredStations.length === 1 ? 'station' : 'stations'}{gpsStatus === 'active' ? ' near you' : ''}
+              </h2>
+              <span aria-hidden="true" className="material-symbols-outlined text-slate-400 text-[20px]">
                 {sheetMode === 'expanded' ? 'keyboard_arrow_down' : 'keyboard_arrow_up'}
               </span>
             </div>
@@ -683,7 +685,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
 
           {sheetMode === 'collapsed' ? null : filteredStations.length === 0 ? (
             <div className="px-5 pt-4 pb-28 text-center flex flex-col items-center gap-2">
-              <h4 className="font-extrabold text-on-surface text-body-lg">No stations found</h4>
+              <h3 className="font-extrabold text-on-surface text-body-lg">No stations found</h3>
               <p className="text-caption text-on-surface-variant max-w-xs">
                 Nothing matches your search or filters right now.
               </p>
@@ -758,7 +760,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                       <img src={station.images?.[0] || ASSETS.stationWide} alt="" className="w-full h-full object-cover" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <h4 className="font-bold text-body text-on-surface truncate leading-snug">{station.name}</h4>
+                      <h3 className="font-bold text-body text-on-surface truncate leading-snug">{station.name}</h3>
                       <p className="text-caption text-outline truncate">{meta.join(' · ') || 'No recent reports'}</p>
                       <span
                         className={`inline-flex items-center mt-1 rounded-md px-1.5 py-0.5 text-micro font-bold text-white ${info.solidBg}`}
@@ -775,7 +777,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                         aria-label={`Share ${station.name} on WhatsApp`}
                         className="w-9 h-9 rounded-full bg-emerald-50 text-whatsapp flex items-center justify-center active:scale-95"
                       >
-                        <span className="material-symbols-outlined text-[16px]">share</span>
+                        <span aria-hidden="true" className="material-symbols-outlined text-[16px]">share</span>
                       </button>
                       <button
                         onClick={(e) => {
@@ -785,7 +787,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                         aria-label={`Navigate to ${station.name}`}
                         className="w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center active:scale-95"
                       >
-                        <span className="material-symbols-outlined text-[16px]">navigation</span>
+                        <span aria-hidden="true" className="material-symbols-outlined text-[16px]">navigation</span>
                       </button>
                     </div>
                   </div>
@@ -803,7 +805,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                 onClick={() => setIsSuggestModalOpen(true)}
                 className="w-full py-3 text-primary text-caption font-bold flex items-center justify-center gap-2"
               >
-                <span className="material-symbols-outlined text-[16px]">add_location_alt</span>
+                <span aria-hidden="true" className="material-symbols-outlined text-[16px]">add_location_alt</span>
                 Can&apos;t find a station? Suggest one
               </button>
             </div>
@@ -816,9 +818,9 @@ export const MapScreen: React.FC<MapScreenProps> = ({
         {/* Right Panel Header: Search & Filter */}
         <div className="p-4 flex flex-col gap-3 bg-white shadow-[0_2px_10px_rgba(31,41,35,0.05)]">
           <div className="flex items-center justify-between">
-            <h3 className="font-extrabold text-[1rem] text-slate-900 flex items-center gap-2">
+            <h2 className="font-extrabold text-[1rem] text-slate-900 flex items-center gap-2">
               <span>Stations & Chargers</span>
-            </h3>
+            </h2>
             <span className="text-[0.75rem] font-bold text-primary bg-primary-container px-3 py-1 rounded-full">
               {filteredStations.length} Results
             </span>
@@ -826,7 +828,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
 
           {/* Desktop Search Input */}
           <div className="flex items-center bg-surface rounded-full px-4 py-2.5 gap-2 focus-within:ring-2 focus-within:ring-primary/20">
-            <span className="material-symbols-outlined text-slate-400 text-[18px]">search</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-slate-400 text-[18px]">search</span>
             <input
               type="text"
               value={searchQuery}
@@ -836,7 +838,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
             />
             {searchQuery && (
               <button onClick={() => setSearchQuery('')} className="text-slate-400 hover:text-slate-600">
-                <span className="material-symbols-outlined text-[16px]">close</span>
+                <span aria-hidden="true" className="material-symbols-outlined text-[16px]">close</span>
               </button>
             )}
           </div>
@@ -857,7 +859,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                 stationTypeFilter === 'cng' ? 'bg-deep-teal text-white' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              <span className="material-symbols-outlined text-[14px]">local_gas_station</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[14px]">local_gas_station</span>
               <span>CNG</span>
             </button>
           </div>
@@ -866,7 +868,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
             onClick={() => setIsSuggestModalOpen(true)}
             className="w-full py-2.5 bg-primary hover:bg-emerald-700 text-white rounded-full text-micro font-extrabold active:scale-98 transition-all flex items-center justify-center gap-2"
           >
-            <span className="material-symbols-outlined text-[16px]">add_location_alt</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[16px]">add_location_alt</span>
             <span>+ Suggest New Station</span>
           </button>
         </div>
@@ -895,9 +897,9 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-2 min-w-0">
                       <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${statusInfo.dotColor}`} />
-                      <h4 className="font-extrabold text-body-lg text-slate-900 truncate">
+                      <h3 className="font-extrabold text-body-lg text-slate-900 truncate">
                         {station.name}
-                      </h4>
+                      </h3>
                     </div>
                     <span className="text-micro font-extrabold text-primary shrink-0">
                       {station.distance}
@@ -920,7 +922,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                       className="text-micro font-extrabold text-primary hover:underline flex items-center gap-1"
                     >
                       <span>Group Chat & Specs</span>
-                      <span className="material-symbols-outlined text-[14px]">chevron_right</span>
+                      <span aria-hidden="true" className="material-symbols-outlined text-[14px]">chevron_right</span>
                     </button>
                   </div>
                 </div>
@@ -975,7 +977,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                   >
                     <span className={`w-2 h-2 rounded-full ${opt.dot}`} />
                     <span className="flex-1 text-caption font-semibold">{opt.label}</span>
-                    {on && <span className="material-symbols-outlined text-primary text-[18px]">check</span>}
+                    {on && <span aria-hidden="true" className="material-symbols-outlined text-primary text-[18px]">check</span>}
                   </button>
                 );
               })}

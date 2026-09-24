@@ -117,7 +117,7 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
               className="w-full py-4 bg-primary text-white font-bold text-[0.9375rem] rounded-full flex items-center justify-center gap-2 shadow-[0_8px_18px_rgba(49,154,63,0.3)] active:scale-[0.98] transition-transform"
             >
               Sign Up
-              <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[20px]">arrow_forward</span>
             </button>
             <div className="flex items-center justify-center gap-8">
               <button onClick={onStartLogin} className="text-[0.9375rem] font-semibold text-slate-900 py-1">
@@ -145,7 +145,7 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
                   aria-label="Previous slide"
                   className="w-12 h-12 rounded-full bg-surface-container text-slate-900 flex items-center justify-center active:scale-95 transition-transform"
                 >
-                  <span className="material-symbols-outlined text-[20px]">arrow_back</span>
+                  <span aria-hidden="true" className="material-symbols-outlined text-[20px]">arrow_back</span>
                 </button>
               )}
               <button
@@ -153,7 +153,7 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
                 aria-label="Continue"
                 className="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center active:scale-95 transition-transform shadow-[0_6px_14px_rgba(49,154,63,0.35)]"
               >
-                <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
+                <span aria-hidden="true" className="material-symbols-outlined text-[20px]">arrow_forward</span>
               </button>
             </div>
           </div>

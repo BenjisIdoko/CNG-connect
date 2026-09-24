@@ -133,14 +133,14 @@ export const LiveCameraCaptureModal: React.FC<LiveCameraCaptureModalProps> = ({
               className="w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white backdrop-blur-md active:scale-95 transition-all"
               title="Switch Camera (Rear/Front)"
             >
-              <span className="material-symbols-outlined text-[20px]">flip_camera_ios</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[20px]">flip_camera_ios</span>
             </button>
           )}
           <button
             onClick={onClose}
             className="w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white backdrop-blur-md active:scale-95 transition-all"
           >
-            <span className="material-symbols-outlined text-[22px]">close</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[22px]">close</span>
           </button>
         </div>
       </div>
@@ -150,7 +150,7 @@ export const LiveCameraCaptureModal: React.FC<LiveCameraCaptureModalProps> = ({
         {cameraError ? (
           <div className="p-6 text-center text-status-red max-w-sm flex flex-col items-center">
             <div className="w-16 h-16 rounded-full bg-status-red/20 text-status-red flex items-center justify-center mb-3">
-              <span className="material-symbols-outlined text-[36px]">videocam_off</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[36px]">videocam_off</span>
             </div>
             <h3 className="font-bold text-[1.125rem] text-white">Enable Camera Access</h3>
             <p className="text-[0.875rem] mt-1 text-slate-300 font-normal leading-relaxed mb-5">
@@ -161,7 +161,7 @@ export const LiveCameraCaptureModal: React.FC<LiveCameraCaptureModalProps> = ({
               onClick={() => startCamera(facingMode)}
               className="px-6 py-3.5 bg-status-green hover:opacity-95 text-on-surface font-bold text-[0.9062rem] rounded-full shadow-lg flex items-center gap-2 active:scale-95 transition-all"
             >
-              <span className="material-symbols-outlined text-[20px]">photo_camera</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[20px]">photo_camera</span>
               <span>Allow &amp; Enable Camera</span>
             </button>
           </div>
@@ -206,7 +206,7 @@ export const LiveCameraCaptureModal: React.FC<LiveCameraCaptureModalProps> = ({
             aria-label="Take Live Snapshot"
           >
             <div className="w-14 h-14 rounded-full bg-white flex items-center justify-center text-primary">
-              <span className="material-symbols-outlined text-[32px]">photo_camera</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[32px]">photo_camera</span>
             </div>
           </button>
         )}

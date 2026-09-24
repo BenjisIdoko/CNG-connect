@@ -15,7 +15,6 @@ export const TabUnderline: React.FC<{
   useLayoutEffect(() => {
     const el = listRef.current?.querySelector<HTMLElement>('[data-state="active"]');
     if (el) setBox({ x: el.offsetLeft, w: el.offsetWidth });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [active, ...deps]);
 
   if (!box) return null;

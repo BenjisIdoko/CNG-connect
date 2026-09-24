@@ -98,7 +98,7 @@ export const Modal: React.FC<ModalProps> = ({
                   aria-label="Close modal"
                   className="w-8 h-8 rounded-full bg-surface-container text-slate-600 hover:bg-surface-container-high flex items-center justify-center transition-colors shrink-0 active:scale-95"
                 >
-                  <span className="material-symbols-outlined text-[18px]">close</span>
+                  <span aria-hidden="true" className="material-symbols-outlined text-[18px]">close</span>
                 </DialogPrimitive.Close>
               </div>
             </>

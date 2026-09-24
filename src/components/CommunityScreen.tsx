@@ -212,7 +212,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
         {/* Search Bar & Notification Button */}
         <div className="flex items-center gap-2">
           <div className="flex-1 relative flex items-center">
-            <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-outline text-[20px]">
+            <span aria-hidden="true" className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-outline text-[20px]">
               search
             </span>
             <input
@@ -221,8 +221,8 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={
                 activeMainTab === 'station_groups'
-                  ? 'Search station groups, city, state...'
-                  : 'Search tips, station updates, deals...'
+                  ? 'Search groups or city'
+                  : 'Search tips and deals'
               }
               className="w-full bg-surface-container rounded-full py-2.5 pl-10 pr-9 text-body font-normal text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary/30 focus:bg-white transition-all"
             />
@@ -232,7 +232,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                 className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-outline hover:text-on-surface rounded-full shrink-0"
                 aria-label="Clear search query"
               >
-                <span className="material-symbols-outlined text-[16px]">close</span>
+                <span aria-hidden="true" className="material-symbols-outlined text-[16px]">close</span>
               </button>
             )}
           </div>
@@ -249,7 +249,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
             aria-label="Notifications"
             className="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-high text-on-surface hover:bg-surface-container-highest transition-colors relative active:scale-95 shrink-0"
           >
-            <span className="material-symbols-outlined text-[20px]">
+            <span aria-hidden="true" className="material-symbols-outlined text-[20px]">
               notifications
             </span>
             <span className="absolute top-2 right-2 w-2 h-2 bg-error rounded-full border-2 border-white" />
@@ -272,7 +272,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                   className="w-6 h-6 rounded-full bg-emerald-100 hover:bg-emerald-200 text-primary flex items-center justify-center transition-all active:scale-95 shrink-0"
                   title="Policy Info"
                 >
-                  <span className="material-symbols-outlined text-[15px]">info</span>
+                  <span aria-hidden="true" className="material-symbols-outlined text-[15px]">info</span>
                 </button>
               </div>
               {/* Status filter — collapsed into a single control */}
@@ -286,13 +286,13 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                       : 'bg-primary text-white border-primary'
                   }`}
                 >
-                  <span className="material-symbols-outlined text-[16px]">tune</span>
+                  <span aria-hidden="true" className="material-symbols-outlined text-[16px]">tune</span>
                   {statusFilter !== 'all' && (
                     <span className="whitespace-nowrap">
                       {STATUS_OPTIONS.find((o) => o.id === statusFilter)?.label}
                     </span>
                   )}
-                  <span className="material-symbols-outlined text-[15px]">
+                  <span aria-hidden="true" className="material-symbols-outlined text-[15px]">
                     {showStatusMenu ? 'expand_less' : 'expand_more'}
                   </span>
                 </button>
@@ -315,7 +315,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                           <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${o.dotColor ?? 'bg-transparent'}`} />
                           <span>{o.label}</span>
                           {statusFilter === o.id && (
-                            <span className="material-symbols-outlined text-[16px] ml-auto">check</span>
+                            <span aria-hidden="true" className="material-symbols-outlined text-[16px] ml-auto">check</span>
                           )}
                         </button>
                       ))}
@@ -347,7 +347,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                       className="flex items-center gap-3 py-4 cursor-pointer transition-colors active:bg-surface-container/40 md:bg-white md:p-4 md:rounded-2xl md:border md:border-slate-200/80 md:shadow-2xs md:hover:border-primary/60 md:active:bg-transparent"
                     >
                       <div className="w-10 h-10 rounded-2xl bg-emerald-50 flex items-center justify-center text-primary shrink-0">
-                        <span className="material-symbols-outlined text-[20px]">groups</span>
+                        <span aria-hidden="true" className="material-symbols-outlined text-[20px]">groups</span>
                       </div>
 
                       <div className="min-w-0 flex-1">
@@ -368,7 +368,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                         </p>
                       </div>
 
-                      <span className="material-symbols-outlined text-[18px] text-outline shrink-0">chevron_right</span>
+                      <span aria-hidden="true" className="material-symbols-outlined text-[18px] text-outline shrink-0">chevron_right</span>
                     </div>
                   );
                 })}
@@ -413,25 +413,21 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                   }`}
                 >
                   <div className="w-11 h-11 rounded-full bg-deep-teal flex items-center justify-center text-status-green shadow-sm shrink-0">
-                    <span className="material-symbols-outlined text-[22px]">
+                    <span aria-hidden="true" className="material-symbols-outlined text-[22px]">
                       build_circle
                     </span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="text-body font-bold text-slate-900 truncate">
-                        CNG Kit Conversion Centers
-                      </span>
-                      <span className="text-micro font-semibold text-primary bg-emerald-100 px-2 py-1 rounded-xl">
-                        Pi-CNG
-                      </span>
-                    </div>
-                    <p className="text-micro font-normal text-slate-500 truncate">
-                      337+ Pi-CNG certified centers nationwide
+                    <span className="text-body font-bold text-slate-900 leading-tight block">
+                      CNG Kit Conversion Centres
+                    </span>
+                    <p className="text-micro font-normal text-slate-500 mt-0.5 flex items-center gap-1.5">
+                      <span className="text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded-md font-semibold whitespace-nowrap">Pi-CNG</span>
+                      <span className="truncate">337+ certified nationwide</span>
                     </p>
                   </div>
                   <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center shadow-2xs transition-colors shrink-0">
-                    <span className="material-symbols-outlined text-[18px]">
+                    <span aria-hidden="true" className="material-symbols-outlined text-[18px]">
                       chevron_right
                     </span>
                   </div>
@@ -451,7 +447,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                   }`}
                 >
                   <div className="w-10 h-10 rounded-full bg-primary-container/30 flex items-center justify-center text-on-primary-container shadow-xs">
-                    <span className="material-symbols-outlined text-[20px]">
+                    <span aria-hidden="true" className="material-symbols-outlined text-[20px]">
                       build
                     </span>
                   </div>
@@ -474,7 +470,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                   }`}
                 >
                   <div className="w-10 h-10 rounded-full bg-secondary-container/30 flex items-center justify-center text-on-secondary-container shadow-xs">
-                    <span className="material-symbols-outlined text-[20px]">
+                    <span aria-hidden="true" className="material-symbols-outlined text-[20px]">
                       settings
                     </span>
                   </div>
@@ -497,7 +493,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                   }`}
                 >
                   <div className="w-10 h-10 rounded-full bg-tertiary-container/40 flex items-center justify-center text-on-tertiary-container shadow-xs">
-                    <span
+                    <span aria-hidden="true"
                       className="material-symbols-outlined text-[20px]"
                       style={{ fontVariationSettings: "'FILL' 1" }}
                     >
@@ -523,7 +519,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                   }`}
                 >
                   <div className="w-10 h-10 rounded-full bg-electric-amber/30 flex items-center justify-center text-[#2d1600] shadow-xs">
-                    <span className="material-symbols-outlined text-[20px]">
+                    <span aria-hidden="true" className="material-symbols-outlined text-[20px]">
                       local_offer
                     </span>
                   </div>
@@ -630,7 +626,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                             : 'text-slate-500 hover:text-slate-800'
                         }`}
                       >
-                        <span
+                        <span aria-hidden="true"
                           className="material-symbols-outlined text-[19px]"
                           style={{
                             fontVariationSettings: (likeOverrides[post.id]?.isLiked ?? Boolean(post.isLiked))
@@ -647,7 +643,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                         onClick={() => onOpenDiscussion(post)}
                         className="flex items-center gap-2 text-caption font-extrabold text-slate-500 hover:text-slate-800 transition-colors"
                       >
-                        <span className="material-symbols-outlined text-[19px]">
+                        <span aria-hidden="true" className="material-symbols-outlined text-[19px]">
                           chat_bubble
                         </span>
                         <span>
@@ -660,7 +656,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                         onClick={(e) => handleSharePost(post, e)}
                         className="flex items-center gap-1 text-slate-400 hover:text-slate-700 transition-colors ml-auto p-1"
                       >
-                        <span className="material-symbols-outlined text-[19px]">
+                        <span aria-hidden="true" className="material-symbols-outlined text-[19px]">
                           share
                         </span>
                       </button>
@@ -738,7 +734,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
         aria-label="Create Post"
         className="fixed bottom-24 right-6 w-14 h-14 bg-primary hover:bg-deep-teal text-white rounded-full shadow-[0_8px_24px_rgba(0,108,80,0.35)] flex items-center justify-center transition-all hover:scale-105 active:scale-95 z-40 border-2 border-white"
       >
-        <span className="material-symbols-outlined text-[30px]">add</span>
+        <span aria-hidden="true" className="material-symbols-outlined text-[30px]">add</span>
       </button>
 
       <StationGroupInfoSheet

@@ -22,7 +22,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
 }) => {
   const activeIndex = Math.max(0, TABS.findIndex((t) => t.id === activeTab));
   return (
-    <nav className="lg:hidden fixed bottom-3 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-[380px] bg-white rounded-[28px] shadow-[0_10px_32px_rgba(31,41,35,0.18)] grid grid-cols-4 px-2 pb-2 pt-2">
+    <nav aria-label="Primary" className="lg:hidden fixed bottom-3 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-[380px] bg-white rounded-[28px] shadow-[0_10px_32px_rgba(31,41,35,0.18)] grid grid-cols-4 px-2 pb-2 pt-2">
       {/* The green bubble slides between tabs (one column = 25% of the inner width) */}
       <div aria-hidden className="absolute top-0 left-2 right-2 pointer-events-none">
         <div
@@ -47,17 +47,17 @@ export const BottomNav: React.FC<BottomNavProps> = ({
                 active ? '-translate-y-5 text-white' : 'text-slate-400'
               }`}
             >
-              <span className={`material-symbols-outlined text-[22px] ${active ? 'material-symbols-fill' : ''}`}>
+              <span aria-hidden="true" className={`material-symbols-outlined text-[22px] ${active ? 'material-symbols-fill' : ''}`}>
                 {tab.icon}
               </span>
             </span>
             {tab.id === 'community' && unreadNotifications > 0 && (
-              <span className="absolute top-0 right-[22%] min-w-[16px] h-4 px-1 bg-status-red text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white">
+              <span className="absolute top-0 right-[22%] min-w-[16px] h-4 px-1 bg-status-red text-white text-[0.75rem] font-bold rounded-full flex items-center justify-center border-2 border-white">
                 {unreadNotifications}
               </span>
             )}
             <span
-              className={`text-[11px] leading-none mt-1 transition-colors ${
+              className={`text-[0.75rem] leading-none mt-1 transition-colors ${
                 active ? 'font-extrabold text-slate-900' : 'font-semibold text-slate-400'
               }`}
             >

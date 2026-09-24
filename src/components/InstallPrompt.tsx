@@ -20,7 +20,7 @@ export const InstallPrompt: React.FC = () => {
       <div className="max-w-md mx-auto pointer-events-auto bg-deep-teal text-white rounded-2xl shadow-[0_10px_30px_rgba(31,41,35,0.3)] p-3">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-primary text-white flex items-center justify-center shrink-0">
-            <span className="material-symbols-outlined text-[22px]">install_mobile</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[22px]">install_mobile</span>
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-body font-semibold text-white leading-tight">Install CNG-Connect</p>
@@ -42,7 +42,7 @@ export const InstallPrompt: React.FC = () => {
               className="shrink-0 px-3 py-2 rounded-full bg-primary text-white text-caption font-bold active:scale-95 transition-transform flex items-center gap-1"
             >
               <span>How</span>
-              <span className="material-symbols-outlined text-[16px]">
+              <span aria-hidden="true" className="material-symbols-outlined text-[16px]">
                 {iosStepsOpen ? 'expand_less' : 'expand_more'}
               </span>
             </button>
@@ -53,26 +53,26 @@ export const InstallPrompt: React.FC = () => {
             aria-label="Dismiss install banner"
             className="shrink-0 w-7 h-7 rounded-full text-white/60 hover:bg-white/10 flex items-center justify-center"
           >
-            <span className="material-symbols-outlined text-[18px]">close</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[18px]">close</span>
           </button>
         </div>
 
         {isIosSafari && iosStepsOpen && (
           <ol className="mt-2.5 pt-2.5 border-t border-white/15 text-caption text-white/80 space-y-1.5">
             <li className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-[18px] text-emerald-400">ios_share</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[18px] text-emerald-400">ios_share</span>
               <span>
                 Tap the <strong>Share</strong> button in Safari's toolbar.
               </span>
             </li>
             <li className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-[18px] text-emerald-400">add_box</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[18px] text-emerald-400">add_box</span>
               <span>
                 Choose <strong>Add to Home Screen</strong>.
               </span>
             </li>
             <li className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-[18px] text-emerald-400">check_circle</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[18px] text-emerald-400">check_circle</span>
               <span>
                 Tap <strong>Add</strong> — the CNG-Connect icon appears on your home screen.
               </span>

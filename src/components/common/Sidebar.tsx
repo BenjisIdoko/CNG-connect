@@ -2,6 +2,7 @@ import React from 'react';
 import { UserProfile } from '../../types';
 import { ASSETS } from '../../data/mockData';
 import { Icon } from './Icon';
+import { Avatar } from './Avatar';
 
 interface SidebarProps {
   activeTab: 'map' | 'conversions' | 'community' | 'profile';
@@ -26,11 +27,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
   ];
 
   return (
-    <aside className="hidden lg:flex flex-col fixed left-0 top-0 bottom-0 w-64 bg-white border-r border-slate-200/80 z-40 shadow-xs select-none">
+    <aside aria-label="Sidebar" className="hidden lg:flex flex-col fixed left-0 top-0 bottom-0 w-64 bg-white border-r border-slate-200/80 z-40 shadow-xs select-none">
       {/* Brand Header */}
       <div className="p-5 border-b border-slate-100 flex items-center gap-3">
         <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-700 via-primary to-emerald-500 text-white flex items-center justify-center font-black shadow-md shadow-emerald-700/20">
-          <span className="material-symbols-outlined text-[24px]">local_gas_station</span>
+          <span aria-hidden="true" className="material-symbols-outlined text-[24px]">local_gas_station</span>
         </div>
         <div>
           <h1 className="font-extrabold text-[1.0625rem] text-slate-900 leading-tight">
@@ -61,7 +62,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               }`}
             >
               <div className="flex items-center gap-3">
-                <span
+                <span aria-hidden="true"
                   className="material-symbols-outlined text-[22px]"
                   style={{ fontVariationSettings: isActive ? "'FILL' 1" : "'FILL' 0" }}
                 >
@@ -83,7 +84,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             onClick={onOpenRoiCalculator}
             className="w-full py-2.5 px-3.5 rounded-2xl font-extrabold text-[0.875rem] bg-slate-50 hover:bg-slate-100 text-slate-800 border border-slate-200 flex items-center gap-3 transition-all"
           >
-            <span className="material-symbols-outlined text-[20px] text-emerald-600">calculate</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[20px] text-emerald-600">calculate</span>
             <span>CNG & EV Savings</span>
           </button>
         )}
@@ -93,7 +94,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             onClick={onOpenAiAssistant}
             className="w-full py-2.5 px-3.5 rounded-2xl font-extrabold text-[0.875rem] bg-gradient-to-r from-emerald-50 to-sky-50 hover:from-emerald-100 hover:to-sky-100 text-primary border border-emerald-200 flex items-center gap-3 transition-all mt-1"
           >
-            <span className="material-symbols-outlined text-[20px] text-primary">smart_toy</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[20px] text-primary">smart_toy</span>
             <span>CNG Copilot AI</span>
           </button>
         )}
@@ -102,17 +103,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Bottom User Card */}
       {userProfile && (
         <div className="p-3 m-3 bg-slate-50 rounded-2xl border border-slate-200 flex items-center gap-3">
-          <img
-            src={userProfile.avatar || ASSETS.userAvatar}
-            alt={userProfile.name}
-            className="w-10 h-10 rounded-full object-cover border-2 border-primary"
-          />
+          <Avatar src={userProfile.avatar} name={userProfile.name} className="w-10 h-10" />
           <div className="flex-1 min-w-0">
-            <h4 className="font-extrabold text-[0.875rem] text-slate-900 truncate leading-tight">
-              {userProfile.name}
-            </h4>
+            <p className="font-extrabold text-[0.875rem] text-slate-900 truncate leading-tight">
+              {userProfile.name || 'Guest driver'}
+            </p>
             <p className="text-[0.75rem] font-semibold text-slate-500 truncate">
-              {userProfile.vehicle || 'Verified Driver'}
+              {userProfile.vehicle || 'Driver'}
             </p>
           </div>
         </div>

@@ -26,7 +26,7 @@ export const StationGroupInfoSheet: React.FC<StationGroupInfoSheetProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-primary text-[22px]">
+            <span aria-hidden="true" className="material-symbols-outlined text-primary text-[22px]">
               info
             </span>
             <h2 className="text-body-lg font-bold text-on-surface">
@@ -38,7 +38,7 @@ export const StationGroupInfoSheet: React.FC<StationGroupInfoSheetProps> = ({
             aria-label="Close"
             className="w-11 h-11 rounded-full bg-surface-container hover:bg-surface-container-high flex items-center justify-center text-on-surface-variant transition-all active:scale-95 shrink-0"
           >
-            <span className="material-symbols-outlined text-[18px]">close</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[18px]">close</span>
           </button>
         </div>
 

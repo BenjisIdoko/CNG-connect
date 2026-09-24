@@ -8,6 +8,7 @@ import { getDriverTier, DRIVER_TIERS } from '../utils/reputationEngine';
 import { Icon } from './common/Icon';
 import { TierBadge } from './common/TierBadge';
 import { CountUp } from './common/CountUp';
+import { Avatar } from './common/Avatar';
 
 interface ProfileScreenProps {
   user: UserProfile;
@@ -130,13 +131,13 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
       className={`px-4 py-3.5 flex items-center justify-between gap-3 ${onClick ? 'cursor-pointer active:bg-surface-container' : ''}`}
     >
       <div className="flex items-center gap-3 min-w-0">
-        <span className={`material-symbols-outlined text-[20px] ${danger ? 'text-status-red' : 'text-outline'}`}>{icon}</span>
+        <span aria-hidden="true" className={`material-symbols-outlined text-[20px] ${danger ? 'text-status-red' : 'text-outline'}`}>{icon}</span>
         <div className="min-w-0">
           <span className={`text-body font-semibold block leading-tight ${danger ? 'text-status-red' : 'text-on-surface'}`}>{label}</span>
           {hint && <span className="text-micro text-outline">{hint}</span>}
         </div>
       </div>
-      {right ?? (onClick && <span className="material-symbols-outlined text-outline text-[18px]">chevron_right</span>)}
+      {right ?? (onClick && <span aria-hidden="true" className="material-symbols-outlined text-outline text-[18px]">chevron_right</span>)}
     </div>
   );
 
@@ -153,11 +154,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
         <div className="max-w-3xl mx-auto">
           <div className="flex items-center gap-3.5">
             <div className="relative shrink-0">
-              <img
-                src={user.avatar || ASSETS.userAvatar}
-                alt={user.name}
-                className="w-14 h-14 rounded-full object-cover bg-white/10"
-              />
+              <Avatar src={user.avatar} name={user.name} className="w-14 h-14 text-[1.25rem]" />
               {onUploadAvatar ? (
                 <>
                   <button
@@ -167,7 +164,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                     aria-label="Change profile photo"
                     className="absolute -bottom-0.5 -right-0.5 w-[22px] h-[22px] rounded-full bg-primary text-white border-2 border-deep-teal flex items-center justify-center active:scale-90 transition-transform disabled:opacity-60"
                   >
-                    <span className="material-symbols-outlined text-[13px]">
+                    <span aria-hidden="true" className="material-symbols-outlined text-[13px]">
                       {isUploadingAvatar ? 'progress_activity' : 'photo_camera'}
                     </span>
                   </button>
@@ -182,7 +179,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
               <PopoverPrimitive.Root>
                 <PopoverPrimitive.Trigger className="flex items-center gap-1 mt-0.5 text-micro text-[#B7CBB9] cursor-pointer text-left max-w-full">
                   <span className="truncate">{user.vehicle || 'Add your vehicle'}</span>
-                  <span className="material-symbols-outlined text-[15px] shrink-0">chevron_right</span>
+                  <span aria-hidden="true" className="material-symbols-outlined text-[15px] shrink-0">chevron_right</span>
                 </PopoverPrimitive.Trigger>
                 <PopoverPrimitive.Portal>
                   <PopoverPrimitive.Content
@@ -208,7 +205,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                         }`}
                       >
                         <span className="truncate">{v}</span>
-                        {user.vehicle === v && <span className="material-symbols-outlined text-[15px] text-primary">check</span>}
+                        {user.vehicle === v && <span aria-hidden="true" className="material-symbols-outlined text-[15px] text-primary">check</span>}
                       </button>
                     ))}
                   </PopoverPrimitive.Content>
@@ -220,7 +217,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
               aria-label="Edit Profile"
               className="w-10 h-10 rounded-full bg-white/10 text-white flex items-center justify-center active:scale-95 transition-transform shrink-0"
             >
-              <span className="material-symbols-outlined text-[18px]">edit</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[18px]">edit</span>
             </button>
           </div>
 
@@ -269,7 +266,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                     unlocked ? 'bg-primary-container' : 'bg-surface-dim/60 opacity-60 grayscale'
                   }`}
                 >
-                  {unlocked ? <TierBadge tierId={t.id} size={24} /> : <span className="material-symbols-outlined text-[16px] text-slate-500">lock</span>}
+                  {unlocked ? <TierBadge tierId={t.id} size={24} /> : <span aria-hidden="true" className="material-symbols-outlined text-[16px] text-slate-500">lock</span>}
                 </div>
               );
             })}
@@ -296,9 +293,9 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
           <Row
             icon="location_on"
             label="Home state"
-            hint="Alerts are scoped to this state"
+            hint="Alerts follow this state"
             right={
-              <select
+              <select aria-label="Home state"
                 value={user.state || 'Abuja FCT'}
                 onChange={(e) => {
                   const newState = e.target.value;
@@ -417,7 +414,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
 
           <div>
             <label className="block text-caption font-bold text-slate-700 mb-1">Registered State</label>
-            <select
+            <select aria-label="Registered State"
               value={editState}
               onChange={(e) => setEditState(e.target.value)}
               className="w-full bg-surface border border-surface-container-highest rounded-xl px-3 py-2 text-body font-semibold text-slate-900 outline-none focus:border-primary"

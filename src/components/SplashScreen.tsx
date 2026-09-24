@@ -1,95 +1,54 @@
 import React, { useEffect, useState } from 'react';
-import { ASSETS } from '../data/mockData';
 
 interface SplashScreenProps {
   onFinish: () => void;
 }
 
+const SEEN_KEY = 'cng_splash_seen_v2';
+
+/** Splash is only worth showing once: returning drivers go straight to the map. */
+export function shouldShowSplash(): boolean {
+  try {
+    return localStorage.getItem(SEEN_KEY) !== '1';
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * A short brand moment on the very first launch: app mark + wordmark on the dark
+ * ground (matches the installed-app icon), auto-dismissing in ~1.2 s. No button,
+ * no marketing copy — the onboarding slides that follow do the explaining.
+ */
 export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
-  const [progress, setProgress] = useState(0);
-  const [isFadingOut, setIsFadingOut] = useState(false);
+  const [leaving, setLeaving] = useState(false);
 
   useEffect(() => {
-    const p1 = setTimeout(() => setProgress(35), 400);
-    const p2 = setTimeout(() => setProgress(75), 1100);
-    const p3 = setTimeout(() => setProgress(100), 1800);
-    const p4 = setTimeout(() => setIsFadingOut(true), 3400);
-    const p5 = setTimeout(() => onFinish(), 3900);
-
+    try {
+      localStorage.setItem(SEEN_KEY, '1');
+    } catch {
+      /* private mode: splash may show again, harmless */
+    }
+    const t1 = setTimeout(() => setLeaving(true), 900);
+    const t2 = setTimeout(onFinish, 1250);
     return () => {
-      clearTimeout(p1);
-      clearTimeout(p2);
-      clearTimeout(p3);
-      clearTimeout(p4);
-      clearTimeout(p5);
+      clearTimeout(t1);
+      clearTimeout(t2);
     };
   }, [onFinish]);
 
   return (
     <div
-      className={`fixed inset-0 z-[100] bg-black text-white flex flex-col justify-between overflow-hidden transition-opacity duration-500 ${
-        isFadingOut ? 'opacity-0 pointer-events-none' : 'opacity-100'
+      role="status"
+      aria-label="CNG-Connect is loading"
+      className={`fixed inset-0 z-[100] flex flex-col items-center justify-center gap-4 bg-[radial-gradient(circle_at_35%_30%,#28362F,#1A2420)] text-white transition-opacity duration-300 ${
+        leaving ? 'opacity-0 pointer-events-none' : 'opacity-100'
       }`}
     >
-      {/* Full-Bleed Nigerian Filling Station Photography Background */}
-      <img
-        src="/onboarding/splash-hero.webp"
-        alt="CNG filling station in Nigeria"
-        className="absolute inset-0 w-full h-full object-cover transform scale-105 transition-transform duration-[4000ms] ease-out pointer-events-none"
-      />
-
-      {/* Dark Cinematic Gradient Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-[#090e0c] via-black/40 to-black/60 pointer-events-none" />
-
-      {/* Top Bar - Brand Logo */}
-      <div className="relative z-10 p-6 pt-10 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl bg-white/90 p-1 backdrop-blur-md shadow-md flex items-center justify-center">
-            <img src={ASSETS.logo} alt="CNG-Connect Logo" className="w-full h-full object-contain" />
-          </div>
-          <span className="text-[1.375rem] font-extrabold text-white tracking-tight">
-            CNG-<span className="text-status-green">Connect</span>
-          </span>
-        </div>
-
-        {/* Minimal Progress Line */}
-        <div className="w-24 bg-white/20 h-1 rounded-full overflow-hidden backdrop-blur-md">
-          <div
-            className="bg-status-green h-full rounded-full transition-all duration-500 ease-out shadow-[0_0_10px_var(--color-status-green)]"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-      </div>
-
-      {/* Bottom Hero Typography & AutoGo-Style CTA Pill */}
-      <div className="relative z-10 p-6 pb-12 max-w-md mx-auto w-full space-y-6 animate-fade-in">
-        <div className="space-y-2 text-left">
-          <span className="text-[0.75rem] font-bold text-status-green bg-status-green/20 px-3 py-1 rounded-full uppercase tracking-widest backdrop-blur-md border border-status-green/30 inline-block">
-            Official CNG Network
-          </span>
-
-          <h1 className="text-[2.375rem] sm:text-[2.625rem] font-extrabold tracking-tight leading-[1.08] text-white">
-            Find CNG stations <br />
-            <span className="text-status-green">near you, instantly.</span>
-          </h1>
-
-          <p className="text-[0.9062rem] text-slate-300 font-normal leading-relaxed max-w-xs">
-            Find, report, and navigate to live CNG stations and accredited kit centers with zero stress.
-          </p>
-        </div>
-
-        {/* Brand Primary Button Pill */}
-        <button
-          onClick={() => {
-            setIsFadingOut(true);
-            setTimeout(onFinish, 400);
-          }}
-          className="w-full h-14 bg-status-green hover:opacity-95 text-on-surface font-bold text-[1rem] rounded-full shadow-[0_10px_30px_rgba(0,230,118,0.35)] flex items-center justify-center gap-2 active:scale-98 transition-all cursor-pointer"
-        >
-          <span>Let's Go!</span>
-          <span className="material-symbols-outlined text-[20px] font-bold">arrow_forward</span>
-        </button>
-      </div>
+      <img src="/pwa-icon.svg" alt="" className="burst-pop w-28 h-28 rounded-[28px] shadow-[0_18px_50px_rgba(0,0,0,0.45)]" />
+      <span className="font-headline font-extrabold text-[1.5rem] tracking-tight">
+        CNG-<span className="text-[#57C06A]">Connect</span>
+      </span>
     </div>
   );
 };
