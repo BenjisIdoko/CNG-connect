@@ -8,7 +8,6 @@ import { StationGroupInfoSheet } from './StationGroupInfoSheet';
 import { formatStationAge, formatRelativeTime, isIsoTimestamp, minutesSince } from '../utils/timeUtils';
 import { openWhatsAppShare } from '../utils/shareMessageBuilder';
 import { describeLocationPrecision } from '../utils/locationPrecision';
-import { EditStationLocationModal } from './EditStationLocationModal';
 
 interface StationDetailScreenProps {
   station: GasStation;
@@ -18,7 +17,6 @@ interface StationDetailScreenProps {
   onNavigate: (station: GasStation) => void;
   onAddStationComment?: (stationId: string, commentText: string) => void;
   onAddPhoto?: () => void;
-  onUpdateLocation?: (stationId: string, lat: number, lng: number) => void;
   isPresenceActive?: boolean;
   isFavorite?: boolean;
   onToggleFavorite?: (stationId: string) => void;
@@ -32,12 +30,10 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
   onNavigate,
   onAddStationComment,
   onAddPhoto,
-  onUpdateLocation,
   isPresenceActive = true,
   isFavorite = false,
   onToggleFavorite,
 }) => {
-  const [showEditLocationModal, setShowEditLocationModal] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
   const [reports, setReports] = useState(station.reports || []);
   const [comments, setComments] = useState<CommentItem[]>(
@@ -301,14 +297,6 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
           {describeLocationPrecision(station) && (
             <p className="text-micro font-medium text-status-orange mt-1">
               {describeLocationPrecision(station)}
-              {onUpdateLocation && (
-                <>
-                  {' · '}
-                  <button onClick={() => setShowEditLocationModal(true)} className="text-primary underline font-semibold">
-                    Fix pin
-                  </button>
-                </>
-              )}
             </p>
           )}
 
@@ -689,17 +677,6 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
         isOpen={showInfoSheet}
         onClose={() => setShowInfoSheet(false)}
       />
-
-      {showEditLocationModal && onUpdateLocation && (
-        <EditStationLocationModal
-          station={station}
-          onClose={() => setShowEditLocationModal(false)}
-          onSaveLocation={(stId, lat, lng) => {
-            onUpdateLocation(stId, lat, lng);
-            setShowEditLocationModal(false);
-          }}
-        />
-      )}
     </div>
   );
 };

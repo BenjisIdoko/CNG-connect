@@ -737,60 +737,6 @@ export const apiService = {
   },
 
   /**
-   * Updates and persists exact GPS location coordinates for a station.
-   */
-  async updateStationLocation(
-    stationId: string,
-    lat: number,
-    lng: number
-  ): Promise<GasStation | null> {
-    const stations = getLocalStations();
-    let updatedStation: GasStation | null = null;
-
-    const updatedStations = stations.map((st) => {
-      if (st.id === stationId) {
-        updatedStation = {
-          ...st,
-          lat,
-          lng,
-          locationPrecision: 'gps_confirmed' as const,
-          accuracyRadiusM: 20,
-          needsPinReview: false,
-          dataSource: 'Community GPS Confirmed Pin',
-          dataSourceDate: new Date().toISOString().split('T')[0],
-          verifiedByCommunity: true,
-        };
-        return updatedStation;
-      }
-      return st;
-    });
-
-    saveLocalStations(updatedStations);
-
-    const supabase = isSupabaseConfigured ? await getSupabase() : null;
-
-    if (supabase) {
-      try {
-        // Anon clients have no direct UPDATE grant on `stations` (see RLS in
-        // supabase/schema.sql) — pin corrections go through this
-        // SECURITY DEFINER function, which can only touch location columns.
-        const { error } = await supabase.rpc('update_station_pin', {
-          p_station_id: stationId,
-          p_lat: lat,
-          p_lng: lng,
-        });
-        if (error) {
-          console.error('Supabase update_station_pin rpc failed:', error.message);
-        }
-      } catch (err) {
-        console.warn('Supabase location update fallback:', err);
-      }
-    }
-
-    return updatedStation;
-  },
-
-  /**
    * Submits a user suggestion for a new CNG or EV station.
    */
   async addStationSuggestion(
