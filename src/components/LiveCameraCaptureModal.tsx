@@ -98,11 +98,11 @@ export const LiveCameraCaptureModal: React.FC<LiveCameraCaptureModalProps> = ({
       const timestamp = new Date().toLocaleTimeString();
       const dateStr = new Date().toLocaleDateString();
 
-      ctx.fillStyle = 'rgba(0, 77, 64, 0.85)';
+      ctx.fillStyle = 'rgba(31, 41, 35, 0.85)';
       ctx.fillRect(15, canvas.height - 55, 340, 40);
 
       ctx.font = 'bold 13px sans-serif';
-      ctx.fillStyle = '#00E676';
+      ctx.fillStyle = '#57C06A';
       ctx.fillText('VERIFIED LIVE CAMERA SNAPSHOT', 25, canvas.height - 35);
       ctx.fillStyle = '#ffffff';
       ctx.font = '11px sans-serif';

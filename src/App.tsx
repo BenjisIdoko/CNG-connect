@@ -8,7 +8,7 @@ import {
 import {
   INITIAL_STATIONS,
   INITIAL_POSTS,
-  INITIAL_CONVERSION_CENTERS,
+  loadConversionCenters,
 } from './data/mockData';
 import { ConversionCenter } from './types';
 import { Header } from './components/Header';
@@ -469,6 +469,14 @@ export const App: React.FC = () => {
     };
   }, [userProfile, proximityAlertStation]);
 
+  // Kits directory data is a large JSON chunk; fetch it the first time the tab opens.
+  const [conversionCenters, setConversionCenters] = useState<ConversionCenter[] | null>(null);
+  useEffect(() => {
+    if (activeTab === 'conversions' && !conversionCenters) {
+      loadConversionCenters().then(setConversionCenters);
+    }
+  }, [activeTab, conversionCenters]);
+
   // System back gesture / browser back closes the top-most screen instead of exiting the app.
   useBackLayer(!!activeDetailStation, () => setActiveDetailStation(null));
   useBackLayer(!!activeDiscussionPost, () => setActiveDiscussionPost(null));
@@ -887,10 +895,14 @@ export const App: React.FC = () => {
               }}
             />
           ) : activeTab === 'conversions' ? (
-            <ConversionCentersScreen
-              centers={INITIAL_CONVERSION_CENTERS as ConversionCenter[]}
-              onBookAppointment={(center) => setSelectedBookingCenter(center)}
-            />
+            conversionCenters ? (
+              <ConversionCentersScreen
+                centers={conversionCenters}
+                onBookAppointment={(center) => setSelectedBookingCenter(center)}
+              />
+            ) : (
+              <ScreenSkeleton />
+            )
           ) : activeTab === 'community' ? (
             <CommunityScreen
               posts={posts}

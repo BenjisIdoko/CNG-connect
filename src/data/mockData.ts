@@ -2,7 +2,6 @@ import { GasStation, CommunityPost, ChatMessage, UserProfile, ConversionCenter }
 import pciStationsSeed from './pci-stations-seed.json';
 import evStationsSeed from './ev-stations-seed.json';
 import coreCngStationsSeed from './core-cng-stations-seed.json';
-import pciConversionCentersSeed from './pci-conversion-centers-seed.json';
 
 export const ASSETS = {
   logo: '/images/img-05.webp',
@@ -86,4 +85,7 @@ export const INITIAL_POSTS = INITIAL_COMMUNITY_POSTS;
 
 export const INITIAL_CHAT_MESSAGES: ChatMessage[] = [];
 
-export const INITIAL_CONVERSION_CENTERS: ConversionCenter[] = pciConversionCentersSeed as ConversionCenter[];
+// Loaded on demand (~250 KB of JSON) — only the Kits tab needs it, so it stays
+// out of the startup bundle. The service worker still precaches the chunk.
+export const loadConversionCenters = (): Promise<ConversionCenter[]> =>
+  import('./pci-conversion-centers-seed.json').then((m) => m.default as unknown as ConversionCenter[]);

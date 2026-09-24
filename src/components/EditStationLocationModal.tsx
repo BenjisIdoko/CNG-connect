@@ -94,13 +94,13 @@ export const EditStationLocationModal: React.FC<EditStationLocationModalProps> =
   return (
     <Modal isOpen={true} onClose={onClose} title="Update Station Location Pin">
       <form onSubmit={handleSubmit} className="flex flex-col gap-4 p-1">
-        <div className="flex items-center gap-2 bg-emerald-50 text-emerald-900 border border-emerald-200 p-3 rounded-2xl text-[0.875rem]">
+        <div className="flex items-center gap-2 bg-primary-container text-on-primary-container p-3 rounded-2xl text-[0.875rem]">
           <span className="material-symbols-outlined text-emerald-600 text-[20px] shrink-0">edit_location</span>
           <span>Help the driver community by setting the exact GPS pin for <strong>{station.name}</strong>.</span>
         </div>
 
         {errorMsg && (
-          <div className="bg-red-50 text-red-700 border border-red-200 p-3 rounded-xl text-caption font-semibold flex items-center gap-2">
+          <div className="bg-status-red-container text-on-error-container p-3 rounded-xl text-caption font-semibold flex items-center gap-2">
             <span className="material-symbols-outlined text-[18px]">error</span>
             <span>{errorMsg}</span>
           </div>
@@ -114,7 +114,7 @@ export const EditStationLocationModal: React.FC<EditStationLocationModalProps> =
             value={mapsUrlInput}
             onChange={(e) => handleUrlInputChange(e.target.value)}
             placeholder="e.g. https://www.google.com/maps?q=9.101597,7.243265"
-            className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-body text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/30"
+            className="w-full px-3.5 py-2.5 bg-surface-container rounded-xl text-body text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/30"
           />
           <span className="text-micro text-slate-500 font-medium">Extracts exact latitude & longitude automatically.</span>
         </div>
@@ -148,7 +148,7 @@ export const EditStationLocationModal: React.FC<EditStationLocationModalProps> =
                 setErrorMsg(null);
               }}
               placeholder="e.g. 9.101597"
-              className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-body font-mono text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/30"
+              className="w-full px-3 py-2 bg-surface-container rounded-xl text-body font-mono text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/30"
               required
             />
           </div>
@@ -163,14 +163,14 @@ export const EditStationLocationModal: React.FC<EditStationLocationModalProps> =
                 setErrorMsg(null);
               }}
               placeholder="e.g. 7.243265"
-              className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-body font-mono text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/30"
+              className="w-full px-3 py-2 bg-surface-container rounded-xl text-body font-mono text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/30"
               required
             />
           </div>
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-2 pt-4 border-t border-slate-200 mt-2">
+        <div className="flex items-center gap-2 pt-4 mt-2">
           <button
             type="button"
             onClick={onClose}

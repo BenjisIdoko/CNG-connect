@@ -35,7 +35,7 @@ export const DiscussionScreen: React.FC<DiscussionScreenProps> = ({
     <div className="min-h-screen bg-surface text-on-surface pb-32">
       {/* Post Content */}
       <div className="max-w-3xl mx-auto px-4 md:px-6 pt-4">
-        <div className="bg-white rounded-3xl p-5 shadow-xs border border-surface-container-highest flex flex-col gap-4">
+        <div className="bg-white rounded-3xl p-5 shadow-[0_4px_14px_rgba(31,41,35,0.05)] flex flex-col gap-4">
           {/* Author Row */}
           <div className="flex items-center gap-3">
             {post.authorAvatar ? (
@@ -89,7 +89,7 @@ export const DiscussionScreen: React.FC<DiscussionScreenProps> = ({
 
           {/* Attached Photo */}
           {post.image && (
-            <div className="w-full rounded-2xl overflow-hidden shadow-xs border border-surface-container-highest aspect-video relative bg-surface-container">
+            <div className="w-full rounded-2xl overflow-hidden shadow-xs aspect-video relative bg-surface-container">
               <img
                 src={post.image}
                 alt={post.title}
@@ -104,7 +104,7 @@ export const DiscussionScreen: React.FC<DiscussionScreenProps> = ({
           )}
 
           {/* Actions */}
-          <div className="flex items-center justify-between border-t border-surface-container-highest/70 pt-3 mt-1">
+          <div className="flex items-center justify-between pt-3 mt-1">
             <div className="flex gap-4">
               <button
                 onClick={() => onToggleLike(post.id)}
@@ -167,7 +167,7 @@ export const DiscussionScreen: React.FC<DiscussionScreenProps> = ({
             {comments.map((comment) => (
               <div
                 key={comment.id}
-                className="bg-white rounded-2xl p-4 shadow-xs border border-surface-container-highest flex flex-col gap-2"
+                className="bg-white rounded-2xl p-4 shadow-[0_4px_14px_rgba(31,41,35,0.05)] flex flex-col gap-2"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
@@ -175,7 +175,7 @@ export const DiscussionScreen: React.FC<DiscussionScreenProps> = ({
                       <img
                         src={comment.authorAvatar}
                         alt={comment.author}
-                        className="w-9 h-9 rounded-full object-cover border border-surface-container-highest"
+                        className="w-9 h-9 rounded-full object-cover"
                       />
                     ) : (
                       <div className="w-9 h-9 rounded-full bg-primary/20 text-primary font-bold flex items-center justify-center text-body">
@@ -236,7 +236,7 @@ export const DiscussionScreen: React.FC<DiscussionScreenProps> = ({
       </div>
 
       {/* Fixed Sticky Comment Input */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md p-3 px-4 border-t border-surface-container-highest shadow-lg z-40 pb-safe">
+      <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md p-3 px-4 shadow-[0_-6px_20px_rgba(31,41,35,0.06)] z-40 pb-safe">
         <div className="max-w-xl mx-auto">
           {replyingTo && (
             <div className="flex items-center justify-between text-caption text-primary font-semibold mb-1.5 px-2">
@@ -250,7 +250,7 @@ export const DiscussionScreen: React.FC<DiscussionScreenProps> = ({
             </div>
           )}
           <form onSubmit={handleAddComment} className="flex items-center gap-2">
-            <div className="flex-1 bg-surface-container rounded-full h-12 flex items-center px-4 border border-surface-container-highest">
+            <div className="flex-1 bg-surface-container rounded-full h-12 flex items-center px-4">
               <input
                 type="text"
                 value={newCommentText}

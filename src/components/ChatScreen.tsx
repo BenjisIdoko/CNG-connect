@@ -99,7 +99,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ post, onBack }) => {
   return (
     <div className="min-h-screen bg-surface text-on-surface flex flex-col justify-between pb-24">
       {/* Sticky Chat Header */}
-      <div className="sticky top-16 z-30 bg-surface/95 backdrop-blur-md border-b border-surface-container-highest/70 max-w-xl w-full mx-auto px-4 py-2.5 flex items-center justify-between shadow-xs">
+      <div className="sticky top-16 z-30 bg-surface/95 backdrop-blur-md shadow-[0_2px_10px_rgba(31,41,35,0.05)] max-w-xl w-full mx-auto px-4 py-2.5 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <button
             onClick={onBack}
@@ -139,9 +139,9 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ post, onBack }) => {
 
       {/* Pinned Listing Context Card */}
       <div className="max-w-xl w-full mx-auto px-4 pt-3">
-        <div className="bg-white rounded-2xl shadow-xs p-3 flex items-center gap-3 border border-surface-container-highest/70 hover:border-primary/40 transition-colors">
+        <div className="bg-white rounded-2xl shadow-[0_4px_14px_rgba(31,41,35,0.05)] p-3 flex items-center gap-3 hover:border-primary/40 transition-colors">
           <div
-            className="w-12 h-12 rounded-xl bg-cover bg-center shrink-0 border border-surface-container-highest"
+            className="w-12 h-12 rounded-xl bg-cover bg-center shrink-0"
             style={{ backgroundImage: `url('${listingImage}')` }}
           />
           <div className="flex-1 min-w-0">
@@ -184,7 +184,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ post, onBack }) => {
                   className={`rounded-2xl p-3 shadow-xs text-body-lg font-normal leading-relaxed relative ${
                     isMe
                       ? 'bg-primary text-white rounded-br-xs'
-                      : 'bg-white text-on-surface border border-surface-container-highest rounded-bl-xs'
+                      : 'bg-white text-on-surface rounded-bl-xs'
                   }`}
                 >
                   {msg.image && (
@@ -222,7 +222,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ post, onBack }) => {
 
         {/* Typing Indicator */}
         {isTyping && (
-          <div className="self-start flex items-center gap-2 bg-white px-4 py-2.5 rounded-2xl rounded-bl-xs border border-surface-container-highest shadow-xs">
+          <div className="self-start flex items-center gap-2 bg-white px-4 py-2.5 rounded-2xl rounded-bl-xs shadow-[0_4px_14px_rgba(31,41,35,0.05)]">
             <div className="flex gap-1.5 items-center">
               <div className="w-2 h-2 rounded-full bg-primary animate-bounce" />
               <div
@@ -244,8 +244,8 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ post, onBack }) => {
       </div>
 
       {/* Fixed Chat Input Footer */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-surface-container-highest p-3 px-4 shadow-lg z-40 pb-safe">
-        <div className="max-w-xl mx-auto flex items-end gap-2 bg-surface-container rounded-2xl p-1.5 px-2 border border-surface-container-highest focus-within:ring-2 focus-within:ring-primary/30 transition-all">
+      <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md p-3 px-4 shadow-[0_-6px_20px_rgba(31,41,35,0.06)] z-40 pb-safe">
+        <div className="max-w-xl mx-auto flex items-end gap-2 bg-surface-container rounded-2xl p-1.5 px-2 focus-within:ring-2 focus-within:ring-primary/30 transition-all">
           <input
             type="file"
             ref={fileInputRef}
