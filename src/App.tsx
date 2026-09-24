@@ -81,6 +81,8 @@ import { PullToRefresh } from './components/common/PullToRefresh';
 import { formatRelativeTime, isIsoTimestamp } from './utils/timeUtils';
 import { SuccessBurst } from './components/common/SuccessBurst';
 import { haptic } from './utils/haptics';
+import { track } from './services/analytics';
+import { takeDueFollowUp } from './utils/followUp';
 import { useBackLayer } from './utils/backLayer';
 import { Icon } from './components/common/Icon';
 
@@ -144,6 +146,7 @@ export const App: React.FC = () => {
   const [isRoiModalOpen, setIsRoiModalOpen] = useState(false);
   const [unlockedTierModal, setUnlockedTierModal] = useState<DriverTier | null>(null);
   const [proximityAlertStation, setProximityAlertStation] = useState<GasStation | null>(null);
+  const [proximityVariant, setProximityVariant] = useState<'arrival' | 'followup'>('arrival');
   const [globalToast, setGlobalToast] = useState<{ msg: string; tone?: ToastTone } | null>(null);
   const [gpsStatus, setGpsStatus] = useState<GpsStatus>('unavailable');
 
@@ -449,6 +452,8 @@ export const App: React.FC = () => {
       });
 
       if (nearbyStaleStation && (!proximityAlertStation || proximityAlertStation.id !== nearbyStaleStation.id)) {
+        setProximityVariant('arrival');
+        track('arrival_prompt_shown', { station_id: nearbyStaleStation.id, source: 'geofence' });
         setProximityAlertStation(nearbyStaleStation);
         setStationCooldown(userKey, nearbyStaleStation.id);
         showToast(`Geofence Nudge: You arrived near ${nearbyStaleStation.name}`, 'pin');
@@ -496,6 +501,36 @@ export const App: React.FC = () => {
     }
   }, [activeTab, conversionCenters]);
 
+  // "Did you fill up?" — when the driver returns after tapping Directions, offer a one-tap report.
+  const followUpCtxRef = useRef({ stations, busy: false });
+  followUpCtxRef.current = {
+    stations,
+    busy: !!proximityAlertStation || isReportModalOpen || authMode !== null || showSplash,
+  };
+  useEffect(() => {
+    const check = () => {
+      if (document.visibilityState !== 'visible' || followUpCtxRef.current.busy) return;
+      const due = takeDueFollowUp();
+      if (!due) return;
+      const st = followUpCtxRef.current.stations.find((x) => x.id === due.id);
+      if (!st) return;
+      setProximityVariant('followup');
+      track('followup_prompt_shown', { station_id: st.id });
+      setProximityAlertStation(st);
+    };
+    document.addEventListener('visibilitychange', check);
+    const t = setTimeout(check, 2500); // also covers reopening the app cold
+    return () => {
+      document.removeEventListener('visibilitychange', check);
+      clearTimeout(t);
+    };
+  }, []);
+
+  // Which screen the driver is on (funnel analysis).
+  useEffect(() => {
+    track('screen_view', { tab: activeTab });
+  }, [activeTab]);
+
   // System back gesture / browser back closes the top-most screen instead of exiting the app.
   useBackLayer(!!activeDetailStation, () => setActiveDetailStation(null));
   useBackLayer(!!activeDiscussionPost, () => setActiveDiscussionPost(null));
@@ -540,6 +575,8 @@ export const App: React.FC = () => {
       return;
     }
 
+    setProximityVariant('arrival');
+    track('arrival_prompt_shown', { station_id: candidate.id, source: 'manual' });
     setProximityAlertStation(candidate);
     setStationCooldown(userKey, candidate.id);
     showToast(`Geofence Alert: Arrived near ${candidate.name}`, 'pin');
@@ -550,26 +587,34 @@ export const App: React.FC = () => {
     const userKey = userProfile.email || userProfile.phone || 'default_driver';
     const activeCount = await apiService.pingStationPresence(station.id, userKey);
     const updatedStation = { ...station, activePresenceCount: activeCount };
+    track('station_viewed', { station_id: station.id, status: station.status });
     setActiveDetailStation(updatedStation);
   };
 
   const handleOpenReportModal = (station: GasStation) => {
     if (!requireAuth()) return;
+    track('report_started', { station_id: station.id });
     setReportingStation(station);
     setIsReportModalOpen(true);
   };
 
-  const handleSubmitReport = async (newReport: DriverReport, newStatus: StationStatus) => {
-    if (!reportingStation) return;
+  const submitReportFor = async (
+    station: GasStation,
+    newReport: DriverReport,
+    newStatus: StationStatus,
+    source: 'form' | 'arrival' | 'followup' = 'form'
+  ) => {
+    track('report_submitted', { status: newStatus, has_photo: Boolean(newReport.photo), source, station_id: station.id });
 
-    setBurst({ status: newStatus, key: Date.now() });
+    // The arrival/follow-up sheet shows its own confirmation.
+    if (source === 'form') setBurst({ status: newStatus, key: Date.now() });
     haptic(15);
-    flashStations([reportingStation.id]);
+    flashStations([station.id]);
 
-    const updatedStations = await apiService.submitReport(reportingStation.id, newReport, newStatus);
+    const updatedStations = await apiService.submitReport(station.id, newReport, newStatus);
     updateStationsWithAlerts(updatedStations);
 
-    const activeSt = updatedStations.find((s) => s.id === reportingStation.id);
+    const activeSt = updatedStations.find((s) => s.id === station.id);
     if (activeSt) {
       if (activeDetailStation?.id === activeSt.id) {
         setActiveDetailStation(activeSt);
@@ -580,7 +625,7 @@ export const App: React.FC = () => {
     }
 
     const broadcast = apiService.broadcastStatusUpdate(
-      reportingStation,
+      station,
       newReport,
       newStatus,
       userProfile.state || 'Abuja FCT'
@@ -606,6 +651,11 @@ export const App: React.FC = () => {
     });
 
     showToast(`Thanks! +${award.pointsAwarded} reputation points earned.`);
+  };
+
+  const handleSubmitReport = (newReport: DriverReport, newStatus: StationStatus) => {
+    if (!reportingStation) return Promise.resolve();
+    return submitReportFor(reportingStation, newReport, newStatus, 'form');
   };
 
   const handleAddStationComment = async (stationId: string, commentText: string) => {
@@ -804,15 +854,27 @@ export const App: React.FC = () => {
       {proximityAlertStation && (
         <ProximityAlertBanner
           station={proximityAlertStation}
+          variant={proximityVariant}
           onQuickSubmitReport={(st, report, status) => {
-            setReportingStation(st);
-            handleSubmitReport(report, status);
+            if (!requireAuth()) {
+              setProximityAlertStation(null);
+              return false;
+            }
+            void submitReportFor(
+              st,
+              { ...report, author: userProfile.name || 'Driver', authorAvatar: userProfile.avatar || '', comment: undefined },
+              status,
+              proximityVariant
+            );
           }}
           onShareStatus={(st) => {
             setProximityAlertStation(null);
             handleOpenReportModal(st);
           }}
-          onDismiss={() => setProximityAlertStation(null)}
+          onDismiss={() => {
+            if (proximityVariant === 'followup') track('followup_dismissed', { station_id: proximityAlertStation.id });
+            setProximityAlertStation(null);
+          }}
         />
       )}
 

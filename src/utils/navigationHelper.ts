@@ -1,4 +1,6 @@
 import { GasStation } from '../types';
+import { rememberFollowUp } from './followUp';
+import { track } from '../services/analytics';
 
 /**
  * Returns a direct Google Maps location pin link.
@@ -26,6 +28,9 @@ export function openExternalMaps(station: GasStation): void {
   const lat = station.lat || 9.0765;
   const lng = station.lng || 7.4853;
   const mapsUrl = getNavigationDirectionsUrl(lat, lng);
+
+  rememberFollowUp({ id: station.id, name: station.name });
+  track('directions_clicked', { station_id: station.id });
 
   if (typeof window !== 'undefined') {
     window.open(mapsUrl, '_blank');

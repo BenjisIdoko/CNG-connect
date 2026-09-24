@@ -4,6 +4,7 @@ import { getSupabase, isSupabaseConfigured } from '../services/supabaseClient';
 import { UserProfile } from '../types';
 import { INITIAL_USER } from '../data/mockData';
 import { resizeToSquareJpeg } from '../utils/resizeImage';
+import { track, setAnalyticsUser } from '../services/analytics';
 
 interface AuthResult {
   success: boolean;
@@ -70,6 +71,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isAuthLoading, setIsAuthLoading] = useState(true);
   const [driverProfile, setDriverProfile] = useState<UserProfile>(INITIAL_USER);
   const [isNewDriver, setIsNewDriver] = useState(false);
+
+  useEffect(() => {
+    setAnalyticsUser(session?.user.id ?? null);
+  }, [session]);
 
   const loadProfile = useCallback(async (userId: string, fallbackEmail: string): Promise<boolean> => {
     const supabase = await getSupabase();
@@ -150,6 +155,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!supabase) return { success: false, error: 'Backend not configured.' };
     const { error } = await supabase.auth.signInWithOtp({ email, options: { shouldCreateUser: true } });
     if (error) return { success: false, error: error.message };
+    track('login_code_requested');
     return { success: true };
   }, []);
 
@@ -162,6 +168,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     setSession(data.session);
     const isNewDriver = await loadProfile(data.session.user.id, data.session.user.email || '');
+    track('login_verified', { new_driver: isNewDriver });
     return { success: true, isNewDriver };
   }, [loadProfile]);
 

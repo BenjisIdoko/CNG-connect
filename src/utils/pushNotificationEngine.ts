@@ -10,6 +10,7 @@
 import { GasStation, StationStatus, UserProfile } from '../types';
 import { checkNotificationPermission } from './permissionManager';
 import { getDistanceInKm } from './proximityAlertEngine';
+import { track } from '../services/analytics';
 
 export type TransitionType = 'recovered' | 'depleted';
 
@@ -33,6 +34,7 @@ export async function requestNotificationPermission(): Promise<NotificationPermi
 
   try {
     const permission = await Notification.requestPermission();
+    track('notification_permission', { result: permission });
     return permission;
   } catch (error) {
     console.error('[PushAlerts] Error requesting notification permission:', error);

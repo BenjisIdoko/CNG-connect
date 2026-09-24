@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { track } from '../services/analytics';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -82,6 +83,7 @@ export function useInstallPrompt(): InstallPromptState {
     if (!deferred) return 'unavailable' as const;
     await deferred.prompt();
     const { outcome } = await deferred.userChoice;
+    if (outcome === 'accepted') track('install_prompt_accepted');
     setDeferred(null);
     if (outcome === 'dismissed') {
       try {

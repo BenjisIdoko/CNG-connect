@@ -8,6 +8,7 @@ import { getDriverTier, DRIVER_TIERS } from '../utils/reputationEngine';
 import { Icon } from './common/Icon';
 import { TierBadge } from './common/TierBadge';
 import { CountUp } from './common/CountUp';
+import { isAnalyticsOptedOut, setAnalyticsEnabled } from '../services/analytics';
 import { Avatar } from './common/Avatar';
 
 interface ProfileScreenProps {
@@ -107,6 +108,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
     showToast('Profile updated successfully!');
   };
 
+  const [analyticsOn, setAnalyticsOn] = useState(() => !isAnalyticsOptedOut());
   const points = user.communityPoints ?? 450;
   const tierProgress = getDriverTier(points);
   const openEdit = () => {
@@ -328,6 +330,32 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                 <span
                   className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-all ${
                     notificationsEnabled ? 'right-0.5' : 'left-0.5'
+                  }`}
+                />
+              </button>
+            }
+          />
+          <Row
+            icon="tune"
+            label="Anonymous usage data"
+            hint="Helps us fix and improve the app. No name, email or location."
+            right={
+              <button
+                onClick={() => {
+                  const next = !analyticsOn;
+                  setAnalyticsOn(next);
+                  setAnalyticsEnabled(next);
+                  showToast(next ? 'Thanks — anonymous usage data is on' : 'Anonymous usage data is off');
+                }}
+                aria-pressed={analyticsOn}
+                aria-label="Toggle anonymous usage data"
+                className={`w-[34px] h-5 rounded-full transition-colors relative shrink-0 ${
+                  analyticsOn ? 'bg-primary' : 'bg-surface-container-highest'
+                }`}
+              >
+                <span
+                  className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-all ${
+                    analyticsOn ? 'right-0.5' : 'left-0.5'
                   }`}
                 />
               </button>

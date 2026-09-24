@@ -3,13 +3,17 @@ import { GasStation, StationStatus, DriverReport } from '../types';
 
 interface ProximityAlertBannerProps {
   station: GasStation;
-  onQuickSubmitReport?: (station: GasStation, newReport: DriverReport, newStatus: StationStatus) => void;
+  /** Return false to signal the report was NOT sent (e.g. driver not signed in). */
+  onQuickSubmitReport?: (station: GasStation, newReport: DriverReport, newStatus: StationStatus) => boolean | void;
+  /** 'arrival' = geofence says you're here; 'followup' = you tapped Directions earlier. */
+  variant?: 'arrival' | 'followup';
   onShareStatus: (station: GasStation) => void;
   onDismiss: () => void;
 }
 
 export const ProximityAlertBanner: React.FC<ProximityAlertBannerProps> = ({
   station,
+  variant = 'arrival',
   onQuickSubmitReport,
   onShareStatus,
   onDismiss,
@@ -39,19 +43,19 @@ export const ProximityAlertBanner: React.FC<ProximityAlertBannerProps> = ({
 
     const quickReport: DriverReport = {
       id: `nudge-rep-${Date.now()}`,
-      author: 'You (Geofence Nudge)',
+      author: 'You',
       authorAvatar: '',
       verified: false,
       isPhotoVerified: false,
       timestamp: new Date().toISOString(),
       status: status,
       statusLabel: statusLabels[status],
-      comment: `1-tap geofence update near ${station.name}`,
       likes: 1,
     };
 
-    if (onQuickSubmitReport) {
-      onQuickSubmitReport(station, quickReport, status);
+    if (onQuickSubmitReport && onQuickSubmitReport(station, quickReport, status) === false) {
+      setSelectedQuickStatus(null);
+      return;
     }
 
     setIsSubmitted(true);
@@ -75,12 +79,14 @@ export const ProximityAlertBanner: React.FC<ProximityAlertBannerProps> = ({
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <h2 className="text-body-lg font-extrabold text-slate-900 leading-snug">
-              Arrived near {station.name}
+              {variant === 'followup' ? `Did you fill up at ${station.name}?` : `Arrived near ${station.name}`}
             </h2>
             <div className="flex items-center gap-1.5 mt-1.5">
               <span className="w-2 h-2 rounded-full bg-status-green animate-pulse" />
               <span className="text-caption font-semibold text-emerald-700">
-                {station.activePresenceCount
+                {variant === 'followup'
+                  ? 'One tap tells the drivers behind you'
+                  : station.activePresenceCount
                   ? `${station.activePresenceCount} drivers here — share what you see`
                   : 'Share what you see'}
               </span>

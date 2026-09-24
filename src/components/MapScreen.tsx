@@ -16,6 +16,7 @@ import { prefersReducedMotion } from '../utils/haptics';
 import { openWhatsAppShare } from '../utils/shareMessageBuilder';
 import { getPinConfidence, getAccuracyRadiusM } from '../utils/locationPrecision';
 import { isSameState } from '../utils/proximityAlertEngine';
+import { track } from '../services/analytics';
 
 // Bundle Leaflet's default marker assets through Vite so the map works offline
 // and never depends on a third-party CDN at runtime.
@@ -143,6 +144,18 @@ export const MapScreen: React.FC<MapScreenProps> = ({
     }
   };
   const [isRecentering, setIsRecentering] = useState(false);
+
+  // Analytics: a search counts once the driver pauses typing (never the text itself).
+  useEffect(() => {
+    if (searchQuery.trim().length < 3) return;
+    const t = setTimeout(() => track('search_used', { length: searchQuery.trim().length }), 1500);
+    return () => clearTimeout(t);
+  }, [searchQuery]);
+  useEffect(() => {
+    if (activeFilter !== 'all' || minPressure > 0 || maxDistanceKm > 0) {
+      track('filter_applied', { status: activeFilter, pressure: minPressure, distance_km: maxDistanceKm });
+    }
+  }, [activeFilter, minPressure, maxDistanceKm]);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [visibleCount, setVisibleCount] = useState(25);
 

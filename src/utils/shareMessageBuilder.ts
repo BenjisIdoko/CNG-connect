@@ -1,4 +1,5 @@
 import { GasStation } from '../types';
+import { track } from '../services/analytics';
 
 // Share links point at whatever origin the app is actually served from
 // (cngconnect.com.ng in prod, a preview URL, or localhost in dev). The
@@ -40,6 +41,7 @@ export function buildStationShareMessage(station: GasStation): string {
 }
 
 export function openWhatsAppShare(station: GasStation): void {
+  track('share_clicked', { station_id: station.id });
   const message = buildStationShareMessage(station);
   const waUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
   if (typeof window !== 'undefined') {
