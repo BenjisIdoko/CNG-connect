@@ -737,6 +737,20 @@ export const apiService = {
   },
 
   /**
+   * Flag a report as wrong/spam/fake. Three distinct open flags hide it (DB trigger);
+   * admins review the rest in the moderation queue.
+   */
+  async flagReport(reportId: string, reason: 'wrong_status' | 'spam' | 'fake_photo' | 'other'): Promise<{ ok: boolean; error?: string }> {
+    const supabase = isSupabaseConfigured ? await getSupabase() : null;
+    if (!supabase) return { ok: false, error: 'Reporting isn’t available offline.' };
+    const { error } = await supabase.from('report_flags').insert({ report_id: reportId, reason });
+    if (!error) return { ok: true };
+    if (error.code === '23505') return { ok: false, error: 'You already reported this one.' };
+    if (/relation .*report_flags|schema cache/i.test(error.message)) return { ok: false, error: 'Reporting isn’t set up yet.' };
+    return { ok: false, error: 'Couldn’t send that. Try again.' };
+  },
+
+  /**
    * Submits a user suggestion for a new CNG or EV station.
    */
   async addStationSuggestion(

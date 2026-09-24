@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as TabsPrimitive from '@radix-ui/react-tabs';
 import { TabUnderline } from './common/TabUnderline';
-import { GasStation, CommentItem, UserProfile } from '../types';
+import { FlagReportSheet, type FlagReason } from './FlagReportSheet';
+import { GasStation, CommentItem, UserProfile, DriverReport } from '../types';
 import { ASSETS } from '../data/mockData';
 import { openExternalMaps, openGoogleMapsPin } from '../utils/navigationHelper';
 import { StationGroupInfoSheet } from './StationGroupInfoSheet';
@@ -10,6 +11,8 @@ import { openWhatsAppShare } from '../utils/shareMessageBuilder';
 import { describeLocationPrecision } from '../utils/locationPrecision';
 
 interface StationDetailScreenProps {
+  /** Flag a report (signed-in drivers). Resolve true when it was sent. */
+  onFlagReport?: (reportId: string, reason: FlagReason) => Promise<boolean>;
   station: GasStation;
   user?: UserProfile;
   onBack: () => void;
@@ -28,6 +31,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
   onBack,
   onOpenReportModal,
   onNavigate,
+  onFlagReport,
   onAddStationComment,
   onAddPhoto,
   isPresenceActive = true,
@@ -52,6 +56,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
   const copiedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [activeTab, setActiveTab] = useState<'feed' | 'reports' | 'photos'>('reports');
   const tabListRef = useRef<HTMLDivElement | null>(null);
+  const [flaggingReport, setFlaggingReport] = useState<DriverReport | null>(null);
   const [isPresenceActiveState, setIsPresenceActiveState] = useState<boolean>(isPresenceActive);
   const [showInfoSheet, setShowInfoSheet] = useState(false);
   const [showFullTitle, setShowFullTitle] = useState(false);
@@ -546,10 +551,11 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                             <img src={report.photo} alt="Report snapshot" className="w-full h-full object-cover" />
                           </div>
                         )}
+                        <div className="mt-2 flex items-center justify-between">
                         <button
                           onClick={() => handleVote(report.id, 'up')}
                           aria-label="Helpful"
-                          className={`mt-2 flex items-center gap-1 text-micro font-semibold transition-colors ${
+                          className={`flex items-center gap-1 text-micro font-semibold transition-colors ${
                             report.userVoted === 'up' ? 'text-primary' : 'text-outline'
                           }`}
                         >
@@ -561,6 +567,17 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                           </span>
                           <span>{report.likes}</span>
                         </button>
+                        {onFlagReport && (
+                          <button
+                            onClick={() => setFlaggingReport(report)}
+                            aria-label={`Report a problem with ${report.author}'s report`}
+                            className="flex items-center gap-1 text-micro font-semibold text-outline hover:text-slate-900 transition-colors"
+                          >
+                            <span aria-hidden="true" className="material-symbols-outlined text-[15px]">flag</span>
+                            <span>Report</span>
+                          </button>
+                        )}
+                        </div>
                       </div>
                     </div>
                   );
@@ -672,6 +689,14 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
             />
           </div>
         </div>
+      )}
+
+      {flaggingReport && onFlagReport && (
+        <FlagReportSheet
+          authorName={flaggingReport.author}
+          onClose={() => setFlaggingReport(null)}
+          onSubmit={(reason) => onFlagReport(flaggingReport.id, reason)}
+        />
       )}
 
       <StationGroupInfoSheet

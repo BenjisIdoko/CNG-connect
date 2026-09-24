@@ -100,6 +100,9 @@ const TOAST_COLORS: Record<ToastTone, string> = {
 const AdminPinsScreen = lazy(() =>
   import('./components/AdminPinsScreen').then((m) => ({ default: m.AdminPinsScreen }))
 );
+const ModerationScreen = lazy(() =>
+  import('./components/ModerationScreen').then((m) => ({ default: m.ModerationScreen }))
+);
 const StationManagerScreen = lazy(() =>
   import('./components/StationManagerScreen').then((m) => ({ default: m.StationManagerScreen }))
 );
@@ -109,6 +112,15 @@ export const App: React.FC = () => {
   const [adminMode] = useState(() => {
     try {
       return new URLSearchParams(window.location.search).has('admin');
+    } catch {
+      return false;
+    }
+  });
+
+  // Hidden ?moderation=1 route — admin queue of flagged reports (keep / remove / restore).
+  const [moderationMode] = useState(() => {
+    try {
+      return new URLSearchParams(window.location.search).has('moderation');
     } catch {
       return false;
     }
@@ -696,6 +708,17 @@ export const App: React.FC = () => {
     }
   };
 
+  const handleFlagReport = async (
+    reportId: string,
+    reason: 'wrong_status' | 'spam' | 'fake_photo' | 'other'
+  ): Promise<boolean> => {
+    if (!requireAuth()) return false;
+    const res = await apiService.flagReport(reportId, reason);
+    track('report_flagged', { reason, ok: res.ok });
+    showToast(res.ok ? 'Thanks — we’ll review that report.' : res.error || 'Couldn’t send that.', res.ok ? 'ok' : 'warn');
+    return res.ok;
+  };
+
   const handleNavigate = (station: GasStation) => {
     setNavigatingStation(station);
     showToast(`Navigation summary for ${station.name} (${station.distance})`);
@@ -791,6 +814,18 @@ export const App: React.FC = () => {
     return (
       <Suspense fallback={<div className="fixed inset-0 grid place-items-center text-slate-500">Loading admin…</div>}>
         <AdminPinsScreen
+          onExit={() => {
+            window.location.href = window.location.pathname;
+          }}
+        />
+      </Suspense>
+    );
+  }
+
+  if (moderationMode) {
+    return (
+      <Suspense fallback={<div className="fixed inset-0 grid place-items-center text-slate-500">Loading…</div>}>
+        <ModerationScreen
           onExit={() => {
             window.location.href = window.location.pathname;
           }}
@@ -941,6 +976,7 @@ export const App: React.FC = () => {
             />
           ) : activeDetailStation ? (
             <StationDetailScreen
+              onFlagReport={handleFlagReport}
               station={activeDetailStation}
               user={userProfile}
               isFavorite={favoriteStationIds.includes(activeDetailStation.id)}

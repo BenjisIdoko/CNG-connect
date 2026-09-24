@@ -143,6 +143,7 @@ export default defineConfig(() => {
             '**/AdminPinsScreen-*.js',
             '**/FullStationEditorModal-*.js',
             '**/StationManagerScreen-*.js',
+            '**/ModerationScreen-*.js',
           ],
           importScripts: ['sw-custom.js'],
           runtimeCaching: [
