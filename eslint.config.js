@@ -10,7 +10,6 @@ export default tseslint.config(
       'node_modules/**',
       'coverage/**',
       'api/**',
-      'netlify/**',
       '.vercel/**',
       'scratch/**',
       'test-results/**',

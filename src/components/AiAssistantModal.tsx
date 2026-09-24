@@ -69,21 +69,12 @@ export const AiAssistantModal: React.FC<AiAssistantModalProps> = ({
     setLoading(true);
 
     try {
-      // Call serverless API endpoint (Vercel/Netlify function)
-      let response = await fetch('/api/chat', {
+      // Call the serverless API endpoint (Vercel function, api/chat.ts)
+      const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt: promptText, stations }),
       });
-
-      if (!response.ok && response.status === 404) {
-        // Try netlify function route if /api/chat isn't found
-        response = await fetch('/.netlify/functions/chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ prompt: promptText, stations }),
-        });
-      }
 
       if (response.ok) {
         const data = await response.json();
