@@ -9,6 +9,7 @@ import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 import { GasStation, StationStatus, StationSuggestion } from '../types';
 import { ASSETS } from '../data/mockData';
+import { searchTokens, stationMatchesQuery, stationSearchScore } from '../utils/stationSearch';
 import { Modal } from './common/Modal';
 import { SuggestStationModal } from './SuggestStationModal';
 import { formatStationAge } from '../utils/timeUtils';
@@ -264,17 +265,40 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       activeCity === 'all' ||
       st.state.toLowerCase().includes(activeCity.toLowerCase()) ||
       st.city.toLowerCase().includes(activeCity.toLowerCase());
-    const matchesSearch =
-      st.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      st.address.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      st.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      st.state.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (st.operator && st.operator.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      (st.network && st.network.toLowerCase().includes(searchQuery.toLowerCase()));
+    const matchesSearch = stationMatchesQuery(st, searchQuery);
     const matchesPressure = minPressure === 0 || (st.pumpPressure != null && st.pumpPressure >= minPressure);
     const matchesDistance = maxDistanceKm === 0 || getDistanceKm(st) <= maxDistanceKm;
     return matchesStationType && matchesFilter && matchesCity && matchesSearch && matchesPressure && matchesDistance;
   });
+  // While searching, best matches first (then nearest); otherwise keep the natural order.
+  if (searchTokens(searchQuery).length > 0) {
+    filteredStations.sort(
+      (a, b) => stationSearchScore(b, searchQuery) - stationSearchScore(a, searchQuery) || getDistanceKm(a) - getDistanceKm(b),
+    );
+  }
+
+  // Once the driver pauses typing, bring the matching stations into view.
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map || searchTokens(searchQuery).length === 0) return;
+    const t = setTimeout(() => {
+      const coords = filteredStations
+        .filter((s) => s.lat != null && s.lng != null)
+        .slice(0, 60)
+        .map((s) => [s.lat!, s.lng!] as [number, number]);
+      if (coords.length === 0) return;
+      initialFitRef.current = true;
+      // On phones the search bar covers the top and the station sheet the bottom.
+      const phone = window.innerWidth < 1024;
+      map.flyToBounds(L.latLngBounds(coords), {
+        paddingTopLeft: [40, phone ? 190 : 60],
+        paddingBottomRight: [40, phone ? 330 : 60],
+        maxZoom: 14,
+        duration: 0.8,
+      });
+    }, 450);
+    return () => clearTimeout(t);
+  }, [searchQuery]);
 
   useEffect(() => {
     if (!mapInstanceRef.current || initialFitRef.current) return;
@@ -592,8 +616,16 @@ export const MapScreen: React.FC<MapScreenProps> = ({
           <span aria-hidden="true" className="material-symbols-outlined text-slate-400 text-[20px] shrink-0">search</span>
           <input
             type="text"
+            inputMode="search"
+            enterKeyHint="search"
+            autoComplete="off"
+            autoCorrect="off"
+            autoCapitalize="none"
+            spellCheck={false}
+            aria-label="Search stations, city or state"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); }}
             placeholder="Search stations, city, state"
             className="flex-1 min-w-0 bg-transparent border-none outline-none text-caption font-medium text-slate-900 placeholder:text-slate-400 py-3.5"
           />
@@ -700,7 +732,9 @@ export const MapScreen: React.FC<MapScreenProps> = ({
             <div className="px-5 pt-4 pb-28 text-center flex flex-col items-center gap-2">
               <h3 className="font-extrabold text-on-surface text-body-lg">No stations found</h3>
               <p className="text-caption text-on-surface-variant max-w-xs">
-                Nothing matches your search or filters right now.
+                {searchQuery.trim()
+                  ? `Nothing matches "${searchQuery.trim()}". Try just the station name or the city.`
+                  : 'Nothing matches your filters right now.'}
               </p>
               <button
                 onClick={() => {
@@ -844,6 +878,11 @@ export const MapScreen: React.FC<MapScreenProps> = ({
             <span aria-hidden="true" className="material-symbols-outlined text-slate-400 text-[18px]">search</span>
             <input
               type="text"
+              inputMode="search"
+              enterKeyHint="search"
+              autoComplete="off"
+              spellCheck={false}
+              aria-label="Search stations, city or state"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search station, city, state..."
