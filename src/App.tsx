@@ -1,4 +1,4 @@
-import { shareApp, shareAppToast } from './utils/shareApp';
+import { ShareAppSheet } from './components/ShareAppSheet';
 import { captureReferralFromUrl, clearPendingReferral, getPendingReferral } from './utils/referral';
 import React, { useState, useEffect, useMemo, useCallback, useRef, lazy, Suspense } from 'react';
 import {
@@ -579,12 +579,9 @@ export const App: React.FC = () => {
     setTimeout(() => setGlobalToast(null), 3500);
   };
 
-  const handleShareApp = async () => {
-    // Signed-in drivers share a link carrying their referral code (best effort).
-    const code = isAuthenticated ? await apiService.getMyReferralCode().catch(() => null) : null;
-    const message = shareAppToast(await shareApp(code));
-    if (message) showToast(message);
-  };
+  // The "Share the App" buttons open a sheet that explains the promo and shares the driver's link.
+  const [isShareSheetOpen, setIsShareSheetOpen] = useState(false);
+  const handleShareApp = () => setIsShareSheetOpen(true);
 
   // Browsing (map, stations, community feed) stays open to guests; writing
   // (reports, comments, likes, suggestions) requires a verified session —
@@ -1162,6 +1159,17 @@ export const App: React.FC = () => {
           onClose={() => setIsCreatePostOpen(false)}
           onSubmitPost={handleCreatePost}
         />
+
+        {isShareSheetOpen && (
+          <ShareAppSheet
+            onClose={() => setIsShareSheetOpen(false)}
+            onSignIn={() => {
+              setIsShareSheetOpen(false);
+              setAuthMode('signup');
+            }}
+            onToast={showToast}
+          />
+        )}
 
         {navigatingStation && (
           <LiveNavigationModal

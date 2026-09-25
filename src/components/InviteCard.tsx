@@ -8,7 +8,13 @@ const REWARD = 500;
 type Summary = { code: string; pending: number; owed: number; paid: number; slotsLeft: number };
 
 /** "Invite drivers, earn ₦500 airtime" — the driver's link, code and progress. */
-export const InviteCard: React.FC<{ onSignIn?: () => void; onToast: (m: string) => void }> = ({ onSignIn, onToast }) => {
+export const InviteCard: React.FC<{
+  onSignIn?: () => void;
+  onToast: (m: string) => void;
+  /** 'sheet' drops the card chrome and title (the sheet supplies its own) and shows the three steps. */
+  variant?: 'card' | 'sheet';
+}> = ({ onSignIn, onToast, variant = 'card' }) => {
+  const isSheet = variant === 'sheet';
   const { isAuthenticated } = useAuth();
   const [summary, setSummary] = useState<Summary | null>(null);
   const [loaded, setLoaded] = useState(false);
@@ -43,38 +49,67 @@ export const InviteCard: React.FC<{ onSignIn?: () => void; onToast: (m: string) 
 
   return (
     <section
-      aria-labelledby="invite-title"
-      className="bg-white rounded-2xl p-4 shadow-[0_4px_14px_rgba(14,20,32,0.05)] border border-primary/15"
+      aria-labelledby={isSheet ? undefined : 'invite-title'}
+      className={isSheet ? '' : 'bg-white rounded-2xl p-4 shadow-[0_4px_14px_rgba(14,20,32,0.05)] border border-primary/15'}
     >
-      <div className="flex items-start gap-3">
-        <span aria-hidden="true" className="w-10 h-10 rounded-full bg-primary-container text-primary flex items-center justify-center shrink-0">
-          <span className="material-symbols-outlined text-[22px]">share</span>
-        </span>
-        <div className="min-w-0">
-          <h2 id="invite-title" className="font-bold text-body-lg leading-tight">
-            Invite drivers, earn ₦{REWARD} airtime
-          </h2>
-          <p className="text-caption text-on-surface-variant mt-1">
-            When a friend joins with your link and files their first station report, you get ₦{REWARD} airtime. Up to ₦
-            {(REWARD * 10).toLocaleString()} per driver.
-          </p>
+      {isSheet ? (
+        <ol className="flex flex-col gap-3">
+          {[
+            { icon: 'share', title: 'Share your link', text: 'Send it on WhatsApp, SMS or anywhere.' },
+            { icon: 'person_add', title: 'A friend joins', text: 'They sign up with your link and file their first station report.' },
+            { icon: 'call', title: `You get ₦${REWARD} airtime`, text: `Up to ₦${(REWARD * 10).toLocaleString()} (10 friends) per driver.` },
+          ].map((step, i) => (
+            <li key={step.title} className="flex items-start gap-3">
+              <span aria-hidden="true" className="w-9 h-9 rounded-full bg-primary-container text-primary flex items-center justify-center shrink-0">
+                <span className="material-symbols-outlined text-[20px]">{step.icon}</span>
+              </span>
+              <div className="min-w-0">
+                <p className="font-bold text-body text-on-surface leading-tight">
+                  {i + 1}. {step.title}
+                </p>
+                <p className="text-caption text-on-surface-variant">{step.text}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      ) : (
+        <div className="flex items-start gap-3">
+          <span aria-hidden="true" className="w-10 h-10 rounded-full bg-primary-container text-primary flex items-center justify-center shrink-0">
+            <span className="material-symbols-outlined text-[22px]">share</span>
+          </span>
+          <div className="min-w-0">
+            <h2 id="invite-title" className="font-bold text-body-lg leading-tight">
+              Invite drivers, earn ₦{REWARD} airtime
+            </h2>
+            <p className="text-caption text-on-surface-variant mt-1">
+              When a friend joins with your link and files their first station report, you get ₦{REWARD} airtime. Up to ₦
+              {(REWARD * 10).toLocaleString()} per driver.
+            </p>
+          </div>
         </div>
-      </div>
+      )}
 
       {!isAuthenticated ? (
-        <button
-          onClick={onSignIn}
-          className="mt-3 w-full h-12 rounded-full bg-deep-teal text-white font-bold text-caption active:scale-[0.98] transition-transform"
-        >
-          Sign in to get your invite link
-        </button>
+        <>
+          <button
+            onClick={onSignIn}
+            className="mt-4 w-full h-12 rounded-full bg-deep-teal text-white font-bold text-caption active:scale-[0.98] transition-transform"
+          >
+            Sign in to get your invite link
+          </button>
+          {isSheet && (
+            <button onClick={share} className="mt-1 w-full py-3 text-caption font-semibold text-on-surface-variant">
+              Just share the app (no reward)
+            </button>
+          )}
+        </>
       ) : (
         <>
           {summary && (
             <button
               onClick={copyCode}
               aria-label={`Your invite code ${summary.code}. Tap to copy`}
-              className="mt-3 w-full flex items-center justify-between bg-surface-container rounded-2xl px-4 py-3 active:scale-[0.99] transition-transform"
+              className="mt-4 w-full flex items-center justify-between bg-surface-container rounded-2xl px-4 py-3 active:scale-[0.99] transition-transform"
             >
               <span className="text-micro font-semibold text-outline">Your code</span>
               <span className="font-mono font-bold tracking-[0.2em] text-body-lg text-on-surface">{summary.code}</span>
