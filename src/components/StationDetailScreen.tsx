@@ -4,7 +4,7 @@ import { TabUnderline } from './common/TabUnderline';
 import { FlagReportSheet, type FlagReason } from './FlagReportSheet';
 import { GasStation, CommentItem, UserProfile, DriverReport } from '../types';
 import { ASSETS } from '../data/mockData';
-import { openExternalMaps, openGoogleMapsPin } from '../utils/navigationHelper';
+import { openExternalMaps } from '../utils/navigationHelper';
 import { StationGroupInfoSheet } from './StationGroupInfoSheet';
 import { formatStationAge, formatRelativeTime, isIsoTimestamp, minutesSince } from '../utils/timeUtils';
 import { openWhatsAppShare } from '../utils/shareMessageBuilder';
@@ -358,17 +358,6 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
             </div>
           </div>
         ) : null}
-
-        {station.lat && station.lng && (
-          <button
-            onClick={() => openGoogleMapsPin(station)}
-            className="self-start -mt-2 text-micro font-semibold text-outline hover:text-slate-900 flex items-center gap-1"
-          >
-            <span aria-hidden="true" className="material-symbols-outlined text-[15px]">map</span>
-            View map pin
-            <span aria-hidden="true" className="material-symbols-outlined text-[13px]">open_in_new</span>
-          </button>
-        )}
 
         {/* Radix Accessible 3-Way Tabs Switcher */}
         <TabsPrimitive.Root value={activeTab} onValueChange={(val) => setActiveTab(val as 'feed' | 'reports' | 'photos')} className="w-full">

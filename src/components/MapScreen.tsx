@@ -8,14 +8,10 @@ import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 import { GasStation, StationStatus, StationSuggestion } from '../types';
-import { ASSETS } from '../data/mockData';
 import { StationSearchOverlay, rememberRecentStation } from './StationSearchOverlay';
 import { searchTokens, stationMatchesQuery, stationSearchScore } from '../utils/stationSearch';
-import { Modal } from './common/Modal';
 import { SuggestStationModal } from './SuggestStationModal';
-import { formatStationAge } from '../utils/timeUtils';
 import { prefersReducedMotion } from '../utils/haptics';
-import { openWhatsAppShare } from '../utils/shareMessageBuilder';
 import { getPinConfidence, getAccuracyRadiusM } from '../utils/locationPrecision';
 import { isSameState } from '../utils/proximityAlertEngine';
 import { track } from '../services/analytics';
@@ -70,10 +66,8 @@ export const MapScreen: React.FC<MapScreenProps> = ({
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   // Station the driver picked from search: shown first in the sheet and highlighted.
   const [pinnedId, setPinnedId] = useState<string | null>(null);
-  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [isSuggestModalOpen, setIsSuggestModalOpen] = useState(false);
   const [showPiCngInfo, setShowPiCngInfo] = useState(false);
-  const [maxDistanceKm, setMaxDistanceKm] = useState<number>(0); // 0 = any distance
   const [sheetMode, setSheetMode] = useState<'standard' | 'expanded' | 'collapsed'>('standard');
   const toggleSheetMode = () => setSheetMode((prev) => (prev === 'expanded' ? 'standard' : 'expanded'));
 
@@ -156,10 +150,10 @@ export const MapScreen: React.FC<MapScreenProps> = ({
     return () => clearTimeout(t);
   }, [searchQuery]);
   useEffect(() => {
-    if (activeFilter !== 'all' || maxDistanceKm > 0) {
-      track('filter_applied', { status: activeFilter, distance_km: maxDistanceKm });
+    if (activeFilter !== 'all') {
+      track('filter_applied', { status: activeFilter });
     }
-  }, [activeFilter, maxDistanceKm]);
+  }, [activeFilter]);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [visibleCount, setVisibleCount] = useState(25);
 
@@ -269,8 +263,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       st.state.toLowerCase().includes(activeCity.toLowerCase()) ||
       st.city.toLowerCase().includes(activeCity.toLowerCase());
     const matchesSearch = stationMatchesQuery(st, searchQuery);
-    const matchesDistance = maxDistanceKm === 0 || getDistanceKm(st) <= maxDistanceKm;
-    return matchesStationType && matchesFilter && matchesCity && matchesSearch && matchesDistance;
+    return matchesStationType && matchesFilter && matchesCity && matchesSearch;
   });
   // While searching, best matches first (then nearest); otherwise keep the natural order.
   if (searchTokens(searchQuery).length > 0) {
@@ -722,16 +715,8 @@ export const MapScreen: React.FC<MapScreenProps> = ({
     setPinnedId(null);
     setActiveFilter('all');
     setActiveCity('all');
-    setMaxDistanceKm(0);
     setStationTypeFilter('all');
   };
-
-  const activeFilterCount =
-    (activeFilter !== 'all' ? 1 : 0) +
-    (activeCity !== 'all' ? 1 : 0) +
-    (searchQuery.trim() !== '' ? 1 : 0) +
-    (maxDistanceKm > 0 ? 1 : 0) +
-    (stationTypeFilter !== 'all' ? 1 : 0);
 
   return (
     <div className="relative w-full h-[100dvh] lg:h-[calc(100vh-4rem)] overflow-hidden bg-surface-container-low lg:flex lg:flex-row">
@@ -745,21 +730,13 @@ export const MapScreen: React.FC<MapScreenProps> = ({
         </div>
       )}
 
-      {/* Mobile top overlay: just two floating buttons, so the map is the hero (Bolt / inDrive style) */}
+      {/* Mobile top overlay: the logo and Share the App, so the map is the hero (Bolt / inDrive style) */}
       <div className="lg:hidden absolute top-0 inset-x-0 z-30 pointer-events-none pt-safe px-4">
         <div className="flex items-center justify-between pt-3">
-          <button
-            onClick={() => setIsFilterModalOpen(true)}
-            aria-label={activeFilterCount > 0 ? `Filters, ${activeFilterCount} active` : 'Filters'}
-            className="pointer-events-auto relative w-12 h-12 rounded-full bg-white text-slate-900 flex items-center justify-center shadow-[0_4px_14px_rgba(31,41,35,0.22)] active:scale-95 transition-transform"
-          >
-            <span aria-hidden="true" className="material-symbols-outlined text-[22px]">tune</span>
-            {activeFilterCount > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-primary text-white text-[11px] font-bold flex items-center justify-center">
-                {activeFilterCount}
-              </span>
-            )}
-          </button>
+          <div className="pointer-events-auto h-12 pl-1.5 pr-4 rounded-full bg-white flex items-center gap-2 shadow-[0_4px_14px_rgba(31,41,35,0.22)]">
+            <img src="/pwa-icon.svg" alt="" className="w-9 h-9 rounded-full" />
+            <span className="font-headline font-extrabold text-[1.0625rem] text-slate-900 tracking-tight">CNG&#8209;Connect</span>
+          </div>
           {onShareApp && (
             <button
               onClick={onShareApp}
@@ -1064,77 +1041,6 @@ export const MapScreen: React.FC<MapScreenProps> = ({
           )}
         </div>
       </div>
-
-      {/* Filter Modal */}
-      <Modal isOpen={isFilterModalOpen} onClose={() => setIsFilterModalOpen(false)} title="Filters">
-        <div className="flex flex-col gap-6 py-1 text-on-surface">
-          {/* Distance */}
-          <div>
-            <label className="block text-micro font-bold text-outline uppercase tracking-wider mb-2.5">Distance</label>
-            <div className="flex gap-2 flex-wrap">
-              {[0, 5, 10, 25, 50].map((dist) => (
-                <button
-                  key={dist}
-                  type="button"
-                  onClick={() => setMaxDistanceKm(dist)}
-                  className={`px-4 py-2 rounded-full text-caption font-semibold transition-all active:scale-95 ${
-                    maxDistanceKm === dist ? 'bg-slate-900 text-white' : 'bg-surface text-slate-500'
-                  }`}
-                >
-                  {dist === 0 ? 'Any' : `${dist} km`}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Status */}
-          <div>
-            <label className="block text-micro font-bold text-outline uppercase tracking-wider mb-2.5">Status</label>
-            <div className="flex flex-col gap-2">
-              {[
-                { key: 'all', label: 'All statuses', dot: 'bg-slate-400' },
-                { key: 'full', label: 'Available', dot: 'bg-status-green' },
-                { key: 'queue', label: 'Queuing', dot: 'bg-status-amber' },
-                { key: 'low', label: 'Low pressure', dot: 'bg-status-orange' },
-                { key: 'out', label: 'Out of service', dot: 'bg-status-red' },
-              ].map((opt) => {
-                const on = activeFilter === opt.key;
-                return (
-                  <button
-                    key={opt.key}
-                    type="button"
-                    onClick={() => setActiveFilter(opt.key)}
-                    className={`flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-left transition-all active:scale-[0.99] ${
-                      on ? 'bg-primary-container ring-[1.5px] ring-primary' : 'bg-surface-container'
-                    }`}
-                  >
-                    <span className={`w-2 h-2 rounded-full ${opt.dot}`} />
-                    <span className="flex-1 text-caption font-semibold">{opt.label}</span>
-                    {on && <span aria-hidden="true" className="material-symbols-outlined text-primary text-[18px]">check</span>}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-2 pt-1">
-            <button
-              type="button"
-              onClick={() => setIsFilterModalOpen(false)}
-              className="w-full py-3.5 bg-primary text-white font-bold text-body rounded-full shadow-[0_8px_18px_rgba(49,154,63,0.3)] active:scale-[0.98] transition-all"
-            >
-              Show {filteredStations.length} {filteredStations.length === 1 ? 'station' : 'stations'}
-            </button>
-            <button
-              type="button"
-              onClick={resetAllFilters}
-              className="w-full py-2 text-primary font-semibold text-caption"
-            >
-              Reset filters
-            </button>
-          </div>
-        </div>
-      </Modal>
 
       {/* Suggest Station Modal */}
       <SuggestStationModal
