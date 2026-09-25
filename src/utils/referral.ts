@@ -30,6 +30,16 @@ export function captureReferralFromUrl(): void {
   }
 }
 
+export function setPendingReferral(code: string): void {
+  const c = parseReferralCode(code);
+  if (!c) return;
+  try {
+    localStorage.setItem(KEY, JSON.stringify({ code: c, at: Date.now() }));
+  } catch {
+    /* ignore */
+  }
+}
+
 export function getPendingReferral(): string | null {
   try {
     const raw = localStorage.getItem(KEY);

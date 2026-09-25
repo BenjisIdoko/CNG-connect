@@ -4,6 +4,7 @@ import { validatePhoneNumber } from '../utils/phoneValidator';
 import { validateEmail } from '../utils/emailValidator';
 import { useAuth } from '../context/AuthContext';
 import { Icon } from './common/Icon';
+import { clearPendingReferral, getPendingReferral, parseReferralCode, setPendingReferral } from '../utils/referral';
 
 interface SignUpScreenProps {
   /** Called once the driver is fully signed in — for a returning driver this fires right after OTP verification; for a new driver, after they complete their profile. */
@@ -52,6 +53,10 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
   const [cngStatus, setCngStatus] = useState<'installed' | 'planning' | 'interested'>('installed');
   const [tankSize, setTankSize] = useState('15kg');
   const [isSavingProfile, setIsSavingProfile] = useState(false);
+  // Optional invite code (from a friend's link it is already filled in).
+  const [inviteCode, setInviteCode] = useState(() => getPendingReferral() ?? '');
+  const [showInvite, setShowInvite] = useState(() => !!getPendingReferral());
+  const [inviteError, setInviteError] = useState<string | null>(null);
 
   useEffect(() => {
     if (resendCooldown <= 0) return;
@@ -133,6 +138,21 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
       return;
     }
 
+    // Keep the invite code for the app to claim once the profile is saved.
+    if (!phoneOnly) {
+      const typed = inviteCode.trim();
+      if (typed) {
+        if (!parseReferralCode(typed)) {
+          setShowInvite(true);
+          setInviteError('Invite codes are 4–12 letters and numbers, like K7M2QX.');
+          return;
+        }
+        setPendingReferral(typed);
+      } else {
+        clearPendingReferral();
+      }
+    }
+
     setIsSavingProfile(true);
     if (phoneOnly) {
       await updateProfile({ phone: phoneValidation.formatted || phone.trim() });
@@ -205,7 +225,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
         <p className="text-[0.9375rem] text-on-surface-variant leading-relaxed mt-2">
           {phoneOnly
             ? 'A phone number is required on every CNG-Connect account. It only takes a few seconds.'
-            : 'Just a few details so other drivers know who&apos;s reporting. Your phone number is required.'}
+            : "Just a few details so other drivers know who’s reporting. Your phone number is required."}
         </p>
       )}
 
@@ -355,6 +375,49 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
               </div>
 
               {!phoneOnly && (<>
+              <div>
+                {!showInvite ? (
+                  <button
+                    type="button"
+                    onClick={() => setShowInvite(true)}
+                    className="text-[0.8125rem] font-bold text-primary"
+                  >
+                    Have an invite code?
+                  </button>
+                ) : (
+                  <>
+                    <label htmlFor="signup-invite" className="block text-[0.7812rem] font-semibold text-on-surface-variant mb-1">
+                      Invite code <span className="text-outline font-medium">(optional)</span>
+                    </label>
+                    <div className={`flex items-center bg-surface border rounded-2xl px-3.5 h-12 transition-all ${
+                      inviteError ? 'border-status-red ring-2 ring-status-red/20' : 'border-outline-variant focus-within:ring-2 focus-within:ring-primary/30 focus-within:border-primary'
+                    }`}>
+                      <span aria-hidden="true" className="material-symbols-outlined text-outline text-[20px] mr-2">share</span>
+                      <input
+                        id="signup-invite"
+                        type="text"
+                        autoCapitalize="characters"
+                        autoCorrect="off"
+                        spellCheck={false}
+                        maxLength={12}
+                        value={inviteCode}
+                        onChange={(e) => {
+                          setInviteCode(e.target.value.toUpperCase());
+                          if (inviteError) setInviteError(null);
+                        }}
+                        placeholder="e.g. K7M2QX"
+                        className="flex-1 bg-transparent text-[0.9062rem] font-semibold tracking-widest text-on-surface outline-none placeholder:font-medium placeholder:tracking-normal"
+                      />
+                    </div>
+                    {inviteError ? (
+                      <p className="text-[0.7812rem] font-medium text-status-red mt-1">{inviteError}</p>
+                    ) : (
+                      <p className="text-[0.7812rem] text-outline mt-1">From a friend who shared the app with you.</p>
+                    )}
+                  </>
+                )}
+              </div>
+
 
               <div>
                 <label className="block text-[0.7812rem] font-semibold text-on-surface-variant mb-1">

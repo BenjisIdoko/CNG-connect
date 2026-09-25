@@ -226,7 +226,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
       )}
 
       {/* Hero photo with floating actions */}
-      <div className="relative h-44 w-full bg-slate-900 overflow-hidden md:max-w-4xl md:mx-auto md:rounded-b-3xl">
+      <div className="relative h-72 md:h-96 w-full bg-slate-900 overflow-hidden md:max-w-4xl md:mx-auto md:rounded-b-3xl">
         <img src={images?.[0] || ASSETS.stationWide} alt={station.name} className="w-full h-full object-cover" />
         <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/35 to-transparent" />
         <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/60 to-transparent" />

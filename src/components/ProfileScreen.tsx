@@ -1,4 +1,5 @@
 import { InviteCard } from './InviteCard';
+import { validatePhoneNumber } from '../utils/phoneValidator';
 import { BUILD_ID, checkForAppUpdate } from '../utils/appUpdate';
 import React, { useState } from 'react';
 import * as PopoverPrimitive from '@radix-ui/react-popover';
@@ -90,9 +91,22 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
 
   const handleSaveProfile = (e: React.FormEvent) => {
     e.preventDefault();
+    // A phone number is compulsory; a changed number must be a valid Nigerian one.
+    let phone = user.phone;
+    if (editPhone.trim() !== user.phone.trim()) {
+      const check = validatePhoneNumber(editPhone);
+      if (!check.isValid) {
+        showToast(check.error || 'Enter a valid Nigerian phone number.');
+        return;
+      }
+      phone = check.formatted || editPhone.trim();
+    } else if (!phone.trim()) {
+      showToast('A phone number is required.');
+      return;
+    }
     const updatedData: Partial<UserProfile> = {
       name: editName.trim() || user.name,
-      phone: editPhone.trim() || user.phone,
+      phone,
       email: editEmail.trim() || user.email,
       vehicle: editVehicle.trim() || user.vehicle,
       state: editState,

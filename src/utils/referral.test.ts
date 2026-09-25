@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { buildInviteUrl, captureReferralFromUrl, clearPendingReferral, getPendingReferral, parseReferralCode } from './referral';
+import { buildInviteUrl, captureReferralFromUrl, clearPendingReferral, getPendingReferral, parseReferralCode, setPendingReferral } from './referral';
 
 // Minimal browser stand-ins (the test environment is plain node).
 const store: Record<string, string> = {};
@@ -56,6 +56,13 @@ describe('referral links', () => {
     captureReferralFromUrl();
     expect(getPendingReferral()).toBeNull();
     expect(window.location.search).toBe('');
+  });
+
+  it('stores a code typed in by hand', () => {
+    setPendingReferral(' k7m2qx ');
+    expect(getPendingReferral()).toBe('K7M2QX');
+    setPendingReferral('!!');
+    expect(getPendingReferral()).toBe('K7M2QX');
   });
 
   it('drops a code older than 30 days', () => {

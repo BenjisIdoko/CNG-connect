@@ -194,6 +194,7 @@ export const App: React.FC = () => {
       else referralClaimStarted.current = false;
       track('referral_claimed', { result });
       if (result === 'ok') showToast('You joined through a friend’s link. File your first station report so they earn airtime!');
+      else if (result === 'invalid') showToast('That invite code wasn’t recognised.');
     });
   }, [isAuthenticated, needsPhone, driverProfile.name]);
 
