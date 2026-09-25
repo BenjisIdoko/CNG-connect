@@ -22,6 +22,7 @@ export type EventName =
   | 'report_started'
   | 'report_submitted'
   | 'report_flagged'
+  | 'referral_claimed'
   | 'arrival_prompt_shown'
   | 'followup_prompt_shown'
   | 'followup_dismissed'

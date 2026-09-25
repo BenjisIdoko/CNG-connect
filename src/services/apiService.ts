@@ -750,6 +750,30 @@ export const apiService = {
     return { ok: false, error: 'Couldn’t send that. Try again.' };
   },
 
+  /** The signed-in driver's personal referral code (null if the promo SQL isn't installed or they're a guest). */
+  async getMyReferralCode(): Promise<string | null> {
+    const summary = await this.getReferralSummary();
+    return summary?.code ?? null;
+  },
+
+  async getReferralSummary(): Promise<{ code: string; pending: number; owed: number; paid: number; slotsLeft: number } | null> {
+    const supabase = isSupabaseConfigured ? await getSupabase() : null;
+    if (!supabase) return null;
+    const { data, error } = await supabase.rpc('my_referral_summary');
+    const row = Array.isArray(data) ? data[0] : data;
+    if (error || !row?.code) return null;
+    return { code: row.code, pending: row.pending, owed: row.owed, paid: row.paid, slotsLeft: row.slots_left };
+  },
+
+  /** Attach a new driver to the friend whose link they came from. Returns the server's verdict, or 'error'. */
+  async claimReferral(code: string): Promise<'ok' | 'invalid' | 'self' | 'not_new' | 'already' | 'error'> {
+    const supabase = isSupabaseConfigured ? await getSupabase() : null;
+    if (!supabase) return 'error';
+    const { data, error } = await supabase.rpc('claim_referral', { p_code: code });
+    if (error || typeof data !== 'string') return 'error';
+    return data as 'ok' | 'invalid' | 'self' | 'not_new' | 'already';
+  },
+
   /**
    * Submits a user suggestion for a new CNG or EV station.
    */

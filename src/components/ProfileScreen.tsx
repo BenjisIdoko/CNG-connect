@@ -1,4 +1,4 @@
-import { shareApp, shareAppToast } from '../utils/shareApp';
+import { InviteCard } from './InviteCard';
 import { BUILD_ID, checkForAppUpdate } from '../utils/appUpdate';
 import React, { useState } from 'react';
 import * as PopoverPrimitive from '@radix-ui/react-popover';
@@ -276,6 +276,8 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
           </div>
         </div>
 
+        <InviteCard onSignIn={onOpenSignUp} onToast={showToast} />
+
         {/* Savings summary → canonical calculator */}
         <div
           onClick={onOpenRoiCalculator}
@@ -361,14 +363,6 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                 />
               </button>
             }
-          />
-          <Row
-            icon="ios_share"
-            label="Share app with drivers"
-            onClick={async () => {
-              const message = shareAppToast(await shareApp());
-              if (message) showToast(message);
-            }}
           />
           <Row icon="help" label="Help & FAQ" onClick={() => showToast('Help Center')} />
           <Row icon="slideshow" label="Replay onboarding" onClick={onOpenOnboarding} />

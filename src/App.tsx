@@ -1,4 +1,5 @@
 import { shareApp, shareAppToast } from './utils/shareApp';
+import { captureReferralFromUrl, clearPendingReferral, getPendingReferral } from './utils/referral';
 import React, { useState, useEffect, useMemo, useCallback, useRef, lazy, Suspense } from 'react';
 import {
   GasStation,
@@ -175,6 +176,26 @@ export const App: React.FC = () => {
   useEffect(() => {
     if (needsPhone && authMode !== 'signup') setAuthMode('signup');
   }, [needsPhone, authMode]);
+
+  // Referral promo: remember ?ref=CODE from the link a friend shared, then claim it once the
+  // new driver has finished signing up (name + phone saved). Old accounts are turned down by the server.
+  useEffect(() => {
+    captureReferralFromUrl();
+  }, []);
+  const referralClaimStarted = useRef(false);
+  useEffect(() => {
+    if (referralClaimStarted.current) return;
+    if (!isAuthenticated || needsPhone || !driverProfile.name.trim()) return;
+    const code = getPendingReferral();
+    if (!code) return;
+    referralClaimStarted.current = true;
+    void apiService.claimReferral(code).then((result) => {
+      if (result !== 'error') clearPendingReferral();
+      else referralClaimStarted.current = false;
+      track('referral_claimed', { result });
+      if (result === 'ok') showToast('You joined through a friend’s link. File your first station report so they earn airtime!');
+    });
+  }, [isAuthenticated, needsPhone, driverProfile.name]);
 
   const hasAutoPromptedOnboarding = useRef(false);
   useEffect(() => {
@@ -558,7 +579,9 @@ export const App: React.FC = () => {
   };
 
   const handleShareApp = async () => {
-    const message = shareAppToast(await shareApp());
+    // Signed-in drivers share a link carrying their referral code (best effort).
+    const code = isAuthenticated ? await apiService.getMyReferralCode().catch(() => null) : null;
+    const message = shareAppToast(await shareApp(code));
     if (message) showToast(message);
   };
 

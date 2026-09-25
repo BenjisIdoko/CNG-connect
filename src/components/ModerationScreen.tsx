@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useSupabaseClient } from '../hooks/useSupabaseClient';
 import { formatRelativeTime } from '../utils/timeUtils';
+import { AirtimePayouts } from './AirtimePayouts';
 
 type QueueRow = {
   report_id: string;
@@ -51,6 +52,7 @@ export const ModerationScreen: React.FC<{ onExit: () => void }> = ({ onExit }) =
   const [authBusy, setAuthBusy] = useState(false);
   const [authErr, setAuthErr] = useState<string | null>(null);
 
+  const [section, setSection] = useState<'reports' | 'payouts'>('reports');
   const [view, setView] = useState<'review' | 'hidden'>('review');
   const [rows, setRows] = useState<QueueRow[]>([]);
   const [loading, setLoading] = useState(false);
@@ -82,8 +84,8 @@ export const ModerationScreen: React.FC<{ onExit: () => void }> = ({ onExit }) =
   }, [supabase, view]);
 
   useEffect(() => {
-    if (session && isAdmin) void load();
-  }, [session, isAdmin, load]);
+    if (session && isAdmin && section === 'reports') void load();
+  }, [session, isAdmin, load, section]);
 
   const act = async (row: QueueRow, action: 'hide' | 'keep' | 'restore') => {
     if (!supabase) return;
@@ -198,9 +200,9 @@ export const ModerationScreen: React.FC<{ onExit: () => void }> = ({ onExit }) =
     <div className="fixed inset-0 z-[200] bg-surface flex flex-col">
       <header className="shrink-0 bg-white shadow-[0_2px_10px_rgba(31,41,35,0.06)] px-4 pt-safe">
         <div className="max-w-2xl mx-auto h-14 flex items-center justify-between gap-3">
-          <h1 className="font-headline font-extrabold text-heading text-slate-900">Moderation</h1>
+          <h1 className="font-headline font-extrabold text-heading text-slate-900">Admin</h1>
           <div className="flex items-center gap-2">
-            <button onClick={() => void load()} className="px-3 py-1.5 rounded-full bg-surface-container text-caption font-semibold">
+            <button onClick={() => (section === 'reports' ? void load() : window.location.reload())} className="px-3 py-1.5 rounded-full bg-surface-container text-caption font-semibold">
               Refresh
             </button>
             <button onClick={onExit} className="px-3 py-1.5 rounded-full bg-surface-container text-caption font-semibold">
@@ -208,6 +210,27 @@ export const ModerationScreen: React.FC<{ onExit: () => void }> = ({ onExit }) =
             </button>
           </div>
         </div>
+        <div className="max-w-2xl mx-auto flex gap-2 pb-2" role="tablist" aria-label="Admin sections">
+          {(
+            [
+              ['reports', 'Report moderation'],
+              ['payouts', 'Airtime payouts'],
+            ] as const
+          ).map(([key, label]) => (
+            <button
+              key={key}
+              role="tab"
+              aria-selected={section === key}
+              onClick={() => setSection(key)}
+              className={`px-4 py-2 rounded-full text-caption font-bold transition-colors ${
+                section === key ? 'bg-primary text-white' : 'bg-surface-container text-on-surface-variant'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        {section === 'reports' && (
         <div className="max-w-2xl mx-auto flex gap-2 pb-3" role="tablist">
           {(
             [
@@ -228,9 +251,16 @@ export const ModerationScreen: React.FC<{ onExit: () => void }> = ({ onExit }) =
             </button>
           ))}
         </div>
+        )}
       </header>
 
       <main className="flex-1 overflow-y-auto">
+        {section === 'payouts' && (
+          <div className="max-w-2xl mx-auto p-4 pb-16">
+            <AirtimePayouts supabase={supabase} flash={flash} />
+          </div>
+        )}
+        {section === 'reports' && (
         <div className="max-w-2xl mx-auto p-4 flex flex-col gap-3 pb-16">
           {loading && <p className="text-caption text-outline">Loading…</p>}
           {err && <p className="text-caption text-status-red font-semibold">{err}</p>}
@@ -317,6 +347,7 @@ export const ModerationScreen: React.FC<{ onExit: () => void }> = ({ onExit }) =
             </article>
           ))}
         </div>
+        )}
       </main>
 
       {toast && (
