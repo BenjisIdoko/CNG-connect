@@ -35,6 +35,13 @@ describe('stationSearch', () => {
     expect(stationMatchesQuery(nipcoLagos, 'abuja')).toBe(false);
   });
 
+  it('short fragments only match the start of a word while typing', () => {
+    expect(stationMatchesQuery(nnpcUshafa, 'ab')).toBe(true); // Abuja
+    expect(stationMatchesQuery(nipcoLagos, 'ab')).toBe(false); // no word starts with "ab"
+    expect(stationMatchesQuery(nnpcUshafa, 'sha')).toBe(false); // mid-word in Ushafa
+    expect(stationMatchesQuery(nnpcUshafa, 'ushafa')).toBe(true);
+  });
+
   it('empty query matches everything', () => {
     expect(stationMatchesQuery(nipcoLagos, '   ')).toBe(true);
   });

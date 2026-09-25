@@ -41,7 +41,11 @@ export function stationMatchesQuery(st: Searchable, query: string): boolean {
   const tokens = searchTokens(query);
   if (tokens.length === 0) return true;
   const text = haystack(st);
-  return tokens.every((t) => text.includes(t) || (ALIASES[t] ?? []).some((a) => text.includes(a)));
+  const padded = ` ${text}`;
+  // Short fragments ("ab" while typing "abuja") must start a word, so results narrow
+  // as you type instead of matching the middle of unrelated words; 4+ letters may sit anywhere.
+  const hit = (t: string) => (t.length >= 4 ? text.includes(t) : padded.includes(` ${t}`));
+  return tokens.every((t) => hit(t) || (ALIASES[t] ?? []).some((a) => text.includes(a)));
 }
 
 /** Higher is a better match; used to order results while a search is active. */

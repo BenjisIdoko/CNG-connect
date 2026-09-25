@@ -9,6 +9,7 @@ import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 import { GasStation, StationStatus, StationSuggestion } from '../types';
 import { ASSETS } from '../data/mockData';
+import { StationSearchOverlay, rememberRecentStation } from './StationSearchOverlay';
 import { searchTokens, stationMatchesQuery, stationSearchScore } from '../utils/stationSearch';
 import { Modal } from './common/Modal';
 import { SuggestStationModal } from './SuggestStationModal';
@@ -66,6 +67,9 @@ export const MapScreen: React.FC<MapScreenProps> = ({
   const [stationTypeFilter, setStationTypeFilter] = useState<'all' | 'cng' | 'ev_charging'>('all');
   const [activeCity, setActiveCity] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  // Station the driver picked from search: shown first in the sheet and highlighted.
+  const [pinnedId, setPinnedId] = useState<string | null>(null);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [isSuggestModalOpen, setIsSuggestModalOpen] = useState(false);
   const [showPiCngInfo, setShowPiCngInfo] = useState(false);
@@ -414,6 +418,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       const marker = L.marker([lat, lng], { icon: customIcon });
       marker.on('click', () => {
         userSelectedRef.current = true;
+        setPinnedId(st.id);
         onSelectStation(st);
         setSheetMode('standard');
       });
@@ -445,7 +450,16 @@ export const MapScreen: React.FC<MapScreenProps> = ({
   useEffect(() => {
     if (!mapInstanceRef.current || !selectedStation) return;
     if (userSelectedRef.current && selectedStation.lat && selectedStation.lng) {
-      mapInstanceRef.current.panTo([selectedStation.lat, selectedStation.lng], { animate: true });
+      // Zoom in when the whole country is showing; keep the current zoom once close.
+      const map = mapInstanceRef.current;
+      const zoom = Math.max(map.getZoom(), 14);
+      let target = L.latLng(selectedStation.lat, selectedStation.lng);
+      if (window.innerWidth < 1024) {
+        // Phones: the search bar covers the top and the sheet the bottom; centre the pin between them.
+        const p = map.project(target, zoom);
+        target = map.unproject(L.point(p.x, p.y + 90), zoom);
+      }
+      map.flyTo(target, zoom, { duration: 0.8 });
     }
   }, [selectedStation]);
 
@@ -575,6 +589,96 @@ export const MapScreen: React.FC<MapScreenProps> = ({
 
   // True only when at least one visible station carries a real driver report
   // (anything other than 'unknown'). Drives whether the "live" pulse shows.
+  const handlePickFromSearch = (st: GasStation) => {
+    rememberRecentStation(st.id);
+    track('search_used', { picked: true });
+    setIsSearchOpen(false);
+    setPinnedId(st.id);
+    userSelectedRef.current = true;
+    onSelectStation(st);
+    setSheetMode('standard');
+    initialFitRef.current = true;
+  };
+
+  const handleApplySearch = (q: string) => {
+    setSearchQuery(q);
+    setPinnedId(null);
+    setIsSearchOpen(false);
+  };
+
+  const renderStationRow = (station: GasStation, idx: number, animate = true, compact = false) => {
+    const info = getStatusIndicator(station.status);
+    const isUnknown = station.status === 'unknown';
+    const age = formatStationAge(station).replace(/^Updated /, '');
+    const meta = [
+      station.distance || null,
+      !isUnknown && station.pumpPressure ? `${station.pumpPressure} bar` : null,
+      !isUnknown && age !== 'No recent report' ? age : null,
+    ].filter(Boolean);
+    return (
+      <div
+        key={station.id}
+        onClick={() => {
+          onSelectStation(station);
+          onOpenStationDetails(station);
+        }}
+        className={`bg-white rounded-2xl p-3 flex items-center gap-3 shadow-[0_4px_14px_rgba(14,20,32,0.05)] cursor-pointer active:scale-[0.99] transition-transform ${flashIds?.has(station.id) ? 'flash-ring' : ''}${pinnedId === station.id ? ' ring-2 ring-primary' : ''}${animate && idx < 8 ? ' rise-in' : ''}`}
+        style={animate && idx < 8 ? ({ '--d': `${idx * 35}ms` } as React.CSSProperties) : undefined}
+      >
+        <div className="w-12 h-12 rounded-xl overflow-hidden bg-surface-container-high shrink-0">
+          <img src={station.images?.[0] || ASSETS.stationWide} alt="" className="w-full h-full object-cover" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <h3 className="font-bold text-body text-on-surface truncate leading-snug">{station.name}</h3>
+          {compact ? (
+            <p className="text-caption text-outline truncate flex items-center gap-1.5">
+              <span aria-hidden="true" className={`w-2 h-2 rounded-full shrink-0 ${info.dotColor}`} />
+              <span className="font-semibold text-on-surface-variant">{info.shortLabel}</span>
+              {station.distance ? <span>· {station.distance}</span> : null}
+            </p>
+          ) : (
+            <>
+              <p className="text-caption text-outline truncate">{meta.join(' · ') || 'No recent reports'}</p>
+              <span
+                className={`inline-flex items-center mt-1 rounded-md px-1.5 py-0.5 text-micro font-bold text-white ${info.solidBg}`}
+              >
+                {info.shortLabel}
+              </span>
+            </>
+          )}
+        </div>
+        <div className="flex items-center gap-1 shrink-0">
+          {!compact && (<button
+            onClick={(e) => {
+              e.stopPropagation();
+              openWhatsAppShare(station);
+            }}
+            aria-label={`Share ${station.name} on WhatsApp`}
+            className="w-9 h-9 rounded-full bg-emerald-50 text-whatsapp flex items-center justify-center active:scale-95"
+          >
+            <span aria-hidden="true" className="material-symbols-outlined text-[16px]">share</span>
+          </button>)}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onNavigate(station);
+            }}
+            aria-label={`Navigate to ${station.name}`}
+            className="w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center active:scale-95"
+          >
+            <span aria-hidden="true" className="material-symbols-outlined text-[16px]">navigation</span>
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  const standardRows = useMemo(() => {
+    const pinned = pinnedId ? filteredStations.find((st) => st.id === pinnedId) : undefined;
+    const rest = nearestTop5Stations.filter((st) => st.id !== pinned?.id);
+    return (pinned ? [pinned, ...rest] : rest).slice(0, 2);
+  }, [filteredStations, pinnedId]);
+
   const hasLiveData = filteredStations.some((s) => s.status !== 'unknown');
 
   const activeFilterCount =
@@ -612,27 +716,21 @@ export const MapScreen: React.FC<MapScreenProps> = ({
           )}
         </div>
 
-        <div className="mt-3 flex items-center bg-white rounded-full shadow-[0_8px_20px_rgba(31,41,35,0.18)] px-4 gap-2 pointer-events-auto focus-within:ring-2 focus-within:ring-primary/40">
-          <span aria-hidden="true" className="material-symbols-outlined text-slate-400 text-[20px] shrink-0">search</span>
-          <input
-            type="text"
-            inputMode="search"
-            enterKeyHint="search"
-            autoComplete="off"
-            autoCorrect="off"
-            autoCapitalize="none"
-            spellCheck={false}
+        <div className="mt-3 flex items-center bg-white rounded-full shadow-[0_8px_20px_rgba(31,41,35,0.18)] pointer-events-auto active:scale-[0.99] transition-transform">
+          <button
+            onClick={() => setIsSearchOpen(true)}
             aria-label="Search stations, city or state"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); }}
-            placeholder="Search stations, city, state"
-            className="flex-1 min-w-0 bg-transparent border-none outline-none text-caption font-medium text-slate-900 placeholder:text-slate-400 py-3.5"
-          />
+            className="flex-1 min-w-0 flex items-center gap-2 pl-4 py-3.5 text-left"
+          >
+            <span aria-hidden="true" className="material-symbols-outlined text-slate-400 text-[20px] shrink-0">search</span>
+            <span className={`flex-1 min-w-0 truncate text-caption font-medium ${searchQuery ? 'text-slate-900' : 'text-slate-500'}`}>
+              {searchQuery || 'Search stations, city, state'}
+            </span>
+          </button>
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
-              className="p-1 rounded-full text-slate-400 hover:bg-slate-100 shrink-0"
+              className="p-2 mr-1 rounded-full text-slate-500 hover:bg-slate-100 shrink-0"
               aria-label="Clear search"
             >
               <span aria-hidden="true" className="material-symbols-outlined text-[18px]">close</span>
@@ -751,95 +849,21 @@ export const MapScreen: React.FC<MapScreenProps> = ({
               </button>
             </div>
           ) : sheetMode !== 'expanded' ? (
-            <div className="flex gap-3 overflow-x-auto hide-scrollbar px-5 pt-2 pb-28">
-              {nearestTop5Stations.map((st) => {
-                const info = getStatusIndicator(st.status);
-                return (
-                  <button
-                    key={st.id}
-                    onClick={() => {
-                      onSelectStation(st);
-                      onOpenStationDetails(st);
-                    }}
-                    className={`w-40 shrink-0 bg-white rounded-2xl overflow-hidden text-left shadow-[0_4px_14px_rgba(14,20,32,0.07)] active:scale-[0.98] transition-transform ${flashIds?.has(st.id) ? 'flash-ring' : ''}`}
-                  >
-                    <div className="h-20 bg-surface-container-high">
-                      <img src={st.images?.[0] || ASSETS.stationWide} alt="" className="w-full h-full object-cover" />
-                    </div>
-                    <div className="p-2.5">
-                      <div className="font-bold text-caption text-on-surface truncate">{st.name}</div>
-                      <div className="text-micro text-outline mt-0.5 truncate">
-                        {st.distance || '—'}
-                        {st.pumpPressure ? ` · ${st.pumpPressure} bar` : ''}
-                      </div>
-                      <span
-                        className={`inline-flex items-center gap-1 mt-2 rounded-md px-1.5 py-0.5 text-micro font-bold text-white ${info.solidBg}`}
-                      >
-                        {info.shortLabel}
-                      </span>
-                    </div>
-                  </button>
-                );
-              })}
+            <div className="px-5 pt-1 pb-28 flex flex-col gap-2">
+              {standardRows.map((st, idx) => renderStationRow(st, idx, false, true))}
+              {filteredStations.length > standardRows.length && (
+                <button
+                  onClick={() => setSheetMode('expanded')}
+                  className="w-full py-2.5 text-primary text-caption font-bold flex items-center justify-center gap-1 active:opacity-70"
+                >
+                  See all {filteredStations.length} stations
+                  <span aria-hidden="true" className="material-symbols-outlined text-[18px]">keyboard_arrow_up</span>
+                </button>
+              )}
             </div>
           ) : (
             <div className="px-5 pt-2 pb-28 overflow-y-auto flex-1 hide-scrollbar flex flex-col gap-2">
-              {filteredStations.slice(0, visibleCount).map((station, idx) => {
-                const info = getStatusIndicator(station.status);
-                const isUnknown = station.status === 'unknown';
-                const age = formatStationAge(station).replace(/^Updated /, '');
-                const meta = [
-                  station.distance || null,
-                  !isUnknown && station.pumpPressure ? `${station.pumpPressure} bar` : null,
-                  !isUnknown && age !== 'No recent report' ? age : null,
-                ].filter(Boolean);
-                return (
-                  <div
-                    key={station.id}
-                    onClick={() => {
-                      onSelectStation(station);
-                      onOpenStationDetails(station);
-                    }}
-                    className={`bg-white rounded-2xl p-3 flex items-center gap-3 shadow-[0_4px_14px_rgba(14,20,32,0.05)] cursor-pointer active:scale-[0.99] transition-transform ${flashIds?.has(station.id) ? 'flash-ring' : ''}${idx < 8 ? ' rise-in' : ''}`}
-                    style={idx < 8 ? ({ '--d': `${idx * 35}ms` } as React.CSSProperties) : undefined}
-                  >
-                    <div className="w-12 h-12 rounded-xl overflow-hidden bg-surface-container-high shrink-0">
-                      <img src={station.images?.[0] || ASSETS.stationWide} alt="" className="w-full h-full object-cover" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <h3 className="font-bold text-body text-on-surface truncate leading-snug">{station.name}</h3>
-                      <p className="text-caption text-outline truncate">{meta.join(' · ') || 'No recent reports'}</p>
-                      <span
-                        className={`inline-flex items-center mt-1 rounded-md px-1.5 py-0.5 text-micro font-bold text-white ${info.solidBg}`}
-                      >
-                        {info.shortLabel}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-1 shrink-0">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          openWhatsAppShare(station);
-                        }}
-                        aria-label={`Share ${station.name} on WhatsApp`}
-                        className="w-9 h-9 rounded-full bg-emerald-50 text-whatsapp flex items-center justify-center active:scale-95"
-                      >
-                        <span aria-hidden="true" className="material-symbols-outlined text-[16px]">share</span>
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onNavigate(station);
-                        }}
-                        aria-label={`Navigate to ${station.name}`}
-                        className="w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center active:scale-95"
-                      >
-                        <span aria-hidden="true" className="material-symbols-outlined text-[16px]">navigation</span>
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
+              {filteredStations.slice(0, visibleCount).map((station, idx) => renderStationRow(station, idx))}
               {visibleCount < filteredStations.length && (
                 <button
                   onClick={() => setVisibleCount((c) => c + 25)}
@@ -859,6 +883,27 @@ export const MapScreen: React.FC<MapScreenProps> = ({
           )}
         </div>
       </div>
+
+      {isSearchOpen && (
+        <StationSearchOverlay
+          stations={stations}
+          distanceKm={(st) => (userGps ? getDistanceKm(st) : 999)}
+          suggestions={
+            userGps
+              ? [...stations].sort((a, b) => getDistanceKm(a) - getDistanceKm(b)).slice(0, 6)
+              : baseStations.slice(0, 6)
+          }
+          suggestionsTitle={userGps ? 'Closest to you' : homeState ? `Stations in ${homeState}` : 'Stations'}
+          statusMeta={(st) => {
+            const info = getStatusIndicator(st.status);
+            return { dot: info.dotColor, label: info.shortLabel };
+          }}
+          initialQuery={searchQuery}
+          onPick={handlePickFromSearch}
+          onApply={handleApplySearch}
+          onClose={() => setIsSearchOpen(false)}
+        />
+      )}
 
       {/* Desktop Persistent Right-Hand Panel (lg: 1024px and above) */}
       <div className="hidden lg:flex flex-col w-[380px] xl:w-[420px] bg-surface h-full z-20 shadow-[-8px_0_24px_rgba(31,41,35,0.08)] overflow-hidden shrink-0">
