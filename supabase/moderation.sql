@@ -2,7 +2,16 @@
 -- admins review a queue at /?moderation=1 (keep / remove / restore).
 -- Paste into Supabase dashboard -> SQL Editor -> Run. Safe to re-run.
 
--- 0. helpers ----------------------------------------------------------------
+-- 0. columns first (the helper functions below read station_reports.hidden) --
+alter table station_reports
+  add column if not exists hidden        boolean not null default false,
+  add column if not exists hidden_reason text,
+  add column if not exists hidden_at     timestamptz,
+  add column if not exists hidden_by     uuid;
+
+alter table profiles add column if not exists is_admin boolean not null default false;
+
+-- helpers -------------------------------------------------------------------
 create or replace function cng_is_admin()
 returns boolean language sql stable security definer set search_path = public as $$
   select coalesce((select is_admin from profiles where id = auth.uid()), false)
@@ -18,11 +27,6 @@ revoke all on function cng_report_hidden(text) from public;
 grant execute on function cng_report_hidden(text) to anon, authenticated;
 
 -- 1. hidden reports ---------------------------------------------------------
-alter table station_reports
-  add column if not exists hidden        boolean not null default false,
-  add column if not exists hidden_reason text,
-  add column if not exists hidden_at     timestamptz,
-  add column if not exists hidden_by     uuid;
 
 -- Hidden reports (and their photos) disappear for everyone except admins.
 drop policy if exists "Allow public read station_reports" on station_reports;
