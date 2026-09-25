@@ -1,3 +1,4 @@
+import { shareApp, shareAppToast } from './utils/shareApp';
 import React, { useState, useEffect, useMemo, useCallback, useRef, lazy, Suspense } from 'react';
 import {
   GasStation,
@@ -50,9 +51,6 @@ const ReportStatusModal = lazy(() =>
 );
 const CreatePostModal = lazy(() =>
   import('./components/CreatePostModal').then((m) => ({ default: m.CreatePostModal }))
-);
-const AiAssistantModal = lazy(() =>
-  import('./components/AiAssistantModal').then((m) => ({ default: m.AiAssistantModal }))
 );
 const LiveNavigationModal = lazy(() =>
   import('./components/LiveNavigationModal').then((m) => ({ default: m.LiveNavigationModal }))
@@ -154,7 +152,6 @@ export const App: React.FC = () => {
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [reportingStation, setReportingStation] = useState<GasStation | null>(null);
   const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
-  const [isAiModalOpen, setIsAiModalOpen] = useState(false);
   const [isRoiModalOpen, setIsRoiModalOpen] = useState(false);
   const [unlockedTierModal, setUnlockedTierModal] = useState<DriverTier | null>(null);
   const [proximityAlertStation, setProximityAlertStation] = useState<GasStation | null>(null);
@@ -554,6 +551,11 @@ export const App: React.FC = () => {
     setTimeout(() => setGlobalToast(null), 3500);
   };
 
+  const handleShareApp = async () => {
+    const message = shareAppToast(await shareApp());
+    if (message) showToast(message);
+  };
+
   // Browsing (map, stations, community feed) stays open to guests; writing
   // (reports, comments, likes, suggestions) requires a verified session —
   // the backend enforces this too (RLS requires `authenticated`), so this is
@@ -926,7 +928,7 @@ export const App: React.FC = () => {
             setActiveTab(tab);
           }}
           userProfile={userProfile}
-          onOpenAiAssistant={() => setIsAiModalOpen(true)}
+          onShareApp={handleShareApp}
           onOpenRoiCalculator={() => setIsRoiModalOpen(true)}
         />
       )}
@@ -937,7 +939,7 @@ export const App: React.FC = () => {
           title={headerTitle || 'CNG-Connect'}
           showBack={showHeaderBack}
           onBack={onHeaderBack}
-          onOpenAiAssistant={() => setIsAiModalOpen(true)}
+          onShareApp={handleShareApp}
           mobileHidden={isMapHome || isProfileHome || isStationDetail}
         />
       )}
@@ -997,7 +999,7 @@ export const App: React.FC = () => {
               onNavigate={handleNavigate}
               gpsStatus={gpsStatus}
               userGps={userCoords}
-              onOpenAiAssistant={() => setIsAiModalOpen(true)}
+              onShareApp={handleShareApp}
               onGpsStatusChange={(status, coords) => {
                 setGpsStatus(status);
                 if (coords) setUserCoords(coords);
@@ -1128,17 +1130,6 @@ export const App: React.FC = () => {
           user={userProfile}
           onClose={() => setIsCreatePostOpen(false)}
           onSubmitPost={handleCreatePost}
-        />
-
-        <AiAssistantModal
-          isOpen={isAiModalOpen}
-          onClose={() => setIsAiModalOpen(false)}
-          stations={scopedStations}
-          onSelectStation={(st) => {
-            setSelectedStation(st);
-            setActiveDetailStation(st);
-            setIsAiModalOpen(false);
-          }}
         />
 
         {navigatingStation && (

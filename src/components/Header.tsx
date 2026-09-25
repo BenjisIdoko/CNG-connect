@@ -4,7 +4,7 @@ interface HeaderProps {
   title: string;
   showBack?: boolean;
   onBack?: () => void;
-  onOpenAiAssistant?: () => void;
+  onShareApp?: () => void;
   /** Replaces the default single action button when provided. */
   rightAction?: React.ReactNode;
   /** Hide on phone widths (the map screen draws its own overlay header). */
@@ -15,7 +15,7 @@ export const Header: React.FC<HeaderProps> = ({
   title,
   showBack = false,
   onBack,
-  onOpenAiAssistant,
+  onShareApp,
   rightAction,
   mobileHidden = false,
 }) => {
@@ -49,14 +49,14 @@ export const Header: React.FC<HeaderProps> = ({
         )}
 
         {rightAction ??
-          (onOpenAiAssistant && (
+          (onShareApp && (
             <button
-              onClick={onOpenAiAssistant}
-              aria-label="Open AI Assistant"
-              title="AI Assistant Guide"
+              onClick={onShareApp}
+              aria-label="Share the app with other drivers"
+              title="Share the app"
               className="w-10 h-10 rounded-full bg-emerald-50 hover:bg-emerald-100 text-primary border border-emerald-200/80 flex items-center justify-center shadow-2xs active:scale-95 transition-all shrink-0 cursor-pointer"
             >
-              <span aria-hidden="true" className="material-symbols-outlined text-[18px] text-primary">auto_awesome</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[18px] text-primary">share</span>
             </button>
           ))}
       </div>

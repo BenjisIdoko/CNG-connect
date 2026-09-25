@@ -8,7 +8,7 @@ interface SidebarProps {
   activeTab: 'map' | 'conversions' | 'community' | 'profile';
   setActiveTab: (tab: 'map' | 'conversions' | 'community' | 'profile') => void;
   userProfile?: UserProfile;
-  onOpenAiAssistant?: () => void;
+  onShareApp?: () => void;
   onOpenRoiCalculator?: () => void;
 }
 
@@ -16,7 +16,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   activeTab,
   setActiveTab,
   userProfile,
-  onOpenAiAssistant,
+  onShareApp,
   onOpenRoiCalculator,
 }) => {
   const navItems = [
@@ -89,13 +89,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </button>
         )}
 
-        {onOpenAiAssistant && (
+        {onShareApp && (
           <button
-            onClick={onOpenAiAssistant}
+            onClick={onShareApp}
             className="w-full py-2.5 px-3.5 rounded-2xl font-extrabold text-[0.875rem] bg-gradient-to-r from-emerald-50 to-sky-50 hover:from-emerald-100 hover:to-sky-100 text-primary border border-emerald-200 flex items-center gap-3 transition-all mt-1"
           >
-            <span aria-hidden="true" className="material-symbols-outlined text-[20px] text-primary">smart_toy</span>
-            <span>CNG Copilot AI</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[20px] text-primary">share</span>
+            <span>Share app with drivers</span>
           </button>
         )}
       </div>

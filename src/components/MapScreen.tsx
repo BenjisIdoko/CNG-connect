@@ -43,7 +43,7 @@ interface MapScreenProps {
   userGps?: { lat: number; lng: number } | null;
   onGpsStatusChange?: (status: GpsStatus, coords?: { lat: number; lng: number }) => void;
   onSuggestStation?: (suggestion: Omit<StationSuggestion, 'id' | 'createdAt' | 'status'>) => void;
-  onOpenAiAssistant?: () => void;
+  onShareApp?: () => void;
   /** Stations whose status just changed — they pulse briefly. */
   flashIds?: Set<string>;
 }
@@ -59,7 +59,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
   userGps: propUserGps,
   onGpsStatusChange,
   onSuggestStation,
-  onOpenAiAssistant,
+  onShareApp,
   flashIds,
 }) => {
   const [activeFilter, setActiveFilter] = useState<string>('all');
@@ -601,13 +601,13 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       <div className="lg:hidden absolute top-0 inset-x-0 z-30 pointer-events-none pt-safe px-5">
         <div className="flex items-center justify-between pt-2 pointer-events-auto">
           <span className="font-extrabold text-slate-900 text-[1.1875rem] tracking-tight [text-shadow:0_1px_6px_rgba(255,255,255,0.9)]">CNG&#8209;Connect</span>
-          {onOpenAiAssistant && (
+          {onShareApp && (
             <button
-              onClick={onOpenAiAssistant}
-              aria-label="Open AI Assistant"
+              onClick={onShareApp}
+              aria-label="Share the app with other drivers"
               className="w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center shadow-[0_4px_12px_rgba(49,154,63,0.5)] active:scale-95 transition-transform"
             >
-              <span aria-hidden="true" className="material-symbols-outlined text-[18px]">auto_awesome</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[18px]">share</span>
             </button>
           )}
         </div>

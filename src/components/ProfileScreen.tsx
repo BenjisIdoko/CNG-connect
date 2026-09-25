@@ -1,3 +1,4 @@
+import { shareApp, shareAppToast } from '../utils/shareApp';
 import { BUILD_ID, checkForAppUpdate } from '../utils/appUpdate';
 import React, { useState } from 'react';
 import * as PopoverPrimitive from '@radix-ui/react-popover';
@@ -364,16 +365,9 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
           <Row
             icon="ios_share"
             label="Share app with drivers"
-            onClick={() => {
-              if (navigator.share) {
-                navigator.share({
-                  title: 'CNG-Connect',
-                  text: 'Find CNG stations across Nigeria with live pressure updates!',
-                  url: window.location.href,
-                });
-              } else {
-                showToast('App link copied!');
-              }
+            onClick={async () => {
+              const message = shareAppToast(await shareApp());
+              if (message) showToast(message);
             }}
           />
           <Row icon="help" label="Help & FAQ" onClick={() => showToast('Help Center')} />
