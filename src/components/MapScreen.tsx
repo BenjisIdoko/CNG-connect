@@ -73,7 +73,6 @@ export const MapScreen: React.FC<MapScreenProps> = ({
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [isSuggestModalOpen, setIsSuggestModalOpen] = useState(false);
   const [showPiCngInfo, setShowPiCngInfo] = useState(false);
-  const [minPressure, setMinPressure] = useState<number>(0);
   const [maxDistanceKm, setMaxDistanceKm] = useState<number>(0); // 0 = any distance
   const [sheetMode, setSheetMode] = useState<'standard' | 'expanded' | 'collapsed'>('standard');
   const toggleSheetMode = () => setSheetMode((prev) => (prev === 'expanded' ? 'standard' : 'expanded'));
@@ -157,10 +156,10 @@ export const MapScreen: React.FC<MapScreenProps> = ({
     return () => clearTimeout(t);
   }, [searchQuery]);
   useEffect(() => {
-    if (activeFilter !== 'all' || minPressure > 0 || maxDistanceKm > 0) {
-      track('filter_applied', { status: activeFilter, pressure: minPressure, distance_km: maxDistanceKm });
+    if (activeFilter !== 'all' || maxDistanceKm > 0) {
+      track('filter_applied', { status: activeFilter, distance_km: maxDistanceKm });
     }
-  }, [activeFilter, minPressure, maxDistanceKm]);
+  }, [activeFilter, maxDistanceKm]);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [visibleCount, setVisibleCount] = useState(25);
 
@@ -270,9 +269,8 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       st.state.toLowerCase().includes(activeCity.toLowerCase()) ||
       st.city.toLowerCase().includes(activeCity.toLowerCase());
     const matchesSearch = stationMatchesQuery(st, searchQuery);
-    const matchesPressure = minPressure === 0 || (st.pumpPressure != null && st.pumpPressure >= minPressure);
     const matchesDistance = maxDistanceKm === 0 || getDistanceKm(st) <= maxDistanceKm;
-    return matchesStationType && matchesFilter && matchesCity && matchesSearch && matchesPressure && matchesDistance;
+    return matchesStationType && matchesFilter && matchesCity && matchesSearch && matchesDistance;
   });
   // While searching, best matches first (then nearest); otherwise keep the natural order.
   if (searchTokens(searchQuery).length > 0) {
@@ -718,11 +716,20 @@ export const MapScreen: React.FC<MapScreenProps> = ({
 
   const hasLiveData = filteredStations.some((s) => s.status !== 'unknown');
 
+  // One reset for everything the driver can narrow the map by (search, status, city, distance, type).
+  const resetAllFilters = () => {
+    setSearchQuery('');
+    setPinnedId(null);
+    setActiveFilter('all');
+    setActiveCity('all');
+    setMaxDistanceKm(0);
+    setStationTypeFilter('all');
+  };
+
   const activeFilterCount =
     (activeFilter !== 'all' ? 1 : 0) +
     (activeCity !== 'all' ? 1 : 0) +
     (searchQuery.trim() !== '' ? 1 : 0) +
-    (minPressure > 0 ? 1 : 0) +
     (maxDistanceKm > 0 ? 1 : 0) +
     (stationTypeFilter !== 'all' ? 1 : 0);
 
@@ -886,14 +893,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                   : 'Nothing matches your filters right now.'}
               </p>
               <button
-                onClick={() => {
-                  setSearchQuery('');
-                  setActiveFilter('all');
-                  setActiveCity('all');
-                  setMinPressure(0);
-                  setMaxDistanceKm(0);
-                  setStationTypeFilter('all');
-                }}
+                onClick={resetAllFilters}
                 className="mt-1 px-6 py-3 bg-primary text-white text-caption font-bold rounded-full active:scale-95 transition-all"
               >
                 Reset filters
@@ -1117,23 +1117,6 @@ export const MapScreen: React.FC<MapScreenProps> = ({
             </div>
           </div>
 
-          {/* Minimum Pressure */}
-          <div>
-            <div className="flex justify-between text-micro font-bold uppercase tracking-wider mb-3">
-              <span className="text-outline">Minimum pump pressure</span>
-              <span className="text-primary">{minPressure === 0 ? 'Any' : `${minPressure}+ bar`}</span>
-            </div>
-            <input
-              type="range"
-              min="0"
-              max="220"
-              step="20"
-              value={minPressure}
-              onChange={(e) => setMinPressure(Number(e.target.value))}
-              className="w-full accent-primary cursor-pointer"
-            />
-          </div>
-
           <div className="flex flex-col gap-2 pt-1">
             <button
               type="button"
@@ -1144,12 +1127,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
             </button>
             <button
               type="button"
-              onClick={() => {
-                setMinPressure(0);
-                setMaxDistanceKm(0);
-                setActiveFilter('all');
-                setStationTypeFilter('all');
-              }}
+              onClick={resetAllFilters}
               className="w-full py-2 text-primary font-semibold text-caption"
             >
               Reset filters

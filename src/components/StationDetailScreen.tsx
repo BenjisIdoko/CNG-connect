@@ -192,20 +192,18 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
   };
 
   const handleShareStation = () => {
-    const pricePart = station.cngPrice ? ` • ₦${station.cngPrice}/kg` : '';
-    const pressurePart = station.pumpPressure ? ` • Pressure: ${station.pumpPressure} bar` : '';
     if (navigator.share) {
       navigator
         .share({
           title: `${station.name} Station Group`,
-          text: `Join ${station.name} Station Group on CNG-Connect! Status: ${station.statusLabel}${pricePart}${pressurePart}.`,
+          text: `Join ${station.name} Station Group on CNG-Connect! Status: ${station.statusLabel}.`,
           url: window.location.href,
         })
         .catch(() => {});
     } else {
       navigator.clipboard
         .writeText(
-          `${station.name} Station Group (${station.address}): Status: ${station.statusLabel}${pricePart}${pressurePart}`
+          `${station.name} Station Group (${station.address}): Status: ${station.statusLabel}`
         )
         .then(() => {
           setCopiedNotification(true);
@@ -349,73 +347,17 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
               )}
             </div>
           </div>
-        ) : !station.cngPrice && !station.pumpPressure && station.status === 'unknown' ? (
+        ) : station.status === 'unknown' ? (
           <div className="rounded-2xl bg-white p-4 flex items-center gap-3 shadow-[0_4px_14px_rgba(31,41,35,0.05)]">
             <span className="w-10 h-10 rounded-full bg-primary-container text-primary flex items-center justify-center shrink-0">
               <span aria-hidden="true" className="material-symbols-outlined text-[20px]">local_gas_station</span>
             </span>
             <div className="min-w-0">
               <p className="font-bold text-body text-on-surface">No reports yet</p>
-              <p className="text-caption text-outline">Be the first to tell drivers the price and pressure.</p>
+              <p className="text-caption text-outline">Be the first to tell drivers if this station has gas.</p>
             </div>
           </div>
-        ) : (
-          <div>
-            <div className="flex gap-6">
-              <div className="flex-1">
-                <div className="text-[0.75rem] font-bold text-outline uppercase tracking-wider">CNG price</div>
-                <div
-                  className={`font-extrabold mt-1 ${
-                    station.cngPrice ? 'text-heading text-slate-900' : 'text-body-lg text-slate-400'
-                  }`}
-                >
-                  {station.cngPrice ? (
-                    <>
-                      ₦{station.cngPrice}
-                      <span className="text-caption font-semibold text-outline">/kg</span>
-                    </>
-                  ) : (
-                    'Unreported'
-                  )}
-                </div>
-              </div>
-              <div className="flex-1">
-                <div className="text-[0.75rem] font-bold text-outline uppercase tracking-wider">Pump pressure</div>
-                <div
-                  className={`font-extrabold mt-1 ${
-                    station.pumpPressure ? 'text-heading text-slate-900' : 'text-body-lg text-slate-400'
-                  }`}
-                >
-                  {station.pumpPressure ? (
-                    <>
-                      {station.pumpPressure}
-                      <span className="text-caption font-semibold text-outline"> bar</span>
-                    </>
-                  ) : (
-                    'No data'
-                  )}
-                </div>
-                {station.pumpPressure ? (
-                  <div className="h-1.5 rounded-full bg-surface-container-high mt-2 overflow-hidden">
-                    <div
-                      className={`h-full rounded-full ${
-                        station.pumpPressure >= 180
-                          ? 'bg-status-green'
-                          : station.pumpPressure >= 130
-                          ? 'bg-status-amber'
-                          : 'bg-status-orange'
-                      }`}
-                      style={{ width: `${Math.min(100, (station.pumpPressure / 220) * 100)}%` }}
-                    />
-                  </div>
-                ) : null}
-              </div>
-            </div>
-            {!station.cngPrice && !station.pumpPressure && (
-              <p className="text-micro text-on-surface-variant mt-2">No reports yet — be the first to add one</p>
-            )}
-          </div>
-        )}
+        ) : null}
 
         {station.lat && station.lng && (
           <button
