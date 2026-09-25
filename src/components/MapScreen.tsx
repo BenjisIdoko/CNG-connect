@@ -295,22 +295,66 @@ export const MapScreen: React.FC<MapScreenProps> = ({
     return () => clearTimeout(t);
   }, [searchQuery]);
 
+  // Opening view. Never the whole of West Africa: start on the driver's home state, or Abuja
+  // when we don't know it, then move to the driver's own position as soon as GPS arrives
+  // (unless they have already started moving the map themselves).
+  // Fly to a point, placing it in the middle of the visible map on phones (the search sheet
+  // covers the lower part of the screen, so the true map centre would sit right at its edge).
+  const flyToVisibleCenter = (lat: number, lng: number, zoom: number, duration = 0.8) => {
+    const map = mapInstanceRef.current;
+    if (!map) return;
+    let target = L.latLng(lat, lng);
+    if (window.innerWidth < 1024) {
+      const p = map.project(target, zoom);
+      target = map.unproject(L.point(p.x, p.y + 150), zoom);
+    }
+    map.flyTo(target, zoom, { duration });
+  };
+  const fitSourceRef = useRef<'none' | 'stations' | 'gps'>('none');
+  const touchedRef = useRef(false);
   useEffect(() => {
-    if (!mapInstanceRef.current || initialFitRef.current) return;
+    const map = mapInstanceRef.current;
+    if (!map || initialFitRef.current || touchedRef.current) return;
     if (userGps) {
-      initialFitRef.current = true;
-      mapInstanceRef.current.flyTo([userGps.lat, userGps.lng], 13);
+      if (fitSourceRef.current === 'gps') return;
+      fitSourceRef.current = 'gps';
+      // Show the driver AND their few nearest stations, so there are pins in view straight away.
+      const near = [...filteredStations]
+        .filter((st) => st.lat != null && st.lng != null)
+        .sort(
+          (x, y) =>
+            calculateHaversineKm(userGps.lat, userGps.lng, x.lat, x.lng) -
+            calculateHaversineKm(userGps.lat, userGps.lng, y.lat, y.lng),
+        )
+        .slice(0, 3);
+      const farKm = near.length ? calculateHaversineKm(userGps.lat, userGps.lng, near[near.length - 1].lat, near[near.length - 1].lng) : Infinity;
+      if (near.length > 0 && farKm <= 60) {
+        const phone = window.innerWidth < 1024;
+        map.flyToBounds(L.latLngBounds([[userGps.lat, userGps.lng], ...near.map((st) => [st.lat, st.lng] as [number, number])]), {
+          paddingTopLeft: [40, phone ? 90 : 50],
+          paddingBottomRight: [40, phone ? 400 : 50],
+          maxZoom: 14,
+          duration: 0.8,
+        });
+      } else {
+        flyToVisibleCenter(userGps.lat, userGps.lng, 13);
+      }
       return;
     }
-    const validCoords = filteredStations
-      .filter((s) => s.lat != null && s.lng != null)
-      .map((s) => [s.lat!, s.lng!] as [number, number]);
-
-    if (validCoords.length > 0) {
-      initialFitRef.current = true;
-      mapInstanceRef.current.fitBounds(L.latLngBounds(validCoords), { padding: [50, 50], maxZoom: 13 });
-    }
-  }, [filteredStations, userGps]);
+    if (fitSourceRef.current !== 'none') return;
+    const inAbuja = filteredStations.filter((st) => isSameState(st.state, 'Abuja') || isSameState(st.state, 'FCT'));
+    const pool = homeState || inAbuja.length === 0 ? filteredStations : inAbuja;
+    const coords = pool.filter((s) => s.lat != null && s.lng != null).map((s) => [s.lat!, s.lng!] as [number, number]);
+    if (coords.length === 0) return;
+    fitSourceRef.current = 'stations';
+    const phone = window.innerWidth < 1024;
+    map.fitBounds(L.latLngBounds(coords), {
+      paddingTopLeft: [30, phone ? 80 : 50],
+      paddingBottomRight: [30, phone ? 400 : 50],
+      maxZoom: 12,
+      animate: false,
+    });
+  }, [filteredStations, userGps, homeState]);
 
   const nearestTop5Stations = [...filteredStations]
     .sort((a, b) => getDistanceKm(a) - getDistanceKm(b))
@@ -352,6 +396,8 @@ export const MapScreen: React.FC<MapScreenProps> = ({
     markersLayerRef.current = clusterGroup;
     clusterGroup.addTo(map);
     mapInstanceRef.current = map;
+    // Once the driver touches the map themselves, stop repositioning it automatically.
+    map.getContainer().addEventListener('pointerdown', () => { touchedRef.current = true; }, { once: true });
 
     return () => {
       map.remove();
@@ -519,17 +565,19 @@ export const MapScreen: React.FC<MapScreenProps> = ({
     };
   }, [selectedStation]);
 
+  // Only reacts when the city selection actually changes (the opening view is handled above).
+  const prevCityRef = useRef(activeCity);
   useEffect(() => {
+    if (prevCityRef.current === activeCity) return;
+    prevCityRef.current = activeCity;
     if (!mapInstanceRef.current) return;
     const cityKey = activeCity.toLowerCase();
     const cityInfo = CITY_COORDINATES[cityKey];
 
     if (cityKey !== 'all' && cityInfo) {
       mapInstanceRef.current.flyTo([cityInfo.lat, cityInfo.lng], cityInfo.zoom, { duration: 1.2 });
-    } else if (cityKey === 'all') {
-      if (userGps) {
-        mapInstanceRef.current.flyTo([userGps.lat, userGps.lng], 13, { duration: 1.2 });
-      }
+    } else if (cityKey === 'all' && userGps) {
+      flyToVisibleCenter(userGps.lat, userGps.lng, 13, 1.2);
     }
   }, [activeCity, userGps]);
 
@@ -537,10 +585,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
     setIsRecentering(true);
 
     if (gpsStatus === 'active' && userGps) {
-      showToast(`Live GPS: ${userGps.lat.toFixed(4)}° N, ${userGps.lng.toFixed(4)}° E`);
-      if (mapInstanceRef.current) {
-        mapInstanceRef.current.flyTo([userGps.lat, userGps.lng], 14, { duration: 1.2 });
-      }
+      flyToVisibleCenter(userGps.lat, userGps.lng, 14, 1);
     } else if (gpsStatus === 'denied') {
       showToast('Turn on location to find nearby stations');
       if (mapInstanceRef.current) {
