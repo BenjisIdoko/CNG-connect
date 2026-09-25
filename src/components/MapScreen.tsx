@@ -611,7 +611,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
     const isUnknown = station.status === 'unknown';
     const age = formatStationAge(station).replace(/^Updated /, '');
     const meta = [
-      station.distance || null,
+      userGps ? station.distance || null : null,
       !isUnknown && station.pumpPressure ? `${station.pumpPressure} bar` : null,
       !isUnknown && age !== 'No recent report' ? age : null,
     ].filter(Boolean);
@@ -634,11 +634,11 @@ export const MapScreen: React.FC<MapScreenProps> = ({
             <p className="text-caption text-outline truncate flex items-center gap-1.5">
               <span aria-hidden="true" className={`w-2 h-2 rounded-full shrink-0 ${info.dotColor}`} />
               <span className="font-semibold text-on-surface-variant">{info.shortLabel}</span>
-              {station.distance ? <span>· {station.distance}</span> : null}
+              {userGps && station.distance ? <span>· {station.distance}</span> : null}
             </p>
           ) : (
             <>
-              <p className="text-caption text-outline truncate">{meta.join(' · ') || 'No recent reports'}</p>
+              {meta.length > 0 && <p className="text-caption text-outline truncate">{meta.join(' · ')}</p>}
               <span
                 className={`inline-flex items-center mt-1 rounded-md px-1.5 py-0.5 text-micro font-bold text-white ${info.solidBg}`}
               >
@@ -673,6 +673,22 @@ export const MapScreen: React.FC<MapScreenProps> = ({
     );
   };
 
+  // Closest stations for the search page: to the driver's GPS, or else to the middle of the map.
+  const closestSuggestions = isSearchOpen
+    ? (() => {
+        const c = mapInstanceRef.current?.getCenter();
+        const ref = userGps ?? (c ? { lat: c.lat, lng: c.lng } : null);
+        if (!ref) return baseStations.slice(0, 8);
+        return [...stations]
+          .filter((st) => st.lat != null && st.lng != null)
+          .sort(
+            (a, b) =>
+              calculateHaversineKm(ref.lat, ref.lng, a.lat, a.lng) - calculateHaversineKm(ref.lat, ref.lng, b.lat, b.lng),
+          )
+          .slice(0, 8);
+      })()
+    : [];
+
   const standardRows = useMemo(() => {
     const pinned = pinnedId ? filteredStations.find((st) => st.id === pinnedId) : undefined;
     const rest = nearestTop5Stations.filter((st) => st.id !== pinned?.id);
@@ -701,73 +717,29 @@ export const MapScreen: React.FC<MapScreenProps> = ({
         </div>
       )}
 
-      {/* Mobile top overlay: wordmark, search, filter chips */}
-      <div className="lg:hidden absolute top-0 inset-x-0 z-30 pointer-events-none pt-safe px-5">
-        <div className="flex items-center justify-between pt-2 pointer-events-auto">
-          <span className="font-extrabold text-slate-900 text-[1.1875rem] tracking-tight [text-shadow:0_1px_6px_rgba(255,255,255,0.9)]">CNG&#8209;Connect</span>
+      {/* Mobile top overlay: just two floating buttons, so the map is the hero (Bolt / inDrive style) */}
+      <div className="lg:hidden absolute top-0 inset-x-0 z-30 pointer-events-none pt-safe px-4">
+        <div className="flex items-center justify-between pt-3">
+          <button
+            onClick={() => setIsFilterModalOpen(true)}
+            aria-label={activeFilterCount > 0 ? `Filters, ${activeFilterCount} active` : 'Filters'}
+            className="pointer-events-auto relative w-11 h-11 rounded-full bg-white text-slate-900 flex items-center justify-center shadow-[0_4px_14px_rgba(31,41,35,0.22)] active:scale-95 transition-transform"
+          >
+            <span aria-hidden="true" className="material-symbols-outlined text-[22px]">tune</span>
+            {activeFilterCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-primary text-white text-[11px] font-bold flex items-center justify-center">
+                {activeFilterCount}
+              </span>
+            )}
+          </button>
           {onShareApp && (
             <button
               onClick={onShareApp}
               aria-label="Share the app with other drivers"
-              className="w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center shadow-[0_4px_12px_rgba(49,154,63,0.5)] active:scale-95 transition-transform"
+              className="pointer-events-auto h-11 pl-3.5 pr-4 rounded-full bg-white text-slate-900 flex items-center gap-2 font-bold text-caption shadow-[0_4px_14px_rgba(31,41,35,0.22)] active:scale-95 transition-transform"
             >
-              <span aria-hidden="true" className="material-symbols-outlined text-[18px]">share</span>
-            </button>
-          )}
-        </div>
-
-        <div className="mt-3 flex items-center bg-white rounded-full shadow-[0_8px_20px_rgba(31,41,35,0.18)] pointer-events-auto active:scale-[0.99] transition-transform">
-          <button
-            onClick={() => setIsSearchOpen(true)}
-            aria-label="Search stations, city or state"
-            className="flex-1 min-w-0 flex items-center gap-2 pl-4 py-3.5 text-left"
-          >
-            <span aria-hidden="true" className="material-symbols-outlined text-slate-400 text-[20px] shrink-0">search</span>
-            <span className={`flex-1 min-w-0 truncate text-caption font-medium ${searchQuery ? 'text-slate-900' : 'text-slate-500'}`}>
-              {searchQuery || 'Search stations, city, state'}
-            </span>
-          </button>
-          {searchQuery && (
-            <button
-              onClick={() => setSearchQuery('')}
-              className="p-2 mr-1 rounded-full text-slate-500 hover:bg-slate-100 shrink-0"
-              aria-label="Clear search"
-            >
-              <span aria-hidden="true" className="material-symbols-outlined text-[18px]">close</span>
-            </button>
-          )}
-        </div>
-
-        <div className="mt-3 flex gap-2 overflow-x-auto hide-scrollbar pointer-events-auto pb-1">
-          {[
-            { label: 'Status', active: activeFilter !== 'all', icon: 'radio_button_checked' },
-            { label: 'Pressure', active: minPressure > 0, icon: null },
-            { label: 'Distance', active: maxDistanceKm > 0, icon: null },
-          ].map((chip) => (
-            <button
-              key={chip.label}
-              onClick={() => setIsFilterModalOpen(true)}
-              className={`shrink-0 rounded-full px-3.5 py-1.5 text-micro font-bold flex items-center gap-1 shadow-sm active:scale-95 transition-transform ${
-                chip.active ? 'bg-primary text-white' : 'bg-white text-slate-900'
-              }`}
-            >
-              {chip.icon && <span aria-hidden="true" className="material-symbols-outlined text-[14px]">{chip.icon}</span>}
-              {chip.label}
-            </button>
-          ))}
-          {activeFilterCount > 0 && (
-            <button
-              onClick={() => {
-                setSearchQuery('');
-                setActiveFilter('all');
-                setActiveCity('all');
-                setMinPressure(0);
-                setMaxDistanceKm(0);
-                setStationTypeFilter('all');
-              }}
-              className="shrink-0 rounded-full px-3 py-1.5 text-micro font-bold text-slate-700 underline underline-offset-2"
-            >
-              Reset
+              <span aria-hidden="true" className="material-symbols-outlined text-[20px]">share</span>
+              Share the App
             </button>
           )}
         </div>
@@ -811,19 +783,57 @@ export const MapScreen: React.FC<MapScreenProps> = ({
             }}
             style={{ touchAction: 'none' }}
             aria-label="Station list size — drag or tap to change"
-            className="w-full pt-2.5 pb-1 px-5 flex flex-col items-center shrink-0"
+            className="w-full pt-2.5 pb-2 flex flex-col items-center shrink-0"
           >
-            <div className="w-10 h-1.5 bg-slate-900/15 rounded-full mb-2.5" />
-            <div className="w-full flex items-center justify-between">
-              <h2 className="font-extrabold text-body-lg tracking-tight text-on-surface flex items-center gap-2">
-                {hasLiveData && <span className="w-2 h-2 rounded-full bg-live-pulse animate-pulse" />}
-                {filteredStations.length}{' '}
-                {filteredStations.length === 1 ? 'station' : 'stations'}{gpsStatus === 'active' ? ' near you' : ''}
-              </h2>
-              <span aria-hidden="true" className="material-symbols-outlined text-slate-400 text-[20px]">
+            <div className="w-10 h-1.5 bg-slate-900/15 rounded-full" />
+          </button>
+
+          <div className="px-5 shrink-0 flex items-center bg-transparent">
+            <div className="flex-1 min-w-0 flex items-center bg-white rounded-full shadow-[0_2px_10px_rgba(14,20,32,0.08)]">
+              <button
+                onClick={() => setIsSearchOpen(true)}
+                aria-label="Search stations, city or state"
+                className="flex-1 min-w-0 flex items-center gap-2.5 pl-4 py-3.5 text-left"
+              >
+                <span aria-hidden="true" className="material-symbols-outlined text-primary text-[22px] shrink-0">search</span>
+                <span className={`flex-1 min-w-0 truncate text-body font-semibold ${searchQuery ? 'text-on-surface' : 'text-on-surface-variant'}`}>
+                  {searchQuery || 'Where do you want to fill up?'}
+                </span>
+              </button>
+              {searchQuery && (
+                <button
+                  onClick={() => {
+                    setSearchQuery('');
+                    setPinnedId(null);
+                  }}
+                  className="p-2 mr-1 rounded-full text-slate-500 hover:bg-slate-100 shrink-0"
+                  aria-label="Clear search"
+                >
+                  <span aria-hidden="true" className="material-symbols-outlined text-[18px]">close</span>
+                </button>
+              )}
+            </div>
+          </div>
+
+          <button
+            onClick={toggleSheetMode}
+            className="w-full px-5 pt-3 pb-1 flex items-center justify-between shrink-0 text-left"
+            aria-label={sheetMode === 'expanded' ? 'Show fewer stations' : 'Show all stations'}
+          >
+            <h2 className="font-extrabold text-body tracking-tight text-on-surface flex items-center gap-2">
+              {hasLiveData && <span className="w-2 h-2 rounded-full bg-live-pulse animate-pulse" />}
+              {searchQuery.trim()
+                ? `${filteredStations.length} ${filteredStations.length === 1 ? 'result' : 'results'}`
+                : gpsStatus === 'active'
+                ? 'Closest to you'
+                : 'Stations'}
+            </h2>
+            <span className="flex items-center gap-0.5 text-caption font-bold text-primary">
+              {sheetMode === 'expanded' ? 'Show less' : `See all ${filteredStations.length}`}
+              <span aria-hidden="true" className="material-symbols-outlined text-[20px]">
                 {sheetMode === 'expanded' ? 'keyboard_arrow_down' : 'keyboard_arrow_up'}
               </span>
-            </div>
+            </span>
           </button>
 
           {sheetMode === 'collapsed' ? null : filteredStations.length === 0 ? (
@@ -851,15 +861,6 @@ export const MapScreen: React.FC<MapScreenProps> = ({
           ) : sheetMode !== 'expanded' ? (
             <div className="px-5 pt-1 pb-28 flex flex-col gap-2">
               {standardRows.map((st, idx) => renderStationRow(st, idx, false, true))}
-              {filteredStations.length > standardRows.length && (
-                <button
-                  onClick={() => setSheetMode('expanded')}
-                  className="w-full py-2.5 text-primary text-caption font-bold flex items-center justify-center gap-1 active:opacity-70"
-                >
-                  See all {filteredStations.length} stations
-                  <span aria-hidden="true" className="material-symbols-outlined text-[18px]">keyboard_arrow_up</span>
-                </button>
-              )}
             </div>
           ) : (
             <div className="px-5 pt-2 pb-28 overflow-y-auto flex-1 hide-scrollbar flex flex-col gap-2">
@@ -888,12 +889,8 @@ export const MapScreen: React.FC<MapScreenProps> = ({
         <StationSearchOverlay
           stations={stations}
           distanceKm={(st) => (userGps ? getDistanceKm(st) : 999)}
-          suggestions={
-            userGps
-              ? [...stations].sort((a, b) => getDistanceKm(a) - getDistanceKm(b)).slice(0, 6)
-              : baseStations.slice(0, 6)
-          }
-          suggestionsTitle={userGps ? 'Closest to you' : homeState ? `Stations in ${homeState}` : 'Stations'}
+          suggestions={closestSuggestions}
+          suggestionsTitle={userGps ? 'Closest to you' : 'Closest to this part of the map'}
           statusMeta={(st) => {
             const info = getStatusIndicator(st.status);
             return { dot: info.dotColor, label: info.shortLabel };

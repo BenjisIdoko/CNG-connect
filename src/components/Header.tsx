@@ -53,10 +53,10 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               onClick={onShareApp}
               aria-label="Share the app with other drivers"
-              title="Share the app"
-              className="w-10 h-10 rounded-full bg-emerald-50 hover:bg-emerald-100 text-primary border border-emerald-200/80 flex items-center justify-center shadow-2xs active:scale-95 transition-all shrink-0 cursor-pointer"
+              className="h-10 pl-3 pr-3.5 rounded-full bg-white text-slate-900 border border-slate-200 flex items-center gap-1.5 font-bold text-caption shadow-2xs active:scale-95 transition-all shrink-0 cursor-pointer hover:bg-slate-50"
             >
-              <span aria-hidden="true" className="material-symbols-outlined text-[18px] text-primary">share</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[18px]">share</span>
+              Share the App
             </button>
           ))}
       </div>

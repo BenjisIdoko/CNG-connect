@@ -230,16 +230,16 @@ export const StationSearchOverlay: React.FC<Props> = ({
           )
         ) : (
           <>
+            <p className="px-5 pt-4 pb-1 text-micro font-bold text-outline uppercase tracking-wide">
+              {suggestionsTitle}
+            </p>
+            <ul>{suggestions.map(row)}</ul>
             {recent.length > 0 && (
               <>
                 <p className="px-5 pt-4 pb-1 text-micro font-bold text-outline uppercase tracking-wide">Recent</p>
                 <ul>{recent.map(row)}</ul>
               </>
             )}
-            <p className="px-5 pt-4 pb-1 text-micro font-bold text-outline uppercase tracking-wide">
-              {suggestionsTitle}
-            </p>
-            <ul>{suggestions.map(row)}</ul>
           </>
         )}
       </div>
