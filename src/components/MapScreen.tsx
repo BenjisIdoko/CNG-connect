@@ -675,14 +675,12 @@ export const MapScreen: React.FC<MapScreenProps> = ({
     );
   };
 
-  const statusChips: Array<{ key: string; label: string; dot: string | null }> = [
-    { key: 'all', label: 'All', dot: null },
-    { key: 'full', label: 'Available', dot: 'bg-status-green' },
-    { key: 'queue', label: 'Queuing', dot: 'bg-status-amber' },
-    { key: 'low', label: 'Low pressure', dot: 'bg-status-orange' },
+  const statusChips: Array<{ key: string; label: string; full: string; dot: string | null }> = [
+    { key: 'all', label: 'All', full: 'All stations', dot: null },
+    { key: 'full', label: 'Available', full: 'Available', dot: 'bg-status-green' },
+    { key: 'queue', label: 'Queuing', full: 'Queuing', dot: 'bg-status-amber' },
+    { key: 'low', label: 'Low', full: 'Low pressure', dot: 'bg-status-orange' },
   ];
-  const statusCount = (key: string) =>
-    key === 'all' ? baseStations.length : baseStations.filter((st) => st.status === key).length;
 
 
   // Closest stations for the search page: to the driver's GPS, or else to the middle of the map.
@@ -707,7 +705,6 @@ export const MapScreen: React.FC<MapScreenProps> = ({
     return (pinned ? [pinned, ...rest] : rest).slice(0, 2);
   }, [filteredStations, pinnedId]);
 
-  const hasLiveData = filteredStations.some((s) => s.status !== 'unknown');
 
   // One reset for everything the driver can narrow the map by (search, status, city, distance, type).
   const resetAllFilters = () => {
@@ -771,43 +768,57 @@ export const MapScreen: React.FC<MapScreenProps> = ({
             sheetMode === 'expanded' ? 'h-[calc(100dvh-8rem)]' : sheetMode === 'collapsed' ? 'pb-24' : ''
           }`}
         >
-          <button
-            onPointerDown={onSheetPointerDown}
-            onPointerMove={onSheetPointerMove}
-            onPointerUp={onSheetPointerEnd}
-            onPointerCancel={onSheetPointerEnd}
-            onClick={(e) => {
-              // keyboard activation only; pointer taps are handled on pointer-up
-              if (e.detail === 0) toggleSheetMode();
-            }}
-            style={{ touchAction: 'none' }}
-            aria-label="Station list size — drag or tap to change"
-            className="w-full pt-2.5 pb-2 flex flex-col items-center shrink-0"
-          >
-            <div className="w-10 h-1.5 bg-slate-900/20 rounded-full" />
-          </button>
+          <div className="relative shrink-0">
+            <button
+              onPointerDown={onSheetPointerDown}
+              onPointerMove={onSheetPointerMove}
+              onPointerUp={onSheetPointerEnd}
+              onPointerCancel={onSheetPointerEnd}
+              onClick={(e) => {
+                // keyboard activation only; pointer taps are handled on pointer-up
+                if (e.detail === 0) toggleSheetMode();
+              }}
+              style={{ touchAction: 'none' }}
+              aria-label="Station list size — drag or tap to change"
+              className="w-full pt-3 pb-4 flex flex-col items-center"
+            >
+              <div className="w-10 h-1.5 bg-slate-900/20 rounded-full" />
+            </button>
+            {filteredStations.length > 0 && sheetMode !== 'collapsed' && (
+              <button
+                onClick={toggleSheetMode}
+                className="absolute right-3 top-1 h-9 px-2 flex items-center gap-0.5 text-caption font-bold text-primary active:opacity-70"
+              >
+                {sheetMode === 'expanded'
+                  ? 'Show less'
+                  : `See all ${filteredStations.length}`}
+                <span aria-hidden="true" className="material-symbols-outlined text-[20px]">
+                  {sheetMode === 'expanded' ? 'keyboard_arrow_down' : 'keyboard_arrow_up'}
+                </span>
+              </button>
+            )}
+          </div>
 
           {/* Status tabs (like the ride-type tabs in ride-hailing apps) */}
-          <div role="tablist" aria-label="Filter by pump status" className="flex gap-1.5 overflow-x-auto hide-scrollbar px-4 pb-2 shrink-0">
+          <div role="tablist" aria-label="Filter by pump status" className="flex gap-1 overflow-x-auto hide-scrollbar px-4 pb-2.5 shrink-0">
             {statusChips.map((chip) => {
               const active = activeFilter === chip.key;
-              const n = statusCount(chip.key);
               return (
                 <button
                   key={chip.key}
                   role="tab"
                   aria-selected={active}
+                  aria-label={chip.full}
                   onClick={() => {
                     setActiveFilter(chip.key);
                     track('filter_applied', { status: chip.key });
                   }}
-                  className={`shrink-0 h-11 px-4 rounded-2xl flex items-center gap-2 text-caption font-bold transition-colors ${
+                  className={`shrink-0 h-10 px-3.5 rounded-2xl flex items-center gap-1.5 text-caption font-bold transition-colors ${
                     active ? 'bg-primary-container text-on-surface' : 'text-on-surface-variant active:bg-surface-container'
                   }`}
                 >
                   {chip.dot && <span aria-hidden="true" className={`w-2.5 h-2.5 rounded-full ${chip.dot}`} />}
                   {chip.label}
-                  {n > 0 && <span className="font-semibold text-outline">{n}</span>}
                 </button>
               );
             })}
@@ -818,10 +829,10 @@ export const MapScreen: React.FC<MapScreenProps> = ({
               <button
                 onClick={() => setIsSearchOpen(true)}
                 aria-label="Search stations, city or state"
-                className="flex-1 min-w-0 flex items-center gap-3 pl-4 py-4 text-left"
+                className="flex-1 min-w-0 flex items-center gap-3 pl-4 py-3.5 text-left"
               >
                 <span aria-hidden="true" className="material-symbols-outlined text-on-surface text-[24px] shrink-0">search</span>
-                <span className={`flex-1 min-w-0 truncate text-[1.125rem] font-semibold ${searchQuery ? 'text-on-surface' : 'text-on-surface'}`}>
+                <span className={`flex-1 min-w-0 truncate text-body-lg ${searchQuery ? 'font-semibold text-on-surface' : 'font-medium text-on-surface-variant'}`}>
                   {searchQuery || 'Where do you want to fill up?'}
                 </span>
               </button>
@@ -840,27 +851,6 @@ export const MapScreen: React.FC<MapScreenProps> = ({
             </div>
           </div>
 
-          <button
-            onClick={toggleSheetMode}
-            className="w-full px-5 pt-2.5 pb-0 flex items-center justify-between shrink-0 text-left"
-            aria-label={sheetMode === 'expanded' ? 'Show fewer stations' : 'Show all stations'}
-          >
-            <h2 className="text-micro font-bold uppercase tracking-wide text-outline flex items-center gap-2">
-              {hasLiveData && <span className="w-2 h-2 rounded-full bg-live-pulse animate-pulse" />}
-              {searchQuery.trim()
-                ? `${filteredStations.length} ${filteredStations.length === 1 ? 'result' : 'results'}`
-                : gpsStatus === 'active'
-                ? 'Closest to you'
-                : 'Stations'}
-            </h2>
-            <span className="flex items-center gap-0.5 text-caption font-bold text-primary">
-              {sheetMode === 'expanded' ? 'Show less' : `See all ${filteredStations.length}`}
-              <span aria-hidden="true" className="material-symbols-outlined text-[20px]">
-                {sheetMode === 'expanded' ? 'keyboard_arrow_down' : 'keyboard_arrow_up'}
-              </span>
-            </span>
-          </button>
-
           {sheetMode === 'collapsed' ? null : filteredStations.length === 0 ? (
             <div className="px-5 pt-4 pb-28 text-center flex flex-col items-center gap-2">
               <h3 className="font-extrabold text-on-surface text-body-lg">No stations found</h3>
@@ -877,7 +867,9 @@ export const MapScreen: React.FC<MapScreenProps> = ({
               </button>
             </div>
           ) : sheetMode !== 'expanded' ? (
-            <div className="px-5 pt-0 pb-24 flex flex-col">{standardRows.map((st) => renderPhoneRow(st))}</div>
+            <div className="px-5 pt-3 pb-28 flex flex-col">
+              {standardRows.map((st) => renderPhoneRow(st))}
+            </div>
           ) : (
             <div className="px-5 pt-1 pb-28 overflow-y-auto flex-1 hide-scrollbar flex flex-col">
               {filteredStations.slice(0, visibleCount).map((station) => renderPhoneRow(station))}
