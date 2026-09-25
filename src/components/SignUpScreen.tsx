@@ -9,6 +9,8 @@ interface SignUpScreenProps {
   /** Called once the driver is fully signed in — for a returning driver this fires right after OTP verification; for a new driver, after they complete their profile. */
   onComplete: () => void;
   onCancel?: () => void;
+  /** Offered when the driver is stuck on the compulsory profile step and wants a different account. */
+  onSignOut?: () => void;
 }
 
 /**
@@ -18,10 +20,15 @@ interface SignUpScreenProps {
  * new driver and a returning one. A brand-new driver additionally sees a
  * short "complete your profile" step; a returning driver skips straight in.
  */
-export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel }) => {
-  const { sendLoginCode, verifyLoginCode, updateProfile } = useAuth();
+export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel, onSignOut }) => {
+  const { sendLoginCode, verifyLoginCode, updateProfile, driverProfile, needsPhone } = useAuth();
 
-  const [step, setStep] = useState<1 | 2 | 3>(1);
+  // A signed-in driver with no phone number lands straight on the profile step (it is
+  // compulsory). One who already has a name only needs to add the number, so we ask for
+  // just that and never overwrite the rest of their saved profile.
+  const [resuming] = useState(needsPhone);
+  const [phoneOnly] = useState(needsPhone && !!driverProfile.name.trim());
+  const [step, setStep] = useState<1 | 2 | 3>(needsPhone ? 3 : 1);
 
   // Step 1: identity
   const [email, setEmail] = useState('');
@@ -35,7 +42,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
   const [resendCooldown, setResendCooldown] = useState(0);
 
   // Step 3: profile completion (new drivers only)
-  const [fullName, setFullName] = useState('');
+  const [fullName, setFullName] = useState(driverProfile.name || '');
   const [phone, setPhone] = useState('');
   const [phoneError, setPhoneError] = useState<string | null>(null);
   const [city, setCity] = useState('Abuja FCT');
@@ -127,6 +134,12 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
     }
 
     setIsSavingProfile(true);
+    if (phoneOnly) {
+      await updateProfile({ phone: phoneValidation.formatted || phone.trim() });
+      setIsSavingProfile(false);
+      onComplete();
+      return;
+    }
     await updateProfile({
       name: fullName.trim() || 'CNG Driver',
       phone: phoneValidation.formatted || phone.trim(),
@@ -169,12 +182,12 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
           </button>
         ) : null}
         <span className="text-[0.8125rem] font-semibold text-outline">
-          {step === 3 ? 'Almost there' : `Step ${step} of 2`}
+          {step === 3 ? (phoneOnly ? 'One last step' : 'Almost there') : `Step ${step} of 2`}
         </span>
       </div>
 
       <h1 className="text-[1.625rem] font-bold tracking-tight mt-6">
-        {step === 1 ? 'Sign in or sign up' : step === 2 ? 'Enter code' : 'Complete your profile'}
+        {step === 1 ? 'Sign in or sign up' : step === 2 ? 'Enter code' : phoneOnly ? 'Add your phone number' : 'Complete your profile'}
       </h1>
       {step === 1 && (
         <p className="text-[0.9375rem] text-on-surface-variant leading-relaxed mt-2">
@@ -190,7 +203,9 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
       )}
       {step === 3 && (
         <p className="text-[0.9375rem] text-on-surface-variant leading-relaxed mt-2">
-          Just a few details so other drivers know who&apos;s reporting.
+          {phoneOnly
+            ? 'A phone number is required on every CNG-Connect account. It only takes a few seconds.'
+            : 'Just a few details so other drivers know who&apos;s reporting. Your phone number is required.'}
         </p>
       )}
 
@@ -287,6 +302,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
 
           {step === 3 && (
             <>
+              {!phoneOnly && (
               <div>
                 <label className="block text-[0.7812rem] font-semibold text-on-surface-variant mb-1">Full Name</label>
                 <div className="flex items-center bg-surface border border-outline-variant rounded-2xl px-3.5 h-12 focus-within:ring-2 focus-within:ring-primary/30 focus-within:border-primary transition-all">
@@ -302,18 +318,22 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
                   />
                 </div>
               </div>
+              )}
 
               <div>
-                <label className="block text-[0.7812rem] font-semibold text-on-surface-variant mb-1">
-                  Phone Number (contact info — Nigerian format: 0 + 10 digits or +234)
+                <label htmlFor="signup-phone" className="block text-[0.7812rem] font-semibold text-on-surface-variant mb-1">
+                  Phone number <span className="text-status-red">(required)</span>
                 </label>
                 <div className={`flex items-center bg-surface border rounded-2xl px-3.5 h-12 transition-all ${
                   phoneError ? 'border-status-red ring-2 ring-status-red/20' : 'border-outline-variant focus-within:ring-2 focus-within:ring-primary/30 focus-within:border-primary'
                 }`}>
                   <span aria-hidden="true" className="material-symbols-outlined text-outline text-[20px] mr-2">call</span>
                   <input
+                    id="signup-phone"
                     type="tel"
+                    inputMode="tel"
                     required
+                    autoFocus={phoneOnly}
                     autoComplete="tel"
                     value={phone}
                     onChange={(e) => {
@@ -324,13 +344,17 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
                     className="flex-1 bg-transparent text-[0.9062rem] font-medium text-on-surface outline-none"
                   />
                 </div>
-                {phoneError && (
+                {phoneError ? (
                   <p className="text-[0.7812rem] font-medium text-status-red mt-1 flex items-center gap-1">
                     <span aria-hidden="true" className="material-symbols-outlined text-[15px]">error</span>
                     <span>{phoneError}</span>
                   </p>
+                ) : (
+                  <p className="text-[0.7812rem] text-outline mt-1">Nigerian number, e.g. 0803 123 4567 or +234 803 123 4567</p>
                 )}
               </div>
+
+              {!phoneOnly && (<>
 
               <div>
                 <label className="block text-[0.7812rem] font-semibold text-on-surface-variant mb-1">
@@ -441,6 +465,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
                   </select>
                 </div>
               )}
+              </>)}
             </>
           )}
 
@@ -457,9 +482,18 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
                   <span>{isSendingCode ? 'Sending code…' : isVerifyingCode ? 'Verifying…' : 'Saving…'}</span>
                 </div>
               ) : (
-                <span>{step === 1 ? 'Send code' : step === 2 ? 'Verify & continue' : 'Finish setup'}</span>
+                <span>{step === 1 ? 'Send code' : step === 2 ? 'Verify & continue' : phoneOnly ? 'Save & continue' : 'Finish setup'}</span>
               )}
             </button>
+            {resuming && onSignOut && (
+              <button
+                type="button"
+                onClick={onSignOut}
+                className="w-full mt-3 py-3 text-caption font-semibold text-on-surface-variant"
+              >
+                Use a different account
+              </button>
+            )}
           </div>
         </form>
       </div>

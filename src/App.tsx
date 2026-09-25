@@ -162,7 +162,7 @@ export const App: React.FC = () => {
   // Auth-Gated Onboarding & Registration State. Real identity (session +
   // profile) lives in AuthContext, backed by Supabase Auth email-OTP —
   // App.tsx only tracks which auth screen (if any) is currently showing.
-  const { isAuthenticated, isAuthLoading, driverProfile, updateProfile, uploadAvatar, signOut } = useAuth();
+  const { isAuthenticated, isAuthLoading, driverProfile, needsPhone, updateProfile, uploadAvatar, signOut } = useAuth();
   const [authMode, setAuthMode] = useState<'onboarding' | 'signup' | null>(null);
 
   // Once the initial session check resolves, a guest (no session) sees the
@@ -170,6 +170,12 @@ export const App: React.FC = () => {
   // app. This must fire exactly once — depending on `authMode` here would
   // re-trigger every time it returns to null, fighting "Explore as Guest"
   // (which sets authMode back to null) by immediately reopening onboarding.
+  // A phone number is compulsory: a signed-in driver without one is taken to the
+  // profile step and can't dismiss it (this also re-opens it if they back out).
+  useEffect(() => {
+    if (needsPhone && authMode !== 'signup') setAuthMode('signup');
+  }, [needsPhone, authMode]);
+
   const hasAutoPromptedOnboarding = useRef(false);
   useEffect(() => {
     if (isAuthLoading || hasAutoPromptedOnboarding.current) return;
@@ -1084,7 +1090,8 @@ export const App: React.FC = () => {
           {authMode === 'signup' && (
             <SignUpScreen
               onComplete={handleAuthComplete}
-              onCancel={() => (isAuthenticated ? setAuthMode(null) : setAuthMode('onboarding'))}
+              onCancel={needsPhone ? undefined : () => (isAuthenticated ? setAuthMode(null) : setAuthMode('onboarding'))}
+              onSignOut={handleSignOut}
             />
           )}
         </div>

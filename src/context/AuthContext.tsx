@@ -23,6 +23,8 @@ interface AuthContextType {
   driverProfile: UserProfile;
   /** True once a session exists but the profile has no name yet — i.e. this is their first sign-in and they need the "complete your profile" step. */
   isNewDriver: boolean;
+  /** Signed in and the saved profile has no phone number yet (a phone number is compulsory). */
+  needsPhone: boolean;
   sendLoginCode: (email: string) => Promise<AuthResult>;
   verifyLoginCode: (email: string, code: string) => Promise<VerifyResult>;
   updateProfile: (updater: Partial<UserProfile> | ((prev: UserProfile) => UserProfile)) => Promise<void>;
@@ -71,6 +73,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isAuthLoading, setIsAuthLoading] = useState(true);
   const [driverProfile, setDriverProfile] = useState<UserProfile>(INITIAL_USER);
   const [isNewDriver, setIsNewDriver] = useState(false);
+  // True only once the profile row was really read from the server, so a slow or failed
+  // load can never make an existing driver look like they are missing a phone number.
+  const [isProfileLoaded, setIsProfileLoaded] = useState(false);
 
   useEffect(() => {
     setAnalyticsUser(session?.user.id ?? null);
@@ -89,6 +94,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return true;
     }
     setDriverProfile(mapProfileRow(data, fallbackEmail));
+    setIsProfileLoaded(true);
     const isNew = !data.name;
     setIsNewDriver(isNew);
     return isNew;
@@ -128,6 +134,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         } else {
           setDriverProfile(INITIAL_USER);
           setIsNewDriver(false);
+          setIsProfileLoaded(false);
         }
       });
       unsubscribe = () => listener.subscription.unsubscribe();
@@ -242,6 +249,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setSession(null);
     setDriverProfile(INITIAL_USER);
     setIsNewDriver(false);
+    setIsProfileLoaded(false);
   }, []);
 
   return (
@@ -252,6 +260,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isAuthLoading,
         driverProfile,
         isNewDriver,
+        needsPhone: Boolean(session) && isProfileLoaded && !driverProfile.phone.trim(),
         sendLoginCode,
         verifyLoginCode,
         updateProfile,
