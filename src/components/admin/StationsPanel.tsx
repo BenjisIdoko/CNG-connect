@@ -235,7 +235,7 @@ export const StationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash 
 
   useEffect(() => {
     void load();
-  }, []);
+  }, [load]);
 
   // Google Maps init
   useEffect(() => {
