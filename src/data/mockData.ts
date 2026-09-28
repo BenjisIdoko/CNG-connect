@@ -42,6 +42,7 @@ export const INITIAL_USER: UserProfile = {
   email: '',
   avatar: '',
   vehicle: '',
+  cngKit: '',
   cngInstalledDate: '',
   monthlySavings: 0,
   reportsCount: 0,

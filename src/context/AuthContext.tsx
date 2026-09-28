@@ -42,6 +42,7 @@ function mapProfileRow(row: Record<string, unknown>, fallbackEmail: string): Use
     email: (row.email as string) || fallbackEmail,
     avatar: (row.avatar as string) || INITIAL_USER.avatar,
     vehicle: (row.vehicle as string) || '',
+    cngKit: (row.cng_kit as string) || '',
     cngInstalledDate: (row.cng_installed_date as string) || '',
     monthlySavings: Number(row.monthly_savings || 0),
     reportsCount: Number(row.reports_count || 0),
@@ -59,6 +60,7 @@ function toProfileRow(p: Partial<UserProfile>): Record<string, unknown> {
   if (p.email !== undefined) row.email = p.email;
   if (p.avatar !== undefined) row.avatar = p.avatar;
   if (p.vehicle !== undefined) row.vehicle = p.vehicle;
+  if (p.cngKit !== undefined) row.cng_kit = p.cngKit;
   if (p.cngInstalledDate !== undefined) row.cng_installed_date = p.cngInstalledDate;
   if (p.monthlySavings !== undefined) row.monthly_savings = p.monthlySavings;
   if (p.reportsCount !== undefined) row.reports_count = p.reportsCount;

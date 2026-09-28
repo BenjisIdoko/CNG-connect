@@ -107,7 +107,7 @@ export default defineConfig(() => {
           short_name: 'CNG-Connect',
           description: 'Live CNG fuel station status finder, queue tracker, pump pressure tracker, and driver community for real-time station availability in Nigeria.',
           theme_color: '#1F2923',
-          background_color: '#F6F5EF',
+          background_color: '#F3F3F3',
           display: 'standalone',
           orientation: 'portrait-primary',
           scope: '/',

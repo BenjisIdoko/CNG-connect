@@ -164,7 +164,13 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
       name: fullName.trim() || 'CNG Driver',
       phone: phoneValidation.formatted || phone.trim(),
       avatar: '',
-      vehicle: `${vehicleYear} ${vehicleMake} (${cngStatus === 'installed' ? `CNG ${tankSize}` : 'Petrol'})`,
+      vehicle: `${vehicleYear} ${vehicleMake}`,
+      cngKit:
+        cngStatus === 'installed'
+          ? `${tankSize} cylinder, installed`
+          : cngStatus === 'planning'
+          ? 'Planning to convert soon'
+          : 'Interested in Pi-CNG conversion grant',
       cngInstalledDate: cngStatus === 'installed' ? 'Recently Installed' : 'Planning',
       monthlySavings: cngStatus === 'installed' ? 78500 : 0,
       reportsCount: 0,

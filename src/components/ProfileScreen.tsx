@@ -53,7 +53,8 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   const [editName, setEditName] = useState(user.name);
   const [editPhone, setEditPhone] = useState(user.phone);
   const [editEmail, setEditEmail] = useState(user.email);
-  const [editVehicle, setEditVehicle] = useState(user.vehicle || 'Toyota Corolla 1.8L (Dual Fuel CNG)');
+  const [editVehicle, setEditVehicle] = useState(user.vehicle || 'Toyota Corolla 1.8L');
+  const [editCngKit, setEditCngKit] = useState(user.cngKit || '');
   const [editState, setEditState] = useState(user.state || 'Abuja FCT');
 
   // Embedded ROI Calculator sliders state
@@ -109,6 +110,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
       phone,
       email: editEmail.trim() || user.email,
       vehicle: editVehicle.trim() || user.vehicle,
+      cngKit: editCngKit.trim(),
       state: editState,
     };
 
@@ -130,7 +132,8 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
     setEditName(user.name);
     setEditPhone(user.phone);
     setEditEmail(user.email);
-    setEditVehicle(user.vehicle || 'Toyota Corolla 1.8L (Dual Fuel CNG)');
+    setEditVehicle(user.vehicle || 'Toyota Corolla 1.8L');
+    setEditCngKit(user.cngKit || '');
     setEditState(user.state || 'Abuja FCT');
     setIsEditModalOpen(true);
   };
@@ -195,7 +198,9 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
               <h2 className="font-bold text-body-lg leading-tight truncate">{user.name || 'Driver'}</h2>
               <PopoverPrimitive.Root>
                 <PopoverPrimitive.Trigger className="flex items-center gap-1 mt-0.5 text-micro text-[#B7CBB9] cursor-pointer text-left max-w-full">
-                  <span className="truncate">{user.vehicle || 'Add your vehicle'}</span>
+                  <span className="truncate">
+                    {[user.vehicle, user.cngKit].filter(Boolean).join(' · ') || 'Add your vehicle'}
+                  </span>
                   <span aria-hidden="true" className="material-symbols-outlined text-[15px] shrink-0">chevron_right</span>
                 </PopoverPrimitive.Trigger>
                 <PopoverPrimitive.Portal>
@@ -204,11 +209,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                     className="z-[150] w-64 bg-white rounded-2xl p-3 shadow-xl flex flex-col gap-1.5"
                   >
                     <span className="text-micro font-bold text-outline uppercase tracking-wider px-2">Switch active vehicle</span>
-                    {[
-                      'Toyota Corolla 1.8L (Dual Fuel CNG)',
-                      'Hyundai Accent 1.6L (CNG Kit)',
-                      'Qoray E-Trike (100% EV)',
-                    ].map((v) => (
+                    {['Toyota Corolla 1.8L', 'Hyundai Accent 1.6L', 'Qoray E-Trike (EV)'].map((v) => (
                       <button
                         key={v}
                         onClick={() => {
@@ -432,12 +433,23 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
           </div>
 
           <div>
-            <label className="block text-caption font-bold text-slate-700 mb-1">Vehicle Details &amp; Kit</label>
+            <label className="block text-caption font-bold text-slate-700 mb-1">Vehicle Details</label>
             <input
               type="text"
-              placeholder="e.g. Toyota Corolla 1.8L (Dual Fuel CNG)"
+              placeholder="e.g. Toyota Corolla 1.8L"
               value={editVehicle}
               onChange={(e) => setEditVehicle(e.target.value)}
+              className="w-full bg-surface border border-surface-container-highest rounded-xl px-3 py-2 text-body font-semibold text-slate-900 outline-none focus:border-primary"
+            />
+          </div>
+
+          <div>
+            <label className="block text-caption font-bold text-slate-700 mb-1">CNG Kit</label>
+            <input
+              type="text"
+              placeholder="e.g. 15kg cylinder, dual fuel"
+              value={editCngKit}
+              onChange={(e) => setEditCngKit(e.target.value)}
               className="w-full bg-surface border border-surface-container-highest rounded-xl px-3 py-2 text-body font-semibold text-slate-900 outline-none focus:border-primary"
             />
           </div>

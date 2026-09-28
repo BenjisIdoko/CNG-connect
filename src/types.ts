@@ -143,6 +143,9 @@ export interface UserProfile {
   email: string;
   avatar: string;
   vehicle: string;
+  /** CNG kit details (tank size, install/conversion status) — kept separate from `vehicle` so
+   *  a driver's car and their CNG setup can be edited and shown independently. */
+  cngKit: string;
   cngInstalledDate: string;
   monthlySavings: number; // in Naira
   reportsCount: number;

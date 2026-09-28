@@ -104,37 +104,37 @@
   --color-status-amber-container: #FFF3DF;
   --color-status-orange: #F85B23;
   --color-status-orange-container: #FFF0EA;
-  --color-status-red: #C0313A; /* AA on white/cream as text */
+  --color-status-red: #C0313A; /* AA on white/light grey as text */
   --color-status-red-container: #FCE8E9;
   --color-live-pulse: #319A3F;
   --color-whatsapp: #25D366;
   --color-whatsapp-hover: #1ebd59;
 
-  --color-surface: #F6F5EF;
-  --color-background: #F6F5EF;
-  --color-surface-container: #F1EFE6;
-  --color-surface-container-low: #F6F5EF;
-  --color-surface-container-high: #E9E7DC;
-  --color-surface-container-highest: #E4E2D8;
+  --color-surface: #F3F3F3;
+  --color-background: #F3F3F3;
+  --color-surface-container: #EDEDED;
+  --color-surface-container-low: #F3F3F3;
+  --color-surface-container-high: #E4E4E4;
+  --color-surface-container-highest: #DFDFDF;
   --color-surface-container-lowest: #ffffff;
-  --color-surface-bright: #FBFAF6;
-  --color-surface-variant: #E4E2D8;
-  --color-surface-dim: #DAD7CB;
-  --color-surface-neutral: #FAF9F5;
+  --color-surface-bright: #F9F9F9;
+  --color-surface-variant: #DFDFDF;
+  --color-surface-dim: #D4D4D4;
+  --color-surface-neutral: #F8F8F8;
 
   --color-on-surface: #1F2923;
   --color-on-surface-variant: #5C6B60;
   --color-on-background: #1F2923;
-  --color-outline: #666F67; /* AA on white and cream for helper text */
-  --color-outline-variant: #E4E2D8;
+  --color-outline: #666F67; /* AA on white and light grey for helper text */
+  --color-outline-variant: #DFDFDF;
   --color-inverse-surface: #1F2923;
-  --color-inverse-on-surface: #F6F5EF;
+  --color-inverse-on-surface: #F3F3F3;
   --color-error: #C0313A;
   --color-error-container: #FCE8E9;
   --color-on-error-container: #A82228;
 
   /* Remap Tailwind's raw palettes so the many `emerald-*` / `slate-*` classes
-     across the app pick up the brand green and warm neutrals too. */
+     across the app pick up the brand green and neutral greys too. */
   --color-emerald-50: #F0FAF1;
   --color-emerald-100: #E3F5E6;
   --color-emerald-200: #BAE9C0;
@@ -147,10 +147,10 @@
   --color-emerald-900: #1A4E23;
   --color-emerald-950: #14261A;
 
-  --color-slate-50: #F6F5EF;
-  --color-slate-100: #F1EFE6;
-  --color-slate-200: #E4E2D8;
-  --color-slate-300: #CBCFC4;
+  --color-slate-50: #F3F3F3;
+  --color-slate-100: #EDEDED;
+  --color-slate-200: #DFDFDF;
+  --color-slate-300: #CACACA;
   --color-slate-400: #666F67;
   --color-slate-500: #5C6B60;
   --color-slate-600: #4A574E;
