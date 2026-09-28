@@ -60,8 +60,21 @@ export const PwaUpdateToast: React.FC = () => {
     setOfflineReady(false);
   };
 
+  // Purely informational and not something to act on, so it doesn't sit there forever —
+  // unlike the update and offline banners, which stay until the driver deals with them.
+  useEffect(() => {
+    if (!offlineReady) return;
+    const t = setTimeout(() => setOfflineReady(false), 6000);
+    return () => clearTimeout(t);
+  }, [offlineReady, setOfflineReady]);
+
   return (
-    <aside className="fixed bottom-20 left-4 right-4 sm:left-auto sm:right-6 sm:bottom-6 z-[120] flex flex-col gap-2 max-w-md sm:w-full pointer-events-none">
+    // Phones: high enough to clear every fixed bottom bar in the app (the bottom nav, a
+    // station's sticky Report Status bar, onboarding's stacked buttons on its last slide)
+    // plus the home-indicator safe area, so it never sits over a control someone needs.
+    <aside
+      className="fixed bottom-[calc(env(safe-area-inset-bottom,0px)+8rem)] left-4 right-4 sm:left-auto sm:right-6 sm:bottom-6 z-[120] flex flex-col gap-2 max-w-md sm:w-full pointer-events-none"
+    >
       {/* 1. App Update Banner */}
       {needRefresh && (
         <div className="pointer-events-auto flex items-center justify-between gap-3 p-4 rounded-2xl bg-deep-teal text-white shadow-[0_10px_30px_rgba(31,41,35,0.3)] animate-in slide-in-from-bottom-4 duration-300">

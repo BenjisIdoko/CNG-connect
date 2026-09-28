@@ -63,6 +63,13 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
 
   const isLast = currentSlide === slides.length - 1;
 
+  // "Skip" means "let me in now" — straight to the map as a guest when that's on offer,
+  // not one more slide with yet another tap before they can leave onboarding.
+  const handleSkip = () => {
+    if (onExploreAsGuest) onExploreAsGuest();
+    else setCurrentSlide(slides.length - 1);
+  };
+
   return (
     <div className="fixed inset-0 z-50 bg-white text-slate-900 flex flex-col overflow-hidden">
       {/* Hero photo */}
@@ -132,10 +139,7 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
           </div>
         ) : (
           <div className="flex items-center justify-between">
-            <button
-              onClick={() => setCurrentSlide(slides.length - 1)}
-              className="text-[0.9375rem] font-semibold text-on-surface-variant py-2 pr-4"
-            >
+            <button onClick={handleSkip} className="text-[0.9375rem] font-semibold text-on-surface-variant py-2 pr-4">
               Skip
             </button>
             <div className="flex items-center gap-3">

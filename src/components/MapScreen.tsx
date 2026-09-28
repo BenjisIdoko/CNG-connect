@@ -8,6 +8,8 @@ import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 import { GasStation, StationStatus, StationSuggestion } from '../types';
+import { Modal } from './common/Modal';
+import { formatStationAge } from '../utils/timeUtils';
 import { ASSETS } from '../data/mockData';
 import { StationSearchOverlay, rememberRecentStation } from './StationSearchOverlay';
 import { searchTokens, stationMatchesQuery, stationSearchScore } from '../utils/stationSearch';
@@ -186,6 +188,29 @@ export const MapScreen: React.FC<MapScreenProps> = ({
     delta: { lat: 5.5442, lng: 5.7603, zoom: 11 },
     kaduna: { lat: 10.5105, lng: 7.4165, zoom: 12 },
   };
+  const CITY_LABELS: Record<string, string> = {
+    abuja: 'Abuja',
+    lagos: 'Lagos',
+    rivers: 'Rivers (Port Harcourt)',
+    kano: 'Kano',
+    ogun: 'Ogun',
+    edo: 'Edo (Benin City)',
+    oyo: 'Oyo (Ibadan)',
+    delta: 'Delta',
+    kaduna: 'Kaduna',
+  };
+
+  // GPS-unavailable fallback: give the driver a way to say where they actually are, and
+  // explain why the map opened somewhere that may not match them. Only after a short grace
+  // period, so it doesn't flash on every load while location is still being acquired.
+  const [gpsGracePassed, setGpsGracePassed] = useState(false);
+  const [areaBannerDismissed, setAreaBannerDismissed] = useState(false);
+  const [isAreaPickerOpen, setIsAreaPickerOpen] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setGpsGracePassed(true), 4000);
+    return () => clearTimeout(t);
+  }, []);
+  const showAreaFallback = gpsGracePassed && gpsStatus !== 'active' && !areaBannerDismissed;
 
   const handleCitySelect = (cityId: string) => {
     setActiveCity(cityId);
@@ -445,7 +470,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
             ${isApprox ? '<div style="position:absolute;inset:0;border:1.5px dashed ${colorClass}99;border-radius:9999px"></div>' : ''}
             ${flashIds?.has(st.id) ? `<div class="marker-ring" style="--ring:${colorClass}"></div>` : ''}
             <div class="rounded-full flex items-center justify-center transition-transform ${isSelected ? 'scale-125' : ''} ${bounceIdRef.current === st.id ? 'marker-bounce' : ''}" style="width:30px;height:30px;background:${isApprox ? '#ffffff' : colorClass};border:${isApprox ? '2.5px dashed ' + colorClass : '3px solid #ffffff'};box-shadow:0 2px 8px rgba(31,41,35,0.35), 0 0 0 4px ${colorClass}${isApprox ? '00' : '44'}${isSelected ? ', 0 0 0 7px rgba(31,41,35,0.85)' : ''};">
-              <span class="material-symbols-outlined" style="font-size:15px;color:${isApprox ? colorClass : '#fff'}">${iconSymbol}</span>
+              <span aria-hidden="true" class="material-symbols-outlined" style="font-size:15px;color:${isApprox ? colorClass : '#fff'}">${iconSymbol}</span>
             </div>
           </div>
         `,
@@ -453,7 +478,15 @@ export const MapScreen: React.FC<MapScreenProps> = ({
         iconAnchor: [20, 20],
       });
 
-      const marker = L.marker([lat, lng], { icon: customIcon });
+      // Leaflet gives every marker a keyboard-focusable role="button" div regardless of
+      // icon type, but only sets its `alt` option when the icon is an <img> — a divIcon
+      // (ours) is a plain <div>, so without this it has no accessible name at all, and a
+      // screen reader falls back to the icon glyph's raw text ("local_gas_station"). Its
+      // `title` option, unlike `alt`, is applied to any icon type and doubles as the name.
+      const markerLabel = [st.name, st.area || st.city, getStatusIndicator(st.status).shortLabel]
+        .filter(Boolean)
+        .join(', ');
+      const marker = L.marker([lat, lng], { icon: customIcon, title: markerLabel });
       marker.on('click', () => {
         userSelectedRef.current = true;
         setPinnedId(st.id);
@@ -677,6 +710,9 @@ export const MapScreen: React.FC<MapScreenProps> = ({
   const renderPhoneRow = (station: GasStation) => {
     const info = getStatusIndicator(station.status);
     const isPinned = pinnedId === station.id;
+    // Age is only worth showing next to a real status — for 'unknown' it would just repeat
+    // "No recent report" a second time.
+    const age = station.status !== 'unknown' ? formatStationAge(station).replace(/^Updated /, '') : null;
     const open = () => {
       onSelectStation(station);
       onOpenStationDetails(station);
@@ -703,7 +739,9 @@ export const MapScreen: React.FC<MapScreenProps> = ({
           <p className="text-caption text-outline truncate flex items-center gap-1.5">
             <span aria-hidden="true" className={`w-2 h-2 rounded-full shrink-0 ${info.dotColor}`} />
             <span className="truncate">
-              {[info.shortLabel, userGps && station.distance ? station.distance : null, station.city].filter(Boolean).join(' · ')}
+              {[info.shortLabel, age, userGps && station.distance ? station.distance : null, station.city]
+                .filter(Boolean)
+                .join(' · ')}
             </span>
           </p>
         </div>
@@ -726,6 +764,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
   const renderFloatingCard = (station: GasStation) => {
     const info = getStatusIndicator(station.status);
     const isPinned = pinnedId === station.id;
+    const age = station.status !== 'unknown' ? formatStationAge(station).replace(/^Updated /, '') : null;
     return (
       <button
         key={station.id}
@@ -743,7 +782,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
         <div className="p-2.5">
           <div className="font-bold text-caption text-on-surface truncate">{station.name}</div>
           <div className="text-micro text-outline mt-0.5 truncate">
-            {userGps && station.distance ? station.distance : station.city}
+            {[userGps && station.distance ? station.distance : station.city, age].filter(Boolean).join(' · ')}
           </div>
           <span
             className={`inline-flex items-center gap-1 mt-2 rounded-md px-1.5 py-0.5 text-micro font-bold text-white ${info.solidBg}`}
@@ -825,7 +864,61 @@ export const MapScreen: React.FC<MapScreenProps> = ({
             </button>
           )}
         </div>
+
+        {showAreaFallback && (
+          <div className="pointer-events-auto mt-3 bg-white rounded-2xl shadow-[0_4px_14px_rgba(31,41,35,0.18)] px-4 py-3 flex items-start gap-2.5">
+            <span aria-hidden="true" className="material-symbols-outlined text-status-amber text-[20px] shrink-0 mt-0.5">
+              {gpsStatus === 'denied' ? 'location_disabled' : 'location_searching'}
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="text-caption font-semibold text-on-surface">
+                Showing stations near {activeCity !== 'all' ? CITY_LABELS[activeCity] : homeState || 'Abuja'}
+              </p>
+              <p className="text-micro text-outline mt-0.5">
+                {gpsStatus === 'denied'
+                  ? 'Location is blocked for this site — enable it in your browser or device settings, then reload.'
+                  : "We couldn't get your location. If this isn't where you are:"}
+              </p>
+              <button onClick={() => setIsAreaPickerOpen(true)} className="mt-1.5 text-caption font-bold text-primary active:opacity-70">
+                Choose a different area
+              </button>
+            </div>
+            <button
+              onClick={() => setAreaBannerDismissed(true)}
+              aria-label="Dismiss"
+              className="shrink-0 p-1 -m-1 text-outline hover:text-on-surface"
+            >
+              <span aria-hidden="true" className="material-symbols-outlined text-[18px]">close</span>
+            </button>
+          </div>
+        )}
       </div>
+
+      {isAreaPickerOpen && (
+        <Modal isOpen onClose={() => setIsAreaPickerOpen(false)} title="Choose your area">
+          <div className="flex flex-col gap-1 -mx-1">
+            {(['all', ...Object.keys(CITY_LABELS)] as const).map((key) => {
+              const active = activeCity === key;
+              return (
+                <button
+                  key={key}
+                  onClick={() => {
+                    handleCitySelect(key);
+                    setAreaBannerDismissed(true);
+                    setIsAreaPickerOpen(false);
+                  }}
+                  className={`text-left px-3 py-2.5 rounded-xl text-body font-semibold flex items-center justify-between transition-colors ${
+                    active ? 'bg-primary-container text-on-surface' : 'text-on-surface hover:bg-surface-container'
+                  }`}
+                >
+                  {key === 'all' ? 'Nationwide' : CITY_LABELS[key]}
+                  {active && <span aria-hidden="true" className="material-symbols-outlined text-primary text-[18px]">check</span>}
+                </button>
+              );
+            })}
+          </div>
+        </Modal>
+      )}
 
       {/* Mobile bottom sheet */}
       <div className="lg:hidden absolute bottom-0 left-0 right-0 z-30 max-w-xl mx-auto pointer-events-none">
