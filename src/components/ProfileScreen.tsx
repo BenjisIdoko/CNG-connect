@@ -479,13 +479,31 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
 
           <div>
             <label className="block text-caption font-bold text-slate-700 mb-1">CNG Kit</label>
-            <input
-              type="text"
-              placeholder="e.g. 15kg cylinder, dual fuel"
+            <select
+              aria-label="CNG Kit"
               value={editCngKit}
               onChange={(e) => setEditCngKit(e.target.value)}
               className="w-full bg-surface border border-surface-container-highest rounded-xl px-3 py-2 text-body font-semibold text-slate-900 outline-none focus:border-primary"
-            />
+            >
+              <option value="">Not installed yet</option>
+              <option value="12kg cylinder, installed">12kg cylinder, installed</option>
+              <option value="15kg cylinder, installed">15kg cylinder, installed</option>
+              <option value="20kg cylinder, installed">20kg cylinder, installed</option>
+              <option value="60L Twin Tank, installed">60L Twin Tank, installed</option>
+              <option value="Planning to convert soon">Planning to convert soon</option>
+              <option value="Interested in Pi-CNG conversion grant">Interested in Pi-CNG conversion grant</option>
+              {/* Keeps an older free-typed value selectable instead of silently discarding it. */}
+              {editCngKit &&
+                ![
+                  '',
+                  '12kg cylinder, installed',
+                  '15kg cylinder, installed',
+                  '20kg cylinder, installed',
+                  '60L Twin Tank, installed',
+                  'Planning to convert soon',
+                  'Interested in Pi-CNG conversion grant',
+                ].includes(editCngKit) && <option value={editCngKit}>{editCngKit}</option>}
+            </select>
           </div>
 
           <div>
