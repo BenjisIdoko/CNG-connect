@@ -70,8 +70,14 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
       setEmailError(emailValidation.error || 'Please enter a valid email address.');
       return;
     }
+    const phoneValidation = validatePhoneNumber(phone);
+    if (!phoneValidation.isValid) {
+      setPhoneError(phoneValidation.error || 'Please enter a valid Nigerian phone number.');
+      return;
+    }
 
     setEmailError(null);
+    setPhoneError(null);
     setIsSendingCode(true);
     const res = await sendLoginCode(emailValidation.normalized || email);
     setIsSendingCode(false);
@@ -262,6 +268,34 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
                   <span aria-hidden="true" className="material-symbols-outlined text-[15px]">error</span>
                   <span>{emailError}</span>
                 </p>
+              )}
+
+              <div className={`flex items-center bg-surface rounded-2xl px-4 h-14 mt-3 transition-all ${
+                phoneError ? 'ring-2 ring-status-red/40' : 'focus-within:ring-2 focus-within:ring-primary/40'
+              }`}>
+                <span aria-hidden="true" className="material-symbols-outlined text-outline text-[20px] mr-2.5">call</span>
+                <input
+                  id="signup-phone-step1"
+                  type="tel"
+                  inputMode="tel"
+                  required
+                  autoComplete="tel"
+                  value={phone}
+                  onChange={(e) => {
+                    setPhone(e.target.value);
+                    if (phoneError) setPhoneError(null);
+                  }}
+                  placeholder="Phone number (required)"
+                  className="flex-1 bg-transparent text-[0.9375rem] font-medium text-on-surface outline-none placeholder:text-outline"
+                />
+              </div>
+              {phoneError ? (
+                <p className="text-[0.8125rem] font-medium text-status-red mt-2 flex items-center gap-1">
+                  <span aria-hidden="true" className="material-symbols-outlined text-[15px]">error</span>
+                  <span>{phoneError}</span>
+                </p>
+              ) : (
+                <p className="text-[0.8125rem] text-outline mt-2">Nigerian number, e.g. 0803 123 4567 or +234 803 123 4567</p>
               )}
             </div>
           )}
