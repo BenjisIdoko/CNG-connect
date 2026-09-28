@@ -8,6 +8,7 @@ import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 import { GasStation, StationStatus, StationSuggestion } from '../types';
+import { ASSETS } from '../data/mockData';
 import { StationSearchOverlay, rememberRecentStation } from './StationSearchOverlay';
 import { searchTokens, stationMatchesQuery, stationSearchScore } from '../utils/stationSearch';
 import { SuggestStationModal } from './SuggestStationModal';
@@ -720,6 +721,40 @@ export const MapScreen: React.FC<MapScreenProps> = ({
     );
   };
 
+  // Floating photo card for the driver's short "closest to you" strip — the home-page look
+  // (image, name, distance/status) rather than the plain rows used once the list is expanded.
+  const renderFloatingCard = (station: GasStation) => {
+    const info = getStatusIndicator(station.status);
+    const isPinned = pinnedId === station.id;
+    return (
+      <button
+        key={station.id}
+        onClick={() => {
+          onSelectStation(station);
+          onOpenStationDetails(station);
+        }}
+        className={`w-40 shrink-0 bg-white rounded-2xl overflow-hidden text-left shadow-[0_4px_14px_rgba(14,20,32,0.08)] active:scale-[0.98] transition-transform ${
+          flashIds?.has(station.id) ? 'flash-ring' : ''
+        } ${isPinned ? 'ring-2 ring-primary' : ''}`}
+      >
+        <div className="h-20 bg-surface-container-high">
+          <img src={station.images?.[0] || ASSETS.stationWide} alt="" className="w-full h-full object-cover" loading="lazy" />
+        </div>
+        <div className="p-2.5">
+          <div className="font-bold text-caption text-on-surface truncate">{station.name}</div>
+          <div className="text-micro text-outline mt-0.5 truncate">
+            {userGps && station.distance ? station.distance : station.city}
+          </div>
+          <span
+            className={`inline-flex items-center gap-1 mt-2 rounded-md px-1.5 py-0.5 text-micro font-bold text-white ${info.solidBg}`}
+          >
+            {info.shortLabel}
+          </span>
+        </div>
+      </button>
+    );
+  };
+
   const statusChips: Array<{ key: string; label: string; full: string; dot: string | null }> = [
     { key: 'all', label: 'All', full: 'All stations', dot: null },
     { key: 'full', label: 'Available', full: 'Available', dot: 'bg-status-green' },
@@ -747,7 +782,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
   const standardRows = useMemo(() => {
     const pinned = pinnedId ? filteredStations.find((st) => st.id === pinnedId) : undefined;
     const rest = nearestTop5Stations.filter((st) => st.id !== pinned?.id);
-    return (pinned ? [pinned, ...rest] : rest).slice(0, 2);
+    return (pinned ? [pinned, ...rest] : rest).slice(0, 5);
   }, [filteredStations, pinnedId]);
 
 
@@ -912,8 +947,8 @@ export const MapScreen: React.FC<MapScreenProps> = ({
               </button>
             </div>
           ) : sheetMode !== 'expanded' ? (
-            <div className="px-5 pt-3 pb-28 flex flex-col">
-              {standardRows.map((st) => renderPhoneRow(st))}
+            <div className="flex gap-3 overflow-x-auto hide-scrollbar px-5 pt-3 pb-28">
+              {standardRows.map((st) => renderFloatingCard(st))}
             </div>
           ) : (
             <div className="px-5 pt-1 pb-28 overflow-y-auto flex-1 hide-scrollbar flex flex-col">
