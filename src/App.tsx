@@ -96,41 +96,19 @@ const TOAST_COLORS: Record<ToastTone, string> = {
   wait: 'text-white/70',
 };
 
-const AdminPinsScreen = lazy(() =>
-  import('./components/AdminPinsScreen').then((m) => ({ default: m.AdminPinsScreen }))
-);
-const ModerationScreen = lazy(() =>
-  import('./components/ModerationScreen').then((m) => ({ default: m.ModerationScreen }))
-);
-const StationManagerScreen = lazy(() =>
-  import('./components/StationManagerScreen').then((m) => ({ default: m.StationManagerScreen }))
+const AdminScreen = lazy(() =>
+  import('./components/admin/AdminScreen').then((m) => ({ default: m.AdminScreen }))
 );
 
 export const App: React.FC = () => {
-  // Hidden ?admin=1 route — a full-screen pin editor, gated on profiles.is_admin.
+  // Hidden admin route — one dashboard (sidebar + main content) covering the pin/station
+  // editor, report moderation, airtime payouts and the station-manager view, gated inside
+  // AdminScreen itself (profiles.is_admin vs. a station_managers row). ?admin=1 is the
+  // current link; the older ?moderation=1 / ?manager=1 links still land here too.
   const [adminMode] = useState(() => {
     try {
-      return new URLSearchParams(window.location.search).has('admin');
-    } catch {
-      return false;
-    }
-  });
-
-  // Hidden ?moderation=1 route — admin queue of flagged reports (keep / remove / restore).
-  const [moderationMode] = useState(() => {
-    try {
-      return new URLSearchParams(window.location.search).has('moderation');
-    } catch {
-      return false;
-    }
-  });
-
-  // Hidden ?manager=1 route — lets a station manager (assigned by an admin via
-  // the "Station managers" section of the full editor) edit only their own
-  // station(s); gated on a station_managers row, not profiles.is_admin.
-  const [managerMode] = useState(() => {
-    try {
-      return new URLSearchParams(window.location.search).has('manager');
+      const q = new URLSearchParams(window.location.search);
+      return q.has('admin') || q.has('moderation') || q.has('manager');
     } catch {
       return false;
     }
@@ -842,31 +820,7 @@ export const App: React.FC = () => {
   if (adminMode) {
     return (
       <Suspense fallback={<div className="fixed inset-0 grid place-items-center text-slate-500">Loading admin…</div>}>
-        <AdminPinsScreen
-          onExit={() => {
-            window.location.href = window.location.pathname;
-          }}
-        />
-      </Suspense>
-    );
-  }
-
-  if (moderationMode) {
-    return (
-      <Suspense fallback={<div className="fixed inset-0 grid place-items-center text-slate-500">Loading…</div>}>
-        <ModerationScreen
-          onExit={() => {
-            window.location.href = window.location.pathname;
-          }}
-        />
-      </Suspense>
-    );
-  }
-
-  if (managerMode) {
-    return (
-      <Suspense fallback={<div className="fixed inset-0 grid place-items-center text-slate-500">Loading…</div>}>
-        <StationManagerScreen
+        <AdminScreen
           onExit={() => {
             window.location.href = window.location.pathname;
           }}

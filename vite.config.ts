@@ -137,14 +137,7 @@ export default defineConfig(() => {
           globPatterns: ['**/*.{js,css,html,ico,png,jpg,svg,json,woff,woff2}'],
           // version.json must always come from the network; admin-only chunks are
           // not worth precaching for every driver.
-          globIgnores: [
-            'sw-custom.js',
-            'version.json',
-            '**/AdminPinsScreen-*.js',
-            '**/FullStationEditorModal-*.js',
-            '**/StationManagerScreen-*.js',
-            '**/ModerationScreen-*.js',
-          ],
+          globIgnores: ['sw-custom.js', 'version.json', '**/AdminScreen-*.js'],
           importScripts: ['sw-custom.js'],
           runtimeCaching: [
             {

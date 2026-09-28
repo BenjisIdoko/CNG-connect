@@ -1,11 +1,10 @@
 /// <reference types="google.maps" />
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useSupabaseClient } from '../hooks/useSupabaseClient';
-import { useAuth } from '../context/AuthContext';
-import { loadGoogleMaps, hasGoogleMapsKey } from '../utils/googleMaps';
-import { parseCsv, toCsv } from '../utils/csv';
-import { FullStationEditorModal } from './FullStationEditorModal';
-import { Icon } from './common/Icon';
+import { useSupabaseClient } from '../../hooks/useSupabaseClient';
+import { loadGoogleMaps, hasGoogleMapsKey } from '../../utils/googleMaps';
+import { parseCsv, toCsv } from '../../utils/csv';
+import { FullStationEditorModal } from '../FullStationEditorModal';
+import { Icon } from '../common/Icon';
 
 type Tier = 'source_exact' | 'rooftop' | 'street' | 'area' | 'city';
 const TIERS: Tier[] = ['rooftop', 'street', 'area', 'source_exact', 'city'];
@@ -144,8 +143,7 @@ function haversineM(a: [number, number], b: [number, number]) {
   const toRad = (d: number) => (d * Math.PI) / 180;
   const dLat = toRad(b[0] - a[0]);
   const dLng = toRad(b[1] - a[1]);
-  const s =
-    Math.sin(dLat / 2) ** 2 + Math.cos(toRad(a[0])) * Math.cos(toRad(b[0])) * Math.sin(dLng / 2) ** 2;
+  const s = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(a[0])) * Math.cos(toRad(b[0])) * Math.sin(dLng / 2) ** 2;
   return Math.round(2 * R * Math.asin(Math.sqrt(s)));
 }
 
@@ -182,18 +180,13 @@ const dot = (color: string, r: number): google.maps.Symbol => ({
   scale: r,
 });
 
-export const AdminPinsScreen: React.FC<{ onExit: () => void }> = ({ onExit }) => {
+/**
+ * Pin-location review, full station details, CSV bulk update and bulk delete — the
+ * full admin toolset for the `stations` table. Only ever rendered for an admin.
+ */
+export const StationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash }) => {
   const supabase = useSupabaseClient();
-  const { session, driverProfile, isAuthLoading, sendLoginCode, verifyLoginCode, signOut } = useAuth();
 
-  // sign-in gate
-  const [email, setEmail] = useState('');
-  const [code, setCode] = useState('');
-  const [codeSent, setCodeSent] = useState(false);
-  const [authBusy, setAuthBusy] = useState(false);
-  const [authErr, setAuthErr] = useState<string | null>(null);
-
-  // editor state
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(false);
   const [selId, setSelId] = useState<string | null>(null);
@@ -205,7 +198,6 @@ export const AdminPinsScreen: React.FC<{ onExit: () => void }> = ({ onExit }) =>
   const [search, setSearch] = useState('');
   const [onlyReview, setOnlyReview] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [toast, setToast] = useState<string | null>(null);
   const [mapErr, setMapErr] = useState<string | null>(null);
 
   // bulk CSV import
@@ -225,13 +217,7 @@ export const AdminPinsScreen: React.FC<{ onExit: () => void }> = ({ onExit }) =>
   const markersRef = useRef<Record<string, google.maps.Marker>>({});
   const dragListenerRef = useRef<google.maps.MapsEventListener | null>(null);
 
-  const isAdmin = Boolean(driverProfile.isAdmin);
   const sel = rows.find((r) => r.id === selId) || null;
-
-  const flash = (m: string) => {
-    setToast(m);
-    setTimeout(() => setToast(null), 2600);
-  };
 
   const load = useCallback(async () => {
     if (!supabase) return;
@@ -248,12 +234,12 @@ export const AdminPinsScreen: React.FC<{ onExit: () => void }> = ({ onExit }) =>
   }, [supabase]);
 
   useEffect(() => {
-    if (session && isAdmin) void load();
-  }, [session, isAdmin, load]);
+    void load();
+  }, []);
 
   // Google Maps init
   useEffect(() => {
-    if (!session || !isAdmin || !hasGoogleMapsKey || !mapEl.current || mapRef.current) return;
+    if (!hasGoogleMapsKey || !mapEl.current || mapRef.current) return;
     let cancelled = false;
     loadGoogleMaps()
       .then((maps) => {
@@ -272,7 +258,7 @@ export const AdminPinsScreen: React.FC<{ onExit: () => void }> = ({ onExit }) =>
     return () => {
       cancelled = true;
     };
-  }, [session, isAdmin]);
+  }, []);
 
   // sync station markers with rows
   useEffect(() => {
@@ -336,9 +322,7 @@ export const AdminPinsScreen: React.FC<{ onExit: () => void }> = ({ onExit }) =>
     setPasteErr(null);
     if (sel) {
       setEditName(sel.name);
-      setTier(
-        TIERS.includes(sel.location_precision as Tier) ? (sel.location_precision as Tier) : 'rooftop'
-      );
+      setTier(TIERS.includes(sel.location_precision as Tier) ? (sel.location_precision as Tier) : 'rooftop');
     }
   }, [selId]);
 
@@ -524,118 +508,19 @@ export const AdminPinsScreen: React.FC<{ onExit: () => void }> = ({ onExit }) =>
   const reviewCount = rows.filter((r) => r.needs_pin_review).length;
   const moved = sel && pending ? haversineM([sel.lat, sel.lng], [pending.lat, pending.lng]) : 0;
 
-  // ---------- gates ----------
-  if (isAuthLoading) {
-    return <div className="fixed inset-0 z-[200] bg-white grid place-items-center text-slate-500">Loading…</div>;
-  }
-
-  if (!session) {
-    return (
-      <div className="fixed inset-0 z-[200] bg-slate-50 grid place-items-center p-6">
-        <div className="w-full max-w-sm bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col gap-3">
-          <h1 className="text-lg font-extrabold text-slate-900">Station Pin Admin</h1>
-          <p className="text-sm text-slate-500">Sign in with an admin email.</p>
-          {!codeSent ? (
-            <>
-              <input
-                type="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="border border-slate-300 rounded-lg px-3 py-2 text-sm"
-              />
-              <button
-                disabled={authBusy || !email}
-                onClick={async () => {
-                  setAuthBusy(true);
-                  setAuthErr(null);
-                  const r = await sendLoginCode(email.trim());
-                  setAuthBusy(false);
-                  if (r.success) setCodeSent(true);
-                  else setAuthErr(r.error || 'Could not send code.');
-                }}
-                className="bg-emerald-600 text-white rounded-lg py-2 text-sm font-bold disabled:opacity-50"
-              >
-                {authBusy ? 'Sending…' : 'Send code'}
-              </button>
-            </>
-          ) : (
-            <>
-              <input
-                inputMode="numeric"
-                placeholder="Verification code"
-                value={code}
-                onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
-                className="border border-slate-300 rounded-lg px-3 py-2 text-sm tracking-widest"
-              />
-              <button
-                disabled={authBusy || code.length < 6}
-                onClick={async () => {
-                  setAuthBusy(true);
-                  setAuthErr(null);
-                  const r = await verifyLoginCode(email.trim(), code);
-                  setAuthBusy(false);
-                  if (!r.success) setAuthErr(r.error || 'Invalid code.');
-                }}
-                className="bg-emerald-600 text-white rounded-lg py-2 text-sm font-bold disabled:opacity-50"
-              >
-                {authBusy ? 'Verifying…' : 'Verify'}
-              </button>
-            </>
-          )}
-          {authErr && <p className="text-xs text-rose-600 font-semibold">{authErr}</p>}
-          <button onClick={onExit} className="text-xs text-slate-400 hover:text-slate-600 mt-1">
-            <span className="inline-flex items-center gap-1"><Icon name="arrow_back" size={14} /> Back to app</span>
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (!isAdmin) {
-    return (
-      <div className="fixed inset-0 z-[200] bg-slate-50 grid place-items-center p-6">
-        <div className="w-full max-w-sm bg-white rounded-2xl border border-slate-200 shadow-sm p-6 text-center flex flex-col gap-3">
-          <h1 className="text-lg font-extrabold text-slate-900">Not authorized</h1>
-          <p className="text-sm text-slate-500">
-            <span className="font-mono text-slate-700">{driverProfile.email}</span> isn't an admin. Run in
-            Supabase: <code className="text-xs">update profiles set is_admin = true where email = '…';</code>
-          </p>
-          <div className="flex gap-2 justify-center">
-            <button onClick={() => signOut()} className="text-xs px-3 py-1.5 rounded-full bg-slate-100">
-              Sign out
-            </button>
-            <button onClick={onExit} className="text-xs px-3 py-1.5 rounded-full bg-slate-100">
-              Back to app
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // ---------- editor ----------
   return (
-    <div className="fixed inset-0 z-[200] bg-white flex flex-col">
-      <div className="h-12 shrink-0 border-b border-slate-200 flex items-center justify-between px-4 gap-3">
-        <div className="flex items-center gap-3 min-w-0">
-          <span className="font-extrabold text-slate-900 text-sm whitespace-nowrap">Station Pin Admin</span>
-          <span className="text-xs text-orange-600 font-semibold whitespace-nowrap">{reviewCount} need review</span>
-        </div>
+    <div className="h-full flex flex-col min-h-0">
+      {/* Panel toolbar — the shell's top bar already shows the section title */}
+      <div className="h-11 shrink-0 border-b border-slate-200 flex items-center justify-between px-4 gap-3">
+        <span className="text-xs text-orange-600 font-semibold whitespace-nowrap">{reviewCount} need review</span>
         <div className="flex items-center gap-2 shrink-0">
-          <button
-            onClick={exportCsv}
-            className="text-xs px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200"
-          >
+          <button onClick={exportCsv} className="text-xs px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200">
             Export CSV
           </button>
           <label className="text-xs px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 cursor-pointer">
             Upload CSV
             <input type="file" accept=".csv,text/csv" className="hidden" onChange={onCsvFileSelected} />
           </label>
-          <button onClick={onExit} className="text-xs px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200">
-            Exit
-          </button>
         </div>
       </div>
 
@@ -694,11 +579,7 @@ export const AdminPinsScreen: React.FC<{ onExit: () => void }> = ({ onExit }) =>
                     onChange={() => toggleDeleteSelect(r.id)}
                     className="shrink-0"
                   />
-                  <span
-                    className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-                      r.needs_pin_review ? 'bg-orange-500' : 'bg-emerald-500'
-                    }`}
-                  />
+                  <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${r.needs_pin_review ? 'bg-orange-500' : 'bg-emerald-500'}`} />
                   <span className="text-xs font-semibold text-slate-900 truncate">{r.name}</span>
                 </div>
                 <p className="text-[0.75rem] text-slate-500 truncate mt-0.5">
@@ -736,9 +617,7 @@ export const AdminPinsScreen: React.FC<{ onExit: () => void }> = ({ onExit }) =>
                   value={editName}
                   onChange={(e) => setEditName(e.target.value)}
                   className={`flex-1 border rounded-lg px-2.5 py-1.5 text-sm ${
-                    editName.trim() && editName.trim() !== sel.name
-                      ? 'border-emerald-400 bg-emerald-50/40'
-                      : 'border-slate-300'
+                    editName.trim() && editName.trim() !== sel.name ? 'border-emerald-400 bg-emerald-50/40' : 'border-slate-300'
                   }`}
                 />
                 <button
@@ -763,10 +642,7 @@ export const AdminPinsScreen: React.FC<{ onExit: () => void }> = ({ onExit }) =>
                   placeholder="Paste from Google Maps — e.g. 9.0765, 7.4853"
                   className="flex-1 border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs"
                 />
-                <button
-                  onClick={applyPaste}
-                  className="text-xs px-3 py-1.5 rounded-lg bg-slate-800 text-white font-semibold"
-                >
+                <button onClick={applyPaste} className="text-xs px-3 py-1.5 rounded-lg bg-slate-800 text-white font-semibold">
                   Apply
                 </button>
               </div>
@@ -795,7 +671,8 @@ export const AdminPinsScreen: React.FC<{ onExit: () => void }> = ({ onExit }) =>
               </div>
 
               <div className="flex items-center gap-2">
-                <select aria-label="Pin precision tier"
+                <select
+                  aria-label="Pin precision tier"
                   value={tier}
                   onChange={(e) => setTier(e.target.value as Tier)}
                   className="border border-slate-300 rounded-lg px-2 py-1.5 text-xs flex-1"
@@ -832,12 +709,6 @@ export const AdminPinsScreen: React.FC<{ onExit: () => void }> = ({ onExit }) =>
         </div>
       </div>
 
-      {toast && (
-        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[210] bg-slate-900 text-white text-xs font-semibold px-4 py-2 rounded-full shadow-lg">
-          {toast}
-        </div>
-      )}
-
       {confirmingDelete && (
         <div className="fixed inset-0 z-[225] bg-black/40 grid place-items-center p-6">
           <div className="w-full max-w-sm bg-white rounded-2xl shadow-xl p-5 flex flex-col gap-3">
@@ -857,10 +728,7 @@ export const AdminPinsScreen: React.FC<{ onExit: () => void }> = ({ onExit }) =>
               This permanently deletes each station and its reports, photos, and comments. This can't be undone.
             </p>
             <div className="flex justify-end gap-2 mt-1">
-              <button
-                onClick={() => setConfirmingDelete(false)}
-                className="text-xs px-4 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200"
-              >
+              <button onClick={() => setConfirmingDelete(false)} className="text-xs px-4 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200">
                 Cancel
               </button>
               <button
@@ -881,42 +749,29 @@ export const AdminPinsScreen: React.FC<{ onExit: () => void }> = ({ onExit }) =>
             <div className="p-4 border-b border-slate-200 flex items-center justify-between shrink-0">
               <h2 className="font-extrabold text-slate-900 text-sm">
                 Review bulk update — {csvDiffs.filter((d) => d.current && !d.error).length} station(s) to change
-                {csvDiffs.some((d) => d.error || !d.current)
-                  ? `, ${csvDiffs.filter((d) => d.error || !d.current).length} problem row(s)`
-                  : ''}
+                {csvDiffs.some((d) => d.error || !d.current) ? `, ${csvDiffs.filter((d) => d.error || !d.current).length} problem row(s)` : ''}
               </h2>
-              <button
-                onClick={() => setCsvDiffs(null)}
-                className="text-xs px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 shrink-0"
-              >
+              <button onClick={() => setCsvDiffs(null)} className="text-xs px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 shrink-0">
                 Cancel
               </button>
             </div>
             <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-2.5">
               {csvDiffs.map((d) => (
-                <div
-                  key={d.id}
-                  className={`border rounded-lg p-2.5 text-xs ${
-                    d.error || !d.current ? 'border-rose-300 bg-rose-50' : 'border-slate-200'
-                  }`}
-                >
+                <div key={d.id} className={`border rounded-lg p-2.5 text-xs ${d.error || !d.current ? 'border-rose-300 bg-rose-50' : 'border-slate-200'}`}>
                   <p className="font-semibold text-slate-900">{d.label}</p>
                   {d.error && <p className="text-rose-600 mt-0.5">{d.error}</p>}
                   {!d.current && <p className="text-rose-600 mt-0.5">Unknown station id "{d.id}" — will be skipped.</p>}
                   {Object.entries(d.changes).map(([k, v]) => (
                     <p key={k} className="text-slate-600 mt-0.5">
-                      <span className="font-mono text-[0.75rem] text-slate-400">{k}</span>: {v.from || '(empty)'} <Icon name="arrow_forward" size={12} className="inline" />{' '}
-                      <span className="font-semibold text-emerald-700">{v.to}</span>
+                      <span className="font-mono text-[0.75rem] text-slate-400">{k}</span>: {v.from || '(empty)'}{' '}
+                      <Icon name="arrow_forward" size={12} className="inline" /> <span className="font-semibold text-emerald-700">{v.to}</span>
                     </p>
                   ))}
                 </div>
               ))}
             </div>
             <div className="p-4 border-t border-slate-200 flex justify-end gap-2 shrink-0">
-              <button
-                onClick={() => setCsvDiffs(null)}
-                className="text-xs px-4 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200"
-              >
+              <button onClick={() => setCsvDiffs(null)} className="text-xs px-4 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200">
                 Cancel
               </button>
               <button
