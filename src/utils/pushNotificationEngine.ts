@@ -79,9 +79,13 @@ export function detectStatusTransition(
 }
 
 /**
- * Evaluates whether a driver should be notified for a specific station status change based on:
- * 1. Favorite station list OR proximity (<= 15 km).
- * 2. Driver state scoping.
+ * Evaluates whether a driver should be notified for a specific station status change.
+ *
+ * A driver in the SAME STATE as the station is notified unconditionally — this is meant to
+ * be a broad, state-wide "CNG is back" alert (a driver in Lagos can't act on a station in
+ * Abuja becoming available, but any driver in that station's own state realistically can).
+ * Outside their home state, only a station they've explicitly favorited, or one they happen
+ * to be physically close to right now (e.g. near a state border), still reaches them.
  */
 export function checkShouldNotifyDriver(
   station: GasStation,
@@ -90,39 +94,27 @@ export function checkShouldNotifyDriver(
   favoriteStationIds: string[] = []
 ): { notify: boolean; isFavorite: boolean; distanceKm?: number; reason?: string } {
   const isFavorite = favoriteStationIds.includes(station.id);
+  const isSameState = checkNotificationPermission(userProfile.state, station.state).allowed;
 
-  // 1. State Scoping Check
-  const stateCheck = checkNotificationPermission(userProfile.state, station.state);
-  if (!stateCheck.allowed && !isFavorite) {
-    return {
-      notify: false,
-      isFavorite,
-      reason: stateCheck.reason || 'Station state does not match driver state.',
-    };
-  }
-
-  // 2. Compute Proximity Distance
   let distanceKm: number | undefined;
   if (userCoords?.lat != null && userCoords?.lng != null && station.lat != null && station.lng != null) {
     distanceKm = getDistanceInKm(userCoords.lat, userCoords.lng, station.lat, station.lng);
   }
 
-  const isNearby = distanceKm !== undefined && distanceKm <= 15.0;
+  if (isSameState) {
+    return { notify: true, isFavorite, distanceKm };
+  }
 
-  // Trigger push alert if station is a favorite OR within 15 km
+  const isNearby = distanceKm !== undefined && distanceKm <= 15.0;
   if (isFavorite || isNearby) {
-    return {
-      notify: true,
-      isFavorite,
-      distanceKm,
-    };
+    return { notify: true, isFavorite, distanceKm };
   }
 
   return {
     notify: false,
     isFavorite,
     distanceKm,
-    reason: `Station is neither in driver favorites nor within 15 km proximity (${distanceKm ? distanceKm.toFixed(1) : '?'} km).`,
+    reason: `Station (${station.state}) is outside driver's state (${userProfile.state || 'unset'}), not a favorite, and not within 15 km (${distanceKm !== undefined ? distanceKm.toFixed(1) : '?'} km).`,
   };
 }
 

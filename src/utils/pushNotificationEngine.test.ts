@@ -70,20 +70,18 @@ describe('pushNotificationEngine', () => {
       expect(result.isFavorite).toBe(true);
     });
 
-    it('notifies driver if station is within 15 km in driver registered state', () => {
-      // Coordinates 5 km away in Abuja
-      const userCoords = { lat: 9.0800, lng: 7.4000 };
-      const result = checkShouldNotifyDriver(mockStation, mockUser, userCoords, []);
-      expect(result.notify).toBe(true);
-      expect(result.distanceKm).toBeLessThan(15);
-    });
-
-    it('blocks notification if station is farther than 15 km and not favorite', () => {
-      // Coordinates in Abuja FCT but > 15 km away from station (e.g. Gwagwalada, Abuja: 8.95, 7.08)
+    it('notifies every driver in the station\'s own state, not just favorites or nearby ones', () => {
+      // Gwagwalada, Abuja — same state as the station but well over 15 km away, and not a favorite.
       const userCoords = { lat: 8.9500, lng: 7.0800 };
       const result = checkShouldNotifyDriver(mockStation, mockUser, userCoords, []);
-      expect(result.notify).toBe(false);
-      expect(result.reason).toContain('neither in driver favorites nor within 15 km');
+      expect(result.notify).toBe(true);
+      expect(result.isFavorite).toBe(false);
+    });
+
+    it('notifies a same-state driver even with no known coordinates at all', () => {
+      const result = checkShouldNotifyDriver(mockStation, mockUser, null, []);
+      expect(result.notify).toBe(true);
+      expect(result.distanceKm).toBeUndefined();
     });
 
     it('blocks notification if driver registered state does not match station state', () => {
@@ -91,7 +89,17 @@ describe('pushNotificationEngine', () => {
       const lagosUser: UserProfile = { ...mockUser, state: 'Lagos' };
       const result = checkShouldNotifyDriver(mockStation, lagosUser, userCoords, []);
       expect(result.notify).toBe(false);
-      expect(result.reason).toContain('does not match driver registered state');
+      expect(result.reason).toContain('outside driver\'s state');
+    });
+
+    it('still reaches an out-of-state driver for a favorited station, or one they are physically next to', () => {
+      const lagosUser: UserProfile = { ...mockUser, state: 'Lagos' };
+      const favorited = checkShouldNotifyDriver(mockStation, lagosUser, null, ['st-001']);
+      expect(favorited.notify).toBe(true);
+
+      const rightNextToIt = checkShouldNotifyDriver(mockStation, lagosUser, { lat: 9.0800, lng: 7.4000 }, []);
+      expect(rightNextToIt.notify).toBe(true);
+      expect(rightNextToIt.distanceKm).toBeLessThan(15);
     });
   });
 });
