@@ -5,8 +5,10 @@ import './index.css';
 
 import { startAnalytics } from './services/analytics';
 import { installKeyboardInset } from './utils/keyboardInset';
+import { installStaleChunkReload } from './utils/staleChunkReload';
 import { AuthProvider } from './context/AuthContext';
 
+installStaleChunkReload();
 installKeyboardInset();
 startAnalytics();
 
