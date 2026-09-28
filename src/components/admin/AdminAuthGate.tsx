@@ -21,13 +21,13 @@ export const AdminAuthGate: React.FC<{ title: string; onExit: () => void; childr
   const [err, setErr] = useState<string | null>(null);
 
   if (isAuthLoading) {
-    return <div className="fixed inset-0 z-[200] grid place-items-center bg-white text-sm text-slate-500">Loading…</div>;
+    return <div data-theme="light" className="fixed inset-0 z-[200] grid place-items-center bg-white text-sm text-slate-500">Loading…</div>;
   }
 
   if (session) return <>{children}</>;
 
   return (
-    <div className="fixed inset-0 z-[200] grid place-items-center bg-slate-50 p-6">
+    <div data-theme="light" className="fixed inset-0 z-[200] grid place-items-center bg-slate-50 p-6">
       <div className="w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-6 shadow-sm flex flex-col gap-3">
         <h1 className="text-lg font-extrabold text-slate-900">{title}</h1>
         <p className="text-sm text-slate-500">Sign in with the email an admin knows you under.</p>

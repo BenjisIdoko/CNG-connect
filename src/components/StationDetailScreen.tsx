@@ -231,7 +231,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
         <button
           onClick={onBack}
           aria-label="Go back"
-          className="absolute top-[max(env(safe-area-inset-top,0px),1rem)] left-4 w-10 h-10 rounded-full bg-white/90 text-slate-900 flex items-center justify-center active:scale-95 transition-transform shadow-sm"
+          className="absolute top-[max(env(safe-area-inset-top,0px),1rem)] left-4 w-10 h-10 rounded-full bg-surface-container-high/90 text-slate-900 flex items-center justify-center active:scale-95 transition-transform shadow-sm"
         >
           <span aria-hidden="true" className="material-symbols-outlined text-[20px]">arrow_back</span>
         </button>
@@ -240,7 +240,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
             onClick={() => onToggleFavorite?.(station.id)}
             aria-label={isFavorite ? 'Remove from favorite stations' : 'Add to favorite stations'}
             className={`w-10 h-10 rounded-full flex items-center justify-center active:scale-95 transition-transform shadow-sm ${
-              isFavorite ? 'bg-white text-status-red' : 'bg-white/90 text-slate-900'
+              isFavorite ? 'bg-surface-container-high text-status-red' : 'bg-surface-container-high/90 text-slate-900'
             }`}
           >
             <span aria-hidden="true" className={`material-symbols-outlined text-[20px] ${isFavorite ? 'material-symbols-fill' : ''}`}>
@@ -250,7 +250,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
           <button
             onClick={handleShareStation}
             aria-label="Share Station Group"
-            className="w-10 h-10 rounded-full bg-white/90 text-slate-900 flex items-center justify-center active:scale-95 transition-transform shadow-sm"
+            className="w-10 h-10 rounded-full bg-surface-container-high/90 text-slate-900 flex items-center justify-center active:scale-95 transition-transform shadow-sm"
           >
             <span aria-hidden="true" className="material-symbols-outlined text-[20px]">ios_share</span>
           </button>
@@ -348,7 +348,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
             </div>
           </div>
         ) : station.status === 'unknown' ? (
-          <div className="rounded-2xl bg-white p-4 flex items-center gap-3 shadow-[0_4px_14px_rgba(31,41,35,0.05)]">
+          <div className="rounded-2xl bg-surface-container-high p-4 flex items-center gap-3 shadow-[0_4px_14px_rgba(31,41,35,0.05)]">
             <span className="w-10 h-10 rounded-full bg-primary-container text-primary flex items-center justify-center shrink-0">
               <span aria-hidden="true" className="material-symbols-outlined text-[20px]">local_gas_station</span>
             </span>
@@ -544,7 +544,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
       </div>
 
       {/* Sticky bottom actions: one primary CTA, two quiet secondaries */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white px-5 pt-3 shadow-[0_-6px_18px_rgba(31,41,35,0.08)] z-40 pb-safe">
+      <div className="fixed bottom-0 left-0 right-0 bg-surface-container-high px-5 pt-3 shadow-[0_-6px_18px_rgba(31,41,35,0.08)] z-40 pb-safe">
         <div className="max-w-xl mx-auto flex flex-col gap-2">
           {activeTab === 'feed' && (
             <form onSubmit={handlePostGroupComment} className="flex items-center gap-2">

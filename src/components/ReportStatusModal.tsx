@@ -131,7 +131,7 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
 
   return (
     <Modal isOpen={true} onClose={onClose} title="Report Status" className="bg-surface border-surface-container-highest max-h-[90vh] overflow-y-auto">
-      <div className="relative w-full max-w-lg bg-white rounded-t-3xl sm:rounded-3xl z-10 max-h-[90vh] overflow-y-auto pb-safe">
+      <div className="relative w-full max-w-lg bg-surface-container-high rounded-t-3xl sm:rounded-3xl z-10 max-h-[90vh] overflow-y-auto pb-safe">
         <div className="px-5 pb-6 pt-2">
           <div className="flex items-center gap-1 mb-4">
             <div className="min-w-0 flex-1">
@@ -210,7 +210,7 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
                       type="button"
                       onClick={() => setWaitTime(chip.v)}
                       className={`rounded-lg px-3 py-1.5 text-micro font-semibold transition-colors ${
-                        waitTime === chip.v ? 'bg-slate-900 text-white' : 'bg-white text-slate-500'
+                        waitTime === chip.v ? 'bg-deep-teal text-white' : 'bg-surface-container-high text-slate-500'
                       }`}
                     >
                       {chip.label}
@@ -249,7 +249,7 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
                   <button
                     type="button"
                     onClick={() => setShowLiveCamera(true)}
-                    className="w-full flex items-center gap-2 bg-white rounded-xl p-2.5 text-left active:scale-[0.99] transition-transform"
+                    className="w-full flex items-center gap-2 bg-surface-container-high rounded-xl p-2.5 text-left active:scale-[0.99] transition-transform"
                   >
                     <span aria-hidden="true" className="material-symbols-outlined text-[20px] text-slate-700">photo_camera</span>
                     <span className="text-caption font-semibold flex-1">Add live photo</span>
@@ -262,7 +262,7 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
                 placeholder="Add a note (optional)"
-                className="w-full bg-white rounded-xl px-3 py-2.5 text-caption text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary/30"
+                className="w-full bg-surface-container-high rounded-xl px-3 py-2.5 text-caption text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary/30"
               />
             </div>
 

@@ -160,7 +160,7 @@ export const StationSearchOverlay: React.FC<Props> = ({
       role="dialog"
       aria-modal="true"
       aria-label="Search stations"
-      className="fixed inset-0 z-[80] bg-white flex flex-col search-overlay-in"
+      className="fixed inset-0 z-[80] bg-surface flex flex-col search-overlay-in"
     >
       <div className="pt-safe px-4 pb-3 border-b border-outline-variant/40 shrink-0">
         <div className="flex items-center gap-2 pt-2">
@@ -245,7 +245,7 @@ export const StationSearchOverlay: React.FC<Props> = ({
       </div>
 
       {searching && results.length > 1 && (
-        <div className="shrink-0 px-5 py-3 pb-safe border-t border-outline-variant/40 bg-white">
+        <div className="shrink-0 px-5 py-3 pb-safe border-t border-outline-variant/40 bg-surface">
           <button
             onClick={() => onApply(query)}
             className="w-full py-3.5 rounded-full bg-primary text-white font-bold text-caption flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"

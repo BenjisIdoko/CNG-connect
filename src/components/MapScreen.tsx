@@ -772,7 +772,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
           onSelectStation(station);
           onOpenStationDetails(station);
         }}
-        className={`w-40 shrink-0 bg-white rounded-2xl overflow-hidden text-left shadow-[0_4px_14px_rgba(14,20,32,0.08)] active:scale-[0.98] transition-transform ${
+        className={`w-40 shrink-0 bg-surface-container-high rounded-2xl overflow-hidden text-left shadow-[0_4px_14px_rgba(14,20,32,0.08)] active:scale-[0.98] transition-transform ${
           flashIds?.has(station.id) ? 'flash-ring' : ''
         } ${isPinned ? 'ring-2 ring-primary' : ''}`}
       >
@@ -849,7 +849,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       {/* Mobile top overlay: the logo and Share the App, so the map is the hero (Bolt / inDrive style) */}
       <div className="lg:hidden absolute top-0 inset-x-0 z-30 pointer-events-none pt-safe px-4">
         <div className="flex items-center justify-between pt-3">
-          <div className="pointer-events-auto h-12 pl-1.5 pr-4 rounded-full bg-white flex items-center gap-2 shadow-[0_4px_14px_rgba(31,41,35,0.22)]">
+          <div className="pointer-events-auto h-12 pl-1.5 pr-4 rounded-full bg-surface-container-high flex items-center gap-2 shadow-[0_4px_14px_rgba(31,41,35,0.22)]">
             <img src="/pwa-icon.svg" alt="" className="w-9 h-9 rounded-full" />
             <span className="font-headline font-extrabold text-[1.0625rem] text-slate-900 tracking-tight">CNG&#8209;Connect</span>
           </div>
@@ -857,7 +857,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
             <button
               onClick={onShareApp}
               aria-label="Share the app with other drivers"
-              className="pointer-events-auto h-12 pl-4 pr-5 rounded-full bg-white text-slate-900 flex items-center gap-2 font-bold text-caption shadow-[0_4px_14px_rgba(31,41,35,0.22)] active:scale-95 transition-transform"
+              className="pointer-events-auto h-12 pl-4 pr-5 rounded-full bg-surface-container-high text-slate-900 flex items-center gap-2 font-bold text-caption shadow-[0_4px_14px_rgba(31,41,35,0.22)] active:scale-95 transition-transform"
             >
               <span aria-hidden="true" className="material-symbols-outlined text-[20px]">share</span>
               Share the App
@@ -866,7 +866,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
         </div>
 
         {showAreaFallback && (
-          <div className="pointer-events-auto mt-3 bg-white rounded-2xl shadow-[0_4px_14px_rgba(31,41,35,0.18)] px-4 py-3 flex items-start gap-2.5">
+          <div className="pointer-events-auto mt-3 bg-surface-container-high rounded-2xl shadow-[0_4px_14px_rgba(31,41,35,0.18)] px-4 py-3 flex items-start gap-2.5">
             <span aria-hidden="true" className="material-symbols-outlined text-status-amber text-[20px] shrink-0 mt-0.5">
               {gpsStatus === 'denied' ? 'location_disabled' : 'location_searching'}
             </span>
@@ -926,7 +926,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
           onClick={handleRecenter}
           aria-label="My Location"
           title={gpsStatusText}
-          className={`pointer-events-auto absolute right-4 -top-16 w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-[0_4px_14px_rgba(31,41,35,0.22)] active:scale-95 transition-all ${
+          className={`pointer-events-auto absolute right-4 -top-16 w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center shadow-[0_4px_14px_rgba(31,41,35,0.22)] active:scale-95 transition-all ${
             sheetMode === 'expanded' ? 'opacity-0 pointer-events-none! scale-75' : ''
           } ${gpsStatus === 'active' ? 'text-slate-900' : gpsStatus === 'denied' ? 'text-status-red' : 'text-status-amber'}`}
         >
@@ -937,7 +937,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
 
         <div
           ref={sheetRef}
-          className={`w-full bg-white rounded-t-[28px] shadow-[0_-6px_24px_rgba(0,0,0,0.16),0_100vh_0_0_#FFFFFF] pointer-events-auto flex flex-col overflow-hidden will-change-transform ${
+          className={`w-full bg-surface-container-high rounded-t-[28px] shadow-[0_-6px_24px_rgba(0,0,0,0.16),0_100vh_0_0_#FFFFFF] pointer-events-auto flex flex-col overflow-hidden will-change-transform ${
             sheetMode === 'expanded' ? 'h-[calc(100dvh-8rem)]' : sheetMode === 'collapsed' ? 'pb-24' : ''
           }`}
         >
@@ -1086,7 +1086,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       {/* Desktop Persistent Right-Hand Panel (lg: 1024px and above) */}
       <div className="hidden lg:flex flex-col w-[380px] xl:w-[420px] bg-surface h-full z-20 shadow-[-8px_0_24px_rgba(31,41,35,0.08)] overflow-hidden shrink-0">
         {/* Right Panel Header: Search & Filter */}
-        <div className="p-4 flex flex-col gap-3 bg-white shadow-[0_2px_10px_rgba(31,41,35,0.05)]">
+        <div className="p-4 flex flex-col gap-3 bg-surface-container-high shadow-[0_2px_10px_rgba(31,41,35,0.05)]">
           <div className="flex items-center justify-between">
             <h2 className="font-extrabold text-[1rem] text-slate-900 flex items-center gap-2">
               <span>Stations & Chargers</span>
@@ -1165,8 +1165,8 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                   onClick={() => onSelectStation(station)}
                   className={`p-4 rounded-2xl transition-all cursor-pointer ${flashIds?.has(station.id) ? 'flash-ring ' : ''}${
                     isSelected
-                      ? 'bg-white ring-2 ring-primary shadow-[0_6px_18px_rgba(49,154,63,0.18)]'
-                      : 'bg-white shadow-[0_4px_14px_rgba(31,41,35,0.05)] hover:shadow-[0_6px_18px_rgba(31,41,35,0.1)]'
+                      ? 'bg-surface-container-high ring-2 ring-primary shadow-[0_6px_18px_rgba(49,154,63,0.18)]'
+                      : 'bg-surface-container-high shadow-[0_4px_14px_rgba(31,41,35,0.05)] hover:shadow-[0_6px_18px_rgba(31,41,35,0.1)]'
                   }`}
                 >
                   <div className="flex items-start justify-between gap-2">

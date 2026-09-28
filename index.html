@@ -2,6 +2,16 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <script>
+      // Applies a saved light/dark choice before anything paints, so a driver who picked
+      // "Dark" never sees a flash of the light theme first. Mirrors src/utils/theme.ts —
+      // keep the two in sync if this logic changes. No-ops (stays on system preference) if
+      // nothing was ever saved, or storage is unavailable (private browsing).
+      try {
+        var t = localStorage.getItem('cng_theme_pref');
+        if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {}
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content" />
     <meta name="theme-color" content="#1F2923" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -13,7 +23,10 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="preload" href="/fonts/material-symbols.woff2" as="font" type="font/woff2" crossorigin />
   </head>
-  <body class="bg-[#F3F3F3] text-[#1F2923] antialiased selection:bg-[#319A3F]/25 selection:text-[#1F2923]">
+  <body
+    class="antialiased selection:bg-[#319A3F]/25 selection:text-[#1F2923]"
+    style="background: var(--color-background, #F3F3F3); color: var(--color-on-background, #1F2923)"
+  >
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

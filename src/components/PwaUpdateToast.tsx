@@ -107,7 +107,7 @@ export const PwaUpdateToast: React.FC = () => {
 
       {/* 2. Offline Ready Confirmation */}
       {offlineReady && !needRefresh && (
-        <div className="pointer-events-auto flex items-center justify-between gap-3 p-3.5 rounded-2xl bg-white text-slate-900 shadow-[0_8px_24px_rgba(31,41,35,0.15)] animate-in slide-in-from-bottom-4 duration-300">
+        <div className="pointer-events-auto flex items-center justify-between gap-3 p-3.5 rounded-2xl bg-surface-container-high text-slate-900 shadow-[0_8px_24px_rgba(31,41,35,0.15)] animate-in slide-in-from-bottom-4 duration-300">
           <div className="flex items-center gap-2.5">
             <CheckCircle2 className="w-5 h-5 text-primary shrink-0" />
             <p className="text-xs font-medium">Map & station data cached for offline driving!</p>
@@ -124,7 +124,7 @@ export const PwaUpdateToast: React.FC = () => {
 
       {/* 3. Offline Mode Banner */}
       {isOffline && showOfflineNotice && !needRefresh && (
-        <div className="pointer-events-auto flex items-center justify-between gap-3 p-3.5 rounded-2xl bg-white text-slate-900 shadow-[0_8px_24px_rgba(31,41,35,0.15)] animate-in slide-in-from-bottom-4 duration-300">
+        <div className="pointer-events-auto flex items-center justify-between gap-3 p-3.5 rounded-2xl bg-surface-container-high text-slate-900 shadow-[0_8px_24px_rgba(31,41,35,0.15)] animate-in slide-in-from-bottom-4 duration-300">
           <div className="flex items-center gap-2.5">
             <WifiOff className="w-5 h-5 text-status-amber shrink-0" />
             <div>

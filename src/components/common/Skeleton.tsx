@@ -15,7 +15,7 @@ export const ScreenSkeleton: React.FC = () => (
     </div>
     <Skeleton className="h-12 w-full rounded-full" />
     {[0, 1, 2, 3].map((i) => (
-      <div key={i} className="bg-white rounded-2xl p-4 flex flex-col gap-3 shadow-[0_4px_14px_rgba(31,41,35,0.05)]">
+      <div key={i} className="bg-surface-container-high rounded-2xl p-4 flex flex-col gap-3 shadow-[0_4px_14px_rgba(31,41,35,0.05)]">
         <Skeleton className="h-4 w-2/3" />
         <Skeleton className="h-3 w-full" />
         <Skeleton className="h-3 w-1/2" />

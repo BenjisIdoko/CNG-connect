@@ -11,6 +11,7 @@ import { Icon } from './common/Icon';
 import { TierBadge } from './common/TierBadge';
 import { CountUp } from './common/CountUp';
 import { isAnalyticsOptedOut, setAnalyticsEnabled } from '../services/analytics';
+import { ThemePref, getThemePref, setThemePref } from '../utils/theme';
 import { Avatar } from './common/Avatar';
 
 interface ProfileScreenProps {
@@ -126,6 +127,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   };
 
   const [analyticsOn, setAnalyticsOn] = useState(() => !isAnalyticsOptedOut());
+  const [themePref, setThemePrefState] = useState<ThemePref>(() => getThemePref());
   const points = user.communityPoints ?? 450;
   const tierProgress = getDriverTier(points);
   const openEdit = () => {
@@ -206,7 +208,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                 <PopoverPrimitive.Portal>
                   <PopoverPrimitive.Content
                     sideOffset={5}
-                    className="z-[150] w-64 bg-white rounded-2xl p-3 shadow-xl flex flex-col gap-1.5"
+                    className="z-[150] w-64 bg-surface-container-high rounded-2xl p-3 shadow-xl flex flex-col gap-1.5"
                   >
                     <span className="text-micro font-bold text-outline uppercase tracking-wider px-2">Switch active vehicle</span>
                     {['Toyota Corolla 1.8L', 'Hyundai Accent 1.6L', 'Qoray E-Trike (EV)'].map((v) => (
@@ -296,7 +298,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
         {/* Savings summary → canonical calculator */}
         <div
           onClick={onOpenRoiCalculator}
-          className={`bg-white rounded-2xl p-4 shadow-[0_4px_14px_rgba(14,20,32,0.05)] ${onOpenRoiCalculator ? 'cursor-pointer active:scale-[0.99] transition-transform' : ''}`}
+          className={`bg-surface-container-high rounded-2xl p-4 shadow-[0_4px_14px_rgba(14,20,32,0.05)] ${onOpenRoiCalculator ? 'cursor-pointer active:scale-[0.99] transition-transform' : ''}`}
         >
           <div className="text-micro font-semibold text-outline">Estimated savings</div>
           <div className="font-extrabold text-[1.375rem] text-primary mt-0.5 tracking-tight">
@@ -309,7 +311,39 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
         </div>
 
         {/* Settings */}
-        <div className="bg-white rounded-2xl shadow-[0_4px_14px_rgba(14,20,32,0.05)] divide-y divide-surface-container overflow-hidden">
+        <div className="bg-surface-container-high rounded-2xl shadow-[0_4px_14px_rgba(14,20,32,0.05)] divide-y divide-surface-container overflow-hidden">
+          <Row
+            icon="dark_mode"
+            label="Appearance"
+            right={
+              <div role="radiogroup" aria-label="Appearance" className="flex gap-0.5 bg-surface-container rounded-full p-0.5">
+                {(
+                  [
+                    ['light', 'light_mode', 'Light'],
+                    ['system', 'brightness_auto', 'Match device'],
+                    ['dark', 'dark_mode', 'Dark'],
+                  ] as const
+                ).map(([pref, icon, label]) => (
+                  <button
+                    key={pref}
+                    role="radio"
+                    aria-checked={themePref === pref}
+                    aria-label={label}
+                    title={label}
+                    onClick={() => {
+                      setThemePref(pref);
+                      setThemePrefState(pref);
+                    }}
+                    className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
+                      themePref === pref ? 'bg-primary text-white' : 'text-outline'
+                    }`}
+                  >
+                    <span aria-hidden="true" className="material-symbols-outlined text-[17px]">{icon}</span>
+                  </button>
+                ))}
+              </div>
+            }
+          />
           <Row
             icon="location_on"
             label="Home state"

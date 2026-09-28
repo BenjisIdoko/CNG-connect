@@ -73,7 +73,7 @@ export const ProximityAlertBanner: React.FC<ProximityAlertBannerProps> = ({
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-[60] max-w-xl mx-auto pointer-events-none animate-slide-down">
-      <div className="bg-white rounded-t-3xl shadow-[0_-14px_40px_rgba(0,0,0,0.3)] px-5 pt-2.5 pb-7 pointer-events-auto">
+      <div className="bg-surface-container-high rounded-t-3xl shadow-[0_-14px_40px_rgba(0,0,0,0.3)] px-5 pt-2.5 pb-7 pointer-events-auto">
         <div className="w-10 h-1 bg-surface-container-highest rounded-full mx-auto mb-4" />
 
         <div className="flex items-start justify-between gap-3">

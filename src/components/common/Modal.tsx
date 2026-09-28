@@ -62,7 +62,7 @@ export const Modal: React.FC<ModalProps> = ({
           aria-label={title || ariaLabel || 'Modal Dialog'}
           aria-describedby={undefined}
           className={cn(
-            "fixed z-[101] bg-white focus:outline-none overflow-y-auto shadow-2xl",
+            "fixed z-[101] bg-surface-container-high focus:outline-none overflow-y-auto shadow-2xl",
             // phone: bottom sheet; sm+: centered dialog
             "inset-x-0 bottom-[var(--kb-inset,0px)] max-h-[calc(90dvh-var(--kb-inset,0px))] rounded-t-[28px]",
             "sm:inset-x-auto sm:bottom-auto sm:max-h-[88dvh] sm:left-[50%] sm:top-[50%] sm:translate-x-[-50%] sm:translate-y-[-50%] sm:w-[92%] sm:max-w-lg sm:rounded-3xl",

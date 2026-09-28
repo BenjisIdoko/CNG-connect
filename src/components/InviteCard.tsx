@@ -50,7 +50,7 @@ export const InviteCard: React.FC<{
   return (
     <section
       aria-labelledby={isSheet ? undefined : 'invite-title'}
-      className={isSheet ? '' : 'bg-white rounded-2xl p-4 shadow-[0_4px_14px_rgba(14,20,32,0.05)] border border-primary/15'}
+      className={isSheet ? '' : 'bg-surface-container-high rounded-2xl p-4 shadow-[0_4px_14px_rgba(14,20,32,0.05)] border border-primary/15'}
     >
       {isSheet ? (
         <ol className="flex flex-col gap-3">

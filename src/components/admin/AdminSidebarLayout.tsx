@@ -83,7 +83,7 @@ export const AdminSidebarLayout: React.FC<AdminSidebarLayoutProps> = ({
   );
 
   return (
-    <div className="fixed inset-0 z-[200] flex bg-surface-container-low">
+    <div data-theme="light" className="fixed inset-0 z-[200] flex bg-surface-container-low">
       {/* Desktop sidebar */}
       <aside className="hidden md:flex w-64 shrink-0 flex-col bg-deep-teal">
         <div className="shrink-0 px-4 pt-5 pb-3">

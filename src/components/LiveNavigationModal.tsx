@@ -56,7 +56,7 @@ export const LiveNavigationModal: React.FC<LiveNavigationModalProps> = ({
               {station.statusLabel} {station.pumpPressure ? `• ${station.pumpPressure} bar` : ''}
             </span>
             {station.cngPrice && (
-              <span className="bg-white text-slate-700 text-[0.7812rem] font-medium px-3 py-1 rounded-full">
+              <span className="bg-surface-container-high text-slate-700 text-[0.7812rem] font-medium px-3 py-1 rounded-full">
                 ₦{station.cngPrice}/kg
               </span>
             )}

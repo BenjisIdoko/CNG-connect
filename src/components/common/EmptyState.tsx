@@ -18,7 +18,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   className = '',
 }) => {
   return (
-    <div className={`bg-white rounded-3xl p-6 text-center border border-slate-200/80 shadow-xs flex flex-col items-center gap-2 my-2 ${className}`}>
+    <div className={`bg-surface-container-high rounded-3xl p-6 text-center border border-slate-200/80 shadow-xs flex flex-col items-center gap-2 my-2 ${className}`}>
       <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-primary flex items-center justify-center font-bold">
         <span aria-hidden="true" className="material-symbols-outlined text-[28px]">{icon}</span>
       </div>

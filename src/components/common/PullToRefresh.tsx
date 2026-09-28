@@ -77,7 +77,7 @@ export const PullToRefresh: React.FC<{ onRefresh: () => Promise<unknown>; disabl
       style={{ transform: `translate(-50%, ${pull - 24}px)`, opacity: Math.min(1, pull / 40) }}
       aria-live="polite"
     >
-      <div className="w-10 h-10 rounded-full bg-white shadow-[0_6px_18px_rgba(31,41,35,0.18)] flex items-center justify-center text-primary">
+      <div className="w-10 h-10 rounded-full bg-surface-container-high shadow-[0_6px_18px_rgba(31,41,35,0.18)] flex items-center justify-center text-primary">
         <Icon
           name="refresh"
           size={22}

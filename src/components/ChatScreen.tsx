@@ -136,7 +136,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ post, onBack }) => {
 
       {/* Pinned Listing Context Card */}
       <div className="max-w-xl w-full mx-auto px-4 pt-3">
-        <div className="bg-white rounded-2xl shadow-[0_4px_14px_rgba(31,41,35,0.05)] p-3 flex items-center gap-3 hover:border-primary/40 transition-colors">
+        <div className="bg-surface-container-high rounded-2xl shadow-[0_4px_14px_rgba(31,41,35,0.05)] p-3 flex items-center gap-3 hover:border-primary/40 transition-colors">
           <div
             className="w-12 h-12 rounded-xl bg-cover bg-center shrink-0"
             style={{ backgroundImage: `url('${listingImage}')` }}
@@ -181,7 +181,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ post, onBack }) => {
                   className={`rounded-2xl p-3 shadow-xs text-body-lg font-normal leading-relaxed relative ${
                     isMe
                       ? 'bg-primary text-white rounded-br-xs'
-                      : 'bg-white text-on-surface rounded-bl-xs'
+                      : 'bg-surface-container-high text-on-surface rounded-bl-xs'
                   }`}
                 >
                   {msg.image && (
@@ -219,7 +219,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ post, onBack }) => {
 
         {/* Typing Indicator */}
         {isTyping && (
-          <div className="self-start flex items-center gap-2 bg-white px-4 py-2.5 rounded-2xl rounded-bl-xs shadow-[0_4px_14px_rgba(31,41,35,0.05)]">
+          <div className="self-start flex items-center gap-2 bg-surface-container-high px-4 py-2.5 rounded-2xl rounded-bl-xs shadow-[0_4px_14px_rgba(31,41,35,0.05)]">
             <div className="flex gap-1.5 items-center">
               <div className="w-2 h-2 rounded-full bg-primary animate-bounce" />
               <div
@@ -241,7 +241,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ post, onBack }) => {
       </div>
 
       {/* Fixed Chat Input Footer */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md p-3 px-4 shadow-[0_-6px_20px_rgba(31,41,35,0.06)] z-40 pb-safe">
+      <div className="fixed bottom-0 left-0 right-0 bg-surface-container-high/95 backdrop-blur-md p-3 px-4 shadow-[0_-6px_20px_rgba(31,41,35,0.06)] z-40 pb-safe">
         <div className="max-w-xl mx-auto flex items-end gap-2 bg-surface-container rounded-2xl p-1.5 px-2 focus-within:ring-2 focus-within:ring-primary/30 transition-all">
           <input
             type="file"
@@ -254,7 +254,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ post, onBack }) => {
             type="button"
             onClick={() => fileInputRef.current?.click()}
             aria-label="Add photo"
-            className="w-10 h-10 flex shrink-0 items-center justify-center rounded-full text-outline hover:bg-white hover:text-primary transition-colors mb-0.5"
+            className="w-10 h-10 flex shrink-0 items-center justify-center rounded-full text-outline hover:bg-surface-container-high hover:text-primary transition-colors mb-0.5"
           >
             <span aria-hidden="true" className="material-symbols-outlined text-[22px]">
               add_a_photo

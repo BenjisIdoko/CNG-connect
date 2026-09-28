@@ -224,7 +224,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                   ? 'Search groups or city'
                   : 'Search tips and deals'
               }
-              className="w-full bg-surface-container rounded-full py-2.5 pl-10 pr-9 text-body font-normal text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary/30 focus:bg-white transition-all"
+              className="w-full bg-surface-container rounded-full py-2.5 pl-10 pr-9 text-body font-normal text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary/30 focus:bg-surface-container-high transition-all"
             />
             {searchQuery && (
               <button
@@ -282,7 +282,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                   aria-label="Filter station groups by status"
                   className={`flex items-center gap-1 text-micro font-semibold px-2 py-2 rounded-xl border transition-colors active:scale-95 ${
                     statusFilter === 'all'
-                      ? 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+                      ? 'bg-surface-container-high text-slate-600 border-slate-200 hover:bg-surface-container'
                       : 'bg-primary text-white border-primary'
                   }`}
                 >
@@ -300,7 +300,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                 {showStatusMenu && (
                   <>
                     <div className="fixed inset-0 z-30" onClick={() => setShowStatusMenu(false)} />
-                    <div className="absolute right-0 top-full mt-2 z-40 w-44 bg-white rounded-2xl border border-slate-200 shadow-lg py-1 overflow-hidden">
+                    <div className="absolute right-0 top-full mt-2 z-40 w-44 bg-surface-container-high rounded-2xl border border-slate-200 shadow-lg py-1 overflow-hidden">
                       {STATUS_OPTIONS.map((o) => (
                         <button
                           key={o.id}
@@ -344,7 +344,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                     <div
                       key={st.id}
                       onClick={() => onOpenStationGroup && onOpenStationGroup(st)}
-                      className="flex items-center gap-3 py-4 cursor-pointer transition-colors active:bg-surface-container/40 md:bg-white md:p-4 md:rounded-2xl md:border md:border-slate-200/80 md:shadow-2xs md:hover:border-primary/60 md:active:bg-transparent"
+                      className="flex items-center gap-3 py-4 cursor-pointer transition-colors active:bg-surface-container/40 md:bg-surface-container-high md:p-4 md:rounded-2xl md:border md:border-slate-200/80 md:shadow-2xs md:hover:border-primary/60 md:active:bg-transparent"
                     >
                       <div className="w-10 h-10 rounded-2xl bg-emerald-50 flex items-center justify-center text-primary shrink-0">
                         <span aria-hidden="true" className="material-symbols-outlined text-[20px]">groups</span>
@@ -443,7 +443,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                   className={`rounded-2xl p-4 flex flex-col items-center justify-center gap-2 transition-all cursor-pointer shadow-xs border active:scale-[0.98] ${
                     activeCategory === 'maintenance'
                       ? 'bg-primary-container/30 border-primary ring-2 ring-primary/20'
-                      : 'bg-white border-slate-200/80 hover:border-primary/40'
+                      : 'bg-surface-container-high border-slate-200/80 hover:border-primary/40'
                   }`}
                 >
                   <div className="w-10 h-10 rounded-full bg-primary-container/30 flex items-center justify-center text-on-primary-container shadow-xs">
@@ -466,7 +466,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                   className={`rounded-2xl p-4 flex flex-col items-center justify-center gap-2 transition-all cursor-pointer shadow-xs border active:scale-[0.98] ${
                     activeCategory === 'parts'
                       ? 'bg-secondary-container/30 border-secondary-container ring-2 ring-secondary-container/20'
-                      : 'bg-white border-slate-200/80 hover:border-secondary-container/40'
+                      : 'bg-surface-container-high border-slate-200/80 hover:border-secondary-container/40'
                   }`}
                 >
                   <div className="w-10 h-10 rounded-full bg-secondary-container/30 flex items-center justify-center text-on-secondary-container shadow-xs">
@@ -489,7 +489,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                   className={`rounded-2xl p-4 flex flex-col items-center justify-center gap-2 transition-all cursor-pointer shadow-xs border active:scale-[0.98] ${
                     activeCategory === 'reviews'
                       ? 'bg-tertiary-container/40 border-electric-amber ring-2 ring-electric-amber/20'
-                      : 'bg-white border-slate-200/80 hover:border-electric-amber/40'
+                      : 'bg-surface-container-high border-slate-200/80 hover:border-electric-amber/40'
                   }`}
                 >
                   <div className="w-10 h-10 rounded-full bg-tertiary-container/40 flex items-center justify-center text-on-tertiary-container shadow-xs">
@@ -515,7 +515,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                   className={`rounded-2xl p-4 flex flex-col items-center justify-center gap-2 transition-all cursor-pointer shadow-xs border active:scale-[0.98] ${
                     activeCategory === 'deals'
                       ? 'bg-electric-amber/30 border-secondary ring-2 ring-secondary/20'
-                      : 'bg-white border-slate-200/80 hover:border-electric-amber/40'
+                      : 'bg-surface-container-high border-slate-200/80 hover:border-electric-amber/40'
                   }`}
                 >
                   <div className="w-10 h-10 rounded-full bg-electric-amber/30 flex items-center justify-center text-[#2d1600] shadow-xs">
@@ -563,7 +563,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                   <div
                     key={post.id}
                     onClick={() => onOpenDiscussion(post)}
-                    className="bg-white rounded-2xl p-4 shadow-2xs border border-slate-200/70 flex flex-col gap-3 relative overflow-hidden group hover:border-primary/50 transition-all cursor-pointer"
+                    className="bg-surface-container-high rounded-2xl p-4 shadow-2xs border border-slate-200/70 flex flex-col gap-3 relative overflow-hidden group hover:border-primary/50 transition-all cursor-pointer"
                   >
                     <div className="flex items-center gap-3">
                       {post.authorAvatar ? (

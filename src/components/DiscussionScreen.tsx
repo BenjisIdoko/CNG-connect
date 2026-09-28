@@ -35,7 +35,7 @@ export const DiscussionScreen: React.FC<DiscussionScreenProps> = ({
     <div className="min-h-screen bg-surface text-on-surface pb-32">
       {/* Post Content */}
       <div className="max-w-3xl mx-auto px-4 md:px-6 pt-4">
-        <div className="bg-white rounded-3xl p-5 shadow-[0_4px_14px_rgba(31,41,35,0.05)] flex flex-col gap-4">
+        <div className="bg-surface-container-high rounded-3xl p-5 shadow-[0_4px_14px_rgba(31,41,35,0.05)] flex flex-col gap-4">
           {/* Author Row */}
           <div className="flex items-center gap-3">
             {post.authorAvatar ? (
@@ -167,7 +167,7 @@ export const DiscussionScreen: React.FC<DiscussionScreenProps> = ({
             {comments.map((comment) => (
               <div
                 key={comment.id}
-                className="bg-white rounded-2xl p-4 shadow-[0_4px_14px_rgba(31,41,35,0.05)] flex flex-col gap-2"
+                className="bg-surface-container-high rounded-2xl p-4 shadow-[0_4px_14px_rgba(31,41,35,0.05)] flex flex-col gap-2"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
@@ -236,7 +236,7 @@ export const DiscussionScreen: React.FC<DiscussionScreenProps> = ({
       </div>
 
       {/* Fixed Sticky Comment Input */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md p-3 px-4 shadow-[0_-6px_20px_rgba(31,41,35,0.06)] z-40 pb-safe">
+      <div className="fixed bottom-0 left-0 right-0 bg-surface-container-high/95 backdrop-blur-md p-3 px-4 shadow-[0_-6px_20px_rgba(31,41,35,0.06)] z-40 pb-safe">
         <div className="max-w-xl mx-auto">
           {replyingTo && (
             <div className="flex items-center justify-between text-caption text-primary font-semibold mb-1.5 px-2">

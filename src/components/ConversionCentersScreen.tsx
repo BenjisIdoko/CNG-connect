@@ -75,7 +75,7 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
   return (
     <div className="pb-32 min-h-screen bg-surface-container">
       {/* Header + stats */}
-      <div className="bg-white px-5 pt-5 pb-4 shadow-[0_2px_10px_rgba(14,20,32,0.04)]">
+      <div className="bg-surface-container-high px-5 pt-5 pb-4 shadow-[0_2px_10px_rgba(14,20,32,0.04)]">
         <div className="max-w-3xl mx-auto">
           <h2 className="font-bold text-title tracking-tight">Conversion Centres</h2>
           <div className="flex gap-2 mt-3">
@@ -145,7 +145,7 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           {filteredCenters.length === 0 ? (
-            <div className="bg-white rounded-2xl p-8 text-center col-span-full">
+            <div className="bg-surface-container-high rounded-2xl p-8 text-center col-span-full">
               <p className="font-bold text-body-lg">No centres found</p>
               <p className="text-caption text-outline mt-1">Try another state or clear your search.</p>
               <button
@@ -163,7 +163,7 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
             filteredCenters.map((center, idx) => (
               <div
                 key={center.id}
-                className={`bg-white rounded-2xl p-4 shadow-[0_4px_14px_rgba(14,20,32,0.05)] flex flex-col${idx < 8 ? ' rise-in' : ''}`}
+                className={`bg-surface-container-high rounded-2xl p-4 shadow-[0_4px_14px_rgba(14,20,32,0.05)] flex flex-col${idx < 8 ? ' rise-in' : ''}`}
                 style={idx < 8 ? ({ '--d': `${idx * 35}ms` } as React.CSSProperties) : undefined}
               >
                 <div className="flex items-start justify-between gap-3">
