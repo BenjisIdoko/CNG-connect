@@ -29,6 +29,9 @@ interface AuthContextType {
   verifyLoginCode: (email: string, code: string) => Promise<VerifyResult>;
   /** Password sign-in for the admin/manager dashboard only — see AdminAuthGate. */
   adminSignInWithPassword: (email: string, password: string) => Promise<AuthResult>;
+  /** True once a password-recovery link has been opened — the app must show the "set a new password" screen before anything else, session or not. */
+  isPasswordRecovery: boolean;
+  updatePassword: (newPassword: string) => Promise<AuthResult>;
   updateProfile: (updater: Partial<UserProfile> | ((prev: UserProfile) => UserProfile)) => Promise<void>;
   /** Resize + upload an image to the `avatars` bucket and save its URL on the profile. */
   uploadAvatar: (file: File) => Promise<{ url?: string; error?: string }>;
@@ -80,6 +83,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // True only once the profile row was really read from the server, so a slow or failed
   // load can never make an existing driver look like they are missing a phone number.
   const [isProfileLoaded, setIsProfileLoaded] = useState(false);
+  const [isPasswordRecovery, setIsPasswordRecovery] = useState(false);
 
   useEffect(() => {
     setAnalyticsUser(session?.user.id ?? null);
@@ -132,6 +136,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       const { data: listener } = supabase.auth.onAuthStateChange((_event, newSession) => {
+        // A password-recovery link lands here as a normal sign-in (Supabase
+        // exchanges the emailed token for a real session) — without this
+        // check, the app would just drop the user straight into the driver
+        // home screen or admin dashboard with no way to actually set a new
+        // password, which is the whole reason they clicked the link.
+        if (_event === 'PASSWORD_RECOVERY') setIsPasswordRecovery(true);
         setSession(newSession);
         if (newSession) {
           loadProfile(newSession.user.id, newSession.user.email || '');
@@ -205,6 +215,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return { success: true };
   }, [loadProfile]);
 
+  const updatePassword = useCallback(async (newPassword: string): Promise<AuthResult> => {
+    const supabase = await getSupabase();
+    if (!supabase) return { success: false, error: 'Backend not configured.' };
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    if (error) return { success: false, error: error.message };
+    setIsPasswordRecovery(false);
+    return { success: true };
+  }, []);
+
   const updateProfile = useCallback(
     async (updater: Partial<UserProfile> | ((prev: UserProfile) => UserProfile)) => {
       if (!session) return;
@@ -276,6 +295,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setDriverProfile(INITIAL_USER);
     setIsNewDriver(false);
     setIsProfileLoaded(false);
+    setIsPasswordRecovery(false);
   }, []);
 
   return (
@@ -290,6 +310,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         sendLoginCode,
         verifyLoginCode,
         adminSignInWithPassword,
+        isPasswordRecovery,
+        updatePassword,
         updateProfile,
         uploadAvatar,
         signOut,

@@ -23,6 +23,7 @@ import { SignUpScreen } from './components/SignUpScreen';
 import { SplashScreen, shouldShowSplash } from './components/SplashScreen';
 import { PwaUpdateToast } from './components/PwaUpdateToast';
 import { InstallPrompt } from './components/InstallPrompt';
+import { PasswordResetScreen } from './components/PasswordResetScreen';
 import { useAuth } from './context/AuthContext';
 
 // Code-split secondary screens & modals with React.lazy
@@ -141,7 +142,7 @@ export const App: React.FC = () => {
   // Auth-Gated Onboarding & Registration State. Real identity (session +
   // profile) lives in AuthContext, backed by Supabase Auth email-OTP —
   // App.tsx only tracks which auth screen (if any) is currently showing.
-  const { isAuthenticated, isAuthLoading, driverProfile, needsPhone, updateProfile, uploadAvatar, signOut } = useAuth();
+  const { isAuthenticated, isAuthLoading, isPasswordRecovery, driverProfile, needsPhone, updateProfile, uploadAvatar, signOut } = useAuth();
   const [authMode, setAuthMode] = useState<'onboarding' | 'signup' | null>(null);
 
   // Once the initial session check resolves, a guest (no session) sees the
@@ -816,6 +817,10 @@ export const App: React.FC = () => {
     setAuthMode('onboarding');
     showToast('Signed out successfully.');
   };
+
+  if (isPasswordRecovery) {
+    return <PasswordResetScreen />;
+  }
 
   if (adminMode) {
     return (
