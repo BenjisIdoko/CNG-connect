@@ -1,6 +1,7 @@
 import { ShareAppSheet } from './components/ShareAppSheet';
 import { captureReferralFromUrl, clearPendingReferral, getPendingReferral } from './utils/referral';
-import React, { useState, useEffect, useMemo, useCallback, useRef, lazy, Suspense } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef, Suspense } from 'react';
+import { safeLazy } from './utils/safeLazy';
 import {
   GasStation,
   CommunityPost,
@@ -27,39 +28,17 @@ import { PasswordResetScreen } from './components/PasswordResetScreen';
 import { useAuth } from './context/AuthContext';
 
 // Code-split secondary screens & modals with React.lazy
-const StationDetailScreen = lazy(() =>
-  import('./components/StationDetailScreen').then((m) => ({ default: m.StationDetailScreen }))
-);
-const CommunityScreen = lazy(() =>
-  import('./components/CommunityScreen').then((m) => ({ default: m.CommunityScreen }))
-);
-const ConversionCentersScreen = lazy(() =>
-  import('./components/ConversionCentersScreen').then((m) => ({ default: m.ConversionCentersScreen }))
-);
-const BookConversionModal = lazy(() =>
-  import('./components/BookConversionModal').then((m) => ({ default: m.BookConversionModal }))
-);
-const DiscussionScreen = lazy(() =>
-  import('./components/DiscussionScreen').then((m) => ({ default: m.DiscussionScreen }))
-);
-const ChatScreen = lazy(() =>
-  import('./components/ChatScreen').then((m) => ({ default: m.ChatScreen }))
-);
-const ProfileScreen = lazy(() =>
-  import('./components/ProfileScreen').then((m) => ({ default: m.ProfileScreen }))
-);
-const ReportStatusModal = lazy(() =>
-  import('./components/ReportStatusModal').then((m) => ({ default: m.ReportStatusModal }))
-);
-const CreatePostModal = lazy(() =>
-  import('./components/CreatePostModal').then((m) => ({ default: m.CreatePostModal }))
-);
-const LiveNavigationModal = lazy(() =>
-  import('./components/LiveNavigationModal').then((m) => ({ default: m.LiveNavigationModal }))
-);
-const CngRoiCalculatorModal = lazy(() =>
-  import('./components/CngRoiCalculatorModal').then((m) => ({ default: m.CngRoiCalculatorModal }))
-);
+const StationDetailScreen = safeLazy(() => import('./components/StationDetailScreen'), (m) => m.StationDetailScreen);
+const CommunityScreen = safeLazy(() => import('./components/CommunityScreen'), (m) => m.CommunityScreen);
+const ConversionCentersScreen = safeLazy(() => import('./components/ConversionCentersScreen'), (m) => m.ConversionCentersScreen);
+const BookConversionModal = safeLazy(() => import('./components/BookConversionModal'), (m) => m.BookConversionModal);
+const DiscussionScreen = safeLazy(() => import('./components/DiscussionScreen'), (m) => m.DiscussionScreen);
+const ChatScreen = safeLazy(() => import('./components/ChatScreen'), (m) => m.ChatScreen);
+const ProfileScreen = safeLazy(() => import('./components/ProfileScreen'), (m) => m.ProfileScreen);
+const ReportStatusModal = safeLazy(() => import('./components/ReportStatusModal'), (m) => m.ReportStatusModal);
+const CreatePostModal = safeLazy(() => import('./components/CreatePostModal'), (m) => m.CreatePostModal);
+const LiveNavigationModal = safeLazy(() => import('./components/LiveNavigationModal'), (m) => m.LiveNavigationModal);
+const CngRoiCalculatorModal = safeLazy(() => import('./components/CngRoiCalculatorModal'), (m) => m.CngRoiCalculatorModal);
 import {
   isStationStale,
   isStationOnCooldown,
@@ -97,9 +76,7 @@ const TOAST_COLORS: Record<ToastTone, string> = {
   wait: 'text-white/70',
 };
 
-const AdminScreen = lazy(() =>
-  import('./components/admin/AdminScreen').then((m) => ({ default: m.AdminScreen }))
-);
+const AdminScreen = safeLazy(() => import('./components/admin/AdminScreen'), (m) => m.AdminScreen);
 
 export const App: React.FC = () => {
   // Hidden admin route — one dashboard (sidebar + main content) covering the pin/station
