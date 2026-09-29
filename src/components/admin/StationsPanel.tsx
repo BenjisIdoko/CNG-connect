@@ -171,7 +171,7 @@ const EditableCell: React.FC<{
             setEditing(false);
           }
         }}
-        className={`w-full border border-emerald-400 rounded px-1.5 py-1 text-xs bg-emerald-50/50 outline-none ${
+        className={`block w-full border border-emerald-400 rounded-md px-4 py-3 text-xs bg-emerald-50/50 outline-none ${
           align === 'right' ? 'text-right' : ''
         }`}
       />
@@ -182,7 +182,7 @@ const EditableCell: React.FC<{
       type="button"
       onClick={() => setEditing(true)}
       title="Click to edit"
-      className={`block w-full truncate rounded px-1.5 py-1 text-xs hover:bg-slate-100 ${
+      className={`block w-full truncate px-4 py-3 text-xs hover:bg-slate-100 ${
         align === 'right' ? 'text-right' : 'text-left'
       } ${value ? 'text-slate-800' : 'text-slate-400 italic'}`}
     >
@@ -451,30 +451,31 @@ export const StationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash 
       )}
 
       {/* data table */}
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 overflow-auto p-4">
         {loading && <p className="p-4 text-xs text-slate-400">Loading stations…</p>}
         {!loading && filtered.length > 0 && (
+          <div className="rounded-lg border border-slate-200">
           <table className="min-w-full text-xs border-collapse">
-            <thead className="sticky top-0 z-10 bg-slate-50 text-slate-500 text-left">
-              <tr className="border-b border-slate-200">
-                <th className="px-2 py-2 w-8">
+            <thead className="sticky top-0 z-10 bg-slate-50 text-slate-500 text-left [&_tr]:border-b [&_tr]:border-slate-200">
+              <tr>
+                <th className="h-11 px-4 w-10 align-middle">
                   <input type="checkbox" checked={allVisibleSelected} onChange={toggleSelectAllVisible} aria-label="Select all" />
                 </th>
-                <th className="px-2 py-2 w-4" />
-                <th className="px-2 py-2 min-w-[180px]">Name</th>
-                <th className="px-2 py-2 min-w-[120px]">City</th>
-                <th className="px-2 py-2 min-w-[80px]">State</th>
-                <th className="px-2 py-2 min-w-[140px]">Operator</th>
-                <th className="px-2 py-2 min-w-[90px] text-right">Price (₦)</th>
-                <th className="px-2 py-2 min-w-[90px] text-right">Pressure</th>
-                <th className="px-2 py-2 min-w-[130px]">Pin</th>
-                <th className="px-2 py-2 w-28" />
+                <th className="h-11 px-2 w-6 align-middle" />
+                <th className="h-11 px-4 min-w-[180px] align-middle font-medium">Name</th>
+                <th className="h-11 px-4 min-w-[120px] align-middle font-medium">City</th>
+                <th className="h-11 px-4 min-w-[80px] align-middle font-medium">State</th>
+                <th className="h-11 px-4 min-w-[140px] align-middle font-medium">Operator</th>
+                <th className="h-11 px-4 min-w-[90px] align-middle font-medium text-right">Price (₦)</th>
+                <th className="h-11 px-4 min-w-[90px] align-middle font-medium text-right">Pressure</th>
+                <th className="h-11 px-4 min-w-[140px] align-middle font-medium">Pin</th>
+                <th className="h-11 px-4 min-w-[120px] align-middle" />
               </tr>
             </thead>
-            <tbody>
+            <tbody className="[&_tr:last-child]:border-0">
               {filtered.map((r) => (
                 <tr key={r.id} className={`border-b border-slate-100 ${r.needs_pin_review ? 'bg-orange-50/50' : 'hover:bg-slate-50/70'}`}>
-                  <td className="px-2 py-1">
+                  <td className="px-4 py-3 align-middle">
                     <input
                       type="checkbox"
                       checked={selectedForDelete.has(r.id)}
@@ -482,49 +483,49 @@ export const StationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash 
                       aria-label={`Select ${r.name}`}
                     />
                   </td>
-                  <td className="px-2 py-1">
+                  <td className="px-2 py-3 align-middle">
                     <span className={`inline-block w-2 h-2 rounded-full ${r.needs_pin_review ? 'bg-orange-500' : 'bg-emerald-500'}`} />
                   </td>
-                  <td className="px-1 py-1">
+                  <td className="p-0 align-middle">
                     <EditableCell value={r.name} onCommit={(v) => void saveField(r, { name: v })} />
                   </td>
-                  <td className="px-1 py-1">
+                  <td className="p-0 align-middle">
                     <EditableCell value={r.city || ''} onCommit={(v) => void saveField(r, { city: v })} />
                   </td>
-                  <td className="px-1 py-1">
+                  <td className="p-0 align-middle">
                     <EditableCell value={r.state || ''} onCommit={(v) => void saveField(r, { state: v })} />
                   </td>
-                  <td className="px-1 py-1">
+                  <td className="p-0 align-middle">
                     <EditableCell value={r.operator || ''} onCommit={(v) => void saveField(r, { operator: v })} />
                   </td>
-                  <td className="px-1 py-1">
+                  <td className="p-0 align-middle">
                     <EditableCell
                       align="right"
                       value={r.cng_price != null ? String(r.cng_price) : ''}
                       onCommit={(v) => void saveNumericField(r, 'cng_price', v)}
                     />
                   </td>
-                  <td className="px-1 py-1">
+                  <td className="p-0 align-middle">
                     <EditableCell
                       align="right"
                       value={r.pump_pressure != null ? String(r.pump_pressure) : ''}
                       onCommit={(v) => void saveNumericField(r, 'pump_pressure', v)}
                     />
                   </td>
-                  <td className="px-1 py-1">
+                  <td className="px-4 py-3 align-middle">
                     <button
                       onClick={() => setPinReviewId(r.id)}
-                      className={`text-[0.6875rem] px-2 py-1 rounded-full font-semibold whitespace-nowrap ${
+                      className={`text-[0.6875rem] px-2.5 py-1 rounded-full font-semibold whitespace-nowrap ${
                         r.needs_pin_review ? 'bg-orange-100 text-orange-700' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                       }`}
                     >
                       {TIER_SHORT[(r.location_precision as Tier) || 'city']}
                     </button>
                   </td>
-                  <td className="px-1 py-1 whitespace-nowrap">
+                  <td className="px-4 py-3 align-middle whitespace-nowrap">
                     <button
                       onClick={() => setFullEditorId(r.id)}
-                      className="text-[0.6875rem] px-2.5 py-1 rounded-lg bg-slate-800 text-white font-semibold"
+                      className="text-[0.6875rem] px-3 py-1.5 rounded-lg bg-slate-800 text-white font-semibold"
                     >
                       Full details
                     </button>
@@ -533,6 +534,7 @@ export const StationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash 
               ))}
             </tbody>
           </table>
+          </div>
         )}
         {!loading && filtered.length === 0 && <p className="p-4 text-xs text-slate-400">Nothing matches.</p>}
       </div>

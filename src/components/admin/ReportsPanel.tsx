@@ -115,7 +115,7 @@ export const ReportsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash }
         </button>
       </div>
 
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 overflow-auto p-4">
         {loading && <p className="p-4 text-xs text-slate-400">Loading…</p>}
         {err && <p className="p-4 text-xs font-semibold text-rose-600">{err}</p>}
 
@@ -131,35 +131,36 @@ export const ReportsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash }
         )}
 
         {!loading && !err && rows.length > 0 && (
+          <div className="rounded-lg border border-slate-200">
           <table className="min-w-full text-xs border-collapse">
-            <thead className="sticky top-0 z-10 bg-slate-50 text-slate-500 text-left">
-              <tr className="border-b border-slate-200">
-                <th className="px-3 py-2 min-w-[160px]">Station</th>
-                <th className="px-3 py-2 min-w-[100px]">Status</th>
-                <th className="px-3 py-2 min-w-[110px]">Reporter</th>
-                <th className="px-3 py-2 min-w-[90px]">Reported</th>
-                <th className="px-3 py-2 min-w-[100px]">Verification</th>
-                <th className="px-3 py-2 min-w-[220px]">Flags / comment</th>
-                <th className="px-3 py-2 w-16">Photo</th>
-                <th className="px-3 py-2 w-44" />
+            <thead className="sticky top-0 z-10 bg-slate-50 text-slate-500 text-left [&_tr]:border-b [&_tr]:border-slate-200">
+              <tr>
+                <th className="h-11 px-4 min-w-[160px] align-middle font-medium">Station</th>
+                <th className="h-11 px-4 min-w-[100px] align-middle font-medium">Status</th>
+                <th className="h-11 px-4 min-w-[110px] align-middle font-medium">Reporter</th>
+                <th className="h-11 px-4 min-w-[90px] align-middle font-medium">Reported</th>
+                <th className="h-11 px-4 min-w-[100px] align-middle font-medium">Verification</th>
+                <th className="h-11 px-4 min-w-[220px] align-middle font-medium">Flags / comment</th>
+                <th className="h-11 px-4 w-20 align-middle font-medium">Photo</th>
+                <th className="h-11 px-4 w-44 align-middle" />
               </tr>
             </thead>
-            <tbody>
+            <tbody className="[&_tr:last-child]:border-0">
               {rows.map((r) => (
                 <tr key={r.report_id} className={`border-b border-slate-100 ${r.open_flags > 0 ? 'bg-rose-50/40' : 'hover:bg-slate-50/70'}`}>
-                  <td className="px-3 py-2 font-semibold text-slate-900 max-w-[180px] truncate" title={r.station_name}>
+                  <td className="px-4 py-3 font-semibold text-slate-900 max-w-[180px] truncate" title={r.station_name}>
                     {r.station_name}
                   </td>
-                  <td className="px-3 py-2">
+                  <td className="px-4 py-3">
                     <span className="inline-flex items-center gap-1.5 font-semibold text-slate-900">
                       <span className={`w-2 h-2 rounded-full ${STATUS_DOT[r.status] || 'bg-slate-400'}`} />
                       {r.status_label}
                     </span>
                   </td>
-                  <td className="px-3 py-2 text-slate-600 max-w-[110px] truncate">{r.author}</td>
-                  <td className="px-3 py-2 text-slate-500 whitespace-nowrap">{formatRelativeTime(r.created_at)}</td>
-                  <td className="px-3 py-2 text-slate-600 capitalize">{r.verification_level.replace(/_/g, ' ')}</td>
-                  <td className="px-3 py-2">
+                  <td className="px-4 py-3 text-slate-600 max-w-[110px] truncate">{r.author}</td>
+                  <td className="px-4 py-3 text-slate-500 whitespace-nowrap">{formatRelativeTime(r.created_at)}</td>
+                  <td className="px-4 py-3 text-slate-600 capitalize">{r.verification_level.replace(/_/g, ' ')}</td>
+                  <td className="px-4 py-3">
                     <div className="flex flex-wrap gap-1 mb-1">
                       {r.open_flags > 0 && (
                         <span className="rounded-md bg-rose-100 text-rose-700 px-1.5 py-0.5 font-semibold">
@@ -182,14 +183,14 @@ export const ReportsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash }
                     </div>
                     {r.comment && <p className="text-slate-600 max-w-[260px] truncate" title={r.comment}>&ldquo;{r.comment}&rdquo;</p>}
                   </td>
-                  <td className="px-3 py-2">
+                  <td className="px-4 py-3">
                     {r.photo && (
                       <a href={r.photo} target="_blank" rel="noreferrer">
                         <img src={r.photo} alt="Report" className="w-10 h-10 rounded-lg object-cover" loading="lazy" />
                       </a>
                     )}
                   </td>
-                  <td className="px-3 py-2 whitespace-nowrap">
+                  <td className="px-4 py-3 whitespace-nowrap">
                     {view === 'review' ? (
                       <div className="flex gap-1.5">
                         <button
@@ -221,6 +222,7 @@ export const ReportsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash }
               ))}
             </tbody>
           </table>
+          </div>
         )}
       </div>
     </div>
