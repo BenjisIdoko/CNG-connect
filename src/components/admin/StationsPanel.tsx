@@ -461,15 +461,13 @@ export const StationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash 
                 <th className="h-11 px-4 w-10 align-middle">
                   <input type="checkbox" checked={allVisibleSelected} onChange={toggleSelectAllVisible} aria-label="Select all" />
                 </th>
-                <th className="h-11 px-2 w-6 align-middle" />
-                <th className="h-11 px-4 min-w-[180px] align-middle font-medium">Name</th>
-                <th className="h-11 px-4 min-w-[120px] align-middle font-medium">City</th>
-                <th className="h-11 px-4 min-w-[80px] align-middle font-medium">State</th>
-                <th className="h-11 px-4 min-w-[140px] align-middle font-medium">Operator</th>
-                <th className="h-11 px-4 min-w-[90px] align-middle font-medium text-right">Price (₦)</th>
-                <th className="h-11 px-4 min-w-[90px] align-middle font-medium text-right">Pressure</th>
-                <th className="h-11 px-4 min-w-[140px] align-middle font-medium">Pin</th>
-                <th className="h-11 px-4 min-w-[120px] align-middle" />
+                <th className="h-11 pl-3 pr-2 min-w-[170px] align-middle font-medium">Name</th>
+                <th className="h-11 px-3 min-w-[150px] align-middle font-medium">Location</th>
+                <th className="h-11 px-4 min-w-[130px] align-middle font-medium">Operator</th>
+                <th className="h-11 px-4 min-w-[80px] align-middle font-medium text-right">Price (₦)</th>
+                <th className="h-11 px-4 min-w-[80px] align-middle font-medium text-right">Pressure</th>
+                <th className="h-11 px-4 min-w-[110px] align-middle font-medium">Pin</th>
+                <th className="h-11 px-4 min-w-[110px] align-middle" />
               </tr>
             </thead>
             <tbody className="[&_tr:last-child]:border-0">
@@ -483,17 +481,26 @@ export const StationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash 
                       aria-label={`Select ${r.name}`}
                     />
                   </td>
-                  <td className="px-2 py-3 align-middle">
-                    <span className={`inline-block w-2 h-2 rounded-full ${r.needs_pin_review ? 'bg-orange-500' : 'bg-emerald-500'}`} />
+                  <td className="p-0 align-middle">
+                    <div className="flex items-center gap-2 pl-3">
+                      <span
+                        className={`shrink-0 inline-block w-2 h-2 rounded-full ${r.needs_pin_review ? 'bg-orange-500' : 'bg-emerald-500'}`}
+                      />
+                      <div className="flex-1 min-w-0">
+                        <EditableCell value={r.name} onCommit={(v) => void saveField(r, { name: v })} />
+                      </div>
+                    </div>
                   </td>
                   <td className="p-0 align-middle">
-                    <EditableCell value={r.name} onCommit={(v) => void saveField(r, { name: v })} />
-                  </td>
-                  <td className="p-0 align-middle">
-                    <EditableCell value={r.city || ''} onCommit={(v) => void saveField(r, { city: v })} />
-                  </td>
-                  <td className="p-0 align-middle">
-                    <EditableCell value={r.state || ''} onCommit={(v) => void saveField(r, { state: v })} />
+                    <div className="flex items-center gap-1 pl-2">
+                      <div className="flex-1 min-w-0">
+                        <EditableCell value={r.city || ''} placeholder="City" onCommit={(v) => void saveField(r, { city: v })} />
+                      </div>
+                      <span className="text-slate-300 shrink-0">,</span>
+                      <div className="w-14 shrink-0">
+                        <EditableCell value={r.state || ''} placeholder="State" onCommit={(v) => void saveField(r, { state: v })} />
+                      </div>
+                    </div>
                   </td>
                   <td className="p-0 align-middle">
                     <EditableCell value={r.operator || ''} onCommit={(v) => void saveField(r, { operator: v })} />
