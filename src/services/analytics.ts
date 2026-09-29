@@ -19,6 +19,7 @@ export type EventName =
   | 'share_clicked'
   | 'login_code_requested'
   | 'login_verified'
+  | 'admin_login_verified'
   | 'report_started'
   | 'report_submitted'
   | 'report_flagged'

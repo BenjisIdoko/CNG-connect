@@ -27,6 +27,8 @@ interface AuthContextType {
   needsPhone: boolean;
   sendLoginCode: (email: string) => Promise<AuthResult>;
   verifyLoginCode: (email: string, code: string) => Promise<VerifyResult>;
+  /** Password sign-in for the admin/manager dashboard only — see AdminAuthGate. */
+  adminSignInWithPassword: (email: string, password: string) => Promise<AuthResult>;
   updateProfile: (updater: Partial<UserProfile> | ((prev: UserProfile) => UserProfile)) => Promise<void>;
   /** Resize + upload an image to the `avatars` bucket and save its URL on the profile. */
   uploadAvatar: (file: File) => Promise<{ url?: string; error?: string }>;
@@ -181,6 +183,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return { success: true, isNewDriver };
   }, [loadProfile]);
 
+  /**
+   * Password sign-in used only by the admin/manager dashboard gate — a
+   * deliberate exception to the driver app's passwordless email-OTP flow,
+   * so admins who sign in often aren't stuck waiting on an email round-trip
+   * each time. Requires a password already set for that Supabase Auth user
+   * (Supabase dashboard: Authentication > Users > select the user > reset
+   * password) — signInWithOtp never sets one, so a driver-only account can't
+   * use this until a password is set for it.
+   */
+  const adminSignInWithPassword = useCallback(async (email: string, password: string): Promise<AuthResult> => {
+    const supabase = await getSupabase();
+    if (!supabase) return { success: false, error: 'Backend not configured.' };
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error || !data.session) {
+      return { success: false, error: error?.message || 'Invalid email or password.' };
+    }
+    setSession(data.session);
+    await loadProfile(data.session.user.id, data.session.user.email || '');
+    track('admin_login_verified');
+    return { success: true };
+  }, [loadProfile]);
+
   const updateProfile = useCallback(
     async (updater: Partial<UserProfile> | ((prev: UserProfile) => UserProfile)) => {
       if (!session) return;
@@ -265,6 +289,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         needsPhone: Boolean(session) && isProfileLoaded && !driverProfile.phone.trim(),
         sendLoginCode,
         verifyLoginCode,
+        adminSignInWithPassword,
         updateProfile,
         uploadAvatar,
         signOut,
