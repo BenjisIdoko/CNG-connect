@@ -1,19 +1,18 @@
-/// <reference types="google.maps" />
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSupabaseClient } from '../../hooks/useSupabaseClient';
-import { loadGoogleMaps, hasGoogleMapsKey } from '../../utils/googleMaps';
 import { parseCsv, toCsv } from '../../utils/csv';
 import { FullStationEditorModal } from '../FullStationEditorModal';
+import { PinReviewModal } from './PinReviewModal';
 import { Icon } from '../common/Icon';
 
 type Tier = 'source_exact' | 'rooftop' | 'street' | 'area' | 'city';
 const TIERS: Tier[] = ['rooftop', 'street', 'area', 'source_exact', 'city'];
-const TIER_LABEL: Record<Tier, string> = {
-  source_exact: 'Source exact (±15m)',
-  rooftop: 'Rooftop (±30m)',
-  street: 'Street (±150m)',
-  area: 'Area (±700m)',
-  city: 'City centroid (±4km)',
+const TIER_SHORT: Record<Tier, string> = {
+  source_exact: 'Exact',
+  rooftop: 'Rooftop',
+  street: 'Street',
+  area: 'Area',
+  city: 'City — review',
 };
 
 interface Row {
@@ -45,8 +44,6 @@ interface Row {
   total_ports: number | null;
   network: string | null;
 }
-
-const NG = { minLat: 4, maxLat: 14, minLng: 2.5, maxLng: 15 };
 
 // Text fields the CSV bulk-update can touch, in export column order.
 const CSV_TEXT_FIELDS = ['name', 'address', 'operator', 'city', 'state', 'station_type', 'area'] as const;
@@ -138,67 +135,76 @@ function buildCsvDiff(parsed: string[][], rows: Row[]): { diffs: CsvDiffRow[]; h
   return { diffs };
 }
 
-function haversineM(a: [number, number], b: [number, number]) {
-  const R = 6371000;
-  const toRad = (d: number) => (d * Math.PI) / 180;
-  const dLat = toRad(b[0] - a[0]);
-  const dLng = toRad(b[1] - a[1]);
-  const s = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(a[0])) * Math.cos(toRad(b[0])) * Math.sin(dLng / 2) ** 2;
-  return Math.round(2 * R * Math.asin(Math.sqrt(s)));
-}
+/** A table cell that's plain text until clicked, then becomes an input; commits on blur/Enter. */
+const EditableCell: React.FC<{
+  value: string;
+  placeholder?: string;
+  align?: 'left' | 'right';
+  onCommit: (next: string) => void;
+}> = ({ value, placeholder, align = 'left', onCommit }) => {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(value);
 
-/** Pulls lat,lng out of a pasted "9.07, 7.48", a Google Maps URL, or a place link. */
-function parseLatLng(raw: string): { lat: number; lng: number } | null {
-  const s = raw.trim();
-  const pats = [
-    /@(-?\d{1,2}\.\d+),\s*(-?\d{1,3}\.\d+)/, // .../maps/@9.07,7.48,17z
-    /!3d(-?\d{1,2}\.\d+)!4d(-?\d{1,3}\.\d+)/, // place URL data segment
-    /[?&](?:q|ll|center|destination)=(-?\d{1,2}\.\d+),\s*(-?\d{1,3}\.\d+)/,
-    /^\s*(-?\d{1,2}(?:\.\d+)?)\s*,\s*(-?\d{1,3}(?:\.\d+)?)\s*$/, // bare "lat, lng"
-  ];
-  for (const p of pats) {
-    const m = s.match(p);
-    if (m) {
-      const lat = parseFloat(m[1]);
-      const lng = parseFloat(m[2]);
-      if (lat >= NG.minLat && lat <= NG.maxLat && lng >= NG.minLng && lng <= NG.maxLng) {
-        return { lat: Number(lat.toFixed(6)), lng: Number(lng.toFixed(6)) };
-      }
-      return null; // parsed but outside Nigeria
-    }
+  useEffect(() => {
+    if (!editing) setDraft(value);
+  }, [value, editing]);
+
+  const commit = () => {
+    setEditing(false);
+    const trimmed = draft.trim();
+    if (trimmed && trimmed !== value) onCommit(trimmed);
+    else setDraft(value);
+  };
+
+  if (editing) {
+    return (
+      <input
+        autoFocus
+        value={draft}
+        onChange={(e) => setDraft(e.target.value)}
+        onFocus={(e) => e.currentTarget.select()}
+        onBlur={commit}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') e.currentTarget.blur();
+          if (e.key === 'Escape') {
+            setDraft(value);
+            setEditing(false);
+          }
+        }}
+        className={`w-full border border-emerald-400 rounded px-1.5 py-1 text-xs bg-emerald-50/50 outline-none ${
+          align === 'right' ? 'text-right' : ''
+        }`}
+      />
+    );
   }
-  return null;
-}
-
-// Called only after Google Maps has loaded (from the marker effects).
-const dot = (color: string, r: number): google.maps.Symbol => ({
-  path: window.google.maps.SymbolPath.CIRCLE,
-  fillColor: color,
-  fillOpacity: 0.9,
-  strokeColor: '#fff',
-  strokeWeight: 1.5,
-  scale: r,
-});
+  return (
+    <button
+      type="button"
+      onClick={() => setEditing(true)}
+      title="Click to edit"
+      className={`block w-full truncate rounded px-1.5 py-1 text-xs hover:bg-slate-100 ${
+        align === 'right' ? 'text-right' : 'text-left'
+      } ${value ? 'text-slate-800' : 'text-slate-400 italic'}`}
+    >
+      {value || placeholder || '—'}
+    </button>
+  );
+};
 
 /**
- * Pin-location review, full station details, CSV bulk update and bulk delete — the
- * full admin toolset for the `stations` table. Only ever rendered for an admin.
+ * Full admin toolset for the `stations` table: a data grid where the common
+ * fields are editable inline, plus CSV bulk update, bulk delete, pin-location
+ * review (its own modal — see PinReviewModal), and the full details editor
+ * for everything else (hours, photos, connector types, managers). Only ever
+ * rendered for an admin.
  */
 export const StationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash }) => {
   const supabase = useSupabaseClient();
 
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(false);
-  const [selId, setSelId] = useState<string | null>(null);
-  const [pending, setPending] = useState<{ lat: number; lng: number } | null>(null);
-  const [tier, setTier] = useState<Tier>('rooftop');
-  const [editName, setEditName] = useState('');
-  const [pasteVal, setPasteVal] = useState('');
-  const [pasteErr, setPasteErr] = useState<string | null>(null);
   const [search, setSearch] = useState('');
-  const [onlyReview, setOnlyReview] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [mapErr, setMapErr] = useState<string | null>(null);
+  const [onlyReview, setOnlyReview] = useState(false);
 
   // bulk CSV import
   const [csvDiffs, setCsvDiffs] = useState<CsvDiffRow[] | null>(null);
@@ -206,18 +212,13 @@ export const StationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash 
 
   // full station details editor
   const [fullEditorId, setFullEditorId] = useState<string | null>(null);
+  // pin-location review
+  const [pinReviewId, setPinReviewId] = useState<string | null>(null);
 
   // bulk delete
   const [selectedForDelete, setSelectedForDelete] = useState<Set<string>>(new Set());
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
-
-  const mapEl = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<google.maps.Map | null>(null);
-  const markersRef = useRef<Record<string, google.maps.Marker>>({});
-  const dragListenerRef = useRef<google.maps.MapsEventListener | null>(null);
-
-  const sel = rows.find((r) => r.id === selId) || null;
 
   const load = useCallback(async () => {
     if (!supabase) return;
@@ -237,157 +238,39 @@ export const StationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash 
     void load();
   }, [load]);
 
-  // Google Maps init
-  useEffect(() => {
-    if (!hasGoogleMapsKey || !mapEl.current || mapRef.current) return;
-    let cancelled = false;
-    loadGoogleMaps()
-      .then((maps) => {
-        if (cancelled || !mapEl.current) return;
-        mapRef.current = new maps.Map(mapEl.current, {
-          center: { lat: 9.07, lng: 7.49 },
-          zoom: 6,
-          mapTypeId: 'hybrid',
-          mapTypeControl: true,
-          streetViewControl: false,
-          fullscreenControl: false,
-          clickableIcons: false,
-        });
-      })
-      .catch((e) => setMapErr(e instanceof Error ? e.message : 'Map failed to load.'));
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  // sync station markers with rows
-  useEffect(() => {
-    const map = mapRef.current;
-    const maps = window.google?.maps;
-    if (!map || !maps) return;
-    const seen = new Set<string>();
-    for (const r of rows) {
-      seen.add(r.id);
-      let m = markersRef.current[r.id];
-      if (!m) {
-        m = new maps.Marker({ map, position: { lat: r.lat, lng: r.lng }, title: r.name });
-        m.addListener('click', () => setSelId(r.id));
-        markersRef.current[r.id] = m;
-      } else {
-        m.setPosition({ lat: r.lat, lng: r.lng });
-      }
-    }
-    for (const id of Object.keys(markersRef.current)) {
-      if (!seen.has(id)) {
-        markersRef.current[id].setMap(null);
-        delete markersRef.current[id];
-      }
-    }
-  }, [rows]);
-
-  // style/behaviour for the selected vs the rest
-  useEffect(() => {
-    const map = mapRef.current;
-    if (!map) return;
-    dragListenerRef.current?.remove();
-    dragListenerRef.current = null;
-
-    for (const [id, m] of Object.entries(markersRef.current)) {
-      const r = rows.find((x) => x.id === id);
-      if (id === selId) {
-        m.setIcon(dot('#00b060', 9));
-        m.setDraggable(true);
-        m.setZIndex(999);
-        dragListenerRef.current = m.addListener('dragend', () => {
-          const p = m.getPosition();
-          if (p) setPending({ lat: Number(p.lat().toFixed(6)), lng: Number(p.lng().toFixed(6)) });
-        });
-      } else {
-        m.setIcon(dot(r?.needs_pin_review ? '#ff6d00' : '#00b060', 4));
-        m.setDraggable(false);
-        m.setZIndex(1);
-      }
-    }
-
-    if (sel) {
-      map.panTo({ lat: sel.lat, lng: sel.lng });
-      if ((map.getZoom() ?? 0) < 15) map.setZoom(16);
-    }
-  }, [selId, rows]);
-
-  // when a new station is selected, seed the name field + clear pending
-  useEffect(() => {
-    setPending(null);
-    setPasteVal('');
-    setPasteErr(null);
-    if (sel) {
-      setEditName(sel.name);
-      setTier(TIERS.includes(sel.location_precision as Tier) ? (sel.location_precision as Tier) : 'rooftop');
-    }
-  }, [selId]);
-
-  // reflect a pending coord onto the selected marker + map
-  useEffect(() => {
-    const m = selId ? markersRef.current[selId] : null;
-    if (!m || !pending) return;
-    m.setPosition(pending);
-    mapRef.current?.panTo(pending);
-    if ((mapRef.current?.getZoom() ?? 0) < 16) mapRef.current?.setZoom(17);
-  }, [pending, selId]);
-
-  // A manually-placed pin is no longer "city centroid" accuracy — bump the precision
-  // tier off 'city' the moment a coordinate is actually moved (drag or paste), so Save
-  // doesn't silently resubmit 'city' and leave needs_pin_review stuck true.
-  useEffect(() => {
-    if (pending && tier === 'city') setTier('rooftop');
-  }, [pending]);
-
-  const applyPaste = () => {
-    const parsed = parseLatLng(pasteVal);
-    if (!parsed) {
-      setPasteErr('Could not read a Nigeria coordinate from that. Try "9.0765, 7.4853".');
-      return;
-    }
-    setPasteErr(null);
-    setPending(parsed);
-  };
-
-  const save = async () => {
-    if (!sel || !supabase) return;
-    const lat = pending?.lat ?? sel.lat;
-    const lng = pending?.lng ?? sel.lng;
-    const nameChanged = editName.trim() && editName.trim() !== sel.name;
-    setSaving(true);
-    const { error } = await supabase.rpc('admin_set_station_pin', {
-      p_station_id: sel.id,
-      p_lat: lat,
-      p_lng: lng,
-      p_precision: tier,
-      p_area: null,
-      p_name: nameChanged ? editName.trim() : null,
-    });
-    setSaving(false);
+  const saveField = async (row: Row, patch: Partial<Pick<Row, 'name' | 'operator' | 'city' | 'state'>>) => {
+    if (!supabase) return;
+    const params: Record<string, unknown> = { p_station_id: row.id };
+    if (patch.name !== undefined) params.p_name = patch.name;
+    if (patch.operator !== undefined) params.p_operator = patch.operator;
+    if (patch.city !== undefined) params.p_city = patch.city;
+    if (patch.state !== undefined) params.p_state = patch.state;
+    const { error } = await supabase.rpc('admin_update_station', params);
     if (error) {
       flash(`Save failed: ${error.message}`);
       return;
     }
-    setRows((rs) =>
-      rs.map((r) =>
-        r.id === sel.id
-          ? {
-              ...r,
-              lat,
-              lng,
-              location_precision: tier,
-              needs_pin_review: tier === 'city',
-              name: nameChanged ? editName.trim() : r.name,
-              data_source: 'Admin verified',
-            }
-          : r
-      )
-    );
-    setPending(null);
-    flash(`Saved · ${nameChanged ? editName.trim() : sel.name}`);
+    setRows((rs) => rs.map((r) => (r.id === row.id ? { ...r, ...patch } : r)));
+    flash(`Saved · ${patch.name ?? row.name}`);
+  };
+
+  const saveNumericField = async (row: Row, field: 'cng_price' | 'pump_pressure', raw: string) => {
+    if (!supabase) return;
+    const num = Number(raw);
+    if (!Number.isFinite(num) || num < 0) {
+      flash('Enter a valid number.');
+      return;
+    }
+    const value = field === 'pump_pressure' ? Math.round(num) : num;
+    const params: Record<string, unknown> =
+      field === 'cng_price' ? { p_station_id: row.id, p_cng_price: value } : { p_station_id: row.id, p_pump_pressure: value };
+    const { error } = await supabase.rpc('admin_update_station', params);
+    if (error) {
+      flash(`Save failed: ${error.message}`);
+      return;
+    }
+    setRows((rs) => rs.map((r) => (r.id === row.id ? { ...r, [field]: value } : r)));
+    flash(`Saved · ${row.name}`);
   };
 
   const exportCsv = () => {
@@ -485,8 +368,8 @@ export const StationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash 
       return;
     }
     setRows((rs) => rs.filter((r) => !selectedForDelete.has(r.id)));
-    if (selId && selectedForDelete.has(selId)) setSelId(null);
     if (fullEditorId && selectedForDelete.has(fullEditorId)) setFullEditorId(null);
+    if (pinReviewId && selectedForDelete.has(pinReviewId)) setPinReviewId(null);
     flash(`Deleted ${ids.length} station${ids.length === 1 ? '' : 's'}`);
     setSelectedForDelete(new Set());
   };
@@ -506,13 +389,36 @@ export const StationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash 
   }, [rows, search, onlyReview]);
 
   const reviewCount = rows.filter((r) => r.needs_pin_review).length;
-  const moved = sel && pending ? haversineM([sel.lat, sel.lng], [pending.lat, pending.lng]) : 0;
+  const allVisibleSelected = filtered.length > 0 && filtered.every((r) => selectedForDelete.has(r.id));
+  const toggleSelectAllVisible = () => {
+    setSelectedForDelete((prev) => {
+      const next = new Set(prev);
+      if (allVisibleSelected) filtered.forEach((r) => next.delete(r.id));
+      else filtered.forEach((r) => next.add(r.id));
+      return next;
+    });
+  };
+
+  const pinReviewRow = pinReviewId ? rows.find((r) => r.id === pinReviewId) || null : null;
+  const fullEditorRow = fullEditorId ? rows.find((r) => r.id === fullEditorId) || null : null;
 
   return (
     <div className="h-full flex flex-col min-h-0">
-      {/* Panel toolbar — the shell's top bar already shows the section title */}
-      <div className="h-11 shrink-0 border-b border-slate-200 flex items-center justify-between px-4 gap-3">
-        <span className="text-xs text-orange-600 font-semibold whitespace-nowrap">{reviewCount} need review</span>
+      {/* toolbar */}
+      <div className="h-auto min-h-11 shrink-0 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2 px-4 py-2">
+        <div className="flex items-center gap-3 min-w-0 flex-wrap">
+          <span className="text-xs text-orange-600 font-semibold whitespace-nowrap">{reviewCount} need review</span>
+          <input
+            placeholder="Search name / address / state / operator"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs w-64"
+          />
+          <label className="flex items-center gap-1.5 text-xs text-slate-600 whitespace-nowrap">
+            <input type="checkbox" checked={onlyReview} onChange={(e) => setOnlyReview(e.target.checked)} />
+            Only needs-review
+          </label>
+        </div>
         <div className="flex items-center gap-2 shrink-0">
           <button onClick={exportCsv} className="text-xs px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200">
             Export CSV
@@ -524,189 +430,111 @@ export const StationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash 
         </div>
       </div>
 
-      <div className="flex-1 flex min-h-0">
-        {/* list */}
-        <div className="w-72 shrink-0 border-r border-slate-200 flex flex-col min-h-0">
-          <div className="p-2 border-b border-slate-100 flex flex-col gap-2">
-            <input
-              placeholder="Search name / address / state"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs"
-            />
-            <label className="flex items-center gap-1.5 text-xs text-slate-600">
-              <input type="checkbox" checked={onlyReview} onChange={(e) => setOnlyReview(e.target.checked)} />
-              Only needs-review ({reviewCount})
-            </label>
-          </div>
-          {selectedForDelete.size > 0 && (
-            <div className="flex items-center justify-between gap-2 px-2.5 py-2 bg-rose-50 border-b border-rose-200">
-              <span className="text-xs font-semibold text-rose-700">{selectedForDelete.size} selected</span>
-              <div className="flex items-center gap-1.5">
-                <button
-                  onClick={() => setSelectedForDelete(new Set())}
-                  className="text-xs px-2.5 py-1 rounded-full bg-white text-slate-600 hover:bg-slate-100"
-                >
-                  Clear
-                </button>
-                <button
-                  onClick={() => setConfirmingDelete(true)}
-                  className="text-xs px-2.5 py-1 rounded-full bg-rose-600 text-white font-semibold hover:bg-rose-700"
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          )}
-          <div className="flex-1 overflow-y-auto">
-            {loading && <p className="p-3 text-xs text-slate-400">Loading stations…</p>}
-            {filtered.map((r) => (
-              <div
-                key={r.id}
-                role="button"
-                tabIndex={0}
-                onClick={() => setSelId(r.id)}
-                onKeyDown={(e) => e.key === 'Enter' && setSelId(r.id)}
-                className={`w-full text-left px-3 py-2 border-b border-slate-100 cursor-pointer ${
-                  r.id === selId ? 'bg-emerald-50' : 'hover:bg-slate-50'
-                }`}
-              >
-                <div className="flex items-center gap-1.5">
-                  <input
-                    type="checkbox"
-                    checked={selectedForDelete.has(r.id)}
-                    onClick={(e) => e.stopPropagation()}
-                    onChange={() => toggleDeleteSelect(r.id)}
-                    className="shrink-0"
-                  />
-                  <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${r.needs_pin_review ? 'bg-orange-500' : 'bg-emerald-500'}`} />
-                  <span className="text-xs font-semibold text-slate-900 truncate">{r.name}</span>
-                </div>
-                <p className="text-[0.75rem] text-slate-500 truncate mt-0.5">
-                  {r.location_precision || '—'} · {r.city}, {r.state}
-                </p>
-              </div>
-            ))}
-            {!loading && filtered.length === 0 && <p className="p-3 text-xs text-slate-400">Nothing matches.</p>}
+      {selectedForDelete.size > 0 && (
+        <div className="shrink-0 flex items-center justify-between gap-2 px-4 py-2 bg-rose-50 border-b border-rose-200">
+          <span className="text-xs font-semibold text-rose-700">{selectedForDelete.size} selected</span>
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={() => setSelectedForDelete(new Set())}
+              className="text-xs px-2.5 py-1 rounded-full bg-white text-slate-600 hover:bg-slate-100"
+            >
+              Clear
+            </button>
+            <button
+              onClick={() => setConfirmingDelete(true)}
+              className="text-xs px-2.5 py-1 rounded-full bg-rose-600 text-white font-semibold hover:bg-rose-700"
+            >
+              Delete
+            </button>
           </div>
         </div>
+      )}
 
-        {/* map + editor */}
-        <div className="flex-1 flex flex-col min-h-0">
-          {hasGoogleMapsKey ? (
-            <div ref={mapEl} className="flex-1 min-h-0 bg-slate-100">
-              {mapErr && <p className="p-3 text-xs text-rose-600">{mapErr}</p>}
-            </div>
-          ) : (
-            <div className="flex-1 min-h-0 grid place-items-center p-6 text-center bg-slate-50">
-              <div className="max-w-md text-sm text-slate-600">
-                <p className="font-bold text-slate-900 mb-1">Map disabled</p>
-                Set <code className="text-xs">VITE_GOOGLE_MAPS_API_KEY</code> (Vercel env + local <code>.env.local</code>)
-                and enable <strong>Maps JavaScript API</strong> on that key. You can still fix pins below by pasting
-                coordinates.
-              </div>
-            </div>
-          )}
-
-          {sel && (
-            <div className="shrink-0 border-t border-slate-200 p-3 flex flex-col gap-2.5 bg-white">
-              {/* name */}
-              <div className="flex items-center gap-2">
-                <label className="text-xs font-semibold text-slate-500 w-12 shrink-0">Name</label>
-                <input
-                  value={editName}
-                  onChange={(e) => setEditName(e.target.value)}
-                  className={`flex-1 border rounded-lg px-2.5 py-1.5 text-sm ${
-                    editName.trim() && editName.trim() !== sel.name ? 'border-emerald-400 bg-emerald-50/40' : 'border-slate-300'
-                  }`}
-                />
-                <button
-                  onClick={() => setFullEditorId(sel.id)}
-                  className="text-xs px-3 py-1.5 rounded-lg bg-slate-800 text-white font-semibold whitespace-nowrap shrink-0"
-                >
-                  Full details
-                </button>
-              </div>
-              <p className="text-xs text-slate-500 truncate pl-14 -mt-1">{sel.address || '(no address)'}</p>
-
-              {/* paste coords */}
-              <div className="flex items-center gap-2">
-                <label className="text-xs font-semibold text-slate-500 w-12 shrink-0">Coords</label>
-                <input
-                  value={pasteVal}
-                  onChange={(e) => {
-                    setPasteVal(e.target.value);
-                    setPasteErr(null);
-                  }}
-                  onKeyDown={(e) => e.key === 'Enter' && applyPaste()}
-                  placeholder="Paste from Google Maps — e.g. 9.0765, 7.4853"
-                  className="flex-1 border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs"
-                />
-                <button onClick={applyPaste} className="text-xs px-3 py-1.5 rounded-lg bg-slate-800 text-white font-semibold">
-                  Apply
-                </button>
-              </div>
-              {pasteErr && <p className="text-xs text-rose-600 -mt-1 pl-14">{pasteErr}</p>}
-
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-600 pl-14">
-                <span>
-                  now: {sel.lat.toFixed(5)}, {sel.lng.toFixed(5)}
-                </span>
-                {pending && (
-                  <span className="text-emerald-700 font-semibold">
-                    new: {pending.lat.toFixed(5)}, {pending.lng.toFixed(5)} · moved {moved}m
-                  </span>
-                )}
-                <a
-                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                    `${sel.name} ${sel.address || ''} ${sel.state || ''} Nigeria`
-                  )}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="font-semibold text-emerald-700 hover:underline"
-                >
-                  find on Google Maps <Icon name="north_east" size={12} className="inline" />
-                </a>
-                <span className="text-slate-400">or drag the green pin</span>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <select
-                  aria-label="Pin precision tier"
-                  value={tier}
-                  onChange={(e) => setTier(e.target.value as Tier)}
-                  className="border border-slate-300 rounded-lg px-2 py-1.5 text-xs flex-1"
-                >
-                  {TIERS.map((t) => (
-                    <option key={t} value={t}>
-                      {TIER_LABEL[t]}
-                    </option>
-                  ))}
-                </select>
-                {(pending || (editName.trim() && editName.trim() !== sel.name)) && (
-                  <button
-                    onClick={() => {
-                      setPending(null);
-                      setEditName(sel.name);
-                      const m = markersRef.current[sel.id];
-                      m?.setPosition({ lat: sel.lat, lng: sel.lng });
-                    }}
-                    className="text-xs px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200"
-                  >
-                    Reset
-                  </button>
-                )}
-                <button
-                  onClick={save}
-                  disabled={saving}
-                  className="text-xs px-4 py-1.5 rounded-lg bg-emerald-600 text-white font-bold disabled:opacity-50"
-                >
-                  {saving ? 'Saving…' : 'Save'}
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
+      {/* data table */}
+      <div className="flex-1 overflow-auto">
+        {loading && <p className="p-4 text-xs text-slate-400">Loading stations…</p>}
+        {!loading && filtered.length > 0 && (
+          <table className="min-w-full text-xs border-collapse">
+            <thead className="sticky top-0 z-10 bg-slate-50 text-slate-500 text-left">
+              <tr className="border-b border-slate-200">
+                <th className="px-2 py-2 w-8">
+                  <input type="checkbox" checked={allVisibleSelected} onChange={toggleSelectAllVisible} aria-label="Select all" />
+                </th>
+                <th className="px-2 py-2 w-4" />
+                <th className="px-2 py-2 min-w-[180px]">Name</th>
+                <th className="px-2 py-2 min-w-[120px]">City</th>
+                <th className="px-2 py-2 min-w-[80px]">State</th>
+                <th className="px-2 py-2 min-w-[140px]">Operator</th>
+                <th className="px-2 py-2 min-w-[90px] text-right">Price (₦)</th>
+                <th className="px-2 py-2 min-w-[90px] text-right">Pressure</th>
+                <th className="px-2 py-2 min-w-[130px]">Pin</th>
+                <th className="px-2 py-2 w-28" />
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((r) => (
+                <tr key={r.id} className={`border-b border-slate-100 ${r.needs_pin_review ? 'bg-orange-50/50' : 'hover:bg-slate-50/70'}`}>
+                  <td className="px-2 py-1">
+                    <input
+                      type="checkbox"
+                      checked={selectedForDelete.has(r.id)}
+                      onChange={() => toggleDeleteSelect(r.id)}
+                      aria-label={`Select ${r.name}`}
+                    />
+                  </td>
+                  <td className="px-2 py-1">
+                    <span className={`inline-block w-2 h-2 rounded-full ${r.needs_pin_review ? 'bg-orange-500' : 'bg-emerald-500'}`} />
+                  </td>
+                  <td className="px-1 py-1">
+                    <EditableCell value={r.name} onCommit={(v) => void saveField(r, { name: v })} />
+                  </td>
+                  <td className="px-1 py-1">
+                    <EditableCell value={r.city || ''} onCommit={(v) => void saveField(r, { city: v })} />
+                  </td>
+                  <td className="px-1 py-1">
+                    <EditableCell value={r.state || ''} onCommit={(v) => void saveField(r, { state: v })} />
+                  </td>
+                  <td className="px-1 py-1">
+                    <EditableCell value={r.operator || ''} onCommit={(v) => void saveField(r, { operator: v })} />
+                  </td>
+                  <td className="px-1 py-1">
+                    <EditableCell
+                      align="right"
+                      value={r.cng_price != null ? String(r.cng_price) : ''}
+                      onCommit={(v) => void saveNumericField(r, 'cng_price', v)}
+                    />
+                  </td>
+                  <td className="px-1 py-1">
+                    <EditableCell
+                      align="right"
+                      value={r.pump_pressure != null ? String(r.pump_pressure) : ''}
+                      onCommit={(v) => void saveNumericField(r, 'pump_pressure', v)}
+                    />
+                  </td>
+                  <td className="px-1 py-1">
+                    <button
+                      onClick={() => setPinReviewId(r.id)}
+                      className={`text-[0.6875rem] px-2 py-1 rounded-full font-semibold whitespace-nowrap ${
+                        r.needs_pin_review ? 'bg-orange-100 text-orange-700' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      }`}
+                    >
+                      {TIER_SHORT[(r.location_precision as Tier) || 'city']}
+                    </button>
+                  </td>
+                  <td className="px-1 py-1 whitespace-nowrap">
+                    <button
+                      onClick={() => setFullEditorId(r.id)}
+                      className="text-[0.6875rem] px-2.5 py-1 rounded-lg bg-slate-800 text-white font-semibold"
+                    >
+                      Full details
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+        {!loading && filtered.length === 0 && <p className="p-4 text-xs text-slate-400">Nothing matches.</p>}
       </div>
 
       {confirmingDelete && (
@@ -788,22 +616,28 @@ export const StationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash 
         </div>
       )}
 
-      {fullEditorId &&
-        (() => {
-          const row = rows.find((r) => r.id === fullEditorId);
-          if (!row) return null;
-          return (
-            <FullStationEditorModal
-              station={row}
-              isAdmin
-              onClose={() => setFullEditorId(null)}
-              onSaved={(id, patch) => {
-                setRows((rs) => rs.map((r) => (r.id === id ? { ...r, ...patch } : r)));
-                flash('Saved station details');
-              }}
-            />
-          );
-        })()}
+      {pinReviewRow && (
+        <PinReviewModal
+          station={pinReviewRow}
+          flash={flash}
+          onClose={() => setPinReviewId(null)}
+          onSaved={(id, patch) => {
+            setRows((rs) => rs.map((r) => (r.id === id ? { ...r, ...patch } : r)));
+          }}
+        />
+      )}
+
+      {fullEditorRow && (
+        <FullStationEditorModal
+          station={fullEditorRow}
+          isAdmin
+          onClose={() => setFullEditorId(null)}
+          onSaved={(id, patch) => {
+            setRows((rs) => rs.map((r) => (r.id === id ? { ...r, ...patch } : r)));
+            flash('Saved station details');
+          }}
+        />
+      )}
     </div>
   );
 };

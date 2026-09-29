@@ -29,15 +29,17 @@ const REASON_LABEL: Record<string, string> = {
 };
 
 const STATUS_DOT: Record<string, string> = {
-  full: 'bg-status-green',
-  queue: 'bg-status-amber',
-  low: 'bg-status-orange',
-  out: 'bg-status-red',
+  full: 'bg-emerald-500',
+  queue: 'bg-amber-500',
+  low: 'bg-orange-500',
+  out: 'bg-rose-500',
 };
 
 /**
  * Reports drivers flagged (or that got 3+ dislikes): keep, remove, or restore. Removing
  * re-computes the station status from the newest remaining report. Needs supabase/moderation.sql.
+ * Styled as a plain data table to match the Stations panel, rather than the driver app's
+ * card feed — this is a review queue for an admin, not a driver-facing screen.
  */
 export const ReportsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash }) => {
   const supabase = useSupabaseClient();
@@ -85,9 +87,9 @@ export const ReportsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash }
   };
 
   return (
-    <div className="h-full overflow-y-auto">
-    <div className="max-w-2xl mx-auto p-4 flex flex-col gap-3 pb-16">
-      <div className="flex items-center justify-between gap-2">
+    <div className="h-full flex flex-col min-h-0">
+      {/* toolbar */}
+      <div className="h-11 shrink-0 border-b border-slate-200 flex items-center justify-between px-4 gap-3">
         <div className="flex gap-2" role="tablist">
           {(
             [
@@ -100,102 +102,127 @@ export const ReportsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash }
               role="tab"
               aria-selected={view === key}
               onClick={() => setView(key)}
-              className={`px-4 py-2 rounded-full text-caption font-bold transition-colors ${
-                view === key ? 'bg-deep-teal text-white' : 'bg-surface-container text-on-surface-variant'
+              className={`px-3 py-1.5 rounded-full text-xs font-bold transition-colors ${
+                view === key ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
             >
               {label}
             </button>
           ))}
         </div>
-        <button onClick={() => void load()} className="px-3 py-1.5 rounded-full bg-surface-container text-caption font-semibold shrink-0">
+        <button onClick={() => void load()} className="text-xs px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 font-semibold shrink-0">
           Refresh
         </button>
       </div>
 
-      {loading && <p className="text-caption text-outline">Loading…</p>}
-      {err && <p className="text-caption text-status-red font-semibold">{err}</p>}
-      {!loading && !err && rows.length === 0 && (
-        <div className="bg-white rounded-2xl p-8 text-center shadow-[0_4px_14px_rgba(31,41,35,0.05)]">
-          <p className="font-bold text-body-lg">{view === 'review' ? 'Nothing to review' : 'Nothing removed recently'}</p>
-          <p className="text-caption text-outline mt-1">
-            {view === 'review'
-              ? 'Reports appear here when drivers flag them or they get 3+ dislikes.'
-              : 'Removed reports stay here for 30 days so you can restore them.'}
-          </p>
-        </div>
-      )}
+      <div className="flex-1 overflow-auto">
+        {loading && <p className="p-4 text-xs text-slate-400">Loading…</p>}
+        {err && <p className="p-4 text-xs font-semibold text-rose-600">{err}</p>}
 
-      {rows.map((r) => (
-        <article key={r.report_id} className="bg-white rounded-2xl p-4 shadow-[0_4px_14px_rgba(31,41,35,0.05)]">
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <h2 className="font-bold text-body text-slate-900 truncate">{r.station_name}</h2>
-              <p className="text-caption text-outline">
-                {r.author} · {formatRelativeTime(r.created_at)} · {r.verification_level.replace(/_/g, ' ')}
-              </p>
-            </div>
-            <span className="shrink-0 inline-flex items-center gap-1.5 text-caption font-bold text-slate-900">
-              <span className={`w-2 h-2 rounded-full ${STATUS_DOT[r.status] || 'bg-slate-400'}`} />
-              {r.status_label}
-            </span>
+        {!loading && !err && rows.length === 0 && (
+          <div className="p-8 text-center">
+            <p className="font-bold text-sm text-slate-900">{view === 'review' ? 'Nothing to review' : 'Nothing removed recently'}</p>
+            <p className="text-xs text-slate-500 mt-1">
+              {view === 'review'
+                ? 'Reports appear here when drivers flag them or they get 3+ dislikes.'
+                : 'Removed reports stay here for 30 days so you can restore them.'}
+            </p>
           </div>
+        )}
 
-          {r.comment && <p className="text-caption text-on-surface-variant mt-2">“{r.comment}”</p>}
-          {r.photo && <img src={r.photo} alt="Report photo" className="mt-2 w-40 h-28 rounded-xl object-cover" loading="lazy" />}
-
-          <div className="mt-3 flex flex-wrap gap-1.5 text-micro font-semibold">
-            {r.open_flags > 0 && (
-              <span className="rounded-md bg-status-red-container text-on-error-container px-2 py-0.5">
-                {r.open_flags} flag{r.open_flags > 1 ? 's' : ''}
-              </span>
-            )}
-            {(r.reasons || []).map((x) => (
-              <span key={x} className="rounded-md bg-surface-container text-slate-600 px-2 py-0.5">
-                {REASON_LABEL[x] || x}
-              </span>
-            ))}
-            {r.dislikes > 0 && (
-              <span className="rounded-md bg-surface-container text-slate-600 px-2 py-0.5">
-                {r.dislikes} dislike{r.dislikes > 1 ? 's' : ''}
-              </span>
-            )}
-            {r.hidden && r.hidden_reason && (
-              <span className="rounded-md bg-surface-container text-slate-600 px-2 py-0.5">{r.hidden_reason}</span>
-            )}
-          </div>
-
-          <div className="mt-3 flex gap-2">
-            {view === 'review' ? (
-              <>
-                <button
-                  disabled={busyId === r.report_id}
-                  onClick={() => void act(r, 'hide')}
-                  className="flex-1 h-11 rounded-full bg-status-red text-white font-bold text-caption disabled:opacity-50 active:scale-95 transition-transform"
-                >
-                  Remove report
-                </button>
-                <button
-                  disabled={busyId === r.report_id}
-                  onClick={() => void act(r, 'keep')}
-                  className="flex-1 h-11 rounded-full bg-surface-container text-slate-900 font-bold text-caption disabled:opacity-50 active:scale-95 transition-transform"
-                >
-                  Keep
-                </button>
-              </>
-            ) : (
-              <button
-                disabled={busyId === r.report_id}
-                onClick={() => void act(r, 'restore')}
-                className="flex-1 h-11 rounded-full bg-primary text-white font-bold text-caption disabled:opacity-50 active:scale-95 transition-transform"
-              >
-                Restore report
-              </button>
-            )}
-          </div>
-        </article>
-      ))}
-    </div>
+        {!loading && !err && rows.length > 0 && (
+          <table className="min-w-full text-xs border-collapse">
+            <thead className="sticky top-0 z-10 bg-slate-50 text-slate-500 text-left">
+              <tr className="border-b border-slate-200">
+                <th className="px-3 py-2 min-w-[160px]">Station</th>
+                <th className="px-3 py-2 min-w-[100px]">Status</th>
+                <th className="px-3 py-2 min-w-[110px]">Reporter</th>
+                <th className="px-3 py-2 min-w-[90px]">Reported</th>
+                <th className="px-3 py-2 min-w-[100px]">Verification</th>
+                <th className="px-3 py-2 min-w-[220px]">Flags / comment</th>
+                <th className="px-3 py-2 w-16">Photo</th>
+                <th className="px-3 py-2 w-44" />
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r) => (
+                <tr key={r.report_id} className={`border-b border-slate-100 ${r.open_flags > 0 ? 'bg-rose-50/40' : 'hover:bg-slate-50/70'}`}>
+                  <td className="px-3 py-2 font-semibold text-slate-900 max-w-[180px] truncate" title={r.station_name}>
+                    {r.station_name}
+                  </td>
+                  <td className="px-3 py-2">
+                    <span className="inline-flex items-center gap-1.5 font-semibold text-slate-900">
+                      <span className={`w-2 h-2 rounded-full ${STATUS_DOT[r.status] || 'bg-slate-400'}`} />
+                      {r.status_label}
+                    </span>
+                  </td>
+                  <td className="px-3 py-2 text-slate-600 max-w-[110px] truncate">{r.author}</td>
+                  <td className="px-3 py-2 text-slate-500 whitespace-nowrap">{formatRelativeTime(r.created_at)}</td>
+                  <td className="px-3 py-2 text-slate-600 capitalize">{r.verification_level.replace(/_/g, ' ')}</td>
+                  <td className="px-3 py-2">
+                    <div className="flex flex-wrap gap-1 mb-1">
+                      {r.open_flags > 0 && (
+                        <span className="rounded-md bg-rose-100 text-rose-700 px-1.5 py-0.5 font-semibold">
+                          {r.open_flags} flag{r.open_flags > 1 ? 's' : ''}
+                        </span>
+                      )}
+                      {(r.reasons || []).map((x) => (
+                        <span key={x} className="rounded-md bg-slate-100 text-slate-600 px-1.5 py-0.5">
+                          {REASON_LABEL[x] || x}
+                        </span>
+                      ))}
+                      {r.dislikes > 0 && (
+                        <span className="rounded-md bg-slate-100 text-slate-600 px-1.5 py-0.5">
+                          {r.dislikes} dislike{r.dislikes > 1 ? 's' : ''}
+                        </span>
+                      )}
+                      {r.hidden && r.hidden_reason && (
+                        <span className="rounded-md bg-slate-100 text-slate-600 px-1.5 py-0.5">{r.hidden_reason}</span>
+                      )}
+                    </div>
+                    {r.comment && <p className="text-slate-600 max-w-[260px] truncate" title={r.comment}>&ldquo;{r.comment}&rdquo;</p>}
+                  </td>
+                  <td className="px-3 py-2">
+                    {r.photo && (
+                      <a href={r.photo} target="_blank" rel="noreferrer">
+                        <img src={r.photo} alt="Report" className="w-10 h-10 rounded-lg object-cover" loading="lazy" />
+                      </a>
+                    )}
+                  </td>
+                  <td className="px-3 py-2 whitespace-nowrap">
+                    {view === 'review' ? (
+                      <div className="flex gap-1.5">
+                        <button
+                          disabled={busyId === r.report_id}
+                          onClick={() => void act(r, 'hide')}
+                          className="text-[0.6875rem] px-2.5 py-1 rounded-lg bg-rose-600 text-white font-bold disabled:opacity-50"
+                        >
+                          Remove
+                        </button>
+                        <button
+                          disabled={busyId === r.report_id}
+                          onClick={() => void act(r, 'keep')}
+                          className="text-[0.6875rem] px-2.5 py-1 rounded-lg bg-slate-100 text-slate-900 font-bold disabled:opacity-50"
+                        >
+                          Keep
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        disabled={busyId === r.report_id}
+                        onClick={() => void act(r, 'restore')}
+                        className="text-[0.6875rem] px-2.5 py-1 rounded-lg bg-emerald-600 text-white font-bold disabled:opacity-50"
+                      >
+                        Restore
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
     </div>
   );
 };
