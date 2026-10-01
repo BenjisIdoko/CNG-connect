@@ -119,6 +119,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
   };
 
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [sortByNearest, setSortByNearest] = useState(false);
 
   const filteredPosts = posts.filter((p) => {
     const matchesCategory =
@@ -138,21 +139,31 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
         })()
       : stations;
 
-  const filteredStations = scopedStationGroups.filter((st) => {
-    const q = searchQuery.toLowerCase();
-    const matchesSearch =
-      st.name.toLowerCase().includes(q) ||
-      st.city.toLowerCase().includes(q) ||
-      st.state.toLowerCase().includes(q) ||
-      st.address.toLowerCase().includes(q) ||
-      (st.operator && st.operator.toLowerCase().includes(q));
+  const filteredStations = scopedStationGroups
+    .filter((st) => {
+      const q = searchQuery.toLowerCase();
+      const matchesSearch =
+        st.name.toLowerCase().includes(q) ||
+        st.city.toLowerCase().includes(q) ||
+        st.state.toLowerCase().includes(q) ||
+        st.address.toLowerCase().includes(q) ||
+        (st.operator && st.operator.toLowerCase().includes(q));
 
-    const matchesStatus = statusFilter === 'all' || st.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
+      const matchesStatus = statusFilter === 'all' || st.status === statusFilter;
+      return matchesSearch && matchesStatus;
+    })
+    .sort((a, b) => {
+      if (!sortByNearest) return 0;
+      const da = parseFloat(a.distance?.match(/([\d.]+)/)?.[1] || '') || Infinity;
+      const db = parseFloat(b.distance?.match(/([\d.]+)/)?.[1] || '') || Infinity;
+      return da - db;
+    });
 
   return (
-    <div className="min-h-screen bg-surface text-on-surface pb-28 relative">
+    // data-theme="light": same reasoning as the other rebuilt screens — the handoff has no
+    // dark-mode values yet, and this screen now mixes literal bg-white/rd-ink with tokens
+    // that'd otherwise flip dark on their own.
+    <div data-theme="light" className="min-h-screen bg-rd-bg text-rd-ink pb-28 relative">
       {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-on-surface/90 text-white text-body font-bold px-4 py-2 rounded-full shadow-lg backdrop-blur-md">
@@ -160,14 +171,52 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
         </div>
       )}
 
-      {/* Sticky Top Bar: Main Segment Control + Search */}
-      <div className="sticky top-0 z-30 bg-surface/95 backdrop-blur-md py-3 px-4 md:px-6 shadow-[0_2px_10px_rgba(31,41,35,0.04)] max-w-4xl mx-auto flex flex-col gap-2">
+      {/* Sticky Top Bar: Title + Main Segment Control + Search */}
+      <div className="sticky top-0 z-30 bg-surface/95 backdrop-blur-md py-3 px-4 md:px-6 shadow-[0_2px_10px_rgba(31,41,35,0.04)] max-w-4xl mx-auto flex flex-col gap-3">
+        {/* Title row: Community + share + bell, per design_handoff_cng_connect_mobile 3d */}
+        <div className="flex items-center justify-between gap-2">
+          <h1 className="font-geist text-[1.75rem] font-bold text-rd-ink tracking-tight">Community</h1>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={() => {
+                if (navigator.share) {
+                  navigator.share({ title: 'CNG-Connect Community', url: window.location.href }).catch(() => {});
+                } else {
+                  navigator.clipboard
+                    .writeText(window.location.href)
+                    .then(() => showToast('Link copied!'))
+                    .catch(() => {});
+                }
+              }}
+              aria-label="Share the community"
+              className="w-11 h-11 rounded-full bg-surface-container-high text-rd-ink flex items-center justify-center active:scale-95 transition-transform"
+            >
+              <span aria-hidden="true" className="material-symbols-outlined text-[20px]">share</span>
+            </button>
+            <button
+              onClick={() => {
+                if (onOpenNotifications) {
+                  onOpenNotifications();
+                } else {
+                  setToastMessage('Notifications panel coming soon');
+                  setTimeout(() => setToastMessage(null), 2500);
+                }
+              }}
+              aria-label="Notifications"
+              className="relative w-11 h-11 rounded-full bg-surface-container-high text-rd-ink flex items-center justify-center active:scale-95 transition-transform"
+            >
+              <span aria-hidden="true" className="material-symbols-outlined text-[20px]">notifications</span>
+              <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-error rounded-full border-2 border-white" />
+            </button>
+          </div>
+        </div>
+
         {/* Main Section Tab Switcher */}
         <div className="relative flex bg-surface-container p-1 rounded-full">
           {/* Sliding pill behind the active tab */}
           <span
             aria-hidden
-            className="absolute top-1 bottom-1 left-1 rounded-full bg-deep-teal shadow-xs transition-transform duration-300 ease-[cubic-bezier(0.3,1,0.4,1)]"
+            className="absolute top-1 bottom-1 left-1 rounded-full bg-rd-ink shadow-xs transition-transform duration-300 ease-[cubic-bezier(0.3,1,0.4,1)]"
             style={{
               width: `calc((100% - 8px) / ${SHOW_LEADERBOARD ? 3 : 2})`,
               transform: `translateX(${['station_groups', 'general', 'leaderboard'].indexOf(activeMainTab) * 100}%)`,
@@ -209,7 +258,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
           )}
         </div>
 
-        {/* Search Bar & Notification Button */}
+        {/* Search Bar + (Station Groups only) Nearest sort */}
         <div className="flex items-center gap-2">
           <div className="flex-1 relative flex items-center">
             <span aria-hidden="true" className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-outline text-[20px]">
@@ -237,23 +286,18 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
             )}
           </div>
 
-          <button
-            onClick={() => {
-              if (onOpenNotifications) {
-                onOpenNotifications();
-              } else {
-                setToastMessage('Notifications panel coming soon');
-                setTimeout(() => setToastMessage(null), 2500);
-              }
-            }}
-            aria-label="Notifications"
-            className="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-high text-on-surface hover:bg-surface-container-highest transition-colors relative active:scale-95 shrink-0"
-          >
-            <span aria-hidden="true" className="material-symbols-outlined text-[20px]">
-              notifications
-            </span>
-            <span className="absolute top-2 right-2 w-2 h-2 bg-error rounded-full border-2 border-white" />
-          </button>
+          {activeMainTab === 'station_groups' && (
+            <button
+              onClick={() => setSortByNearest((v) => !v)}
+              aria-pressed={sortByNearest}
+              className={`shrink-0 flex items-center gap-1.5 px-3.5 py-2.5 rounded-full text-caption font-bold transition-colors active:scale-95 ${
+                sortByNearest ? 'bg-rd-ink text-white' : 'bg-surface-container text-rd-ink'
+              }`}
+            >
+              <span aria-hidden="true" className="material-symbols-outlined text-[18px]">near_me</span>
+              Nearest
+            </button>
+          )}
         </div>
       </div>
 
@@ -325,6 +369,10 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
               </div>
             </div>
 
+            <p className="text-[0.8125rem] text-rd-text-tertiary leading-relaxed -mt-1">
+              Each station has one group for pump status and queues. Everything else goes in the General hub.
+            </p>
+
             {/* Station Groups — flat divider rows on mobile, cards from md up */}
             {filteredStations.length === 0 ? (
               <EmptyState
@@ -339,36 +387,55 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
             ) : (
               <div className="flex flex-col divide-y divide-outline-variant/50 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-3 md:divide-y-0">
                 {filteredStations.map((st) => {
-                  const snippet = st.reports?.[0]?.comment || st.stationNotice || '';
+                  const dotColor =
+                    st.status === 'full'
+                      ? 'bg-rd-available'
+                      : st.status === 'queue'
+                      ? 'bg-rd-queuing'
+                      : st.status === 'low'
+                      ? 'bg-rd-low'
+                      : st.status === 'out'
+                      ? 'bg-rd-out'
+                      : 'bg-slate-400';
                   return (
                     <div
                       key={st.id}
                       onClick={() => onOpenStationGroup && onOpenStationGroup(st)}
-                      className="flex items-center gap-3 py-4 cursor-pointer transition-colors active:bg-surface-container/40 md:bg-surface-container-high md:p-4 md:rounded-2xl md:border md:border-slate-200/80 md:shadow-2xs md:hover:border-primary/60 md:active:bg-transparent"
+                      className="flex items-center gap-3 py-4 cursor-pointer transition-colors active:bg-surface-container/40 md:bg-white md:p-4 md:rounded-2xl md:border md:border-slate-200/80 md:shadow-2xs md:hover:border-primary/60 md:active:bg-transparent"
                     >
-                      <div className="w-10 h-10 rounded-2xl bg-emerald-50 flex items-center justify-center text-primary shrink-0">
-                        <span aria-hidden="true" className="material-symbols-outlined text-[20px]">groups</span>
+                      <div className="w-12 h-12 rounded-2xl overflow-hidden shrink-0 bg-emerald-50 flex items-center justify-center text-primary">
+                        {st.images?.[0] ? (
+                          <img src={st.images[0]} alt="" className="w-full h-full object-cover" loading="lazy" />
+                        ) : (
+                          <span aria-hidden="true" className="material-symbols-outlined text-[22px]">local_gas_station</span>
+                        )}
                       </div>
 
                       <div className="min-w-0 flex-1">
-                        <h3 className="text-body font-semibold text-on-surface leading-tight truncate">
-                          {st.name} Group
-                        </h3>
-                        <p className="text-caption text-outline font-medium mt-1 truncate">
-                          {st.status !== 'unknown' && (
-                            <span
-                              className={st.status === 'full' ? 'text-primary font-semibold' : 'text-amber-700 font-semibold'}
-                            >
-                              {st.statusLabel}
-                              {'  ·  '}
+                        <div className="flex items-center gap-1.5">
+                          <h3 className="text-body font-semibold text-rd-ink leading-tight truncate">{st.name}</h3>
+                          {st.verifiedByCommunity && (
+                            <span className="shrink-0 inline-flex items-center gap-0.5 rounded-md bg-rd-available-container text-rd-on-available-container px-1.5 py-0.5 text-[0.6875rem] font-bold">
+                              <span aria-hidden="true" className="material-symbols-outlined text-[11px] material-symbols-fill">verified</span>
+                              Official
                             </span>
                           )}
-                          {st.city}, {st.state}
-                          {snippet ? `  ·  ${snippet}` : ''}
+                        </div>
+                        <p className="text-caption text-rd-text-tertiary font-medium mt-1 flex items-center gap-1.5 truncate">
+                          {st.status !== 'unknown' && (
+                            <span className="inline-flex items-center gap-1 shrink-0">
+                              <span aria-hidden="true" className={`w-1.5 h-1.5 rounded-full ${dotColor}`} />
+                              <span className="text-rd-ink font-semibold">{st.statusLabel}</span>
+                            </span>
+                          )}
+                          <span className="truncate">{st.city}, {st.state}</span>
                         </p>
                       </div>
 
-                      <span aria-hidden="true" className="material-symbols-outlined text-[18px] text-outline shrink-0">chevron_right</span>
+                      <div className="shrink-0 flex flex-col items-end gap-1">
+                        {st.distance && <span className="text-caption font-semibold text-rd-text-tertiary">{st.distance}</span>}
+                        <span aria-hidden="true" className="material-symbols-outlined text-[18px] text-rd-text-tertiary">chevron_right</span>
+                      </div>
                     </div>
                   );
                 })}
@@ -378,165 +445,58 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
         ) : activeMainTab === 'general' ? (
           /* MAIN TAB 2: General Community Hub (Maintenance, Parts, Deals, Conversions) */
           <div className="flex flex-col gap-4">
-            {/* Hub Categories Grid */}
-            <div>
-              <div className="flex justify-between items-center mb-3">
-                <h2 className="text-title font-bold text-on-surface tracking-tight">
-                  Hub Categories
-                </h2>
-                {activeCategory !== 'all' && (
+            {/* Topic chips — design_handoff_cng_connect_mobile 3f (height-44 chip row). Kept
+                this app's existing category set (conversions/maintenance/parts/reviews/deals)
+                rather than swapping to the handoff's (conversion/questions/road trips) — the
+                seeded post data is already tagged with the former, and changing the taxonomy
+                itself is a data-model change, not a visual one. */}
+            <div className="flex gap-2 overflow-x-auto hide-scrollbar">
+              {[
+                { id: 'all', label: 'All', icon: null },
+                { id: 'conversions', label: 'Conversion', icon: 'build_circle' },
+                { id: 'maintenance', label: 'Maintenance', icon: 'build' },
+                { id: 'parts', label: 'Parts', icon: 'settings' },
+                { id: 'reviews', label: 'Reviews', icon: 'star' },
+                { id: 'deals', label: 'Deals', icon: 'local_offer' },
+              ].map((chip) => {
+                const active = activeCategory === chip.id;
+                return (
                   <button
-                    onClick={() => setActiveCategory('all')}
-                    className="text-caption font-semibold text-primary hover:underline"
+                    key={chip.id}
+                    onClick={() => {
+                      if (chip.id === 'conversions' && onOpenConversions) {
+                        onOpenConversions();
+                        return;
+                      }
+                      setActiveCategory(chip.id === activeCategory ? 'all' : chip.id);
+                    }}
+                    className={`shrink-0 h-11 flex items-center gap-1.5 px-4 rounded-full text-caption font-bold transition-colors active:scale-95 ${
+                      active ? 'bg-rd-ink text-white' : 'bg-white text-rd-ink ring-1 ring-[#E3E6E4]'
+                    }`}
                   >
-                    Clear filter
+                    {chip.icon && <span aria-hidden="true" className="material-symbols-outlined text-[16px]">{chip.icon}</span>}
+                    {chip.label}
                   </button>
-                )}
-              </div>
+                );
+              })}
+            </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                {/* Pi-CNG Conversion Kit Centers */}
-                <div
-                  onClick={() => {
-                    if (onOpenConversions) {
-                      onOpenConversions();
-                    } else {
-                      setActiveCategory(
-                        activeCategory === 'conversions' ? 'all' : 'conversions'
-                      );
-                    }
-                  }}
-                  className={`col-span-2 rounded-2xl p-4 flex items-center gap-3 transition-all cursor-pointer shadow-xs border active:scale-[0.98] ${
-                    activeCategory === 'conversions'
-                      ? 'bg-emerald-500/20 border-primary ring-2 ring-primary/20'
-                      : 'bg-gradient-to-r from-emerald-50 to-teal-50/60 border-emerald-200/80 hover:border-primary/50'
-                  }`}
-                >
-                  <div className="w-11 h-11 rounded-full bg-deep-teal flex items-center justify-center text-status-green shadow-sm shrink-0">
-                    <span aria-hidden="true" className="material-symbols-outlined text-[22px]">
-                      build_circle
-                    </span>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <span className="text-body font-bold text-slate-900 leading-tight block">
-                      CNG Kit Conversion Centres
-                    </span>
-                    <p className="text-micro font-normal text-slate-500 mt-0.5 flex items-center gap-1.5">
-                      <span className="text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded-md font-semibold whitespace-nowrap">Pi-CNG</span>
-                      <span className="truncate">337+ certified nationwide</span>
-                    </p>
-                  </div>
-                  <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center shadow-2xs transition-colors shrink-0">
-                    <span aria-hidden="true" className="material-symbols-outlined text-[18px]">
-                      chevron_right
-                    </span>
-                  </div>
-                </div>
-
-                {/* Maintenance */}
-                <div
-                  onClick={() =>
-                    setActiveCategory(
-                      activeCategory === 'maintenance' ? 'all' : 'maintenance'
-                    )
-                  }
-                  className={`rounded-2xl p-4 flex flex-col items-center justify-center gap-2 transition-all cursor-pointer shadow-xs border active:scale-[0.98] ${
-                    activeCategory === 'maintenance'
-                      ? 'bg-primary-container/30 border-primary ring-2 ring-primary/20'
-                      : 'bg-surface-container-high border-slate-200/80 hover:border-primary/40'
-                  }`}
-                >
-                  <div className="w-10 h-10 rounded-full bg-primary-container/30 flex items-center justify-center text-on-primary-container shadow-xs">
-                    <span aria-hidden="true" className="material-symbols-outlined text-[20px]">
-                      build
-                    </span>
-                  </div>
-                  <span className="text-body font-semibold text-on-surface text-center">
-                    Maintenance
-                  </span>
-                </div>
-
-                {/* Parts & Accessories */}
-                <div
-                  onClick={() =>
-                    setActiveCategory(
-                      activeCategory === 'parts' ? 'all' : 'parts'
-                    )
-                  }
-                  className={`rounded-2xl p-4 flex flex-col items-center justify-center gap-2 transition-all cursor-pointer shadow-xs border active:scale-[0.98] ${
-                    activeCategory === 'parts'
-                      ? 'bg-secondary-container/30 border-secondary-container ring-2 ring-secondary-container/20'
-                      : 'bg-surface-container-high border-slate-200/80 hover:border-secondary-container/40'
-                  }`}
-                >
-                  <div className="w-10 h-10 rounded-full bg-secondary-container/30 flex items-center justify-center text-on-secondary-container shadow-xs">
-                    <span aria-hidden="true" className="material-symbols-outlined text-[20px]">
-                      settings
-                    </span>
-                  </div>
-                  <span className="text-body font-semibold text-on-surface text-center leading-tight">
-                    Parts &amp; Accessories
-                  </span>
-                </div>
-
-                {/* Reviews */}
-                <div
-                  onClick={() =>
-                    setActiveCategory(
-                      activeCategory === 'reviews' ? 'all' : 'reviews'
-                    )
-                  }
-                  className={`rounded-2xl p-4 flex flex-col items-center justify-center gap-2 transition-all cursor-pointer shadow-xs border active:scale-[0.98] ${
-                    activeCategory === 'reviews'
-                      ? 'bg-tertiary-container/40 border-electric-amber ring-2 ring-electric-amber/20'
-                      : 'bg-surface-container-high border-slate-200/80 hover:border-electric-amber/40'
-                  }`}
-                >
-                  <div className="w-10 h-10 rounded-full bg-tertiary-container/40 flex items-center justify-center text-on-tertiary-container shadow-xs">
-                    <span aria-hidden="true"
-                      className="material-symbols-outlined text-[20px]"
-                      style={{ fontVariationSettings: "'FILL' 1" }}
-                    >
-                      star
-                    </span>
-                  </div>
-                  <span className="text-body font-semibold text-on-surface text-center">
-                    Reviews
-                  </span>
-                </div>
-
-                {/* Car Deals */}
-                <div
-                  onClick={() =>
-                    setActiveCategory(
-                      activeCategory === 'deals' ? 'all' : 'deals'
-                    )
-                  }
-                  className={`rounded-2xl p-4 flex flex-col items-center justify-center gap-2 transition-all cursor-pointer shadow-xs border active:scale-[0.98] ${
-                    activeCategory === 'deals'
-                      ? 'bg-electric-amber/30 border-secondary ring-2 ring-secondary/20'
-                      : 'bg-surface-container-high border-slate-200/80 hover:border-electric-amber/40'
-                  }`}
-                >
-                  <div className="w-10 h-10 rounded-full bg-electric-amber/30 flex items-center justify-center text-[#2d1600] shadow-xs">
-                    <span aria-hidden="true" className="material-symbols-outlined text-[20px]">
-                      local_offer
-                    </span>
-                  </div>
-                  <span className="text-body font-extrabold text-on-surface text-center">
-                    Car Deals
-                  </span>
-                </div>
-              </div>
+            {/* Pump-status redirect banner */}
+            <div className="rounded-2xl bg-rd-available-container px-4 py-3 flex items-center gap-3">
+              <span aria-hidden="true" className="material-symbols-outlined text-rd-on-available-container text-[20px] shrink-0">local_gas_station</span>
+              <p className="flex-1 text-caption font-semibold text-rd-on-available-container">
+                Pump status goes in station groups, where it reaches the map.
+              </p>
+              <button
+                onClick={() => setActiveMainTab('station_groups')}
+                className="shrink-0 rounded-full bg-white text-rd-on-available-container text-[0.75rem] font-bold px-3 py-1.5 active:scale-95 transition-transform"
+              >
+                Find group
+              </button>
             </div>
 
             {/* General Discussions List */}
             <div className="flex flex-col gap-4">
-              <div className="flex items-center justify-between">
-                <h2 className="text-title font-black text-slate-900 tracking-tight">
-                  General Discussions
-                </h2>
-              </div>
 
               {filteredPosts.length === 0 ? (
                 <EmptyState
@@ -584,9 +544,17 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
 
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-2">
-                          <h3 className="text-body font-semibold text-slate-900 truncate">
-                            {post.author}
-                          </h3>
+                          <div className="flex items-center gap-1.5 min-w-0">
+                            <h3 className="text-body font-semibold text-slate-900 truncate">
+                              {post.author}
+                            </h3>
+                            {post.verified && (
+                              <span className="shrink-0 inline-flex items-center gap-0.5 rounded-md bg-rd-available-container text-rd-on-available-container px-1.5 py-0.5 text-[0.6875rem] font-bold whitespace-nowrap">
+                                <span aria-hidden="true" className="material-symbols-outlined text-[11px] material-symbols-fill">workspace_premium</span>
+                                Verified Reporter
+                              </span>
+                            )}
+                          </div>
                           <span className="text-micro font-medium text-slate-400 shrink-0">
                             {post.timeAgo}
                           </span>
@@ -728,13 +696,14 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
         ) : null}
       </div>
 
-      {/* Floating Action Button (+) */}
+      {/* "New post" FAB — design_handoff_cng_connect_mobile 3d (labeled pill, not a bare +) */}
       <button
         onClick={onOpenCreatePost}
-        aria-label="Create Post"
-        className="fixed bottom-24 right-6 w-14 h-14 bg-primary hover:bg-deep-teal text-white rounded-full shadow-[0_8px_24px_rgba(0,108,80,0.35)] flex items-center justify-center transition-all hover:scale-105 active:scale-95 z-40 border-2 border-white"
+        aria-label="New post"
+        className="fixed bottom-24 right-5 h-[52px] pl-4 pr-5 bg-primary hover:bg-emerald-700 text-white rounded-full shadow-[0_10px_24px_rgba(40,132,53,0.35)] flex items-center gap-2 font-geist font-bold text-body transition-all active:scale-95 z-40"
       >
-        <span aria-hidden="true" className="material-symbols-outlined text-[30px]">add</span>
+        <span aria-hidden="true" className="material-symbols-outlined text-[20px]">edit</span>
+        New post
       </button>
 
       <StationGroupInfoSheet
