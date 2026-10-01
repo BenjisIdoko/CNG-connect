@@ -10,6 +10,15 @@ import { formatStationAge, formatRelativeTime, isIsoTimestamp, minutesSince } fr
 import { openWhatsAppShare } from '../utils/shareMessageBuilder';
 import { describeLocationPrecision } from '../utils/locationPrecision';
 
+// Status-card icon/tile colors per the 2026-10 redesign's 4-status system.
+const STATUS_CARD_INFO: Record<string, { icon: string; tileBg: string; tileColor: string }> = {
+  full: { icon: 'check_circle', tileBg: 'bg-rd-available-container', tileColor: 'text-rd-on-available-container' },
+  queue: { icon: 'schedule', tileBg: 'bg-rd-queuing-container', tileColor: 'text-rd-on-queuing-container' },
+  low: { icon: 'speed', tileBg: 'bg-rd-low-container', tileColor: 'text-rd-on-low-container' },
+  out: { icon: 'block', tileBg: 'bg-rd-out-container', tileColor: 'text-rd-on-out-container' },
+  unknown: { icon: 'history', tileBg: 'bg-surface-container-high', tileColor: 'text-outline' },
+};
+
 interface StationDetailScreenProps {
   /** Flag a report (signed-in drivers). Resolve true when it was sent. */
   onFlagReport?: (reportId: string, reason: FlagReason) => Promise<boolean>;
@@ -215,7 +224,11 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-surface text-on-surface pb-36">
+    // data-theme="light": this screen is being rebuilt to design_handoff_cng_connect_mobile,
+    // which has no dark-mode values defined yet (same reasoning as MapScreen's mobile UI) —
+    // forcing light here avoids a half-light/half-dark mix between the new literal bg-white/
+    // rd-ink classes and the semantic tokens that still flip dark.
+    <div data-theme="light" className="min-h-screen bg-surface text-on-surface pb-36">
       {/* Toast Notification */}
       {copiedNotification && (
         <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-on-surface text-white text-[0.875rem] font-bold px-4 py-2 rounded-full shadow-lg">
@@ -223,15 +236,17 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
         </div>
       )}
 
-      {/* Hero photo with floating actions */}
-      <div className="relative h-72 md:h-96 w-full bg-slate-900 overflow-hidden md:max-w-4xl md:mx-auto md:rounded-b-3xl">
+      {/* Hero photo with floating actions — redesign (design_handoff_cng_connect_mobile 3c):
+          44pt translucent round buttons, a "Photos · n" badge instead of the old
+          distance/drivetime overlay (that info moves into the eyebrow line below). */}
+      <div className="relative h-[250px] md:h-96 w-full bg-slate-900 overflow-hidden md:max-w-4xl md:mx-auto md:rounded-b-3xl">
         <img src={images?.[0] || ASSETS.stationWide} alt={station.name} className="w-full h-full object-cover" />
         <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/35 to-transparent" />
         <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/60 to-transparent" />
         <button
           onClick={onBack}
           aria-label="Go back"
-          className="absolute top-[max(env(safe-area-inset-top,0px),1rem)] left-4 w-10 h-10 rounded-full bg-surface-container-high/90 text-slate-900 flex items-center justify-center active:scale-95 transition-transform shadow-sm"
+          className="absolute top-[max(env(safe-area-inset-top,0px),1rem)] left-4 w-11 h-11 rounded-full bg-white/80 backdrop-blur-sm text-rd-ink flex items-center justify-center active:scale-95 transition-transform"
         >
           <span aria-hidden="true" className="material-symbols-outlined text-[20px]">arrow_back</span>
         </button>
@@ -239,8 +254,8 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
           <button
             onClick={() => onToggleFavorite?.(station.id)}
             aria-label={isFavorite ? 'Remove from favorite stations' : 'Add to favorite stations'}
-            className={`w-10 h-10 rounded-full flex items-center justify-center active:scale-95 transition-transform shadow-sm ${
-              isFavorite ? 'bg-surface-container-high text-status-red' : 'bg-surface-container-high/90 text-slate-900'
+            className={`w-11 h-11 rounded-full backdrop-blur-sm flex items-center justify-center active:scale-95 transition-transform ${
+              isFavorite ? 'bg-white/80 text-status-red' : 'bg-white/80 text-rd-ink'
             }`}
           >
             <span aria-hidden="true" className={`material-symbols-outlined text-[20px] ${isFavorite ? 'material-symbols-fill' : ''}`}>
@@ -250,34 +265,42 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
           <button
             onClick={handleShareStation}
             aria-label="Share Station Group"
-            className="w-10 h-10 rounded-full bg-surface-container-high/90 text-slate-900 flex items-center justify-center active:scale-95 transition-transform shadow-sm"
+            className="w-11 h-11 rounded-full bg-white/80 backdrop-blur-sm text-rd-ink flex items-center justify-center active:scale-95 transition-transform"
           >
             <span aria-hidden="true" className="material-symbols-outlined text-[20px]">ios_share</span>
           </button>
         </div>
-        <div className="absolute bottom-2.5 inset-x-4 flex items-center justify-between text-white text-micro font-semibold">
-          <span>
-            {station.distance}
-            {station.driveTime ? ` · ${station.driveTime}` : ''}
+        {images.length > 0 && (
+          <span className="absolute bottom-3 left-4 inline-flex items-center gap-1 rounded-lg bg-rd-ink/80 text-white text-[0.75rem] font-semibold px-2 py-1">
+            <span aria-hidden="true" className="material-symbols-outlined text-[14px]">photo_camera</span>
+            Photos · {images.length}
           </span>
-          <span>{station.stationType === 'ev_charging' ? 'EV hub' : 'CNG station'}</span>
-        </div>
+        )}
       </div>
 
       {/* Main Content Area */}
       <div className="max-w-4xl mx-auto px-5 pt-4 flex flex-col gap-5">
         {/* Identity + live status */}
         <div>
+          <p className="font-geist-mono text-[11px] font-medium tracking-[0.08em] uppercase text-rd-text-tertiary">
+            {[
+              station.stationType === 'ev_charging' ? 'EV charging' : 'CNG station',
+              station.distance,
+              station.driveTime || null,
+            ]
+              .filter(Boolean)
+              .join(' · ')}
+          </p>
           <h1
             onClick={() => setShowFullTitle(!showFullTitle)}
             title={station.name}
-            className={`text-title font-extrabold text-slate-900 tracking-tight cursor-pointer ${
+            className={`font-geist text-[1.625rem] font-bold text-rd-ink tracking-tight leading-tight cursor-pointer mt-0.5 ${
               showFullTitle ? '' : 'truncate'
             }`}
           >
             {station.name}
           </h1>
-          <p className="text-caption text-outline mt-0.5 flex items-center gap-1 min-w-0">
+          <p className="text-caption text-outline mt-1 flex items-center gap-1 min-w-0">
             <span className="truncate">{station.address}</span>
             <button
               onClick={() => setShowInfoSheet(true)}
@@ -292,44 +315,55 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
               {describeLocationPrecision(station)}
             </p>
           )}
-
-          <div className="flex items-center gap-2 mt-3 flex-wrap empty:hidden">
-            {station.status === 'unknown' ? null : (
-              <>
-                <span
-                  className={`w-2 h-2 rounded-full shrink-0 ${
-                    station.status === 'full'
-                      ? 'bg-status-green'
-                      : station.status === 'queue'
-                      ? 'bg-status-amber'
-                      : station.status === 'low'
-                      ? 'bg-status-orange'
-                      : 'bg-status-red'
-                  }`}
-                />
-                <span className="text-caption font-bold text-slate-900">
-                  {station.status === 'full'
-                    ? 'Available'
-                    : station.status === 'queue'
-                    ? 'Queuing'
-                    : station.status === 'low'
-                    ? 'Low pressure'
-                    : 'Out of service'}
-                </span>
-                <span className="text-caption text-outline">· {formatStationAge(station).toLowerCase()}</span>
-              </>
-            )}
-            {presenceCount > 0 && (
-              <span className="ml-auto flex items-center gap-1.5 text-micro font-semibold text-primary">
-                <span className="w-1.5 h-1.5 rounded-full bg-live-pulse animate-pulse" />
-                {presenceCount} here now
-              </span>
-            )}
-          </div>
+          {presenceCount > 0 && (
+            <span className="mt-2 flex items-center gap-1.5 text-micro font-semibold text-primary">
+              <span className="w-1.5 h-1.5 rounded-full bg-live-pulse animate-pulse" />
+              {presenceCount} here now
+            </span>
+          )}
         </div>
 
-        {/* Key numbers */}
-        {station.stationType === 'ev_charging' ? (
+        {/* Status card (design_handoff_cng_connect_mobile 3c): icon tile + title + freshness,
+            plus a report-incentive prompt strip when there's no report today. Simplified from
+            the handoff's "Last: Full stock, 15 min wait · 17 Sep" line — reconstructing the
+            true last-known report (vs. today's aggregate status) needs new history-lookup logic
+            this pass doesn't add; see the age line used elsewhere in the app instead. */}
+        {station.stationType !== 'ev_charging' &&
+          (() => {
+            const cardInfo = STATUS_CARD_INFO[station.status] || STATUS_CARD_INFO.unknown;
+            const isUnknown = station.status === 'unknown';
+            return (
+              <div className="flex flex-col gap-3">
+                <div className="rounded-[22px] bg-white shadow-[0_1px_2px_rgba(20,32,26,0.05),0_8px_24px_rgba(20,32,26,0.05)] p-4 flex items-center gap-3">
+                  <span className={`w-[46px] h-[46px] rounded-2xl flex items-center justify-center shrink-0 ${cardInfo.tileBg} ${cardInfo.tileColor}`}>
+                    <span aria-hidden="true" className="material-symbols-outlined text-[22px]">{cardInfo.icon}</span>
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-geist font-bold text-[1.25rem] text-rd-ink leading-tight truncate">
+                      {isUnknown ? 'No report today' : getFormattedStatusPillText(station)}
+                    </p>
+                    <p className="text-caption text-rd-text-tertiary mt-0.5">
+                      {isUnknown
+                        ? 'Be the first to tell drivers if this station has gas.'
+                        : formatStationAge(station)}
+                    </p>
+                  </div>
+                </div>
+                {isUnknown && (
+                  <div className="rounded-2xl bg-rd-available-container px-4 py-3 flex items-center gap-3">
+                    <span aria-hidden="true" className="material-symbols-outlined text-rd-on-available-container text-[20px] shrink-0">bolt</span>
+                    <p className="flex-1 text-caption font-semibold text-rd-on-available-container">
+                      At the station? Be the first to report today.
+                    </p>
+                    <span className="shrink-0 text-[0.75rem] font-bold text-rd-on-available-container">+10 pts</span>
+                  </div>
+                )}
+              </div>
+            );
+          })()}
+
+        {/* Key numbers (EV only — CNG's equivalent is the status card above) */}
+        {station.stationType === 'ev_charging' && (
           <div className="flex gap-6">
             <div className="flex-1">
               <div className="text-[0.75rem] font-bold text-outline uppercase tracking-wider">Rate</div>
@@ -347,36 +381,26 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
               )}
             </div>
           </div>
-        ) : station.status === 'unknown' ? (
-          <div className="rounded-2xl bg-surface-container-high p-4 flex items-center gap-3 shadow-[0_4px_14px_rgba(31,41,35,0.05)]">
-            <span className="w-10 h-10 rounded-full bg-primary-container text-primary flex items-center justify-center shrink-0">
-              <span aria-hidden="true" className="material-symbols-outlined text-[20px]">local_gas_station</span>
-            </span>
-            <div className="min-w-0">
-              <p className="font-bold text-body text-on-surface">No reports yet</p>
-              <p className="text-caption text-outline">Be the first to tell drivers if this station has gas.</p>
-            </div>
-          </div>
-        ) : null}
+        )}
 
         {/* Radix Accessible 3-Way Tabs Switcher */}
         <TabsPrimitive.Root value={activeTab} onValueChange={(val) => setActiveTab(val as 'feed' | 'reports' | 'photos')} className="w-full">
           <TabsPrimitive.List ref={tabListRef} className="relative flex gap-6 border-b border-surface-container-highest">
             <TabsPrimitive.Trigger
-              value="feed"
-              className="pb-2.5 -mb-px text-caption font-semibold text-outline border-b-2 border-transparent transition-colors data-[state=active]:text-slate-900 data-[state=active]:font-extrabold focus:outline-none"
-            >
-              Chat{comments.length > 0 ? ` · ${comments.length}` : ''}
-            </TabsPrimitive.Trigger>
-            <TabsPrimitive.Trigger
               value="reports"
-              className="pb-2.5 -mb-px text-caption font-semibold text-outline border-b-2 border-transparent transition-colors data-[state=active]:text-slate-900 data-[state=active]:font-extrabold focus:outline-none"
+              className="pb-2.5 -mb-px font-geist text-[0.9375rem] font-semibold text-rd-text-tertiary border-b-2 border-transparent transition-colors data-[state=active]:text-rd-ink data-[state=active]:font-bold focus:outline-none"
             >
               Reports{reports.length > 0 ? ` · ${reports.length}` : ''}
             </TabsPrimitive.Trigger>
             <TabsPrimitive.Trigger
+              value="feed"
+              className="pb-2.5 -mb-px font-geist text-[0.9375rem] font-semibold text-rd-text-tertiary border-b-2 border-transparent transition-colors data-[state=active]:text-rd-ink data-[state=active]:font-bold focus:outline-none"
+            >
+              Chat{comments.length > 0 ? ` · ${comments.length}` : ''}
+            </TabsPrimitive.Trigger>
+            <TabsPrimitive.Trigger
               value="photos"
-              className="pb-2.5 -mb-px text-caption font-semibold text-outline border-b-2 border-transparent transition-colors data-[state=active]:text-slate-900 data-[state=active]:font-extrabold focus:outline-none"
+              className="pb-2.5 -mb-px font-geist text-[0.9375rem] font-semibold text-rd-text-tertiary border-b-2 border-transparent transition-colors data-[state=active]:text-rd-ink data-[state=active]:font-bold focus:outline-none"
             >
               Photos{images.length > 0 ? ` · ${images.length}` : ''}
             </TabsPrimitive.Trigger>
@@ -440,13 +464,14 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                       ? 'bg-status-orange'
                       : 'bg-status-red';
                   const verified = Boolean(report.verified && report.isPhotoVerified);
+                  const freshness = getFreshnessBadgeInfo(report.timestamp);
                   return (
                     <div key={report.id} className="flex gap-3 items-start">
                       <div className="relative shrink-0">
                         {report.authorAvatar ? (
-                          <img src={report.authorAvatar} alt={report.author} className="w-9 h-9 rounded-full object-cover" />
+                          <img src={report.authorAvatar} alt={report.author} className="w-10 h-10 rounded-full object-cover" />
                         ) : (
-                          <div className="w-9 h-9 rounded-full bg-surface-container-highest text-slate-600 font-bold flex items-center justify-center text-caption">
+                          <div className="w-10 h-10 rounded-full bg-surface-container-highest text-slate-600 font-bold flex items-center justify-center text-caption">
                             {report.author.charAt(0)}
                           </div>
                         )}
@@ -460,13 +485,15 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-baseline justify-between gap-2">
-                          <span className="text-caption font-bold text-slate-900 truncate">{report.author}</span>
-                          <span className="text-micro text-outline shrink-0">{getFreshnessBadgeInfo(report.timestamp).label}</span>
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="font-geist text-[0.9375rem] font-semibold text-rd-ink truncate">{report.author}</span>
+                          <span className="shrink-0 inline-flex items-center rounded-md bg-surface-container-high px-1.5 py-0.5 text-[0.6875rem] font-bold uppercase tracking-wide text-rd-text-tertiary">
+                            {freshness.label}
+                          </span>
                         </div>
                         <div className="flex items-center gap-1.5 mt-1">
                           <span className={`w-1.5 h-1.5 rounded-full ${dot}`} />
-                          <span className="text-caption font-bold text-slate-900">
+                          <span className="text-caption font-bold text-rd-ink">
                             {report.statusLabel}
                             {report.waitMinutes ? ` · ${report.waitMinutes}m wait` : ''}
                           </span>
@@ -502,7 +529,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                           <button
                             onClick={() => setFlaggingReport(report)}
                             aria-label={`Report a problem with ${report.author}'s report`}
-                            className="flex items-center gap-1 text-micro font-semibold text-outline hover:text-slate-900 transition-colors"
+                            className="flex items-center gap-1 text-micro font-semibold text-outline hover:text-rd-ink transition-colors"
                           >
                             <span aria-hidden="true" className="material-symbols-outlined text-[15px]">flag</span>
                             <span>Report</span>
@@ -544,7 +571,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
       </div>
 
       {/* Sticky bottom actions: one primary CTA, two quiet secondaries */}
-      <div className="fixed bottom-0 left-0 right-0 bg-surface-container-high px-5 pt-3 shadow-[0_-6px_18px_rgba(31,41,35,0.08)] z-40 pb-safe">
+      <div className="fixed bottom-0 left-0 right-0 bg-white px-5 pt-3 shadow-[0_-10px_30px_rgba(20,32,26,0.12)] z-40 pb-safe">
         <div className="max-w-xl mx-auto flex flex-col gap-2">
           {activeTab === 'feed' && (
             <form onSubmit={handlePostGroupComment} className="flex items-center gap-2">
@@ -571,28 +598,28 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
 
           <div className="flex items-center gap-2 pb-1">
             <button
-              onClick={() => onOpenReportModal(station)}
-              className="flex-1 h-12 bg-accent text-white rounded-full font-bold text-body flex items-center justify-center gap-2 shadow-[0_8px_18px_rgba(208,66,12,0.3)] active:scale-[0.98] transition-transform"
-            >
-              <span aria-hidden="true" className="material-symbols-outlined text-[18px]">edit</span>
-              Report Status
-            </button>
-            <button
               onClick={() => {
                 openExternalMaps(station);
                 if (onNavigate) onNavigate(station);
               }}
               aria-label="Directions"
               title="Directions"
-              className="w-12 h-12 rounded-full bg-surface-container text-slate-900 flex items-center justify-center active:scale-95 transition-transform shrink-0"
+              className="w-14 h-14 rounded-full bg-surface-container text-rd-ink flex items-center justify-center active:scale-95 transition-transform shrink-0"
             >
-              <span aria-hidden="true" className="material-symbols-outlined text-[22px]">navigation</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[24px]">navigation</span>
+            </button>
+            <button
+              onClick={() => onOpenReportModal(station)}
+              className="flex-1 h-14 bg-rd-ink text-white rounded-full font-geist font-bold text-body flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
+            >
+              <span aria-hidden="true" className="material-symbols-outlined text-[18px]">campaign</span>
+              Report status
             </button>
             <button
               onClick={() => openWhatsAppShare(station)}
-              aria-label="Share station"
-              title="Share"
-              className="w-12 h-12 rounded-full bg-surface-container text-slate-900 flex items-center justify-center active:scale-95 transition-transform shrink-0"
+              aria-label="Share station on WhatsApp"
+              title="Share on WhatsApp"
+              className="w-14 h-14 rounded-full bg-surface-container text-rd-ink flex items-center justify-center active:scale-95 transition-transform shrink-0"
             >
               <span aria-hidden="true" className="material-symbols-outlined text-[22px]">ios_share</span>
             </button>
