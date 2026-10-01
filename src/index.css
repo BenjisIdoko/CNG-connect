@@ -43,6 +43,24 @@
   src: url('/fonts/urbanist-latin.woff2') format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0300-0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
+/* Mobile redesign typeface (variable fonts, latin subset pulled from Google
+   Fonts' own gstatic CDN and self-hosted here, same as Inter/Urbanist above). */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/geist-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0300-0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/geist-mono-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0300-0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
 /* Subset of Material Symbols Outlined: only the icons in scripts/icon-names.json.
    font-display: block avoids flashing raw ligature names like "near_me". */
 @font-face {
@@ -132,6 +150,50 @@
   --color-error: #C0313A;
   --color-error-container: #FCE8E9;
   --color-on-error-container: #A82228;
+
+  /* ---- Mobile redesign tokens (2026-10 handoff) ----
+     Being introduced screen-by-screen alongside the existing palette below,
+     not replacing it outright. Every "rd-" token here is new vocabulary a
+     rebuilt screen needs, or a deliberate departure from the tokens below.
+     Brand green is unchanged (--color-primary above already equals the
+     handoff's brand-green, #288435). Names/hex follow
+     design_handoff_cng_connect_mobile/README.md. */
+  --font-geist: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-geist-mono: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --color-rd-ink: #14201A;
+  --color-rd-ink-2: #22302A;
+  --color-rd-ink-border: #3E4C44;
+  --color-rd-text-secondary: #4A505B;
+  --color-rd-text-tertiary: #5B616B;
+  --color-rd-bg: #FCFCFC;
+  --color-rd-bg-map: #E7EAE8;
+  --color-rd-chip-grey: #ECEEED;
+  --color-rd-segmented-track: #E6E8E7;
+  --color-rd-divider: #E1E4E2;
+  --color-rd-divider-2: #EEF0EF;
+  --color-rd-gold: #D4A73A;
+  --color-rd-proximity: #B45CFF;
+  --color-rd-proximity-text: #6A2FB0;
+  --color-rd-user-location: #2F5BFF;
+
+  /* Status system: solid (fresh, <=1h), container+on-container (recent, 1-24h
+     tint), stale (>24h grey), none (no reports yet). */
+  --color-rd-available: #12A150;
+  --color-rd-available-container: #E2F4E8;
+  --color-rd-on-available-container: #0A6B34;
+  --color-rd-queuing: #E0A106;
+  --color-rd-queuing-container: #FBF0D6;
+  --color-rd-on-queuing-container: #7A5200;
+  --color-rd-low: #E0600B;
+  --color-rd-low-container: #FCE8DA;
+  --color-rd-on-low-container: #9A3D06;
+  --color-rd-out: #D92D20;
+  --color-rd-out-container: #FCE4E2;
+  --color-rd-on-out-container: #A1201A;
+  --color-rd-stale-container: #EEF0EF;
+  --color-rd-on-stale-container: #3F4550;
+  --color-rd-stale-inset: #C3C8C5;
 
   /* Remap Tailwind's raw palettes so the many `emerald-*` / `slate-*` classes
      across the app pick up the brand green and neutral greys too. */
