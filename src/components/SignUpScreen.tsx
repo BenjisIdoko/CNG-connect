@@ -201,40 +201,40 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
   const fmtCooldown = `0:${String(resendCooldown).padStart(2, '0')}`;
 
   return (
-    <div className="min-h-[100dvh] bg-surface text-on-surface flex flex-col p-6 pt-[max(env(safe-area-inset-top,0px),1.75rem)] max-w-xl mx-auto animate-fade-in">
+    // data-theme="light": same reasoning as the other rebuilt screens — the handoff has no
+    // dark-mode values yet.
+    <div data-theme="light" className="min-h-[100dvh] bg-rd-bg text-rd-ink flex flex-col p-6 pt-[max(env(safe-area-inset-top,0px),1.75rem)] max-w-xl mx-auto animate-fade-in">
       {/* Top bar: back / step */}
-      <div className="flex items-center gap-3.5 min-h-[36px]">
+      <div className="flex items-center gap-3.5 min-h-[44px]">
         {step === 2 ? (
-          <button type="button" onClick={() => setStep(1)} aria-label="Back" className="text-slate-900 -ml-1 p-1">
-            <span aria-hidden="true" className="material-symbols-outlined text-[22px]">arrow_back</span>
+          <button type="button" onClick={() => setStep(1)} aria-label="Back" className="w-11 h-11 rounded-full bg-white flex items-center justify-center text-rd-ink -ml-1 shadow-[0_2px_8px_rgba(20,32,26,0.06)]">
+            <span aria-hidden="true" className="material-symbols-outlined text-[20px]">arrow_back</span>
           </button>
         ) : onCancel ? (
-          <button type="button" onClick={onCancel} aria-label="Close" className="text-slate-900 -ml-1 p-1">
-            <span aria-hidden="true" className="material-symbols-outlined text-[22px]">close</span>
+          <button type="button" onClick={onCancel} aria-label="Close" className="w-11 h-11 rounded-full bg-white flex items-center justify-center text-rd-ink -ml-1 shadow-[0_2px_8px_rgba(20,32,26,0.06)]">
+            <span aria-hidden="true" className="material-symbols-outlined text-[20px]">close</span>
           </button>
         ) : null}
-        <span className="text-[0.8125rem] font-semibold text-outline">
+        <span className="text-[0.8125rem] font-semibold text-rd-text-tertiary">
           {step === 3 ? (phoneOnly ? 'One last step' : 'Almost there') : `Step ${step} of 2`}
         </span>
       </div>
 
-      <h1 className="text-[1.625rem] font-bold tracking-tight mt-6">
-        {step === 1 ? 'Sign in or sign up' : step === 2 ? 'Enter code' : phoneOnly ? 'Add your phone number' : 'Complete your profile'}
+      <h1 className="font-geist text-[1.625rem] font-bold text-rd-ink tracking-tight mt-6">
+        {step === 1 ? 'Sign in or sign up' : step === 2 ? 'Enter your code' : phoneOnly ? 'Add your phone number' : 'Complete your profile'}
       </h1>
       {step === 1 && (
-        <p className="text-[0.9375rem] text-on-surface-variant leading-relaxed mt-2">
+        <p className="text-[0.9375rem] text-rd-text-tertiary leading-relaxed mt-2">
           No password needed — we&apos;ll email you a code. New here? The same code creates your account.
         </p>
       )}
       {step === 2 && (
-        <p className="text-[0.9375rem] text-on-surface-variant leading-relaxed mt-2">
-          We sent a code to
-          <br />
-          <strong className="text-slate-900">{email}</strong>
+        <p className="text-[0.9375rem] text-rd-text-tertiary leading-relaxed mt-2">
+          Sent to <strong className="text-rd-ink">{email}</strong>. Works for new and returning drivers.
         </p>
       )}
       {step === 3 && (
-        <p className="text-[0.9375rem] text-on-surface-variant leading-relaxed mt-2">
+        <p className="text-[0.9375rem] text-rd-text-tertiary leading-relaxed mt-2">
           {phoneOnly
             ? 'A phone number is required on every CNG-Connect account. It only takes a few seconds.'
             : "Just a few details so other drivers know who’s reporting. Your phone number is required."}
@@ -245,10 +245,10 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 flex-1">
           {step === 1 && (
             <div>
-              <div className={`flex items-center bg-surface rounded-2xl px-4 h-14 transition-all ${
+              <div className={`flex items-center bg-white rounded-2xl px-4 h-14 transition-all ${
                 emailError ? 'ring-2 ring-status-red/40' : 'focus-within:ring-2 focus-within:ring-primary/40'
               }`}>
-                <span aria-hidden="true" className="material-symbols-outlined text-outline text-[20px] mr-2.5">mail</span>
+                <span aria-hidden="true" className="material-symbols-outlined text-rd-text-tertiary text-[20px] mr-2.5">mail</span>
                 <input
                   type="email"
                   required
@@ -260,7 +260,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
                     if (emailError) setEmailError(null);
                   }}
                   placeholder="Email address"
-                  className="flex-1 bg-transparent text-[0.9375rem] font-medium text-on-surface outline-none placeholder:text-outline"
+                  className="flex-1 bg-transparent text-[0.9375rem] font-medium text-rd-ink outline-none placeholder:text-rd-text-tertiary"
                 />
               </div>
               {emailError && (
@@ -270,10 +270,10 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
                 </p>
               )}
 
-              <div className={`flex items-center bg-surface rounded-2xl px-4 h-14 mt-3 transition-all ${
+              <div className={`flex items-center bg-white rounded-2xl px-4 h-14 mt-3 transition-all ${
                 phoneError ? 'ring-2 ring-status-red/40' : 'focus-within:ring-2 focus-within:ring-primary/40'
               }`}>
-                <span aria-hidden="true" className="material-symbols-outlined text-outline text-[20px] mr-2.5">call</span>
+                <span aria-hidden="true" className="material-symbols-outlined text-rd-text-tertiary text-[20px] mr-2.5">call</span>
                 <input
                   id="signup-phone-step1"
                   type="tel"
@@ -286,7 +286,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
                     if (phoneError) setPhoneError(null);
                   }}
                   placeholder="Phone number (required)"
-                  className="flex-1 bg-transparent text-[0.9375rem] font-medium text-on-surface outline-none placeholder:text-outline"
+                  className="flex-1 bg-transparent text-[0.9375rem] font-medium text-rd-ink outline-none placeholder:text-rd-text-tertiary"
                 />
               </div>
               {phoneError ? (
@@ -295,7 +295,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
                   <span>{phoneError}</span>
                 </p>
               ) : (
-                <p className="text-[0.8125rem] text-outline mt-2">Nigerian number, e.g. 0803 123 4567 or +234 803 123 4567</p>
+                <p className="text-[0.8125rem] text-rd-text-tertiary mt-2">Nigerian number, e.g. 0803 123 4567 or +234 803 123 4567</p>
               )}
             </div>
           )}
@@ -325,12 +325,8 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
                     return (
                       <div
                         key={i}
-                        className={`flex-1 max-w-[46px] h-[54px] rounded-xl flex items-center justify-center text-[1.375rem] font-bold transition-colors ${
-                          ch
-                            ? 'bg-primary-container text-slate-900'
-                            : isActive
-                            ? 'bg-surface border-2 border-primary'
-                            : 'bg-surface'
+                        className={`flex-1 max-w-[46px] h-[62px] rounded-2xl flex items-center justify-center font-geist text-[1.375rem] font-bold text-rd-ink bg-white transition-all ${
+                          isActive ? 'ring-2 ring-primary' : ''
                         }`}
                       >
                         {ch}
@@ -345,18 +341,25 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
                   <span>{codeError}</span>
                 </p>
               )}
-              <div className="mt-5 text-[0.875rem] text-outline">
-                Didn&apos;t get a code?{' '}
+              <div className="mt-5 flex items-center justify-between">
+                <span className="text-[0.875rem] text-rd-text-tertiary">Didn&apos;t get it?</span>
                 <button
                   type="button"
                   onClick={handleResendCode}
                   disabled={resendCooldown > 0 || isSendingCode}
-                  className="font-bold text-primary disabled:text-outline disabled:font-medium"
+                  className={`font-geist-mono text-[0.8125rem] font-semibold px-3 py-1.5 rounded-full transition-colors ${
+                    resendCooldown > 0 ? 'bg-rd-chip-grey text-rd-text-tertiary' : 'bg-rd-chip-grey text-primary'
+                  }`}
                 >
                   {resendCooldown > 0 ? `Resend in ${fmtCooldown}` : 'Resend code'}
                 </button>
               </div>
-              <p className="mt-1.5 text-[0.8125rem] text-outline italic">A confirmation link may arrive instead, in some cases.</p>
+              <div className="mt-4 flex items-start gap-2.5 bg-white rounded-2xl p-3.5">
+                <span aria-hidden="true" className="material-symbols-outlined text-primary text-[18px] shrink-0 mt-0.5">mail</span>
+                <p className="text-[0.8125rem] text-rd-text-tertiary leading-relaxed">
+                  Got a link instead of a code? Tap it on this phone and you&apos;ll be signed in.
+                </p>
+              </div>
             </div>
           )}
 
@@ -364,8 +367,8 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
             <>
               {!phoneOnly && (
               <div>
-                <label className="block text-[0.7812rem] font-semibold text-on-surface-variant mb-1">Full Name</label>
-                <div className="flex items-center bg-surface border border-outline-variant rounded-2xl px-3.5 h-12 focus-within:ring-2 focus-within:ring-primary/30 focus-within:border-primary transition-all">
+                <label className="block text-[0.7812rem] font-semibold text-rd-text-tertiary mb-1">Full Name</label>
+                <div className="flex items-center bg-white border border-[#E3E6E4] rounded-2xl px-3.5 h-12 focus-within:ring-2 focus-within:ring-primary/30 focus-within:border-primary transition-all">
                   <span aria-hidden="true" className="material-symbols-outlined text-outline text-[20px] mr-2">person</span>
                   <input
                     type="text"
@@ -374,17 +377,17 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     placeholder="e.g. Tunde Adebayo"
-                    className="flex-1 bg-transparent text-[0.9062rem] font-medium text-on-surface outline-none"
+                    className="flex-1 bg-transparent text-[0.9062rem] font-medium text-rd-ink outline-none"
                   />
                 </div>
               </div>
               )}
 
               <div>
-                <label htmlFor="signup-phone" className="block text-[0.7812rem] font-semibold text-on-surface-variant mb-1">
+                <label htmlFor="signup-phone" className="block text-[0.7812rem] font-semibold text-rd-text-tertiary mb-1">
                   Phone number <span className="text-status-red">(required)</span>
                 </label>
-                <div className={`flex items-center bg-surface border rounded-2xl px-3.5 h-12 transition-all ${
+                <div className={`flex items-center bg-white border rounded-2xl px-3.5 h-12 transition-all ${
                   phoneError ? 'border-status-red ring-2 ring-status-red/20' : 'border-outline-variant focus-within:ring-2 focus-within:ring-primary/30 focus-within:border-primary'
                 }`}>
                   <span aria-hidden="true" className="material-symbols-outlined text-outline text-[20px] mr-2">call</span>
@@ -401,7 +404,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
                       if (phoneError) setPhoneError(null);
                     }}
                     placeholder="0803 123 4567"
-                    className="flex-1 bg-transparent text-[0.9062rem] font-medium text-on-surface outline-none"
+                    className="flex-1 bg-transparent text-[0.9062rem] font-medium text-rd-ink outline-none"
                   />
                 </div>
                 {phoneError ? (
@@ -426,10 +429,10 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
                   </button>
                 ) : (
                   <>
-                    <label htmlFor="signup-invite" className="block text-[0.7812rem] font-semibold text-on-surface-variant mb-1">
+                    <label htmlFor="signup-invite" className="block text-[0.7812rem] font-semibold text-rd-text-tertiary mb-1">
                       Invite code <span className="text-outline font-medium">(optional)</span>
                     </label>
-                    <div className={`flex items-center bg-surface border rounded-2xl px-3.5 h-12 transition-all ${
+                    <div className={`flex items-center bg-white border rounded-2xl px-3.5 h-12 transition-all ${
                       inviteError ? 'border-status-red ring-2 ring-status-red/20' : 'border-outline-variant focus-within:ring-2 focus-within:ring-primary/30 focus-within:border-primary'
                     }`}>
                       <span aria-hidden="true" className="material-symbols-outlined text-outline text-[20px] mr-2">share</span>
@@ -446,7 +449,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
                           if (inviteError) setInviteError(null);
                         }}
                         placeholder="e.g. K7M2QX"
-                        className="flex-1 bg-transparent text-[0.9062rem] font-semibold tracking-widest text-on-surface outline-none placeholder:font-medium placeholder:tracking-normal"
+                        className="flex-1 bg-transparent text-[0.9062rem] font-semibold tracking-widest text-rd-ink outline-none placeholder:font-medium placeholder:tracking-normal"
                       />
                     </div>
                     {inviteError ? (
@@ -460,13 +463,13 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
 
 
               <div>
-                <label className="block text-[0.7812rem] font-semibold text-on-surface-variant mb-1">
+                <label className="block text-[0.7812rem] font-semibold text-rd-text-tertiary mb-1">
                   Primary Location / State
                 </label>
                 <select aria-label="Primary Location / State"
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
-                  className="w-full bg-surface border border-outline-variant rounded-2xl px-3.5 h-12 text-[0.9375rem] font-medium text-on-surface outline-none focus:ring-2 focus:ring-primary/30"
+                  className="w-full bg-white border border-[#E3E6E4] rounded-2xl px-3.5 h-12 text-[0.9375rem] font-medium text-rd-ink outline-none focus:ring-2 focus:ring-primary/30"
                 >
                   <option value="Abuja FCT">Abuja FCT</option>
                   <option value="Lagos State">Lagos State</option>
@@ -478,7 +481,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
               </div>
 
               <div>
-                <label className="block text-[0.7812rem] font-bold text-on-surface-variant mb-2">Vehicle Category</label>
+                <label className="block text-[0.7812rem] font-bold text-rd-text-tertiary mb-2">Vehicle Category</label>
                 <div className="grid grid-cols-2 gap-2">
                   {[
                     { id: 'private', icon: 'directions_car', label: 'Private Car', sub: 'Personal drive' },
@@ -490,14 +493,14 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
                       key={v.id}
                       type="button"
                       onClick={() => setVehicleType(v.id as 'private' | 'taxi' | 'keke' | 'truck')}
-                      className={`p-3 rounded-2xl border text-left transition-all ${
+                      className={`min-h-[78px] p-3 rounded-2xl text-left transition-all ${
                         vehicleType === v.id
-                          ? 'bg-primary text-on-primary border-primary shadow-sm'
-                          : 'bg-surface text-on-surface border-outline-variant hover:bg-surface-container'
+                          ? 'bg-rd-ink text-white'
+                          : 'bg-white text-rd-ink ring-1 ring-[#E3E6E4] hover:ring-rd-ink/30'
                       }`}
                     >
-                      <p className="font-bold text-[0.8438rem] flex items-center gap-1.5"><Icon name={v.icon} size={18} className="shrink-0" />{v.label}</p>
-                      <p className={`text-[0.75rem] mt-0.5 ${vehicleType === v.id ? 'text-emerald-100' : 'text-outline'}`}>{v.sub}</p>
+                      <p className="font-geist font-bold text-[0.8438rem] flex items-center gap-1.5"><Icon name={v.icon} size={18} className="shrink-0" />{v.label}</p>
+                      <p className={`text-[0.75rem] mt-0.5 ${vehicleType === v.id ? 'text-white/70' : 'text-rd-text-tertiary'}`}>{v.sub}</p>
                     </button>
                   ))}
                 </div>
@@ -505,31 +508,31 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[0.7812rem] font-bold text-on-surface-variant mb-1">Car Model</label>
+                  <label className="block text-[0.7812rem] font-bold text-rd-text-tertiary mb-1">Car Model</label>
                   <input
                     type="text"
                     required
                     value={vehicleMake}
                     onChange={(e) => setVehicleMake(e.target.value)}
                     placeholder="e.g. Toyota Camry"
-                    className="w-full bg-surface border border-outline-variant rounded-2xl px-3.5 h-12 text-[0.9375rem] font-bold text-on-surface outline-none"
+                    className="w-full bg-white border border-[#E3E6E4] rounded-2xl px-3.5 h-12 text-[0.9375rem] font-bold text-rd-ink outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-[0.7812rem] font-bold text-on-surface-variant mb-1">Year</label>
+                  <label className="block text-[0.7812rem] font-bold text-rd-text-tertiary mb-1">Year</label>
                   <input
                     type="text"
                     required
                     value={vehicleYear}
                     onChange={(e) => setVehicleYear(e.target.value)}
                     placeholder="2018"
-                    className="w-full bg-surface border border-outline-variant rounded-2xl px-3.5 h-12 text-[0.9375rem] font-bold text-on-surface outline-none"
+                    className="w-full bg-white border border-[#E3E6E4] rounded-2xl px-3.5 h-12 text-[0.9375rem] font-bold text-rd-ink outline-none"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-[0.7812rem] font-bold text-on-surface-variant mb-1.5">CNG Conversion Status</label>
+                <label className="block text-[0.7812rem] font-bold text-rd-text-tertiary mb-1.5">CNG Conversion Status</label>
                 <div className="flex flex-col gap-2">
                   {[
                     { id: 'installed', icon: 'check_circle', label: 'CNG Kit Already Installed', desc: 'Active AutoCNG driver' },
@@ -540,14 +543,14 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
                       key={st.id}
                       type="button"
                       onClick={() => setCngStatus(st.id as 'installed' | 'planning' | 'interested')}
-                      className={`p-3 rounded-2xl border text-left transition-all ${
+                      className={`min-h-[62px] p-3 rounded-2xl text-left transition-all ${
                         cngStatus === st.id
-                          ? 'bg-primary text-on-primary border-primary'
-                          : 'bg-surface text-on-surface border-outline-variant hover:bg-surface-container'
+                          ? 'bg-white ring-2 ring-rd-ink'
+                          : 'bg-white ring-1 ring-[#E3E6E4] hover:ring-rd-ink/30'
                       }`}
                     >
-                      <p className="font-bold text-[0.875rem] flex items-center gap-1.5"><Icon name={st.icon} size={18} fill className="shrink-0" />{st.label}</p>
-                      <p className={`text-[0.75rem] ${cngStatus === st.id ? 'text-emerald-100' : 'text-outline'}`}>{st.desc}</p>
+                      <p className="font-geist font-bold text-[0.875rem] text-rd-ink flex items-center gap-1.5"><Icon name={st.icon} size={18} fill className="shrink-0" />{st.label}</p>
+                      <p className="text-[0.75rem] text-rd-text-tertiary">{st.desc}</p>
                     </button>
                   ))}
                 </div>
@@ -555,11 +558,11 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
 
               {cngStatus === 'installed' && (
                 <div>
-                  <label className="block text-[0.7812rem] font-bold text-on-surface-variant mb-1">CNG Cylinder Tank Size</label>
+                  <label className="block text-[0.7812rem] font-bold text-rd-text-tertiary mb-1">CNG Cylinder Tank Size</label>
                   <select aria-label="CNG Cylinder Tank Size"
                     value={tankSize}
                     onChange={(e) => setTankSize(e.target.value)}
-                    className="w-full bg-surface border border-outline-variant rounded-2xl px-3.5 h-12 text-[0.9375rem] font-bold text-on-surface outline-none"
+                    className="w-full bg-white border border-[#E3E6E4] rounded-2xl px-3.5 h-12 text-[0.9375rem] font-bold text-rd-ink outline-none"
                   >
                     <option value="12kg">12kg Cylinder</option>
                     <option value="15kg">15kg Cylinder (Standard Sedan)</option>
@@ -576,8 +579,8 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
           <div className="pt-2">
             <button
               type="submit"
-              disabled={isBusy}
-              className="w-full py-4 bg-slate-900 text-white font-semibold text-[0.9375rem] rounded-full active:scale-[0.98] transition-transform flex items-center justify-center gap-2 disabled:opacity-50"
+              disabled={isBusy || (step === 2 && userCodeInput.trim().length < 6)}
+              className="w-full h-14 bg-rd-ink text-white font-geist font-bold text-[0.9375rem] rounded-full active:scale-[0.98] transition-transform flex items-center justify-center gap-2 disabled:opacity-35"
             >
               {isBusy ? (
                 <div className="flex items-center gap-2">
@@ -585,14 +588,14 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
                   <span>{isSendingCode ? 'Sending code…' : isVerifyingCode ? 'Verifying…' : 'Saving…'}</span>
                 </div>
               ) : (
-                <span>{step === 1 ? 'Send code' : step === 2 ? 'Verify & continue' : phoneOnly ? 'Save & continue' : 'Finish setup'}</span>
+                <span>{step === 1 ? 'Send code' : step === 2 ? 'Verify' : phoneOnly ? 'Save & continue' : 'Save and open map'}</span>
               )}
             </button>
             {resuming && onSignOut && (
               <button
                 type="button"
                 onClick={onSignOut}
-                className="w-full mt-3 py-3 text-caption font-semibold text-on-surface-variant"
+                className="w-full mt-3 py-3 text-caption font-semibold text-rd-text-tertiary"
               >
                 Use a different account
               </button>

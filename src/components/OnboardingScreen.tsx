@@ -71,9 +71,11 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-surface text-slate-900 flex flex-col overflow-hidden">
-      {/* Hero photo */}
-      <div className="relative h-[55%] min-h-[300px] shrink-0 bg-surface-container-high">
+    // data-theme="light": same reasoning as the other rebuilt screens — the handoff has no
+    // dark-mode values yet.
+    <div data-theme="light" className="fixed inset-0 z-50 bg-rd-bg text-rd-ink flex flex-col overflow-hidden">
+      {/* Hero photo — design_handoff_cng_connect_mobile 1g: fixed height, rounded bottom corners */}
+      <div className="relative h-[430px] shrink-0 bg-surface-container-high rounded-b-[36px] overflow-hidden">
         <img
           key={activeSlide.id}
           src={activeSlide.image}
@@ -82,64 +84,67 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
         />
         <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/45 to-transparent" />
         <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/20 to-transparent" />
-        <div className="absolute top-0 inset-x-0 pt-[max(env(safe-area-inset-top,0px),1.25rem)] px-6 flex items-center justify-between max-w-xl mx-auto">
-          <span className="text-[1.0625rem] font-extrabold text-white tracking-tight [text-shadow:0_1px_4px_rgba(0,0,0,0.4)]">
-            CNG&#8209;Connect
-          </span>
-          <button
-            onClick={onStartLogin}
-            className="text-[0.875rem] font-semibold text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.5)] active:opacity-70"
-          >
-            Log in
-          </button>
-        </div>
+        {!isLast && (
+          <div className="absolute top-0 inset-x-0 pt-[max(env(safe-area-inset-top,0px),1.25rem)] px-6 flex items-center justify-between max-w-xl mx-auto">
+            <span className="font-geist text-[1.0625rem] font-extrabold text-white tracking-tight [text-shadow:0_1px_4px_rgba(0,0,0,0.4)]">
+              CNG&#8209;Connect
+            </span>
+            <button
+              onClick={onStartLogin}
+              className="text-[0.875rem] font-semibold text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.5)] active:opacity-70"
+            >
+              Log in
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Copy + controls */}
       <div className="flex-1 flex flex-col px-6 pt-6 pb-[max(env(safe-area-inset-bottom,0px),1.5rem)] max-w-xl mx-auto w-full">
-        <h1 key={`t-${activeSlide.id}`} className="text-[1.5rem] leading-[1.25] font-bold tracking-tight animate-fade-in">
-          {activeSlide.title}
-        </h1>
-        <p className="mt-2.5 text-[0.9375rem] text-on-surface-variant leading-relaxed">{activeSlide.description}</p>
-
-        <div className="flex-1" />
-
-        <div className="flex items-center gap-1.5 my-5">
+        {/* Page dots — design_handoff_cng_connect_mobile 1g: 8px, active 26x8 ink pill */}
+        <div className="flex items-center gap-1.5 mb-5">
           {slides.map((s, idx) => (
             <button
               key={s.id}
               onClick={() => setCurrentSlide(idx)}
               aria-label={`Go to slide ${idx + 1}`}
-              className={`h-1.5 rounded-full transition-all duration-300 ${
-                currentSlide === idx ? 'w-[22px] bg-primary' : 'w-1.5 bg-surface-dim'
+              className={`h-2 rounded-full transition-all duration-300 ${
+                currentSlide === idx ? 'w-[26px] bg-rd-ink' : 'w-2 bg-[#C3C8C5]'
               }`}
             />
           ))}
         </div>
 
+        <h1 key={`t-${activeSlide.id}`} className="font-geist text-[2rem] leading-[1.15] font-bold tracking-tight animate-fade-in">
+          {activeSlide.title}
+        </h1>
+        <p className="mt-2.5 text-[0.9375rem] text-rd-text-tertiary leading-relaxed">{activeSlide.description}</p>
+
+        <div className="flex-1" />
+
         {isLast ? (
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-2.5">
             <button
               onClick={onStartSignUp}
-              className="w-full py-4 bg-primary text-white font-bold text-[0.9375rem] rounded-full flex items-center justify-center gap-2 shadow-[0_8px_18px_rgba(49,154,63,0.3)] active:scale-[0.98] transition-transform"
+              className="w-full h-14 bg-rd-ink text-white font-geist font-bold text-[0.9375rem] rounded-full flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
             >
-              Sign Up
-              <span aria-hidden="true" className="material-symbols-outlined text-[20px]">arrow_forward</span>
+              Create account
             </button>
-            <div className="flex items-center justify-center gap-8">
-              <button onClick={onStartLogin} className="text-[0.9375rem] font-semibold text-slate-900 py-1">
-                Log in
+            <button
+              onClick={onStartLogin}
+              className="w-full h-14 bg-white text-rd-ink font-geist font-bold text-[0.9375rem] rounded-full ring-1 ring-[#D5D8D6] active:scale-[0.98] transition-transform"
+            >
+              Log in
+            </button>
+            {onExploreAsGuest && (
+              <button onClick={onExploreAsGuest} className="h-10 text-[0.9375rem] font-bold text-primary">
+                Explore as guest
               </button>
-              {onExploreAsGuest && (
-                <button onClick={onExploreAsGuest} className="text-[0.9375rem] font-semibold text-outline py-1">
-                  Explore as guest
-                </button>
-              )}
-            </div>
+            )}
           </div>
         ) : (
           <div className="flex items-center justify-between">
-            <button onClick={handleSkip} className="text-[0.9375rem] font-semibold text-on-surface-variant py-2 pr-4">
+            <button onClick={handleSkip} className="text-[0.9375rem] font-semibold text-rd-text-tertiary py-2 pr-4">
               Skip
             </button>
             <div className="flex items-center gap-3">
@@ -147,7 +152,7 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
                 <button
                   onClick={handlePrev}
                   aria-label="Previous slide"
-                  className="w-12 h-12 rounded-full bg-surface-container text-slate-900 flex items-center justify-center active:scale-95 transition-transform"
+                  className="w-12 h-12 rounded-full bg-surface-container text-rd-ink flex items-center justify-center active:scale-95 transition-transform"
                 >
                   <span aria-hidden="true" className="material-symbols-outlined text-[20px]">arrow_back</span>
                 </button>
