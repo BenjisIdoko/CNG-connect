@@ -10,6 +10,8 @@ interface SidebarProps {
   userProfile?: UserProfile;
   onShareApp?: () => void;
   onOpenRoiCalculator?: () => void;
+  /** Force the light palette regardless of system/app theme — see Header's identical prop. */
+  forceLight?: boolean;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -18,6 +20,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   userProfile,
   onShareApp,
   onOpenRoiCalculator,
+  forceLight = false,
 }) => {
   const navItems = [
     { id: 'map' as const, label: 'Map & Stations', icon: 'map' },
@@ -27,7 +30,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
   ];
 
   return (
-    <aside aria-label="Sidebar" className="hidden lg:flex flex-col fixed left-0 top-0 bottom-0 w-64 bg-surface-container-high border-r border-slate-200/80 z-40 shadow-xs select-none">
+    <aside
+      aria-label="Sidebar"
+      data-theme={forceLight ? 'light' : undefined}
+      className="hidden lg:flex flex-col fixed left-0 top-0 bottom-0 w-64 bg-surface-container-high border-r border-slate-200/80 z-40 shadow-xs select-none"
+    >
       {/* Brand Header */}
       <div className="p-5 border-b border-slate-100 flex items-center gap-3">
         <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-700 via-primary to-emerald-500 text-white flex items-center justify-center font-black shadow-md shadow-emerald-700/20">

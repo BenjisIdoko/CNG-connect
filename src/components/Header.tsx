@@ -9,6 +9,11 @@ interface HeaderProps {
   rightAction?: React.ReactNode;
   /** Hide on phone widths (the map screen draws its own overlay header). */
   mobileHidden?: boolean;
+  /** Force the light palette regardless of system/app theme — every redesigned screen this
+      header sits above is force-light (no dark values in the handoff yet) except Map, whose
+      desktop panel still supports real dark mode. Without this, the header mismatched the
+      force-light content below it whenever the system was in dark mode. */
+  forceLight?: boolean;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -18,9 +23,13 @@ export const Header: React.FC<HeaderProps> = ({
   onShareApp,
   rightAction,
   mobileHidden = false,
+  forceLight = false,
 }) => {
   return (
-    <header className={`${mobileHidden ? 'hidden lg:block ' : ''}fixed top-0 inset-x-0 lg:left-64 z-50 bg-surface-container-high/95 backdrop-blur-xl shadow-[0_1px_8px_rgba(31,41,35,0.06)] pt-safe`}>
+    <header
+      data-theme={forceLight ? 'light' : undefined}
+      className={`${mobileHidden ? 'hidden lg:block ' : ''}fixed top-0 inset-x-0 lg:left-64 z-50 bg-surface-container-high/95 backdrop-blur-xl shadow-[0_1px_8px_rgba(31,41,35,0.06)] pt-safe`}
+    >
       <div className="h-14 px-4 md:px-8 max-w-7xl mx-auto flex items-center justify-between gap-3">
         {showBack ? (
           <div className="flex items-center gap-2 min-w-0 flex-1">

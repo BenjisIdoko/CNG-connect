@@ -893,6 +893,7 @@ export const App: React.FC = () => {
           userProfile={userProfile}
           onShareApp={handleShareApp}
           onOpenRoiCalculator={() => setIsRoiModalOpen(true)}
+          forceLight={!isMapHome}
         />
       )}
 
@@ -904,6 +905,7 @@ export const App: React.FC = () => {
           onBack={onHeaderBack}
           onShareApp={handleShareApp}
           mobileHidden={isMapHome || isProfileHome || isStationDetail}
+          forceLight={!isMapHome}
         />
       )}
 
