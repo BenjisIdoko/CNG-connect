@@ -280,17 +280,21 @@ export const MapScreen: React.FC<MapScreenProps> = ({
     return inHome.length > 0 ? inHome : stations;
   }, [stations, homeState, searchQuery, activeCity]);
 
-  const filteredStations = baseStations.filter((st) => {
+  const matchesScope = (st: GasStation) => {
     const matchesStationType =
       stationTypeFilter === 'all' || (st.stationType || 'cng') === stationTypeFilter;
-    const matchesFilter = activeFilter === 'all' || st.status === activeFilter;
     const matchesCity =
       activeCity === 'all' ||
       st.state.toLowerCase().includes(activeCity.toLowerCase()) ||
       st.city.toLowerCase().includes(activeCity.toLowerCase());
     const matchesSearch = stationMatchesQuery(st, searchQuery);
-    return matchesStationType && matchesFilter && matchesCity && matchesSearch;
-  });
+    return matchesStationType && matchesCity && matchesSearch;
+  };
+  // Same scope as filteredStations but ignoring the status filter — what "All {n}" counts.
+  const scopedCount = baseStations.filter(matchesScope).length;
+  const filteredStations = baseStations.filter(
+    (st) => matchesScope(st) && (activeFilter === 'all' || st.status === activeFilter)
+  );
   // While searching, best matches first (then nearest); otherwise keep the natural order.
   if (searchTokens(searchQuery).length > 0) {
     filteredStations.sort(
@@ -412,7 +416,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       iconCreateFunction: (cluster: any) => {
         const childCount = cluster.getChildCount();
         return L.divIcon({
-          html: `<div class="w-9 h-9 rounded-full bg-primary text-white font-extrabold text-[14px] flex items-center justify-center border-[3px] border-white shadow-[0_2px_8px_rgba(31,41,35,0.35),0_0_0_4px_rgba(49,154,63,0.3)] transition-transform hover:scale-110"><span>${childCount}</span></div>`,
+          html: `<div class="w-9 h-9 rounded-full bg-[#14201A] text-white font-extrabold text-[14px] flex items-center justify-center border-[3px] border-white shadow-[0_2px_8px_rgba(20,32,26,0.35)] transition-transform hover:scale-110"><span>${childCount}</span></div>`,
           className: 'custom-cluster-icon',
           iconSize: [36, 36],
         });
@@ -451,11 +455,11 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       const isSelected = selectedStation?.id === st.id;
       const isEv = st.stationType === 'ev_charging';
 
-      let colorClass = '#319A3F';
+      let colorClass = '#12A150';
       const iconSymbol = isEv ? 'bolt' : 'local_gas_station';
-      if (st.status === 'queue') colorClass = '#F5A623';
-      if (st.status === 'low') colorClass = '#F85B23';
-      if (st.status === 'out') colorClass = '#E5484D';
+      if (st.status === 'queue') colorClass = '#E0A106';
+      if (st.status === 'low') colorClass = '#E0600B';
+      if (st.status === 'out') colorClass = '#D92D20';
       if (st.status === 'unknown') colorClass = '#8B9389';
 
       // Precision tier drives the pin's confidence: exact pins are solid glowing
@@ -635,41 +639,50 @@ export const MapScreen: React.FC<MapScreenProps> = ({
     setTimeout(() => setIsRecentering(false), 600);
   };
 
+  // Colors/icon per the 2026-10 redesign's 4-status system (design_handoff_cng_connect_mobile).
   const getStatusIndicator = (status: StationStatus) => {
     switch (status) {
       case 'full':
         return {
-          barColor: 'bg-status-green',
-          badgeBg: 'bg-emerald-50 border-emerald-200 text-primary',
-          dotColor: 'bg-status-green',
-          solidBg: 'bg-status-green',
+          barColor: 'bg-rd-available',
+          badgeBg: 'bg-rd-available-container border-transparent text-rd-on-available-container',
+          dotColor: 'bg-rd-available',
+          solidBg: 'bg-rd-available',
+          iconColor: 'text-rd-available',
+          icon: 'check_circle',
           shortLabel: 'Available',
           label: 'Full stock',
         };
       case 'queue':
         return {
-          barColor: 'bg-status-amber',
-          badgeBg: 'bg-amber-50 border-amber-200 text-amber-900',
-          dotColor: 'bg-status-amber',
-          solidBg: 'bg-status-amber',
+          barColor: 'bg-rd-queuing',
+          badgeBg: 'bg-rd-queuing-container border-transparent text-rd-on-queuing-container',
+          dotColor: 'bg-rd-queuing',
+          solidBg: 'bg-rd-queuing',
+          iconColor: 'text-rd-queuing',
+          icon: 'schedule',
           shortLabel: 'Queuing',
           label: 'Queuing',
         };
       case 'low':
         return {
-          barColor: 'bg-status-orange',
-          badgeBg: 'bg-orange-50 border-orange-200 text-orange-900',
-          dotColor: 'bg-status-orange',
-          solidBg: 'bg-status-orange',
+          barColor: 'bg-rd-low',
+          badgeBg: 'bg-rd-low-container border-transparent text-rd-on-low-container',
+          dotColor: 'bg-rd-low',
+          solidBg: 'bg-rd-low',
+          iconColor: 'text-rd-low',
+          icon: 'speed',
           shortLabel: 'Low pressure',
           label: 'Low pressure',
         };
       case 'out':
         return {
-          barColor: 'bg-status-red',
-          badgeBg: 'bg-rose-50 border-rose-200 text-rose-900',
-          dotColor: 'bg-status-red',
-          solidBg: 'bg-status-red',
+          barColor: 'bg-rd-out',
+          badgeBg: 'bg-rd-out-container border-transparent text-rd-on-out-container',
+          dotColor: 'bg-rd-out',
+          solidBg: 'bg-rd-out',
+          iconColor: 'text-rd-out',
+          icon: 'block',
           shortLabel: 'Out of service',
           label: 'Out of gas',
         };
@@ -677,9 +690,11 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       default:
         return {
           barColor: 'bg-slate-400',
-          badgeBg: 'bg-slate-100 border-slate-200 text-slate-700',
+          badgeBg: 'bg-rd-stale-container border-transparent text-rd-on-stale-container',
           dotColor: 'bg-slate-400',
           solidBg: 'bg-surface-container-high text-outline!',
+          iconColor: 'text-outline',
+          icon: 'help',
           shortLabel: 'No recent report',
           label: 'No recent reports',
         };
@@ -729,14 +744,14 @@ export const MapScreen: React.FC<MapScreenProps> = ({
             open();
           }
         }}
-        className={`flex items-center gap-3.5 py-2.5 px-2 -mx-2 rounded-2xl cursor-pointer active:bg-surface-container transition-colors ${isPinned ? 'bg-primary-container/50' : ''} ${flashIds?.has(station.id) ? 'flash-ring' : ''}`}
+        className={`flex items-center gap-3 py-2.5 px-2 -mx-2 rounded-2xl cursor-pointer active:bg-surface-container transition-colors ${isPinned ? 'bg-primary-container/50' : ''} ${flashIds?.has(station.id) ? 'flash-ring' : ''}`}
       >
-        <span aria-hidden="true" className="material-symbols-outlined text-[26px] text-outline shrink-0 w-9 text-center">
-          local_gas_station
-        </span>
+        <div className="w-12 h-12 rounded-xl overflow-hidden shrink-0 bg-surface-container-high">
+          <img src={station.images?.[0] || ASSETS.stationWide} alt="" className="w-full h-full object-cover" loading="lazy" />
+        </div>
         <div className="min-w-0 flex-1">
-          <h3 className="font-semibold text-[1.0625rem] text-on-surface truncate leading-snug">{station.name}</h3>
-          <p className="text-caption text-outline truncate flex items-center gap-1.5">
+          <h3 className="font-geist font-semibold text-[0.9375rem] text-rd-ink truncate leading-snug">{station.name}</h3>
+          <p className="text-caption text-outline truncate flex items-center gap-1.5 mt-0.5">
             <span aria-hidden="true" className={`w-2 h-2 rounded-full shrink-0 ${info.dotColor}`} />
             <span className="truncate">
               {[info.shortLabel, age, userGps && station.distance ? station.distance : null, station.city]
@@ -751,7 +766,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
             onNavigate(station);
           }}
           aria-label={`Navigate to ${station.name}`}
-          className="w-10 h-10 rounded-full bg-surface-container text-on-surface flex items-center justify-center active:scale-95 shrink-0"
+          className="w-10 h-10 rounded-full bg-surface-container text-rd-ink flex items-center justify-center active:scale-95 shrink-0"
         >
           <span aria-hidden="true" className="material-symbols-outlined text-[20px]">navigation</span>
         </button>
@@ -759,9 +774,71 @@ export const MapScreen: React.FC<MapScreenProps> = ({
     );
   };
 
-  // Floating photo card for the driver's short "closest to you" strip — the home-page look
-  // (image, name, distance/status) rather than the plain rows used once the list is expanded.
-  const renderFloatingCard = (station: GasStation) => {
+  // The single prominent "nearest station" hero card at the top of the standard sheet —
+  // ink surface, per design_handoff_cng_connect_mobile screen 3b. No report yet today
+  // doubles as the incentive-to-report moment (ghost pill + points).
+  const renderNearestCard = (station: GasStation) => {
+    const info = getStatusIndicator(station.status);
+    const isPinned = pinnedId === station.id;
+    const age = station.status !== 'unknown' ? formatStationAge(station).replace(/^Updated /, '') : null;
+    const noReportToday = station.status === 'unknown';
+    return (
+      <button
+        key={station.id}
+        onClick={() => {
+          onSelectStation(station);
+          onOpenStationDetails(station);
+        }}
+        className={`w-full bg-rd-ink rounded-[22px] overflow-hidden text-left active:scale-[0.98] transition-transform ${
+          flashIds?.has(station.id) ? 'flash-ring' : ''
+        } ${isPinned ? 'ring-2 ring-primary' : ''}`}
+      >
+        <div className="flex gap-3 p-3">
+          <div className="w-[84px] h-[84px] rounded-2xl overflow-hidden shrink-0 bg-rd-ink-2">
+            <img src={station.images?.[0] || ASSETS.stationWide} alt="" className="w-full h-full object-cover" loading="lazy" />
+          </div>
+          <div className="min-w-0 flex-1 flex flex-col justify-center gap-1.5">
+            <p className="font-geist-mono text-[11px] font-medium tracking-[0.08em] uppercase text-[#B4BAC4] truncate">
+              Nearest{userGps && station.distance ? ` · ${station.distance}` : ''}{station.driveTime ? ` · ${station.driveTime}` : ''}
+            </p>
+            <h3 className="font-geist font-bold text-[1.0625rem] leading-snug text-white line-clamp-2">{station.name}</h3>
+            <span className="inline-flex self-start items-center gap-1.5 rounded-lg bg-rd-ink-2 border border-rd-ink-border px-2 py-1 text-[0.75rem] font-semibold text-white/85">
+              <span aria-hidden="true" className={`material-symbols-outlined text-[13px] ${info.iconColor || ''}`}>
+                {info.icon}
+              </span>
+              {noReportToday ? 'No report today' : `${info.shortLabel}${age ? ` · ${age}` : ''}`}
+            </span>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 px-3 pb-3">
+          {noReportToday && (
+            <span className="flex-1 min-w-0 inline-flex items-center gap-1.5 rounded-full bg-rd-ink-2 text-white/90 text-[0.75rem] font-semibold pl-3 pr-2 py-2 truncate">
+              <span aria-hidden="true" className="material-symbols-outlined text-[15px] shrink-0">campaign</span>
+              <span className="truncate">First report today</span>
+              <span className="ml-auto shrink-0 text-[0.6875rem] font-bold text-white/60">+10</span>
+            </span>
+          )}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onNavigate(station);
+            }}
+            aria-label={`Navigate to ${station.name}`}
+            className={`shrink-0 inline-flex items-center gap-1.5 rounded-full bg-primary text-white text-[0.8125rem] font-bold px-4 py-2 active:scale-95 transition-transform ${
+              noReportToday ? '' : 'flex-1 justify-center'
+            }`}
+          >
+            <span aria-hidden="true" className="material-symbols-outlined text-[16px]">directions</span>
+            Go
+          </button>
+        </div>
+      </button>
+    );
+  };
+
+  // Plain row for the rest of the standard-mode list (below the nearest card): small photo
+  // thumbnail, name, solid status chip, distance — per design_handoff_cng_connect_mobile 3b.
+  const renderCompactRow = (station: GasStation) => {
     const info = getStatusIndicator(station.status);
     const isPinned = pinnedId === station.id;
     const age = station.status !== 'unknown' ? formatStationAge(station).replace(/^Updated /, '') : null;
@@ -772,33 +849,32 @@ export const MapScreen: React.FC<MapScreenProps> = ({
           onSelectStation(station);
           onOpenStationDetails(station);
         }}
-        className={`w-40 shrink-0 bg-surface-container-high rounded-2xl overflow-hidden text-left shadow-[0_4px_14px_rgba(14,20,32,0.08)] active:scale-[0.98] transition-transform ${
+        className={`w-full flex items-center gap-3 py-2.5 text-left active:bg-surface-container rounded-xl transition-colors ${
           flashIds?.has(station.id) ? 'flash-ring' : ''
-        } ${isPinned ? 'ring-2 ring-primary' : ''}`}
+        } ${isPinned ? 'bg-primary-container/40' : ''}`}
       >
-        <div className="h-20 bg-surface-container-high">
+        <div className="w-12 h-12 rounded-xl overflow-hidden shrink-0 bg-surface-container-high">
           <img src={station.images?.[0] || ASSETS.stationWide} alt="" className="w-full h-full object-cover" loading="lazy" />
         </div>
-        <div className="p-2.5">
-          <div className="font-bold text-caption text-on-surface truncate">{station.name}</div>
-          <div className="text-micro text-outline mt-0.5 truncate">
-            {[userGps && station.distance ? station.distance : station.city, age].filter(Boolean).join(' · ')}
-          </div>
-          <span
-            className={`inline-flex items-center gap-1 mt-2 rounded-md px-1.5 py-0.5 text-micro font-bold text-white ${info.solidBg}`}
-          >
+        <div className="min-w-0 flex-1">
+          <h3 className="font-geist font-semibold text-[0.9375rem] text-rd-ink truncate">{station.name}</h3>
+          <span className={`inline-flex items-center gap-1 mt-0.5 rounded-md px-1.5 py-0.5 text-[0.75rem] font-semibold ${info.badgeBg}`}>
             {info.shortLabel}
+            {age ? ` · ${age}` : ''}
           </span>
         </div>
+        {userGps && station.distance && (
+          <span className="shrink-0 text-[0.8125rem] font-semibold text-rd-text-tertiary">{station.distance}</span>
+        )}
       </button>
     );
   };
 
-  const statusChips: Array<{ key: string; label: string; full: string; dot: string | null }> = [
-    { key: 'all', label: 'All', full: 'All stations', dot: null },
-    { key: 'full', label: 'Available', full: 'Available', dot: 'bg-status-green' },
-    { key: 'queue', label: 'Queuing', full: 'Queuing', dot: 'bg-status-amber' },
-    { key: 'low', label: 'Low', full: 'Low pressure', dot: 'bg-status-orange' },
+  const statusChips: Array<{ key: string; label: string; full: string; icon: string | null; iconColor: string }> = [
+    { key: 'all', label: `All ${scopedCount}`, full: 'All stations', icon: null, iconColor: '' },
+    { key: 'full', label: 'Available', full: 'Available', icon: 'check_circle', iconColor: 'text-rd-available' },
+    { key: 'queue', label: 'Queuing', full: 'Queuing', icon: 'schedule', iconColor: 'text-rd-queuing' },
+    { key: 'low', label: 'Low', full: 'Low pressure', icon: 'speed', iconColor: 'text-rd-low' },
   ];
 
 
@@ -846,21 +922,29 @@ export const MapScreen: React.FC<MapScreenProps> = ({
         </div>
       )}
 
-      {/* Mobile top overlay: the logo and Share the App, so the map is the hero (Bolt / inDrive style) */}
-      <div className="lg:hidden absolute top-0 inset-x-0 z-30 pointer-events-none pt-safe px-4">
-        <div className="flex items-center justify-between pt-3">
-          <div className="pointer-events-auto h-12 pl-1.5 pr-4 rounded-full bg-surface-container-high flex items-center gap-2 shadow-[0_4px_14px_rgba(31,41,35,0.22)]">
-            <img src="/pwa-icon.svg" alt="" className="w-9 h-9 rounded-full" />
-            <span className="font-headline font-extrabold text-[1.0625rem] text-slate-900 tracking-tight">CNG&#8209;Connect</span>
-          </div>
+      {/* Mobile top overlay: search pill + round Share button, no logo pill (redesign: "the map is the hero").
+          data-theme="light" because the redesign handoff only specifies a light palette — forcing light
+          here (not on the whole screen, so the untouched desktop panel keeps following system theme)
+          avoids a half-light/half-dark mismatch until a dark variant of the new design exists. */}
+      <div data-theme="light" className="lg:hidden absolute top-0 inset-x-0 z-30 pointer-events-none pt-safe px-4">
+        <div className="flex items-center gap-2.5 pt-3">
+          <button
+            onClick={() => setIsSearchOpen(true)}
+            aria-label="Search stations, city or state"
+            className="pointer-events-auto flex-1 min-w-0 h-[52px] pl-4 pr-4 rounded-full bg-white flex items-center gap-2.5 text-left shadow-[0_6px_20px_rgba(20,32,26,0.12)] font-geist"
+          >
+            <span aria-hidden="true" className="material-symbols-outlined text-rd-ink text-[22px] shrink-0">search</span>
+            <span className={`flex-1 min-w-0 truncate text-[0.9375rem] ${searchQuery ? 'font-semibold text-rd-ink' : 'font-normal text-rd-text-tertiary'}`}>
+              {searchQuery || 'Where do you want to fill up?'}
+            </span>
+          </button>
           {onShareApp && (
             <button
               onClick={onShareApp}
               aria-label="Share the app with other drivers"
-              className="pointer-events-auto h-12 pl-4 pr-5 rounded-full bg-surface-container-high text-slate-900 flex items-center gap-2 font-bold text-caption shadow-[0_4px_14px_rgba(31,41,35,0.22)] active:scale-95 transition-transform"
+              className="pointer-events-auto shrink-0 w-[52px] h-[52px] rounded-full bg-white flex items-center justify-center shadow-[0_6px_20px_rgba(20,32,26,0.12)] active:scale-95 transition-transform"
             >
-              <span aria-hidden="true" className="material-symbols-outlined text-[20px]">share</span>
-              Share the App
+              <span aria-hidden="true" className="material-symbols-outlined text-rd-ink text-[20px]">share</span>
             </button>
           )}
         </div>
@@ -920,15 +1004,15 @@ export const MapScreen: React.FC<MapScreenProps> = ({
         </Modal>
       )}
 
-      {/* Mobile bottom sheet */}
-      <div className="lg:hidden absolute bottom-0 left-0 right-0 z-30 max-w-xl mx-auto pointer-events-none">
+      {/* Mobile bottom sheet — data-theme="light", see the top overlay's comment above. */}
+      <div data-theme="light" className="lg:hidden absolute bottom-0 left-0 right-0 z-30 max-w-xl mx-auto pointer-events-none">
         <button
           onClick={handleRecenter}
           aria-label="My Location"
           title={gpsStatusText}
-          className={`pointer-events-auto absolute right-4 -top-16 w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center shadow-[0_4px_14px_rgba(31,41,35,0.22)] active:scale-95 transition-all ${
+          className={`pointer-events-auto absolute right-4 -top-16 w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-[0_6px_20px_rgba(20,32,26,0.12)] active:scale-95 transition-all ${
             sheetMode === 'expanded' ? 'opacity-0 pointer-events-none! scale-75' : ''
-          } ${gpsStatus === 'active' ? 'text-slate-900' : gpsStatus === 'denied' ? 'text-status-red' : 'text-status-amber'}`}
+          } ${gpsStatus === 'active' ? 'text-primary' : gpsStatus === 'denied' ? 'text-status-red' : 'text-status-amber'}`}
         >
           <span aria-hidden="true" className="material-symbols-outlined text-[24px]">
             {gpsStatus === 'active' ? 'near_me' : gpsStatus === 'denied' ? 'location_disabled' : 'location_searching'}
@@ -937,7 +1021,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
 
         <div
           ref={sheetRef}
-          className={`w-full bg-surface-container-high rounded-t-[28px] shadow-[0_-6px_24px_rgba(0,0,0,0.16),0_100vh_0_0_#FFFFFF] pointer-events-auto flex flex-col overflow-hidden will-change-transform ${
+          className={`w-full bg-white rounded-t-[28px] shadow-[0_-10px_30px_rgba(20,32,26,0.12),0_100vh_0_0_#FFFFFF] pointer-events-auto flex flex-col overflow-hidden will-change-transform ${
             sheetMode === 'expanded' ? 'h-[calc(100dvh-8rem)]' : sheetMode === 'collapsed' ? 'pb-24' : ''
           }`}
         >
@@ -955,7 +1039,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
               aria-label="Station list size — drag or tap to change"
               className="w-full pt-3 pb-4 flex flex-col items-center"
             >
-              <div className="w-10 h-1.5 bg-slate-900/20 rounded-full" />
+              <div className="w-10 h-1.5 bg-[#D5D8D6] rounded-full" />
             </button>
             {filteredStations.length > 0 && sheetMode !== 'collapsed' && (
               <button
@@ -973,7 +1057,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
           </div>
 
           {/* Status tabs (like the ride-type tabs in ride-hailing apps) */}
-          <div role="tablist" aria-label="Filter by pump status" className="flex gap-1 overflow-x-auto hide-scrollbar px-4 pb-2.5 shrink-0">
+          <div role="tablist" aria-label="Filter by pump status" className="flex gap-1.5 overflow-x-auto hide-scrollbar px-4 pb-2.5 shrink-0">
             {statusChips.map((chip) => {
               const active = activeFilter === chip.key;
               return (
@@ -986,42 +1070,19 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                     setActiveFilter(chip.key);
                     track('filter_applied', { status: chip.key });
                   }}
-                  className={`shrink-0 h-10 px-3.5 rounded-2xl flex items-center gap-1.5 text-caption font-bold transition-colors ${
-                    active ? 'bg-primary-container text-on-surface' : 'text-on-surface-variant active:bg-surface-container'
+                  className={`shrink-0 rounded-full flex items-center gap-1.5 text-[0.8125rem] font-semibold font-geist py-[7px] px-3 transition-colors ${
+                    active ? 'bg-rd-ink text-white' : 'bg-rd-chip-grey text-rd-ink'
                   }`}
                 >
-                  {chip.dot && <span aria-hidden="true" className={`w-2.5 h-2.5 rounded-full ${chip.dot}`} />}
+                  {chip.icon && (
+                    <span aria-hidden="true" className={`material-symbols-outlined text-[15px] ${active ? 'text-white' : chip.iconColor}`}>
+                      {chip.icon}
+                    </span>
+                  )}
                   {chip.label}
                 </button>
               );
             })}
-          </div>
-
-          <div className="px-4 shrink-0">
-            <div className="flex items-center bg-surface-container rounded-2xl">
-              <button
-                onClick={() => setIsSearchOpen(true)}
-                aria-label="Search stations, city or state"
-                className="flex-1 min-w-0 flex items-center gap-3 pl-4 py-3.5 text-left"
-              >
-                <span aria-hidden="true" className="material-symbols-outlined text-on-surface text-[24px] shrink-0">search</span>
-                <span className={`flex-1 min-w-0 truncate text-body-lg ${searchQuery ? 'font-semibold text-on-surface' : 'font-medium text-on-surface-variant'}`}>
-                  {searchQuery || 'Where do you want to fill up?'}
-                </span>
-              </button>
-              {searchQuery && (
-                <button
-                  onClick={() => {
-                    setSearchQuery('');
-                    setPinnedId(null);
-                  }}
-                  className="p-2 mr-2 rounded-full text-slate-500 shrink-0"
-                  aria-label="Clear search"
-                >
-                  <span aria-hidden="true" className="material-symbols-outlined text-[20px]">close</span>
-                </button>
-              )}
-            </div>
           </div>
 
           {sheetMode === 'collapsed' ? null : filteredStations.length === 0 ? (
@@ -1040,8 +1101,9 @@ export const MapScreen: React.FC<MapScreenProps> = ({
               </button>
             </div>
           ) : sheetMode !== 'expanded' ? (
-            <div className="flex gap-3 overflow-x-auto hide-scrollbar px-5 pt-3 pb-28">
-              {standardRows.map((st) => renderFloatingCard(st))}
+            <div className="overflow-y-auto flex-1 hide-scrollbar px-5 pt-3 pb-28 flex flex-col gap-1">
+              {standardRows[0] && renderNearestCard(standardRows[0])}
+              {standardRows.slice(1).map((st) => renderCompactRow(st))}
             </div>
           ) : (
             <div className="px-5 pt-1 pb-28 overflow-y-auto flex-1 hide-scrollbar flex flex-col">
