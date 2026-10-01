@@ -782,14 +782,26 @@ export const MapScreen: React.FC<MapScreenProps> = ({
     const isPinned = pinnedId === station.id;
     const age = station.status !== 'unknown' ? formatStationAge(station).replace(/^Updated /, '') : null;
     const noReportToday = station.status === 'unknown';
+    const openDetails = () => {
+      onSelectStation(station);
+      onOpenStationDetails(station);
+    };
     return (
-      <button
+      // A <div role="button"> — not a <button> — because this card contains its own nested
+      // "Go" button; a <button> can't validly contain another <button> (it broke hydration
+      // and made click/keyboard behavior unreliable across browsers).
+      <div
         key={station.id}
-        onClick={() => {
-          onSelectStation(station);
-          onOpenStationDetails(station);
+        role="button"
+        tabIndex={0}
+        onClick={openDetails}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            openDetails();
+          }
         }}
-        className={`w-full bg-rd-ink rounded-[22px] overflow-hidden text-left active:scale-[0.98] transition-transform ${
+        className={`w-full bg-rd-ink rounded-[22px] overflow-hidden text-left active:scale-[0.98] transition-transform cursor-pointer ${
           flashIds?.has(station.id) ? 'flash-ring' : ''
         } ${isPinned ? 'ring-2 ring-primary' : ''}`}
       >
@@ -832,7 +844,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
             Go
           </button>
         </div>
-      </button>
+      </div>
     );
   };
 
