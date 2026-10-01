@@ -16,8 +16,12 @@ describe('motion components render', () => {
     expect(renderToString(<CountUp value={1234} format={(n) => n.toLocaleString('en-US')} />)).toContain('1,234');
   });
 
-  it('BottomNav positions the sliding bubble under the active tab', () => {
+  it('BottomNav raises the active tab in a floating green circle', () => {
     const html = renderToString(<BottomNav activeTab="community" onTabChange={() => {}} />);
-    expect(html).toContain('translateX(200%)');
+    // Redesign (2026-10): no shared sliding bubble — each tab's own button
+    // renders the raised circle when it's the active one.
+    expect(html).toContain('aria-label="Community" aria-current="page"');
+    expect(html).toContain('-top-[34px]');
+    expect(html.match(/-top-\[34px\]/g)).toHaveLength(1);
   });
 });
