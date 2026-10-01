@@ -48,27 +48,29 @@ export const CngRoiCalculatorModal: React.FC<CngRoiCalculatorModalProps> = ({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Fuel Savings Calculator" bare className="max-w-lg">
-      <div className="flex flex-col text-on-surface">
-        <div className="bg-deep-teal text-white px-5 pt-5 pb-6">
+      {/* data-theme="light": same reasoning as the other rebuilt screens — the handoff has no
+          dark-mode values yet. */}
+      <div data-theme="light" className="flex flex-col bg-white text-on-surface">
+        <div className="bg-rd-ink text-white px-5 pt-5 pb-6">
           <div className="flex items-center justify-between">
-            <span className="font-bold text-body">Fuel Savings Calculator</span>
-            <button onClick={onClose} aria-label="Close" className="text-[#9FB8A3] p-1 -mr-1">
+            <span className="font-geist font-bold text-[0.9375rem]">Fuel Savings Calculator</span>
+            <button onClick={onClose} aria-label="Close" className="text-[#A9AFBA] p-1 -mr-1">
               <span aria-hidden="true" className="material-symbols-outlined text-[20px]">close</span>
             </button>
           </div>
           <div className="text-center mt-5">
-            <div className="text-[0.75rem] font-bold uppercase tracking-[0.06em] text-[#9FB8A3]">You&apos;d save</div>
-            <div className="font-extrabold text-[2.75rem] leading-none tracking-tight mt-2">
+            <div className="text-[0.75rem] font-bold uppercase tracking-[0.06em] text-[#A9AFBA]">You&apos;d save</div>
+            <div className="font-geist font-extrabold text-[3.125rem] leading-none tracking-[-0.03em] mt-1.5">
               ₦{monthlySavings.toLocaleString()}
-              <span className="text-[0.9375rem] font-semibold text-[#9FB8A3]">/mo</span>
+              <span className="text-[0.875rem] font-semibold text-[#A9AFBA]">/mo</span>
             </div>
-            <div className="text-caption text-[#9FB8A3] mt-2">{savingsPercent}% less than petrol</div>
+            <div className="text-caption text-[#A9AFBA] mt-2">{savingsPercent}% less than petrol</div>
           </div>
         </div>
 
         <div className="px-5 py-5 flex flex-col gap-4">
           <div>
-            <div className="flex justify-between text-caption font-semibold">
+            <div className="flex justify-between text-caption font-semibold text-rd-ink">
               <span>Daily distance</span>
               <span className="text-primary">{dailyKm} km</span>
             </div>
@@ -76,7 +78,7 @@ export const CngRoiCalculatorModal: React.FC<CngRoiCalculatorModalProps> = ({
               onChange={(e) => setDailyKm(Number(e.target.value))} className="w-full mt-2 accent-primary" />
           </div>
           <div>
-            <div className="flex justify-between text-caption font-semibold">
+            <div className="flex justify-between text-caption font-semibold text-rd-ink">
               <span>Vehicle mileage</span>
               <span className="text-primary">{kmPerLiter} km/l</span>
             </div>
@@ -84,27 +86,30 @@ export const CngRoiCalculatorModal: React.FC<CngRoiCalculatorModalProps> = ({
               onChange={(e) => setKmPerLiter(Number(e.target.value))} className="w-full mt-2 accent-primary" />
           </div>
 
+          {/* Manual price overrides aren't in the reference (which uses fixed placeholder
+              prices) but are real, useful functionality — local petrol/CNG prices swing
+              often, so kept rather than removed to match the simpler spec. */}
           <div className="grid grid-cols-2 gap-3">
             <label className="block">
-              <span className="text-micro font-semibold text-outline">Petrol (₦/L)</span>
+              <span className="text-micro font-semibold text-rd-text-tertiary">Petrol (₦/L)</span>
               <input type="number" value={petrolPrice} onChange={(e) => setPetrolPrice(Number(e.target.value))}
-                className="mt-1 w-full bg-surface rounded-xl px-3 py-2 text-caption font-bold outline-none focus:ring-2 focus:ring-primary/30" />
+                className="mt-1 w-full bg-white ring-1 ring-[#E3E6E4] rounded-xl px-3 py-2 text-caption font-bold text-rd-ink outline-none focus:ring-2 focus:ring-primary/30" />
             </label>
             <label className="block">
-              <span className="text-micro font-semibold text-outline">CNG (₦/kg)</span>
+              <span className="text-micro font-semibold text-rd-text-tertiary">CNG (₦/kg)</span>
               <input type="number" value={cngPrice} onChange={(e) => setCngPrice(Number(e.target.value))}
-                className="mt-1 w-full bg-surface rounded-xl px-3 py-2 text-caption font-bold outline-none focus:ring-2 focus:ring-primary/30" />
+                className="mt-1 w-full bg-white ring-1 ring-[#E3E6E4] rounded-xl px-3 py-2 text-caption font-bold text-rd-ink outline-none focus:ring-2 focus:ring-primary/30" />
             </label>
           </div>
 
-          <div className="flex gap-1 bg-surface rounded-full p-1">
+          <div className="flex gap-1 bg-[#F6F5EF] rounded-full p-1">
             {[
               { on: true, label: 'Government grant' },
               { on: false, label: 'Self-funded kit' },
             ].map((opt) => (
               <button key={String(opt.on)} type="button" onClick={() => setIsCommercialGrant(opt.on)}
                 className={`flex-1 rounded-full py-2.5 text-caption font-semibold transition-colors ${
-                  isCommercialGrant === opt.on ? 'bg-slate-900 text-white' : 'text-slate-500'
+                  isCommercialGrant === opt.on ? 'bg-rd-ink text-white' : 'text-rd-text-tertiary'
                 }`}>
                 {opt.label}
               </button>
@@ -112,13 +117,13 @@ export const CngRoiCalculatorModal: React.FC<CngRoiCalculatorModalProps> = ({
           </div>
 
           <div className="grid grid-cols-2 gap-2.5">
-            <div className="bg-surface-container rounded-2xl p-3">
-              <div className="text-micro font-semibold text-outline">Payback</div>
-              <div className="font-bold text-body mt-0.5">{paybackMonths}</div>
+            <div className="bg-[#F1EFE6] rounded-2xl p-3">
+              <div className="text-micro font-semibold text-rd-text-tertiary">Payback</div>
+              <div className="font-geist font-bold text-body text-rd-ink mt-0.5">{paybackMonths}</div>
             </div>
-            <div className="bg-surface-container rounded-2xl p-3">
-              <div className="text-micro font-semibold text-outline">CO₂ avoided</div>
-              <div className="font-bold text-body mt-0.5">{annualCo2SavedTons} t/yr</div>
+            <div className="bg-[#F1EFE6] rounded-2xl p-3">
+              <div className="text-micro font-semibold text-rd-text-tertiary">CO₂ avoided</div>
+              <div className="font-geist font-bold text-body text-rd-ink mt-0.5">{annualCo2SavedTons} t/yr</div>
             </div>
           </div>
 
@@ -128,7 +133,7 @@ export const CngRoiCalculatorModal: React.FC<CngRoiCalculatorModalProps> = ({
                 onClose();
                 onOpenConversions();
               }}
-              className="w-full py-3.5 bg-primary text-white font-bold text-body rounded-full flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
+              className="w-full py-3.5 bg-primary text-white font-geist font-bold text-body rounded-full flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
             >
               Find an accredited centre
               <span aria-hidden="true" className="material-symbols-outlined text-[18px]">arrow_forward</span>
