@@ -21,6 +21,8 @@ export const LiveCameraCaptureModal: React.FC<LiveCameraCaptureModalProps> = ({
   const [isCapturing, setIsCapturing] = useState(false);
   const [facingMode, setFacingMode] = useState<'environment' | 'user'>('environment');
   const [isPermissionRequested, setIsPermissionRequested] = useState(false);
+  // Ticks while the stream is live so the preview watermark matches the one burned into the photo.
+  const [previewTime, setPreviewTime] = useState(() => new Date());
 
   const stopCurrentStream = () => {
     if (streamRef.current) {
@@ -71,6 +73,12 @@ export const LiveCameraCaptureModal: React.FC<LiveCameraCaptureModalProps> = ({
     };
   }, [facingMode]);
 
+  useEffect(() => {
+    if (!stream) return;
+    const id = setInterval(() => setPreviewTime(new Date()), 1000);
+    return () => clearInterval(id);
+  }, [stream]);
+
   const toggleCameraFacing = () => {
     const newMode = facingMode === 'environment' ? 'user' : 'environment';
     setFacingMode(newMode);
@@ -119,51 +127,35 @@ export const LiveCameraCaptureModal: React.FC<LiveCameraCaptureModalProps> = ({
   };
 
   return (
-    <Modal isOpen={true} onClose={onClose} title={title} className="bg-black text-white h-full max-w-full p-4 flex flex-col justify-between rounded-none sm:rounded-none">
-      {/* Top Header */}
-      <div className="flex items-center justify-between text-white z-10 pt-2 pb-2">
-        <div className="flex items-center gap-2">
-          <span className="w-2.5 h-2.5 rounded-full bg-status-green animate-pulse" />
-          <span className="font-bold text-[1rem] text-status-green">{title}</span>
-        </div>
-        <div className="flex items-center gap-2">
-          {stream && (
-            <button
-              onClick={toggleCameraFacing}
-              className="w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white backdrop-blur-md active:scale-95 transition-all"
-              title="Switch Camera (Rear/Front)"
-            >
-              <span aria-hidden="true" className="material-symbols-outlined text-[20px]">flip_camera_ios</span>
-            </button>
-          )}
-          <button
-            onClick={onClose}
-            className="w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white backdrop-blur-md active:scale-95 transition-all"
-          >
-            <span aria-hidden="true" className="material-symbols-outlined text-[22px]">close</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Camera Viewfinder & Permission Card */}
-      <div className="relative flex-1 bg-slate-900 rounded-3xl overflow-hidden flex items-center justify-center border border-white/10 my-2">
+    <Modal
+      isOpen={true}
+      onClose={onClose}
+      title={title}
+      bare
+      overlayClassName="bg-black"
+      className="fixed inset-0 w-full h-full max-w-full max-h-full p-0 rounded-none bg-[#0B0D10] text-white sm:inset-0 sm:left-0 sm:top-0 sm:w-full sm:h-full sm:max-h-full sm:translate-x-0 sm:translate-y-0 sm:rounded-none"
+    >
+      {/* design_handoff_cng_connect 8: full-bleed viewfinder, floating controls, no chrome bar */}
+      <div className="relative w-full h-full overflow-hidden">
         {cameraError ? (
-          <div className="p-6 text-center text-status-red max-w-sm flex flex-col items-center">
-            <div className="w-16 h-16 rounded-full bg-status-red/20 text-status-red flex items-center justify-center mb-3">
-              <span aria-hidden="true" className="material-symbols-outlined text-[36px]">videocam_off</span>
-            </div>
-            <h3 className="font-bold text-[1.125rem] text-white">Enable Camera Access</h3>
-            <p className="text-[0.875rem] mt-1 text-slate-300 font-normal leading-relaxed mb-5">
-              {cameraError}
-            </p>
+          <div className="absolute inset-0 flex items-center justify-center p-6">
+            <div className="text-center text-status-red max-w-sm flex flex-col items-center">
+              <div className="w-16 h-16 rounded-full bg-status-red/20 text-status-red flex items-center justify-center mb-3">
+                <span aria-hidden="true" className="material-symbols-outlined text-[36px]">videocam_off</span>
+              </div>
+              <h3 className="font-geist font-bold text-[1.125rem] text-white">Enable Camera Access</h3>
+              <p className="text-[0.875rem] mt-1 text-white/70 font-normal leading-relaxed mb-5">
+                {cameraError}
+              </p>
 
-            <button
-              onClick={() => startCamera(facingMode)}
-              className="px-6 py-3.5 bg-status-green hover:opacity-95 text-on-surface font-bold text-[0.9062rem] rounded-full shadow-lg flex items-center gap-2 active:scale-95 transition-all"
-            >
-              <span aria-hidden="true" className="material-symbols-outlined text-[20px]">photo_camera</span>
-              <span>Allow &amp; Enable Camera</span>
-            </button>
+              <button
+                onClick={() => startCamera(facingMode)}
+                className="px-6 py-3.5 bg-rd-available text-white font-geist font-bold text-[0.9062rem] rounded-full shadow-lg flex items-center gap-2 active:scale-95 transition-all"
+              >
+                <span aria-hidden="true" className="material-symbols-outlined text-[20px]">photo_camera</span>
+                <span>Allow &amp; Enable Camera</span>
+              </button>
+            </div>
           </div>
         ) : (
           <>
@@ -172,43 +164,67 @@ export const LiveCameraCaptureModal: React.FC<LiveCameraCaptureModalProps> = ({
               autoPlay
               playsInline
               muted
-              className="w-full h-full object-cover"
+              className="absolute inset-0 w-full h-full object-cover"
             />
-            {/* Viewfinder Target Framing Grid */}
-            <div className="absolute inset-8 border-2 border-status-green/40 rounded-2xl pointer-events-none flex flex-col justify-between p-4">
+            {/* Viewfinder target framing — not in the reference, kept as a useful framing cue */}
+            <div className="absolute inset-8 border-2 border-white/25 rounded-2xl pointer-events-none flex flex-col justify-between p-4">
               <div className="flex justify-between">
-                <div className="w-6 h-6 border-t-2 border-l-2 border-status-green" />
-                <div className="w-6 h-6 border-t-2 border-r-2 border-status-green" />
+                <div className="w-6 h-6 border-t-2 border-l-2 border-rd-available/80" />
+                <div className="w-6 h-6 border-t-2 border-r-2 border-rd-available/80" />
               </div>
               <div className="flex justify-between">
-                <div className="w-6 h-6 border-b-2 border-l-2 border-status-green" />
-                <div className="w-6 h-6 border-b-2 border-r-2 border-status-green" />
+                <div className="w-6 h-6 border-b-2 border-l-2 border-rd-available/80" />
+                <div className="w-6 h-6 border-b-2 border-r-2 border-rd-available/80" />
               </div>
-            </div>
-
-            {/* Live Watermark Preview Pill */}
-            <div className="absolute bottom-4 left-4 bg-black/70 backdrop-blur-md text-white text-[0.75rem] font-medium px-3 py-1.5 rounded-full border border-status-green/40 flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-status-green animate-ping" />
-              <span>LIVE CAMERA ACTIVE • Gallery Uploads Blocked</span>
             </div>
           </>
         )}
         <canvas ref={canvasRef} className="hidden" />
-      </div>
 
-      {/* Bottom Controls */}
-      <div className="flex items-center justify-center pt-2 pb-4 z-10">
-        {!cameraError && stream && (
+        {/* Floating top controls — 36px translucent circles over the viewfinder, per spec */}
+        <div className="absolute top-[max(env(safe-area-inset-top,0px),1.25rem)] inset-x-5 flex items-center justify-between z-10">
           <button
-            onClick={takeSnapshot}
-            disabled={isCapturing}
-            className="w-20 h-20 rounded-full border-4 border-white bg-status-green hover:opacity-95 active:scale-90 transition-all flex items-center justify-center shadow-2xl disabled:opacity-50"
-            aria-label="Take Live Snapshot"
+            onClick={onClose}
+            aria-label="Close"
+            className="w-9 h-9 rounded-full bg-white/15 backdrop-blur-md flex items-center justify-center text-white active:scale-95 transition-all"
           >
-            <div className="w-14 h-14 rounded-full bg-white flex items-center justify-center text-primary">
-              <span aria-hidden="true" className="material-symbols-outlined text-[32px]">photo_camera</span>
-            </div>
+            <span aria-hidden="true" className="material-symbols-outlined text-[18px]">close</span>
           </button>
+          <span className="font-geist-mono text-[10px] font-semibold tracking-wide text-white/70 uppercase truncate max-w-[50%] text-center">
+            {title}
+          </span>
+          {stream ? (
+            <button
+              onClick={toggleCameraFacing}
+              aria-label="Switch camera"
+              className="w-9 h-9 rounded-full bg-white/15 backdrop-blur-md flex items-center justify-center text-white active:scale-95 transition-all"
+            >
+              <span aria-hidden="true" className="material-symbols-outlined text-[18px]">flip_camera_ios</span>
+            </button>
+          ) : (
+            <div className="w-9 h-9" aria-hidden="true" />
+          )}
+        </div>
+
+        {/* Floating bottom stack — watermark preview, gallery-blocked notice, shutter */}
+        {!cameraError && stream && (
+          <div className="absolute bottom-[max(env(safe-area-inset-bottom,0px),1.75rem)] inset-x-0 flex flex-col items-center gap-3 z-10">
+            <div className="bg-black/55 backdrop-blur-sm text-rd-available font-geist-mono text-[10px] font-medium px-3 py-1.5 rounded-md">
+              Verified live snapshot &middot; {previewTime.toLocaleDateString()}, {previewTime.toLocaleTimeString()}
+            </div>
+            <div className="flex items-center gap-1.5 text-white/85 text-[11px] font-geist font-medium">
+              <span aria-hidden="true" className="material-symbols-outlined text-[14px]">lock</span>
+              Gallery access disabled
+            </div>
+            <button
+              onClick={takeSnapshot}
+              disabled={isCapturing}
+              className="w-[68px] h-[68px] rounded-full bg-white border-4 border-white/30 active:scale-90 transition-all flex items-center justify-center shadow-2xl disabled:opacity-50"
+              aria-label="Take Live Snapshot"
+            >
+              <span aria-hidden="true" className="material-symbols-outlined text-[28px] text-rd-ink">photo_camera</span>
+            </button>
+          </div>
         )}
       </div>
     </Modal>
