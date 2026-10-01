@@ -164,15 +164,18 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   );
 
   return (
-    <div className="min-h-screen bg-surface-container text-on-surface pb-36">
+    // data-theme="light": same reasoning as the other rebuilt screens — the handoff has no
+    // dark-mode values yet.
+    <div data-theme="light" className="min-h-screen bg-rd-bg text-rd-ink pb-36">
       {toastMessage && (
         <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-on-surface/90 text-white text-caption font-bold px-4 py-2 rounded-full shadow-lg backdrop-blur-md">
           {toastMessage}
         </div>
       )}
 
-      {/* Dark identity header */}
-      <div className="bg-deep-teal text-white px-5 pt-[max(env(safe-area-inset-top,0px),2.75rem)] lg:pt-8 pb-5">
+      {/* Dark identity card — design_handoff_cng_connect_mobile 3e: avatar/name/vehicle/edit,
+          points/reports/rating, and tier progress all live together on the ink surface. */}
+      <div className="bg-rd-ink text-white px-5 pt-[max(env(safe-area-inset-top,0px),2.75rem)] lg:pt-8 pb-5 rounded-b-[26px]">
         <div className="max-w-3xl mx-auto">
           <div className="flex items-center gap-3.5">
             <div className="relative shrink-0">
@@ -184,7 +187,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                     onClick={() => avatarInputRef.current?.click()}
                     disabled={isUploadingAvatar}
                     aria-label="Change profile photo"
-                    className="absolute -bottom-0.5 -right-0.5 w-[22px] h-[22px] rounded-full bg-primary text-white border-2 border-deep-teal flex items-center justify-center active:scale-90 transition-transform disabled:opacity-60"
+                    className="absolute -bottom-0.5 -right-0.5 w-[22px] h-[22px] rounded-full bg-primary text-white border-2 border-rd-ink flex items-center justify-center active:scale-90 transition-transform disabled:opacity-60"
                   >
                     <span aria-hidden="true" className="material-symbols-outlined text-[13px]">
                       {isUploadingAvatar ? 'progress_activity' : 'photo_camera'}
@@ -193,11 +196,11 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                   <input ref={avatarInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarPick} />
                 </>
               ) : (
-                <span className="absolute -bottom-0.5 -right-0.5 w-[18px] h-[18px] rounded-full bg-primary border-2 border-deep-teal" />
+                <span className="absolute -bottom-0.5 -right-0.5 w-[18px] h-[18px] rounded-full bg-primary border-2 border-rd-ink" />
               )}
             </div>
             <div className="min-w-0 flex-1">
-              <h2 className="font-bold text-body-lg leading-tight truncate">{user.name || 'Driver'}</h2>
+              <h2 className="font-geist font-bold text-[1.1875rem] leading-tight truncate">{user.name || 'Driver'}</h2>
               <PopoverPrimitive.Root>
                 <PopoverPrimitive.Trigger className="flex items-center gap-1 mt-0.5 text-micro text-[#B7CBB9] cursor-pointer text-left max-w-full">
                   <span className="truncate">
@@ -243,55 +246,70 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
 
           <div className="flex gap-2.5 mt-5">
             {[
-              { v: <CountUp value={points} format={(n) => n.toLocaleString()} />, l: 'Points', big: true },
+              { v: <CountUp value={points} format={(n) => n.toLocaleString()} />, l: 'Points' },
               { v: <CountUp value={user.reportsCount} />, l: 'Reports' },
               { v: String(user.reputationScore), l: 'Rating' },
             ].map((t) => (
-              <div key={t.l} className="flex-1 bg-white/[0.06] rounded-[14px] py-2.5 text-center">
-                <div className={`font-extrabold tracking-tight ${t.big ? 'text-[1.4375rem]' : 'text-[1.1875rem]'}`}>{t.v}</div>
-                <div className="text-[0.75rem] text-[#9FB8A3] mt-0.5">{t.l}</div>
+              <div key={t.l} className="flex-1 text-center">
+                <div className="font-geist font-bold text-[1.5rem] tracking-tight">{t.v}</div>
+                <div className="text-[0.75rem] font-semibold uppercase tracking-wide text-[#A9AFBA] mt-0.5">{t.l}</div>
               </div>
             ))}
+          </div>
+
+          <div className="h-px bg-[#2A3830] mt-4" />
+
+          {/* Tier progress — on the ink surface, per the handoff */}
+          <div className="mt-4">
+            <div className="flex items-center justify-between">
+              <div className="font-geist font-bold text-caption">{tierProgress.currentTier.title}</div>
+              {tierProgress.nextTier ? (
+                <div className="text-micro text-[#A9AFBA]">
+                  {tierProgress.pointsForNextTier} pts to {tierProgress.nextTier.title}
+                </div>
+              ) : (
+                <div className="text-micro text-[#A9AFBA]">Top tier reached</div>
+              )}
+            </div>
+            <div className="h-1.5 rounded-full bg-[#2A3830] mt-2 overflow-hidden">
+              <div
+                className="h-full bg-primary rounded-full transition-all duration-500"
+                style={{ width: `${tierProgress.nextTier ? tierProgress.progressPercent : 100}%` }}
+              />
+            </div>
           </div>
         </div>
       </div>
 
       <div className="max-w-3xl mx-auto px-5 pt-5 flex flex-col gap-4">
-        {/* Tier + badges */}
-        <div>
-          <div className="flex items-center justify-between">
-            <div className="font-bold text-caption">{tierProgress.currentTier.title}</div>
-            {tierProgress.nextTier ? (
-              <div className="text-micro text-outline">
-                {tierProgress.pointsForNextTier} pts to {tierProgress.nextTier.title}
+        {/* Tier badges — kept as a real, existing feature even though it's not shown in the
+            handoff's one 3e screenshot; not removing working functionality on that basis. */}
+        <div className="flex gap-2">
+          {DRIVER_TIERS.map((t) => {
+            const unlocked = points >= t.minPoints;
+            return (
+              <div
+                key={t.id}
+                title={`${t.title} · ${t.minPoints}+ pts`}
+                className={`w-11 h-11 rounded-xl flex items-center justify-center text-[1.25rem] ${
+                  unlocked ? 'bg-primary-container' : 'bg-surface-dim/60 opacity-60 grayscale'
+                }`}
+              >
+                {unlocked ? <TierBadge tierId={t.id} size={24} /> : <span aria-hidden="true" className="material-symbols-outlined text-[16px] text-slate-500">lock</span>}
               </div>
-            ) : (
-              <div className="text-micro text-outline">Top tier reached</div>
-            )}
-          </div>
-          <div className="h-1.5 rounded-full bg-surface-container-highest mt-2 overflow-hidden">
-            <div
-              className="h-full bg-primary rounded-full transition-all duration-500"
-              style={{ width: `${tierProgress.nextTier ? tierProgress.progressPercent : 100}%` }}
-            />
-          </div>
-          <div className="flex gap-2 mt-3.5">
-            {DRIVER_TIERS.map((t) => {
-              const unlocked = points >= t.minPoints;
-              return (
-                <div
-                  key={t.id}
-                  title={`${t.title} · ${t.minPoints}+ pts`}
-                  className={`w-11 h-11 rounded-xl flex items-center justify-center text-[1.25rem] ${
-                    unlocked ? 'bg-primary-container' : 'bg-surface-dim/60 opacity-60 grayscale'
-                  }`}
-                >
-                  {unlocked ? <TierBadge tierId={t.id} size={24} /> : <span aria-hidden="true" className="material-symbols-outlined text-[16px] text-slate-500">lock</span>}
-                </div>
-              );
-            })}
-          </div>
+            );
+          })}
         </div>
+
+        {/* Nudge: first-report incentive, shown only before any report */}
+        {user.reportsCount === 0 && (
+          <div className="rounded-2xl bg-rd-available-container px-4 py-3 flex items-center gap-3">
+            <span aria-hidden="true" className="material-symbols-outlined text-rd-on-available-container text-[20px] shrink-0">bolt</span>
+            <p className="flex-1 text-caption font-semibold text-rd-on-available-container">
+              Your first station report is worth +10 pts. It's the fastest way to Verified Reporter.
+            </p>
+          </div>
+        )}
 
         <InviteCard onSignIn={onOpenSignUp} onToast={showToast} />
 
@@ -319,26 +337,24 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
               <div role="radiogroup" aria-label="Appearance" className="flex gap-0.5 bg-surface-container rounded-full p-0.5">
                 {(
                   [
-                    ['light', 'light_mode', 'Light'],
-                    ['system', 'brightness_auto', 'Match device'],
-                    ['dark', 'dark_mode', 'Dark'],
+                    ['system', 'Auto'],
+                    ['light', 'Light'],
+                    ['dark', 'Dark'],
                   ] as const
-                ).map(([pref, icon, label]) => (
+                ).map(([pref, label]) => (
                   <button
                     key={pref}
                     role="radio"
                     aria-checked={themePref === pref}
-                    aria-label={label}
-                    title={label}
                     onClick={() => {
                       setThemePref(pref);
                       setThemePrefState(pref);
                     }}
-                    className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
-                      themePref === pref ? 'bg-primary text-white' : 'text-outline'
+                    className={`px-3 py-1.5 rounded-full text-[0.75rem] font-bold transition-colors ${
+                      themePref === pref ? 'bg-rd-ink text-white' : 'text-outline'
                     }`}
                   >
-                    <span aria-hidden="true" className="material-symbols-outlined text-[17px]">{icon}</span>
+                    {label}
                   </button>
                 ))}
               </div>

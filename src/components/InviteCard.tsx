@@ -112,14 +112,15 @@ export const InviteCard: React.FC<{
               className="mt-4 w-full flex items-center justify-between bg-surface-container rounded-2xl px-4 py-3 active:scale-[0.99] transition-transform"
             >
               <span className="text-micro font-semibold text-outline">Your code</span>
-              <span className="font-mono font-bold tracking-[0.2em] text-body-lg text-on-surface">{summary.code}</span>
+              <span className="font-geist-mono font-bold tracking-[0.2em] text-body-lg text-on-surface">{summary.code}</span>
               <span aria-hidden="true" className="material-symbols-outlined text-outline text-[18px]">content_copy</span>
             </button>
           )}
 
+          {/* WhatsApp green is reserved for this one button app-wide. */}
           <button
             onClick={share}
-            className="mt-2 w-full h-12 rounded-full bg-primary text-white font-bold text-caption flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
+            className="mt-2 w-full h-12 rounded-full bg-whatsapp text-white font-bold text-caption flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
           >
             <span aria-hidden="true" className="material-symbols-outlined text-[18px]">share</span>
             Share invite link
