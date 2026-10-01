@@ -69,6 +69,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
   const [isPresenceActiveState, setIsPresenceActiveState] = useState<boolean>(isPresenceActive);
   const [showInfoSheet, setShowInfoSheet] = useState(false);
   const [showFullTitle, setShowFullTitle] = useState(false);
+  const [photoFilter, setPhotoFilter] = useState<'all' | 'live'>('all');
 
   const getFormattedStatusPillText = (st: GasStation): string => {
     const isEv = st.stationType === 'ev_charging';
@@ -151,6 +152,34 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
 
 
   const images = station.images || [];
+  // Live-verified photos (from stationMedia, backed by real report/timestamp data) vs. the
+  // plain listing photo(s) added when the station was suggested — design_handoff_cng_connect_
+  // mobile 4b is explicit that these must never look the same ("isn't a status claim").
+  // Most recent live photo first, then listing photos.
+  const photoItems: { key: string; url: string; isLive: boolean; timestamp?: string }[] = [
+    ...(station.stationMedia || [])
+      .filter((m) => m.isVerified && m.mediaUrl)
+      .map((m) => ({ key: m.id, url: m.mediaUrl, isLive: true, timestamp: m.photoTimestamp })),
+    ...images.map((url, idx) => ({ key: `listing-${idx}`, url, isLive: false, timestamp: undefined })),
+  ].sort((a, b) => {
+    if (a.isLive !== b.isLive) return a.isLive ? -1 : 1;
+    const at = a.timestamp && isIsoTimestamp(a.timestamp) ? new Date(a.timestamp).getTime() : 0;
+    const bt = b.timestamp && isIsoTimestamp(b.timestamp) ? new Date(b.timestamp).getTime() : 0;
+    return bt - at;
+  });
+  const livePhotoCount = photoItems.filter((p) => p.isLive).length;
+
+  // Viewer's local time labeled "WAT" — this app is Nigeria-only, so that's correct for
+  // nearly everyone; not a true timezone conversion.
+  const formatPhotoTimestamp = (iso?: string): string | null => {
+    if (!iso || !isIsoTimestamp(iso)) return null;
+    const d = new Date(iso);
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = d.toLocaleString('en-US', { month: 'short' }).toUpperCase();
+    const hh = String(d.getHours()).padStart(2, '0');
+    const mm = String(d.getMinutes()).padStart(2, '0');
+    return `${day} ${month} ${d.getFullYear()} · ${hh}:${mm} WAT`;
+  };
   const presenceCount = station.activePresenceCount || 0;
 
   const handleVote = (reportId: string, type: 'up' | 'down') => {
@@ -407,41 +436,59 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
             <TabUnderline listRef={tabListRef} active={activeTab} deps={[comments.length, reports.length, images.length]} />
           </TabsPrimitive.List>
 
-          {/* TAB CONTENT 1: Station Group Chat Feed & Discussion */}
+          {/* TAB CONTENT 1: Station Group Chat Feed & Discussion — message bubbles per
+              design_handoff_cng_connect_mobile 4a. "Mine" is inferred by matching the
+              author name (CommentItem has no author-id field to compare against instead),
+              which is good enough for bubble alignment but not a security boundary. Status
+              reports are NOT merged into this timeline — they stay on the separate Reports
+              tab, since merging would be a bigger behavior change than a visual rebuild. */}
           <TabsPrimitive.Content value="feed" className="mt-4 outline-none">
             {comments.length === 0 ? (
               <p className="text-caption text-outline py-6 text-center">No messages yet. Say hi to drivers here.</p>
             ) : (
-              <div className="flex flex-col gap-4">
-                {comments.map((comment) => (
-                  <div key={comment.id} className="flex gap-3 items-start">
-                    {comment.authorAvatar ? (
-                      <img src={comment.authorAvatar} alt={comment.author} className="w-9 h-9 rounded-full object-cover shrink-0" />
-                    ) : (
-                      <div className="w-9 h-9 rounded-full bg-surface-container-highest text-slate-600 font-bold flex items-center justify-center text-caption shrink-0">
-                        {comment.author.charAt(0)}
-                      </div>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-baseline justify-between gap-2">
-                        <span className="text-caption font-bold text-slate-900 truncate">{comment.author}</span>
-                        <span className="text-micro text-outline shrink-0">{comment.timeAgo}</span>
-                      </div>
-                      <p className="text-caption text-on-surface-variant mt-0.5 leading-relaxed">{comment.content}</p>
-                      {comment.replies && comment.replies.length > 0 && (
-                        <div className="mt-2 pl-3 border-l-2 border-surface-container-highest flex flex-col gap-2">
-                          {comment.replies.map((reply) => (
-                            <div key={reply.id}>
-                              <span className="text-micro font-bold text-slate-900">{reply.author}</span>
-                              <span className="text-micro text-outline"> · {reply.timeAgo}</span>
-                              <p className="text-caption text-on-surface-variant">{reply.content}</p>
-                            </div>
-                          ))}
+              <div className="flex flex-col gap-3">
+                {comments.map((comment) => {
+                  const mine = Boolean(user?.name) && comment.author === user?.name;
+                  return (
+                    <div key={comment.id} className={`flex gap-2.5 items-end ${mine ? 'flex-row-reverse' : ''}`}>
+                      {!mine &&
+                        (comment.authorAvatar ? (
+                          <img src={comment.authorAvatar} alt={comment.author} className="w-8 h-8 rounded-full object-cover shrink-0" />
+                        ) : (
+                          <div className="w-8 h-8 rounded-full bg-surface-container-highest text-slate-600 font-bold flex items-center justify-center text-micro shrink-0">
+                            {comment.author.charAt(0)}
+                          </div>
+                        ))}
+                      <div className={`max-w-[78%] flex flex-col ${mine ? 'items-end' : 'items-start'}`}>
+                        {!mine && <span className="text-[0.75rem] font-semibold text-rd-text-tertiary mb-0.5 px-1">{comment.author}</span>}
+                        <div
+                          className={`px-3.5 py-2.5 text-[0.9375rem] leading-relaxed ${
+                            mine
+                              ? 'bg-primary text-white rounded-[18px] rounded-br-[6px]'
+                              : 'bg-white text-rd-ink shadow-[0_1px_2px_rgba(20,32,26,0.05),0_2px_8px_rgba(20,32,26,0.06)] rounded-[18px] rounded-bl-[6px]'
+                          }`}
+                        >
+                          {comment.content}
                         </div>
-                      )}
+                        <span className="text-[0.75rem] text-rd-text-tertiary mt-0.5 px-1 flex items-center gap-1">
+                          {comment.timeAgo}
+                          {mine && <span aria-hidden="true" className="material-symbols-outlined text-[14px] text-primary">done_all</span>}
+                        </span>
+                        {comment.replies && comment.replies.length > 0 && (
+                          <div className="mt-1.5 pl-3 border-l-2 border-surface-container-highest flex flex-col gap-1.5">
+                            {comment.replies.map((reply) => (
+                              <div key={reply.id}>
+                                <span className="text-micro font-bold text-rd-ink">{reply.author}</span>
+                                <span className="text-micro text-rd-text-tertiary"> · {reply.timeAgo}</span>
+                                <p className="text-caption text-on-surface-variant">{reply.content}</p>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </TabsPrimitive.Content>
@@ -544,20 +591,115 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
             )}
           </TabsPrimitive.Content>
 
-          {/* TAB CONTENT 3: Station Photos Gallery */}
+          {/* TAB CONTENT 3: Station Photos Gallery — featured latest + grid, per
+              design_handoff_cng_connect_mobile 4b. Live-verified vs. listing photos are
+              visually distinct (green "Live" badge vs. white "Station listing" badge) so
+              the listing photo never reads as proof of current status. */}
           <TabsPrimitive.Content value="photos" className="mt-4 outline-none">
-            {images.length > 0 ? (
-              <div className="grid grid-cols-2 gap-3">
-                {images.map((imgUrl, idx) => (
-                  <div
-                    key={idx}
-                    onClick={() => setSelectedPhoto(imgUrl)}
-                    className="w-full h-32 rounded-2xl overflow-hidden cursor-pointer bg-surface-container"
+            {photoItems.length > 0 ? (
+              <>
+                <div role="tablist" aria-label="Filter photos" className="flex gap-1.5 mb-3.5">
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={photoFilter === 'all'}
+                    onClick={() => setPhotoFilter('all')}
+                    className={`rounded-full px-3 py-1.5 text-[0.8125rem] font-semibold transition-colors ${
+                      photoFilter === 'all' ? 'bg-rd-ink text-white' : 'bg-rd-chip-grey text-rd-ink'
+                    }`}
                   >
-                    <img src={imgUrl} alt={`Station photo ${idx + 1}`} className="w-full h-full object-cover" />
+                    All {photoItems.length}
+                  </button>
+                  {livePhotoCount > 0 && (
+                    <button
+                      type="button"
+                      role="tab"
+                      aria-selected={photoFilter === 'live'}
+                      onClick={() => setPhotoFilter('live')}
+                      className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-[0.8125rem] font-semibold transition-colors ${
+                        photoFilter === 'live' ? 'bg-rd-ink text-white' : 'bg-rd-chip-grey text-rd-available'
+                      }`}
+                    >
+                      <span aria-hidden="true" className="material-symbols-outlined text-[14px]">photo_camera</span>
+                      Live verified {livePhotoCount}
+                    </button>
+                  )}
+                </div>
+
+                {(() => {
+                  const visible = photoFilter === 'live' ? photoItems.filter((p) => p.isLive) : photoItems;
+                  const [featured, ...rest] = visible;
+                  if (!featured) {
+                    return <p className="text-caption text-outline py-6 text-center">No live-verified photos yet.</p>;
+                  }
+                  const featuredTime = formatPhotoTimestamp(featured.timestamp);
+                  return (
+                    <>
+                      <div
+                        onClick={() => setSelectedPhoto(featured.url)}
+                        className="relative w-full h-[220px] rounded-[20px] overflow-hidden cursor-pointer bg-surface-container"
+                      >
+                        <img src={featured.url} alt="Latest station photo" className="w-full h-full object-cover" />
+                        {featured.isLive && (
+                          <span className="absolute top-3 left-3 inline-flex items-center gap-1 rounded-md bg-rd-available text-white text-[0.75rem] font-bold px-2 py-1">
+                            <span aria-hidden="true" className="material-symbols-outlined text-[13px] material-symbols-fill">verified</span>
+                            Live verified
+                          </span>
+                        )}
+                        <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/70 to-transparent flex flex-col justify-end p-3">
+                          <span className="text-white font-geist font-bold text-[0.9375rem] truncate">{station.name}</span>
+                          {featuredTime ? (
+                            <span className="font-geist-mono text-[11px] text-white/80 mt-0.5">{featuredTime}</span>
+                          ) : (
+                            <span className="text-[0.75rem] text-white/80 mt-0.5">Station listing photo</span>
+                          )}
+                        </div>
+                      </div>
+
+                      {rest.length > 0 && (
+                        <div className="grid grid-cols-2 gap-2.5 mt-2.5">
+                          {rest.map((item) => (
+                            <div
+                              key={item.key}
+                              onClick={() => setSelectedPhoto(item.url)}
+                              className="relative w-full h-[150px] rounded-[18px] overflow-hidden cursor-pointer bg-surface-container"
+                            >
+                              <img src={item.url} alt="Station photo" className="w-full h-full object-cover" />
+                              <span
+                                className={`absolute top-2 left-2 inline-flex items-center gap-1 rounded-md text-[0.6875rem] font-bold px-1.5 py-0.5 ${
+                                  item.isLive ? 'bg-rd-available text-white' : 'bg-white text-rd-ink'
+                                }`}
+                              >
+                                {item.isLive ? 'Live' : 'Station listing'}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </>
+                  );
+                })()}
+
+                <p className="text-[0.75rem] text-rd-text-tertiary leading-relaxed mt-3.5">
+                  Live photos carry a burned-in timestamp. The listing photo was added when the
+                  station was suggested and isn&apos;t a status claim.
+                </p>
+
+                {onAddPhoto && (
+                  <div className="mt-3.5 flex flex-col items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={onAddPhoto}
+                      className="inline-flex items-center gap-2 rounded-full bg-primary text-white font-geist font-bold text-[0.9375rem] px-5 py-3 active:scale-95 transition-transform"
+                    >
+                      <span aria-hidden="true" className="material-symbols-outlined text-[18px]">add_a_photo</span>
+                      Add live photo
+                      <span className="text-[0.75rem] font-bold bg-white/20 rounded-full px-2 py-0.5">+15 pts</span>
+                    </button>
+                    <span className="text-[0.75rem] text-rd-text-tertiary">Camera only · gallery uploads blocked</span>
                   </div>
-                ))}
-              </div>
+                )}
+              </>
             ) : (
               <div className="py-6 text-center flex flex-col items-center gap-2">
                 <span aria-hidden="true" className="material-symbols-outlined text-[32px] text-slate-300">photo_camera</span>
@@ -574,26 +716,42 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
       <div className="fixed bottom-0 left-0 right-0 bg-white px-5 pt-3 shadow-[0_-10px_30px_rgba(20,32,26,0.12)] z-40 pb-safe">
         <div className="max-w-xl mx-auto flex flex-col gap-2">
           {activeTab === 'feed' && (
-            <form onSubmit={handlePostGroupComment} className="flex items-center gap-2">
-              <div className="flex-1 bg-surface-container rounded-full h-10 flex items-center px-4">
-                <input
-                  type="text"
-                  value={newCommentText}
-                  onChange={(e) => setNewCommentText(e.target.value)}
-                  placeholder="Post message to this station…"
-                  aria-label="Message to this station's group"
-                  className="w-full bg-transparent border-none outline-none text-caption text-on-surface placeholder:text-outline"
-                />
+            <>
+              {/* Nudge banner: pushes reporting over chatting, per design_handoff_cng_connect_mobile 4a */}
+              <div className="rounded-2xl bg-rd-available-container px-3.5 py-2.5 flex items-center gap-2.5">
+                <span aria-hidden="true" className="material-symbols-outlined text-rd-on-available-container text-[18px] shrink-0">campaign</span>
+                <p className="flex-1 text-[0.8125rem] font-semibold text-rd-on-available-container leading-snug">
+                  At the pump? A status report reaches more drivers than a message.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => onOpenReportModal(station)}
+                  className="shrink-0 rounded-full bg-primary text-white text-[0.75rem] font-bold px-3 py-1.5 active:scale-95 transition-transform"
+                >
+                  Report
+                </button>
               </div>
-              <button
-                type="submit"
-                disabled={!newCommentText.trim()}
-                aria-label="Post comment to station group"
-                className="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center disabled:opacity-40 active:scale-95 transition-all shrink-0"
-              >
-                <span aria-hidden="true" className="material-symbols-outlined text-[18px] material-symbols-fill">send</span>
-              </button>
-            </form>
+              <form onSubmit={handlePostGroupComment} className="flex items-center gap-2 mt-2">
+                <div className="flex-1 bg-surface-container rounded-full h-[46px] flex items-center px-4">
+                  <input
+                    type="text"
+                    value={newCommentText}
+                    onChange={(e) => setNewCommentText(e.target.value)}
+                    placeholder="Message drivers at this station"
+                    aria-label="Message to this station's group"
+                    className="w-full bg-transparent border-none outline-none text-caption text-on-surface placeholder:text-outline"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={!newCommentText.trim()}
+                  aria-label="Post comment to station group"
+                  className="w-[46px] h-[46px] rounded-full bg-primary text-white flex items-center justify-center disabled:opacity-40 active:scale-95 transition-all shrink-0"
+                >
+                  <span aria-hidden="true" className="material-symbols-outlined text-[18px] material-symbols-fill">send</span>
+                </button>
+              </form>
+            </>
           )}
 
           <div className="flex items-center gap-2 pb-1">
