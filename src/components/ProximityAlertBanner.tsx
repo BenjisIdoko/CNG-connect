@@ -112,7 +112,7 @@ export const ProximityAlertBanner: React.FC<ProximityAlertBannerProps> = ({
                 <button
                   key={opt.key}
                   onClick={() => handleQuickTap(opt.key)}
-                  className="flex items-center gap-2 bg-[#F5F6F4] rounded-[14px] p-3 text-left active:scale-95 transition-transform"
+                  className="flex items-center gap-2 bg-surface-container rounded-[14px] p-3 text-left active:scale-95 transition-transform"
                 >
                   <span className={`w-[26px] h-[26px] rounded-full text-white flex items-center justify-center shrink-0 ${opt.dot}`}>
                     <span aria-hidden="true" className="material-symbols-outlined text-[15px] material-symbols-fill">{opt.icon}</span>
@@ -122,7 +122,7 @@ export const ProximityAlertBanner: React.FC<ProximityAlertBannerProps> = ({
               ))}
             </div>
 
-            <div className="h-px bg-[#EEF0EA] mt-4" />
+            <div className="h-px bg-surface-container-highest mt-4" />
             <div className="flex items-center justify-between mt-3.5">
               <button
                 onClick={() => onShareStatus(station)}

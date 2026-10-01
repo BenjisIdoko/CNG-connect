@@ -102,7 +102,7 @@ export const CngRoiCalculatorModal: React.FC<CngRoiCalculatorModalProps> = ({
             </label>
           </div>
 
-          <div className="flex gap-1 bg-[#F6F5EF] rounded-full p-1">
+          <div className="flex gap-1 bg-surface-container rounded-full p-1">
             {[
               { on: true, label: 'Government grant' },
               { on: false, label: 'Self-funded kit' },
@@ -117,11 +117,11 @@ export const CngRoiCalculatorModal: React.FC<CngRoiCalculatorModalProps> = ({
           </div>
 
           <div className="grid grid-cols-2 gap-2.5">
-            <div className="bg-[#F1EFE6] rounded-2xl p-3">
+            <div className="bg-surface-container rounded-2xl p-3">
               <div className="text-micro font-semibold text-rd-text-tertiary">Payback</div>
               <div className="font-geist font-bold text-body text-rd-ink mt-0.5">{paybackMonths}</div>
             </div>
-            <div className="bg-[#F1EFE6] rounded-2xl p-3">
+            <div className="bg-surface-container rounded-2xl p-3">
               <div className="text-micro font-semibold text-rd-text-tertiary">CO₂ avoided</div>
               <div className="font-geist font-bold text-body text-rd-ink mt-0.5">{annualCo2SavedTons} t/yr</div>
             </div>
