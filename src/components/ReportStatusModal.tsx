@@ -129,150 +129,186 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
     }, 600);
   };
 
+  const isEv = station.stationType === 'ev_charging';
+  const statusOptions: { key: StationStatus; title: string; meaning: string; icon: string; solid: string; container: string }[] = isEv
+    ? [
+        { key: 'full', title: 'Available', meaning: 'Charger free, plug in now', icon: 'check_circle', solid: 'bg-rd-available', container: 'bg-rd-available-container' },
+        { key: 'queue', title: 'Busy', meaning: 'Charging, expect a wait', icon: 'schedule', solid: 'bg-rd-queuing', container: 'bg-rd-queuing-container' },
+        { key: 'low', title: 'All ports occupied', meaning: 'Every port is in use', icon: 'speed', solid: 'bg-rd-low', container: 'bg-rd-low-container' },
+        { key: 'out', title: 'Out of service', meaning: 'Not charging right now', icon: 'block', solid: 'bg-rd-out', container: 'bg-rd-out-container' },
+      ]
+    : [
+        { key: 'full', title: 'Available', meaning: 'Full stock, no wait', icon: 'check_circle', solid: 'bg-rd-available', container: 'bg-rd-available-container' },
+        { key: 'queue', title: 'Queuing', meaning: 'Gas is flowing, expect a wait', icon: 'schedule', solid: 'bg-rd-queuing', container: 'bg-rd-queuing-container' },
+        { key: 'low', title: 'Low pressure', meaning: "Slow fill, tank won't top up", icon: 'speed', solid: 'bg-rd-low', container: 'bg-rd-low-container' },
+        { key: 'out', title: 'Out of gas', meaning: 'Not dispensing right now', icon: 'block', solid: 'bg-rd-out', container: 'bg-rd-out-container' },
+      ];
+
   return (
-    <Modal isOpen={true} onClose={onClose} title="Report Status" className="bg-surface border-surface-container-highest max-h-[90vh] overflow-y-auto">
-      <div className="relative w-full max-w-lg bg-surface-container-high rounded-t-3xl sm:rounded-3xl z-10 max-h-[90vh] overflow-y-auto pb-safe">
-        <div className="px-5 pb-6 pt-2">
-          <div className="flex items-center gap-1 mb-4">
+    <Modal isOpen={true} onClose={onClose} title={`Report status for ${station.name}`} bare className="bg-white max-h-[90vh] overflow-y-auto">
+      <div data-theme="light" className="relative w-full max-w-lg bg-white rounded-t-[28px] sm:rounded-3xl z-10 max-h-[90vh] overflow-y-auto pb-safe">
+        <div className="px-5 pb-6 pt-7">
+          <div className="flex items-start justify-between gap-3 mb-4">
             <div className="min-w-0 flex-1">
-              <p className="text-caption text-outline truncate flex items-center gap-1.5">
+              <p className="font-geist-mono text-[11px] font-medium tracking-[0.08em] uppercase text-rd-text-tertiary truncate flex items-center gap-1.5">
                 {station.name}
                 <button
                   type="button"
                   onClick={() => setShowInfoSheet(true)}
                   aria-label="Station Group Policy Info"
-                  className="text-outline/70 hover:text-outline"
+                  className="text-outline/70 hover:text-outline shrink-0"
                 >
-                  <span aria-hidden="true" className="material-symbols-outlined text-[15px]">info</span>
+                  <span aria-hidden="true" className="material-symbols-outlined text-[14px]">info</span>
                 </button>
               </p>
+              <h1 className="font-geist text-[1.625rem] font-bold text-rd-ink tracking-tight leading-tight mt-0.5">
+                {isEv ? "How's the charger now?" : "How's the pump now?"}
+              </h1>
             </div>
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Close"
+              className="shrink-0 w-10 h-10 rounded-full bg-surface-container text-rd-ink flex items-center justify-center active:scale-95 transition-transform"
+            >
+              <span aria-hidden="true" className="material-symbols-outlined text-[20px]">close</span>
+            </button>
+          </div>
+
+          {/* Geofence banner — positive when presence is confirmed, blocking otherwise */}
+          <div
+            className={`mb-4 rounded-2xl p-3.5 flex items-start gap-2.5 ${
+              presenceActive ? 'bg-rd-available-container' : 'bg-rd-out-container'
+            }`}
+          >
+            <span
+              aria-hidden="true"
+              className={`material-symbols-outlined text-[20px] shrink-0 ${presenceActive ? 'text-rd-on-available-container' : 'text-rd-on-out-container'}`}
+            >
+              {presenceActive ? 'my_location' : 'location_off'}
+            </span>
+            <p className={`flex-1 text-caption font-semibold ${presenceActive ? 'text-rd-on-available-container' : 'text-rd-on-out-container'}`}>
+              {presenceActive
+                ? "You're at this station · reporting unlocked"
+                : 'Reports unlock within 150 m of the station so every status comes from someone actually there.'}
+            </p>
           </div>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            {/* 4 full-width single-tap status buttons */}
-            <div className="flex flex-col gap-2.5">
-              {(() => {
-                const isEv = station.stationType === 'ev_charging';
-                const options: {
-                  key: StationStatus;
-                  label: string;
-                  icon: string;
-                  dot: string;
-                  solid: string;
-                  shadow: string;
-                }[] = [
-                  { key: 'full', label: isEv ? 'Available' : 'Available — full stock', icon: 'check', dot: 'bg-status-green', solid: 'bg-status-green', shadow: 'shadow-[0_8px_20px_rgba(49,154,63,0.35)]' },
-                  { key: 'queue', label: isEv ? 'Busy' : 'Queuing / busy', icon: 'schedule', dot: 'bg-status-amber', solid: 'bg-status-amber', shadow: 'shadow-[0_8px_20px_rgba(245,166,35,0.35)]' },
-                  { key: 'low', label: isEv ? 'All ports occupied' : 'Low pressure', icon: 'warning', dot: 'bg-status-orange', solid: 'bg-status-orange', shadow: 'shadow-[0_8px_20px_rgba(248,91,35,0.35)]' },
-                  { key: 'out', label: isEv ? 'Out of service' : 'Out of service', icon: 'close', dot: 'bg-status-red', solid: 'bg-status-red', shadow: 'shadow-[0_8px_20px_rgba(229,72,77,0.35)]' },
-                ];
-                return options.map((opt) => {
-                  const on = selectedStatus === opt.key;
-                  return (
-                    <button
-                      key={opt.key}
-                      type="button"
-                      onClick={() => setSelectedStatus(opt.key)}
-                      aria-pressed={on}
-                      className={`w-full min-h-[58px] px-4 rounded-[18px] flex items-center gap-3 transition-all active:scale-[0.98] ${
-                        on ? `${opt.solid} text-white ${opt.shadow}` : 'bg-surface-container text-slate-900 shadow-[0_2px_8px_rgba(14,20,32,0.05)]'
-                      }`}
-                    >
-                      <span
-                        className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 text-white ${
-                          on ? 'bg-white/20' : opt.dot
+            {/* 4 full-width radio rows */}
+            <div className="flex flex-col gap-3.5">
+              {statusOptions.map((opt) => {
+                const on = selectedStatus === opt.key;
+                return (
+                  <button
+                    key={opt.key}
+                    type="button"
+                    onClick={() => setSelectedStatus(opt.key)}
+                    role="radio"
+                    aria-checked={on}
+                    className={`w-full min-h-[76px] px-[18px] rounded-[20px] flex items-center gap-3 transition-all active:scale-[0.98] ${
+                      on ? 'bg-white ring-[2.5px] ring-rd-ink' : 'bg-[#FAFBFA] ring-1 ring-[#E3E6E4]'
+                    }`}
+                  >
+                    <span className={`w-11 h-11 rounded-full flex items-center justify-center shrink-0 text-white ${opt.solid}`}>
+                      <span aria-hidden="true" className="material-symbols-outlined text-[22px] material-symbols-fill">{opt.icon}</span>
+                    </span>
+                    <span className="flex-1 text-left min-w-0">
+                      <span className="block font-geist text-[1.125rem] font-bold text-rd-ink truncate">{opt.title}</span>
+                      <span className="block text-[0.8125rem] text-rd-text-tertiary truncate">{opt.meaning}</span>
+                    </span>
+                    <span aria-hidden="true" className="material-symbols-outlined text-[22px] text-rd-ink shrink-0" style={{ fontVariationSettings: on ? "'FILL' 1" : "'FILL' 0" }}>
+                      {on ? 'radio_button_checked' : 'radio_button_unchecked'}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Optional details — collapsed by default (handoff: "happy path = 2 taps") */}
+            {!showMoreDetails ? (
+              <button
+                type="button"
+                onClick={() => setShowMoreDetails(true)}
+                className="w-full bg-white ring-1 ring-[#E3E6E4] rounded-[20px] px-[18px] py-4 flex items-center gap-3 text-left active:scale-[0.99] transition-transform"
+              >
+                <span aria-hidden="true" className="material-symbols-outlined text-[20px] text-primary shrink-0">add_a_photo</span>
+                <span className="flex-1 min-w-0">
+                  <span className="block font-geist text-[0.9375rem] font-semibold text-rd-ink">Add wait time, live photo or note</span>
+                  <span className="block text-[0.75rem] text-rd-text-tertiary">Optional · verified photos earn +15 pts</span>
+                </span>
+                <span aria-hidden="true" className="material-symbols-outlined text-[20px] text-rd-text-tertiary shrink-0">expand_more</span>
+              </button>
+            ) : (
+              <div className="bg-surface-container rounded-2xl p-3.5 flex flex-col gap-3.5">
+                <div>
+                  <p className="text-[0.75rem] font-bold text-outline uppercase tracking-wider">Wait time (optional)</p>
+                  <div className="flex gap-1.5 mt-2">
+                    {[
+                      { label: '0–5m', v: 5 },
+                      { label: '5–15m', v: 15 },
+                      { label: '15–30m', v: 30 },
+                      { label: '30m+', v: 45 },
+                    ].map((chip) => (
+                      <button
+                        key={chip.v}
+                        type="button"
+                        onClick={() => setWaitTime(chip.v)}
+                        className={`rounded-lg px-3 py-1.5 text-micro font-semibold transition-colors ${
+                          waitTime === chip.v ? 'bg-rd-ink text-white' : 'bg-surface-container-high text-slate-500'
                         }`}
                       >
-                        <span aria-hidden="true" className="material-symbols-outlined text-[18px] material-symbols-fill">{opt.icon}</span>
-                      </span>
-                      <span className={`flex-1 text-left text-body ${on ? 'font-extrabold' : 'font-semibold'}`}>{opt.label}</span>
-                      {on && <span aria-hidden="true" className="material-symbols-outlined text-[20px]">check</span>}
-                    </button>
-                  );
-                });
-              })()}
-            </div>
-
-            {/* Optional details */}
-            <div className="bg-surface-container rounded-2xl p-3.5 flex flex-col gap-3.5">
-              <div>
-                <p className="text-[0.75rem] font-bold text-outline uppercase tracking-wider">Wait time (optional)</p>
-                <div className="flex gap-1.5 mt-2">
-                  {[
-                    { label: '0–5m', v: 5 },
-                    { label: '5–15m', v: 15 },
-                    { label: '15–30m', v: 30 },
-                    { label: '30m+', v: 45 },
-                  ].map((chip) => (
-                    <button
-                      key={chip.v}
-                      type="button"
-                      onClick={() => setWaitTime(chip.v)}
-                      className={`rounded-lg px-3 py-1.5 text-micro font-semibold transition-colors ${
-                        waitTime === chip.v ? 'bg-deep-teal text-white' : 'bg-surface-container-high text-slate-500'
-                      }`}
-                    >
-                      {chip.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                {photoError && (
-                  <div role="alert" className="mb-2 p-2.5 bg-status-red-container rounded-xl text-rose-700 text-micro font-medium flex items-start gap-2">
-                    <span aria-hidden="true" className="material-symbols-outlined text-[16px] shrink-0 text-status-red">gpp_bad</span>
-                    <span>{photoError}</span>
+                        {chip.label}
+                      </button>
+                    ))}
                   </div>
-                )}
-                {attachedPhoto ? (
-                  <div className="relative rounded-xl overflow-hidden bg-black/10">
-                    <img src={attachedPhoto} alt="Verified meter snapshot" className="w-full h-32 object-cover" />
-                    <div className="absolute bottom-2 left-2 bg-slate-900/85 text-white text-[0.75rem] font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
-                      <span aria-hidden="true" className="material-symbols-outlined text-[14px] text-status-green">verified</span>
-                      Live camera verified
+                </div>
+
+                <div>
+                  {photoError && (
+                    <div role="alert" className="mb-2 p-2.5 bg-status-red-container rounded-xl text-rose-700 text-micro font-medium flex items-start gap-2">
+                      <span aria-hidden="true" className="material-symbols-outlined text-[16px] shrink-0 text-status-red">gpp_bad</span>
+                      <span>{photoError}</span>
                     </div>
+                  )}
+                  {attachedPhoto ? (
+                    <div className="relative rounded-xl overflow-hidden bg-black/10">
+                      <img src={attachedPhoto} alt="Verified meter snapshot" className="w-full h-32 object-cover" />
+                      <div className="absolute bottom-2 left-2 bg-slate-900/85 text-white text-[0.75rem] font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
+                        <span aria-hidden="true" className="material-symbols-outlined text-[14px] text-status-green">verified</span>
+                        Live camera verified
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setAttachedPhoto(null);
+                          setPhotoError(null);
+                        }}
+                        aria-label="Delete attached photo"
+                        className="absolute top-2 right-2 w-9 h-9 bg-black/70 text-white rounded-full flex items-center justify-center"
+                      >
+                        <span aria-hidden="true" className="material-symbols-outlined text-[16px]">delete</span>
+                      </button>
+                    </div>
+                  ) : (
                     <button
                       type="button"
-                      onClick={() => {
-                        setAttachedPhoto(null);
-                        setPhotoError(null);
-                      }}
-                      aria-label="Delete attached photo"
-                      className="absolute top-2 right-2 w-9 h-9 bg-black/70 text-white rounded-full flex items-center justify-center"
+                      onClick={() => setShowLiveCamera(true)}
+                      className="w-full flex items-center gap-2 bg-surface-container-high rounded-xl p-2.5 text-left active:scale-[0.99] transition-transform"
                     >
-                      <span aria-hidden="true" className="material-symbols-outlined text-[16px]">delete</span>
+                      <span aria-hidden="true" className="material-symbols-outlined text-[20px] text-slate-700">photo_camera</span>
+                      <span className="text-caption font-semibold flex-1">Add live photo</span>
+                      <span className="text-[0.75rem] text-outline">Gallery blocked</span>
                     </button>
-                  </div>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => setShowLiveCamera(true)}
-                    className="w-full flex items-center gap-2 bg-surface-container-high rounded-xl p-2.5 text-left active:scale-[0.99] transition-transform"
-                  >
-                    <span aria-hidden="true" className="material-symbols-outlined text-[20px] text-slate-700">photo_camera</span>
-                    <span className="text-caption font-semibold flex-1">Add live photo</span>
-                    <span className="text-[0.75rem] text-outline">Gallery blocked</span>
-                  </button>
-                )}
-              </div>
-
-              <input
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                placeholder="Add a note (optional)"
-                className="w-full bg-surface-container-high rounded-xl px-3 py-2.5 text-caption text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary/30"
-              />
-            </div>
-
-            {!presenceActive && (
-              <div className="bg-status-red-container rounded-2xl p-3.5 text-rose-900 flex items-start gap-2.5">
-                <span aria-hidden="true" className="material-symbols-outlined text-[22px] text-status-red shrink-0">location_off</span>
-                <div className="flex-1 text-caption">
-                  <strong className="block font-extrabold mb-0.5">You need to be at the station</strong>
-                  <span>Reports need active GPS presence within the station&apos;s geofence.</span>
+                  )}
                 </div>
+
+                <input
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  placeholder="Add a note (optional)"
+                  className="w-full bg-surface-container-high rounded-xl px-3 py-2.5 text-caption text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary/30"
+                />
               </div>
             )}
 
@@ -286,7 +322,7 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
             <button
               type="submit"
               disabled={!presenceActive || isSubmitting}
-              className="w-full py-4 flex items-center justify-center bg-primary text-white rounded-full font-bold text-body active:scale-[0.98] transition-all disabled:opacity-50"
+              className="w-full h-[58px] flex items-center justify-center gap-2 bg-primary text-white rounded-full font-geist font-bold text-body active:scale-[0.98] transition-all disabled:bg-[#B9BCC2] disabled:opacity-100"
             >
               {isSubmitting ? (
                 <div className="flex items-center gap-2">
@@ -294,7 +330,10 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
                   <span>Submitting…</span>
                 </div>
               ) : (
-                <span>Submit Report</span>
+                <>
+                  <span>Submit report</span>
+                  <span className="text-[0.75rem] font-bold bg-white/20 rounded-full px-2 py-0.5">+10 pts</span>
+                </>
               )}
             </button>
           </form>
