@@ -78,11 +78,21 @@ revoke all on function admin_update_profile(uuid, text, text, text, text, text, 
 grant execute on function admin_update_profile(uuid, text, text, text, text, text, boolean) to authenticated;
 
 -- Deletes the Supabase Auth user outright (not just the profile row) —
--- profiles.id references auth.users(id) on delete cascade, so this also
--- removes their profile, reports, posts, etc. There's no client-safe Admin
--- API call available without a service-role key, so this deletes straight
--- from auth.users instead; the function runs as its owner (postgres),
--- which already has the privileges Supabase's own dashboard uses for this.
+-- profiles.id references auth.users(id) on delete cascade, so that part
+-- (profile, referrals, station_managers rows) cleans up on its own. But
+-- station_reports, community_posts, post_comments, station_comments, and
+-- station_suggestions all reference auth.users directly with NO ACTION
+-- (not CASCADE) — so without deleting those rows first, `delete from
+-- auth.users` fails with a foreign-key violation for any user who has
+-- ever filed a report, comment, post, or suggestion, i.e. almost anyone
+-- an admin would actually want to delete. (community_posts cascades on to
+-- that post's own comments/likes from other users; station_reports
+-- cascades to its flags and nulls out station_media.report_id — both
+-- already handled by their own FKs, no extra statements needed for those.)
+-- There's no client-safe Admin API call available without a service-role
+-- key, so this deletes straight from auth.users instead; the function
+-- runs as its owner (postgres), which already has the privileges
+-- Supabase's own dashboard uses for this.
 create or replace function admin_delete_user(p_user_id uuid)
 returns void
 language plpgsql
@@ -99,6 +109,12 @@ begin
   if p_user_id = auth.uid() then
     raise exception 'cannot delete your own account from here';
   end if;
+
+  delete from community_posts where user_id = p_user_id;
+  delete from station_reports where user_id = p_user_id;
+  delete from station_comments where user_id = p_user_id;
+  delete from post_comments where user_id = p_user_id;
+  delete from station_suggestions where user_id = p_user_id;
 
   delete from auth.users where id = p_user_id;
   if not found then
