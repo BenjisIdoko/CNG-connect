@@ -963,10 +963,10 @@ export const apiService = {
   },
 
   /**
-   * Fetch the ranked driver leaderboard from `public_profiles` — a view
-   * exposing only the safe, genuinely-public columns (no email/phone). See
-   * supabase/fix-public-profile-pii-exposure.sql: the underlying `profiles`
-   * table is no longer publicly readable at all.
+   * Fetch the ranked driver leaderboard via the `get_leaderboard` RPC — it
+   * returns only the safe, genuinely-public columns (no email/phone). See
+   * supabase/fix-public-profiles-security-definer-view.sql: the underlying
+   * `profiles` table is no longer publicly readable at all.
    * Returns [] when the backend isn't configured or no driver has points yet
    * — there is no seed/mock fallback.
    */
@@ -974,11 +974,7 @@ export const apiService = {
     const supabase = isSupabaseConfigured ? await getSupabase() : null;
     if (!supabase) return [];
     try {
-      const { data, error } = await supabase
-        .from('public_profiles')
-        .select('id,name,state,avatar,community_points,reports_count,vehicle')
-        .order('community_points', { ascending: false })
-        .limit(100);
+      const { data, error } = await supabase.rpc('get_leaderboard', { p_limit: 100 });
       if (error || !data) {
         console.error('Supabase fetchLeaderboard failed:', error?.message);
         return [];
