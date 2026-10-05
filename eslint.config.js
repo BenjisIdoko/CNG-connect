@@ -38,8 +38,8 @@ export default tseslint.config(
     },
   },
   {
-    // Build/tooling scripts run under Node.
-    files: ['scripts/**/*.js'],
+    // Build/tooling scripts run under Node (both CommonJS and ESM).
+    files: ['scripts/**/*.js', 'scripts/**/*.mjs'],
     languageOptions: {
       globals: {
         process: 'readonly',
@@ -48,6 +48,9 @@ export default tseslint.config(
         __dirname: 'readonly',
         module: 'writable',
         require: 'readonly',
+        URL: 'readonly',
+        fetch: 'readonly',
+        Response: 'readonly',
       },
     },
   }
