@@ -8,12 +8,13 @@ import { ReportsPanel } from './ReportsPanel';
 import { UsersPanel } from './UsersPanel';
 import { MyStationsPanel } from './MyStationsPanel';
 import { AirtimePayouts } from '../AirtimePayouts';
+import { FEATURES } from '../../config/features';
 
 const ADMIN_NAV: AdminNavItem[] = [
   { key: 'stations', label: 'Stations', icon: 'pin_drop' },
   { key: 'reports', label: 'Report moderation', icon: 'flag' },
   { key: 'users', label: 'Users', icon: 'groups' },
-  { key: 'payouts', label: 'Airtime payouts', icon: 'call' },
+  ...(FEATURES.ENABLE_REFERRALS ? [{ key: 'payouts', label: 'Airtime payouts', icon: 'call' }] : []),
 ];
 const MANAGER_NAV: AdminNavItem[] = [{ key: 'mystations', label: 'My stations', icon: 'local_gas_station' }];
 
@@ -58,7 +59,7 @@ export const AdminScreen: React.FC<{ onExit: () => void }> = ({ onExit }) => {
         {isAdmin && activeKey === 'stations' && <StationsPanel flash={flash} />}
         {isAdmin && activeKey === 'reports' && <ReportsPanel flash={flash} />}
         {isAdmin && activeKey === 'users' && <UsersPanel flash={flash} />}
-        {isAdmin && activeKey === 'payouts' && (
+        {FEATURES.ENABLE_REFERRALS && isAdmin && activeKey === 'payouts' && (
           <div className="h-full overflow-y-auto">
             <div className="max-w-2xl mx-auto p-4 pb-16">
               <AirtimePayouts supabase={supabase} flash={flash} />

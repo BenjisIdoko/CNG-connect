@@ -1,5 +1,6 @@
 import { ShareAppSheet } from './components/ShareAppSheet';
 import { captureReferralFromUrl, clearPendingReferral, getPendingReferral } from './utils/referral';
+import { FEATURES } from './config/features';
 import React, { useState, useEffect, useMemo, useCallback, useRef, Suspense } from 'react';
 import { safeLazy } from './utils/safeLazy';
 import {
@@ -136,10 +137,11 @@ export const App: React.FC = () => {
   // Referral promo: remember ?ref=CODE from the link a friend shared, then claim it once the
   // new driver has finished signing up (name + phone saved). Old accounts are turned down by the server.
   useEffect(() => {
-    captureReferralFromUrl();
+    if (FEATURES.ENABLE_REFERRALS) captureReferralFromUrl();
   }, []);
   const referralClaimStarted = useRef(false);
   useEffect(() => {
+    if (!FEATURES.ENABLE_REFERRALS) return;
     if (referralClaimStarted.current) return;
     if (!isAuthenticated || needsPhone || !driverProfile.name.trim()) return;
     const code = getPendingReferral();
@@ -537,7 +539,10 @@ export const App: React.FC = () => {
 
   // The "Share the App" buttons open a sheet that explains the promo and shares the driver's link.
   const [isShareSheetOpen, setIsShareSheetOpen] = useState(false);
-  const handleShareApp = () => setIsShareSheetOpen(true);
+  const handleShareApp = () => {
+    if (!FEATURES.ENABLE_REFERRALS) return;
+    setIsShareSheetOpen(true);
+  };
 
   // Browsing (map, stations, community feed) stays open to guests; writing
   // (reports, comments, likes, suggestions) requires a verified session —
@@ -891,7 +896,7 @@ export const App: React.FC = () => {
             setActiveTab(tab);
           }}
           userProfile={userProfile}
-          onShareApp={handleShareApp}
+          onShareApp={FEATURES.ENABLE_REFERRALS ? handleShareApp : undefined}
           onOpenRoiCalculator={() => setIsRoiModalOpen(true)}
           forceLight={!isMapHome}
         />
@@ -903,7 +908,7 @@ export const App: React.FC = () => {
           title={headerTitle || 'CNG-Connect'}
           showBack={showHeaderBack}
           onBack={onHeaderBack}
-          onShareApp={handleShareApp}
+          onShareApp={FEATURES.ENABLE_REFERRALS ? handleShareApp : undefined}
           mobileHidden={isMapHome || isProfileHome || isStationDetail}
           forceLight={!isMapHome}
         />
@@ -964,7 +969,7 @@ export const App: React.FC = () => {
               onNavigate={handleNavigate}
               gpsStatus={gpsStatus}
               userGps={userCoords}
-              onShareApp={handleShareApp}
+              onShareApp={FEATURES.ENABLE_REFERRALS ? handleShareApp : undefined}
               onGpsStatusChange={(status, coords) => {
                 setGpsStatus(status);
                 if (coords) setUserCoords(coords);
@@ -1098,7 +1103,7 @@ export const App: React.FC = () => {
           onSubmitPost={handleCreatePost}
         />
 
-        {isShareSheetOpen && (
+        {FEATURES.ENABLE_REFERRALS && isShareSheetOpen && (
           <ShareAppSheet
             onClose={() => setIsShareSheetOpen(false)}
             onSignIn={() => {

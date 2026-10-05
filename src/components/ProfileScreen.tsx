@@ -1,4 +1,5 @@
 import { InviteCard } from './InviteCard';
+import { FEATURES } from '../config/features';
 import { validatePhoneNumber } from '../utils/phoneValidator';
 import { BUILD_ID, checkForAppUpdate } from '../utils/appUpdate';
 import React, { useState } from 'react';
@@ -311,7 +312,9 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
           </div>
         )}
 
-        <InviteCard onSignIn={onOpenSignUp} onToast={showToast} />
+        {FEATURES.ENABLE_REFERRALS && (
+          <InviteCard onSignIn={onOpenSignUp} onToast={showToast} />
+        )}
 
         {/* Savings summary → canonical calculator */}
         <div

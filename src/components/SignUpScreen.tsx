@@ -5,6 +5,7 @@ import { validateEmail } from '../utils/emailValidator';
 import { useAuth } from '../context/AuthContext';
 import { Icon } from './common/Icon';
 import { clearPendingReferral, getPendingReferral, parseReferralCode, setPendingReferral } from '../utils/referral';
+import { FEATURES } from '../config/features';
 
 interface SignUpScreenProps {
   /** Called once the driver is fully signed in — for a returning driver this fires right after OTP verification; for a new driver, after they complete their profile. */
@@ -145,7 +146,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
     }
 
     // Keep the invite code for the app to claim once the profile is saved.
-    if (!phoneOnly) {
+    if (!phoneOnly && FEATURES.ENABLE_REFERRALS) {
       const typed = inviteCode.trim();
       if (typed) {
         if (!parseReferralCode(typed)) {
@@ -417,49 +418,52 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
                 )}
               </div>
 
-              {!phoneOnly && (<>
-              <div>
-                {!showInvite ? (
-                  <button
-                    type="button"
-                    onClick={() => setShowInvite(true)}
-                    className="text-[0.8125rem] font-bold text-primary"
-                  >
-                    Have an invite code?
-                  </button>
-                ) : (
-                  <>
-                    <label htmlFor="signup-invite" className="block text-[0.7812rem] font-semibold text-rd-text-tertiary mb-1">
-                      Invite code <span className="text-outline font-medium">(optional)</span>
-                    </label>
-                    <div className={`flex items-center bg-white border rounded-2xl px-3.5 h-12 transition-all ${
-                      inviteError ? 'border-status-red ring-2 ring-status-red/20' : 'border-outline-variant focus-within:ring-2 focus-within:ring-primary/30 focus-within:border-primary'
-                    }`}>
-                      <span aria-hidden="true" className="material-symbols-outlined text-outline text-[20px] mr-2">share</span>
-                      <input
-                        id="signup-invite"
-                        type="text"
-                        autoCapitalize="characters"
-                        autoCorrect="off"
-                        spellCheck={false}
-                        maxLength={12}
-                        value={inviteCode}
-                        onChange={(e) => {
-                          setInviteCode(e.target.value.toUpperCase());
-                          if (inviteError) setInviteError(null);
-                        }}
-                        placeholder="e.g. K7M2QX"
-                        className="flex-1 bg-transparent text-[0.9062rem] font-semibold tracking-widest text-rd-ink outline-none placeholder:font-medium placeholder:tracking-normal"
-                      />
+              {!phoneOnly && (
+                <>
+                  {FEATURES.ENABLE_REFERRALS && (
+                    <div>
+                      {!showInvite ? (
+                        <button
+                          type="button"
+                          onClick={() => setShowInvite(true)}
+                          className="text-[0.8125rem] font-bold text-primary"
+                        >
+                          Have an invite code?
+                        </button>
+                      ) : (
+                        <>
+                          <label htmlFor="signup-invite" className="block text-[0.7812rem] font-semibold text-rd-text-tertiary mb-1">
+                            Invite code <span className="text-outline font-medium">(optional)</span>
+                          </label>
+                          <div className={`flex items-center bg-white border rounded-2xl px-3.5 h-12 transition-all ${
+                            inviteError ? 'border-status-red ring-2 ring-status-red/20' : 'border-outline-variant focus-within:ring-2 focus-within:ring-primary/30 focus-within:border-primary'
+                          }`}>
+                            <span aria-hidden="true" className="material-symbols-outlined text-outline text-[20px] mr-2">share</span>
+                            <input
+                              id="signup-invite"
+                              type="text"
+                              autoCapitalize="characters"
+                              autoCorrect="off"
+                              spellCheck={false}
+                              maxLength={12}
+                              value={inviteCode}
+                              onChange={(e) => {
+                                setInviteCode(e.target.value.toUpperCase());
+                                if (inviteError) setInviteError(null);
+                              }}
+                              placeholder="e.g. K7M2QX"
+                              className="flex-1 bg-transparent text-[0.9062rem] font-semibold tracking-widest text-rd-ink outline-none placeholder:font-medium placeholder:tracking-normal"
+                            />
+                          </div>
+                          {inviteError ? (
+                            <p className="text-[0.7812rem] font-medium text-status-red mt-1">{inviteError}</p>
+                          ) : (
+                            <p className="text-[0.7812rem] text-outline mt-1">From a friend who shared the app with you.</p>
+                          )}
+                        </>
+                      )}
                     </div>
-                    {inviteError ? (
-                      <p className="text-[0.7812rem] font-medium text-status-red mt-1">{inviteError}</p>
-                    ) : (
-                      <p className="text-[0.7812rem] text-outline mt-1">From a friend who shared the app with you.</p>
-                    )}
-                  </>
-                )}
-              </div>
+                  )}
 
 
               <div>
