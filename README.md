@@ -8,7 +8,7 @@
 [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4-38B2AC.svg?logo=tailwind-css)](https://tailwindcss.com/)
 [![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL%2C%20Auth%20%26%20Storage-emerald.svg?logo=supabase)](https://supabase.com/)
 [![Vercel](https://img.shields.io/badge/Vercel-Serverless-black.svg?logo=vercel)](https://vercel.com/)
-[![Tests](https://img.shields.io/badge/Tests-87%2F87%20Passed-success.svg)](https://vitest.dev/)
+[![Tests](https://img.shields.io/badge/Tests-130%2F130%20Passed-success.svg)](https://vitest.dev/)
 
 **CNG-Connect** is a driver-facing PWA built for Nigerian commercial (Bolt, Uber, inDrive) and private drivers running on Compressed Natural Gas. Built in support of the Presidential CNG & EV Initiative (Pi-CNG), it provides a live, crowdsourced map of CNG refuelling stations, a directory of accredited conversion centres, a fuel-savings calculator, a driver community, and an internal toolset for keeping the underlying station data accurate.
 
@@ -72,7 +72,7 @@ Two hidden, authentication-gated routes exist for keeping station data accurate 
 | **AI Assistant** | Vercel Serverless Function (`api/chat.ts`) calling Gemini |
 | **PWA** | `vite-plugin-pwa` (Workbox) — offline caching, installability |
 | **State Management** | React Context (`AuthContext`) + component state; no global store |
-| **Test Runner** | Vitest (87 tests) |
+| **Test Runner** | Vitest (130 tests) |
 
 The app runs as a client-only SPA — there's no traditional application server. The React client talks to Supabase directly with a public anon key; every write that needs privilege beyond "any signed-in driver" (station edits, admin actions, point awards) goes through a Postgres RPC function that checks authorization server-side, rather than trusting the client.
 
@@ -159,7 +159,7 @@ Open [http://localhost:3002](http://localhost:3002).
 ## 🧪 Verification & Testing
 
 ```bash
-npm test           # Vitest — 87 tests across formatting, validation, proximity/push logic, etc.
+npm test           # Vitest — 130 tests across formatting, validation, proximity/push logic, etc.
 npx tsc --noEmit   # TypeScript compiler check
 npm run build      # Production build
 ```
