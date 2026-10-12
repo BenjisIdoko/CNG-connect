@@ -9,10 +9,9 @@ interface HeaderProps {
   rightAction?: React.ReactNode;
   /** Hide on phone widths (the map screen draws its own overlay header). */
   mobileHidden?: boolean;
-  /** Force the light palette regardless of system/app theme — every redesigned screen this
-      header sits above is force-light (no dark values in the handoff yet) except Map, whose
-      desktop panel still supports real dark mode. Without this, the header mismatched the
-      force-light content below it whenever the system was in dark mode. */
+  /** Force the light palette regardless of system/app theme. Every screen this header sits
+      above is force-light (the handoff has no dark values yet), so without this the header
+      mismatched the content below it whenever the system was in dark mode. */
   forceLight?: boolean;
 }
 

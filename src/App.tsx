@@ -898,7 +898,7 @@ export const App: React.FC = () => {
           userProfile={userProfile}
           onShareApp={FEATURES.ENABLE_REFERRALS ? handleShareApp : undefined}
           onOpenRoiCalculator={() => setIsRoiModalOpen(true)}
-          forceLight={!isMapHome}
+          forceLight
         />
       )}
 
@@ -910,7 +910,7 @@ export const App: React.FC = () => {
           onBack={onHeaderBack}
           onShareApp={FEATURES.ENABLE_REFERRALS ? handleShareApp : undefined}
           mobileHidden={isMapHome || isProfileHome || isStationDetail}
-          forceLight={!isMapHome}
+          forceLight
         />
       )}
 

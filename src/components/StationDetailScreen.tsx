@@ -6,7 +6,8 @@ import { GasStation, CommentItem, UserProfile, DriverReport } from '../types';
 import { ASSETS } from '../data/mockData';
 import { openExternalMaps } from '../utils/navigationHelper';
 import { StationGroupInfoSheet } from './StationGroupInfoSheet';
-import { formatStationAge, formatRelativeTime, isIsoTimestamp, minutesSince } from '../utils/timeUtils';
+import { formatRelativeTime, isIsoTimestamp, minutesSince } from '../utils/timeUtils';
+import { getFreshness, STATUS_SHORT_LABEL } from '../utils/stationFreshness';
 import { openWhatsAppShare } from '../utils/shareMessageBuilder';
 import { describeLocationPrecision } from '../utils/locationPrecision';
 
@@ -359,8 +360,12 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
             this pass doesn't add; see the age line used elsewhere in the app instead. */}
         {station.stationType !== 'ev_charging' &&
           (() => {
-            const cardInfo = STATUS_CARD_INFO[station.status] || STATUS_CARD_INFO.unknown;
-            const isUnknown = station.status === 'unknown';
+            // Only a report from the last 24h counts as the station's current status; anything
+            // older is shown as "last known" so a days-old green tick can't pass as live.
+            const freshness = getFreshness(station);
+            const isLive = freshness.tier === 'fresh' || freshness.tier === 'recent';
+            const isStale = freshness.tier === 'stale' && !!freshness.lastKnownStatus;
+            const cardInfo = (isLive && STATUS_CARD_INFO[station.status]) || STATUS_CARD_INFO.unknown;
             return (
               <div className="flex flex-col gap-3">
                 <div className="rounded-[22px] bg-white shadow-[0_1px_2px_rgba(20,32,26,0.05),0_8px_24px_rgba(20,32,26,0.05)] p-4 flex items-center gap-3">
@@ -369,20 +374,26 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                   </span>
                   <div className="min-w-0 flex-1">
                     <p className="font-geist font-bold text-[1.25rem] text-rd-ink leading-tight truncate">
-                      {isUnknown ? 'No report today' : getFormattedStatusPillText(station)}
+                      {isLive
+                        ? getFormattedStatusPillText(station)
+                        : isStale
+                        ? `Last reported: ${STATUS_SHORT_LABEL[freshness.lastKnownStatus!]}`
+                        : 'No report today'}
                     </p>
                     <p className="text-caption text-rd-text-tertiary mt-0.5">
-                      {isUnknown
-                        ? 'Be the first to tell drivers if this station has gas.'
-                        : formatStationAge(station)}
+                      {isLive
+                        ? `Updated ${freshness.ageText}`
+                        : isStale
+                        ? `${freshness.ageText} · it may have changed since. Tell drivers what it's like now.`
+                        : 'Be the first to tell drivers if this station has gas.'}
                     </p>
                   </div>
                 </div>
-                {isUnknown && (
+                {!isLive && (
                   <div className="rounded-2xl bg-rd-available-container px-4 py-3 flex items-center gap-3">
                     <span aria-hidden="true" className="material-symbols-outlined text-rd-on-available-container text-[20px] shrink-0">bolt</span>
                     <p className="flex-1 text-caption font-semibold text-rd-on-available-container">
-                      At the station? Be the first to report today.
+                      {isStale ? 'At the station? Tell drivers how it is now.' : 'At the station? Be the first to report today.'}
                     </p>
                     <span className="shrink-0 text-[0.75rem] font-bold text-rd-on-available-container">+10 pts</span>
                   </div>

@@ -9,8 +9,9 @@ import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 import { GasStation, StationStatus, StationSuggestion } from '../types';
 import { Modal } from './common/Modal';
-import { formatStationAge } from '../utils/timeUtils';
-import { ASSETS } from '../data/mockData';
+import { ASSETS, SHOW_EV_STATIONS } from '../data/mockData';
+import { StationStatusChip } from './common/StationStatusChip';
+import { getFreshness, describeStatus, freshnessRank, currentStatus } from '../utils/stationFreshness';
 import { StationSearchOverlay, rememberRecentStation } from './StationSearchOverlay';
 import { searchTokens, stationMatchesQuery, stationSearchScore } from '../utils/stationSearch';
 import { SuggestStationModal } from './SuggestStationModal';
@@ -64,6 +65,9 @@ export const MapScreen: React.FC<MapScreenProps> = ({
 }) => {
   const [activeFilter, setActiveFilter] = useState<string>('all');
   const [stationTypeFilter, setStationTypeFilter] = useState<'all' | 'cng' | 'ev_charging'>('all');
+  // Desktop list order. 'auto' = nearest when we know where the driver is, otherwise the
+  // stations with the freshest reports first (distance means nothing without a location).
+  const [desktopSort, setDesktopSort] = useState<'auto' | 'nearest' | 'freshest'>('auto');
   const [activeCity, setActiveCity] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -293,7 +297,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
   // Same scope as filteredStations but ignoring the status filter — what "All {n}" counts.
   const scopedCount = baseStations.filter(matchesScope).length;
   const filteredStations = baseStations.filter(
-    (st) => matchesScope(st) && (activeFilter === 'all' || st.status === activeFilter)
+    (st) => matchesScope(st) && (activeFilter === 'all' || currentStatus(st) === activeFilter)
   );
   // While searching, best matches first (then nearest); otherwise keep the natural order.
   if (searchTokens(searchQuery).length > 0) {
@@ -301,6 +305,20 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       (a, b) => stationSearchScore(b, searchQuery) - stationSearchScore(a, searchQuery) || getDistanceKm(a) - getDistanceKm(b),
     );
   }
+
+  const effectiveDesktopSort: 'nearest' | 'freshest' = desktopSort === 'auto' ? (userGps ? 'nearest' : 'freshest') : desktopSort;
+  // While searching, keep best-match order; otherwise apply the chosen sort.
+  const desktopStations = searchTokens(searchQuery).length > 0
+    ? filteredStations
+    : [...filteredStations].sort((a, b) =>
+        effectiveDesktopSort === 'nearest'
+          ? getDistanceKm(a) - getDistanceKm(b)
+          : freshnessRank(a) - freshnessRank(b) || getDistanceKm(a) - getDistanceKm(b),
+      );
+  const desktopLiveCount = filteredStations.filter((st) => {
+    const tier = getFreshness(st).tier;
+    return tier === 'fresh' || tier === 'recent';
+  }).length;
 
   // Once the driver pauses typing, bring the matching stations into view.
   useEffect(() => {
@@ -455,12 +473,16 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       const isSelected = selectedStation?.id === st.id;
       const isEv = st.stationType === 'ev_charging';
 
-      let colorClass = '#12A150';
+      // A report older than 24h (or none at all) is shown grey: a confident green pin for a
+      // station nobody has reported on in days is worse than no colour.
+      const freshness = getFreshness(st);
+      const liveStatus = freshness.tier === 'fresh' || freshness.tier === 'recent' ? freshness.lastKnownStatus : null;
+      let colorClass = '#8B9389';
       const iconSymbol = isEv ? 'bolt' : 'local_gas_station';
-      if (st.status === 'queue') colorClass = '#E0A106';
-      if (st.status === 'low') colorClass = '#E0600B';
-      if (st.status === 'out') colorClass = '#D92D20';
-      if (st.status === 'unknown') colorClass = '#8B9389';
+      if (liveStatus === 'full') colorClass = '#12A150';
+      if (liveStatus === 'queue') colorClass = '#E0A106';
+      if (liveStatus === 'low') colorClass = '#E0600B';
+      if (liveStatus === 'out') colorClass = '#D92D20';
 
       // Precision tier drives the pin's confidence: exact pins are solid glowing
       // dots, approximate ones are hollow/dashed with an accuracy ring.
@@ -487,7 +509,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       // (ours) is a plain <div>, so without this it has no accessible name at all, and a
       // screen reader falls back to the icon glyph's raw text ("local_gas_station"). Its
       // `title` option, unlike `alt`, is applied to any icon type and doubles as the name.
-      const markerLabel = [st.name, st.area || st.city, getStatusIndicator(st.status).shortLabel]
+      const markerLabel = [st.name, st.area || st.city, describeStatus(st)]
         .filter(Boolean)
         .join(', ');
       const marker = L.marker([lat, lng], { icon: customIcon, title: markerLabel });
@@ -723,11 +745,12 @@ export const MapScreen: React.FC<MapScreenProps> = ({
   // Plain list row in the style of ride-hailing apps: icon, name, one quiet line, and a
   // navigate button. The whole row opens the station.
   const renderPhoneRow = (station: GasStation) => {
-    const info = getStatusIndicator(station.status);
+    const freshness = getFreshness(station);
+    const dotColor =
+      freshness.tier === 'fresh' || freshness.tier === 'recent'
+        ? getStatusIndicator(freshness.lastKnownStatus ?? 'unknown').dotColor
+        : 'bg-slate-400';
     const isPinned = pinnedId === station.id;
-    // Age is only worth showing next to a real status — for 'unknown' it would just repeat
-    // "No recent report" a second time.
-    const age = station.status !== 'unknown' ? formatStationAge(station).replace(/^Updated /, '') : null;
     const open = () => {
       onSelectStation(station);
       onOpenStationDetails(station);
@@ -752,9 +775,9 @@ export const MapScreen: React.FC<MapScreenProps> = ({
         <div className="min-w-0 flex-1">
           <h3 className="font-geist font-semibold text-[0.9375rem] text-rd-ink truncate leading-snug">{station.name}</h3>
           <p className="text-caption text-outline truncate flex items-center gap-1.5 mt-0.5">
-            <span aria-hidden="true" className={`w-2 h-2 rounded-full shrink-0 ${info.dotColor}`} />
+            <span aria-hidden="true" className={`w-2 h-2 rounded-full shrink-0 ${dotColor}`} />
             <span className="truncate">
-              {[info.shortLabel, age, userGps && station.distance ? station.distance : null, station.city]
+              {[describeStatus(station), userGps && station.distance ? station.distance : null, station.city]
                 .filter(Boolean)
                 .join(' · ')}
             </span>
@@ -778,30 +801,24 @@ export const MapScreen: React.FC<MapScreenProps> = ({
   // ink surface, per design_handoff_cng_connect_mobile screen 3b. No report yet today
   // doubles as the incentive-to-report moment (ghost pill + points).
   const renderNearestCard = (station: GasStation) => {
-    const info = getStatusIndicator(station.status);
+    // A report older than 24h is no longer "today's" status: show it as last-known and ask for a fresh one.
+    const freshness = getFreshness(station);
+    const isLive = freshness.tier === 'fresh' || freshness.tier === 'recent';
+    const info = getStatusIndicator(isLive && freshness.lastKnownStatus ? freshness.lastKnownStatus : 'unknown');
     const isPinned = pinnedId === station.id;
-    const age = station.status !== 'unknown' ? formatStationAge(station).replace(/^Updated /, '') : null;
-    const noReportToday = station.status === 'unknown';
+    const noReportToday = !isLive;
     const openDetails = () => {
       onSelectStation(station);
       onOpenStationDetails(station);
     };
     return (
-      // A <div role="button"> — not a <button> — because this card contains its own nested
-      // "Go" button; a <button> can't validly contain another <button> (it broke hydration
-      // and made click/keyboard behavior unreliable across browsers).
+      // The card contains its own "Go" button, so the card itself can't be a button (a button
+      // can't validly contain another, nor can role="button"). The station name is the one
+      // real button; its ::after stretches over the whole card so tapping anywhere opens the
+      // station, and "Go" sits above that overlay as a sibling.
       <div
         key={station.id}
-        role="button"
-        tabIndex={0}
-        onClick={openDetails}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            openDetails();
-          }
-        }}
-        className={`w-full bg-rd-ink rounded-[22px] overflow-hidden text-left active:scale-[0.98] transition-transform cursor-pointer ${
+        className={`relative w-full bg-rd-ink rounded-[22px] overflow-hidden text-left active:scale-[0.98] transition-transform ${
           flashIds?.has(station.id) ? 'flash-ring' : ''
         } ${isPinned ? 'ring-2 ring-primary' : ''}`}
       >
@@ -813,12 +830,20 @@ export const MapScreen: React.FC<MapScreenProps> = ({
             <p className="font-geist-mono text-[11px] font-medium tracking-[0.08em] uppercase text-[#B4BAC4] truncate">
               Nearest{userGps && station.distance ? ` · ${station.distance}` : ''}{station.driveTime ? ` · ${station.driveTime}` : ''}
             </p>
-            <h3 className="font-geist font-bold text-[1.0625rem] leading-snug text-white line-clamp-2">{station.name}</h3>
+            <h3 className="font-geist font-bold text-[1.0625rem] leading-snug text-white line-clamp-2">
+              <button
+                type="button"
+                onClick={openDetails}
+                className="text-left after:absolute after:inset-0 after:rounded-[22px] focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-inset focus-visible:after:ring-white"
+              >
+                {station.name}
+              </button>
+            </h3>
             <span className="inline-flex self-start items-center gap-1.5 rounded-lg bg-rd-ink-2 border border-rd-ink-border px-2 py-1 text-[0.75rem] font-semibold text-white/85">
               <span aria-hidden="true" className={`material-symbols-outlined text-[13px] ${info.iconColor || ''}`}>
-                {info.icon}
+                {freshness.tier === 'stale' ? 'history' : info.icon}
               </span>
-              {noReportToday ? 'No report today' : `${info.shortLabel}${age ? ` · ${age}` : ''}`}
+              {describeStatus(station)}
             </span>
           </div>
         </div>
@@ -831,12 +856,10 @@ export const MapScreen: React.FC<MapScreenProps> = ({
             </span>
           )}
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onNavigate(station);
-            }}
+            type="button"
+            onClick={() => onNavigate(station)}
             aria-label={`Navigate to ${station.name}`}
-            className={`shrink-0 inline-flex items-center gap-1.5 rounded-full bg-primary text-white text-[0.8125rem] font-bold px-4 py-2 active:scale-95 transition-transform ${
+            className={`relative z-10 shrink-0 inline-flex items-center gap-1.5 rounded-full bg-primary text-white text-[0.8125rem] font-bold px-4 py-2 active:scale-95 transition-transform ${
               noReportToday ? '' : 'flex-1 justify-center'
             }`}
           >
@@ -851,9 +874,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
   // Plain row for the rest of the standard-mode list (below the nearest card): small photo
   // thumbnail, name, solid status chip, distance — per design_handoff_cng_connect_mobile 3b.
   const renderCompactRow = (station: GasStation) => {
-    const info = getStatusIndicator(station.status);
     const isPinned = pinnedId === station.id;
-    const age = station.status !== 'unknown' ? formatStationAge(station).replace(/^Updated /, '') : null;
     return (
       <button
         key={station.id}
@@ -870,10 +891,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
         </div>
         <div className="min-w-0 flex-1">
           <h3 className="font-geist font-semibold text-[0.9375rem] text-rd-ink truncate">{station.name}</h3>
-          <span className={`inline-flex items-center gap-1 mt-0.5 rounded-md px-1.5 py-0.5 text-[0.75rem] font-semibold ${info.badgeBg}`}>
-            {info.shortLabel}
-            {age ? ` · ${age}` : ''}
-          </span>
+          <StationStatusChip station={station} className="mt-1" />
         </div>
         {userGps && station.distance && (
           <span className="shrink-0 text-[0.8125rem] font-semibold text-rd-text-tertiary">{station.distance}</span>
@@ -936,8 +954,8 @@ export const MapScreen: React.FC<MapScreenProps> = ({
 
       {/* Mobile top overlay: search pill + round Share button, no logo pill (redesign: "the map is the hero").
           data-theme="light" because the redesign handoff only specifies a light palette — forcing light
-          here (not on the whole screen, so the untouched desktop panel keeps following system theme)
-          avoids a half-light/half-dark mismatch until a dark variant of the new design exists. */}
+          here and on the desktop panel avoids a half-light/half-dark mismatch until a dark variant of the
+          new design exists. */}
       <div data-theme="light" className="lg:hidden absolute top-0 inset-x-0 z-30 pointer-events-none pt-safe px-4">
         <div className="flex items-center gap-2.5 pt-3">
           <button
@@ -961,33 +979,6 @@ export const MapScreen: React.FC<MapScreenProps> = ({
           )}
         </div>
 
-        {showAreaFallback && (
-          <div className="pointer-events-auto mt-3 bg-surface-container-high rounded-2xl shadow-[0_4px_14px_rgba(31,41,35,0.18)] px-4 py-3 flex items-start gap-2.5">
-            <span aria-hidden="true" className="material-symbols-outlined text-status-amber text-[20px] shrink-0 mt-0.5">
-              {gpsStatus === 'denied' ? 'location_disabled' : 'location_searching'}
-            </span>
-            <div className="min-w-0 flex-1">
-              <p className="text-caption font-semibold text-on-surface">
-                Showing stations near {activeCity !== 'all' ? CITY_LABELS[activeCity] : homeState || 'Abuja'}
-              </p>
-              <p className="text-micro text-outline mt-0.5">
-                {gpsStatus === 'denied'
-                  ? 'Location is blocked for this site — enable it in your browser or device settings, then reload.'
-                  : "We couldn't get your location. If this isn't where you are:"}
-              </p>
-              <button onClick={() => setIsAreaPickerOpen(true)} className="mt-1.5 text-caption font-bold text-primary active:opacity-70">
-                Choose a different area
-              </button>
-            </div>
-            <button
-              onClick={() => setAreaBannerDismissed(true)}
-              aria-label="Dismiss"
-              className="shrink-0 p-1 -m-1 text-outline hover:text-on-surface"
-            >
-              <span aria-hidden="true" className="material-symbols-outlined text-[18px]">close</span>
-            </button>
-          </div>
-        )}
       </div>
 
       {isAreaPickerOpen && (
@@ -1033,7 +1024,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
 
         <div
           ref={sheetRef}
-          className={`w-full bg-white rounded-t-[28px] shadow-[0_-10px_30px_rgba(20,32,26,0.12),0_100vh_0_0_#FFFFFF] pointer-events-auto flex flex-col overflow-hidden will-change-transform ${
+          className={`w-full bg-white rounded-t-[28px] shadow-[0_-10px_30px_rgba(20,32,26,0.12),0_100vh_0_0_#FFFFFF] pointer-events-auto flex flex-col overflow-hidden will-change-transform max-h-[calc(100dvh-8rem)] ${
             sheetMode === 'expanded' ? 'h-[calc(100dvh-8rem)]' : sheetMode === 'collapsed' ? 'pb-24' : ''
           }`}
         >
@@ -1067,6 +1058,41 @@ export const MapScreen: React.FC<MapScreenProps> = ({
               </button>
             )}
           </div>
+
+          {/* Location notice lives IN the sheet: in the top overlay the sheet (same z-layer, later in the
+              DOM) painted over it, so drivers never saw why the map was showing a default area. */}
+          {showAreaFallback && sheetMode !== 'collapsed' && (
+            <div role="status" className="mx-4 mb-2.5 shrink-0 rounded-2xl bg-rd-queuing-container text-rd-on-queuing-container px-3.5 py-3 flex items-start gap-2.5">
+              <span aria-hidden="true" className="material-symbols-outlined text-[20px] shrink-0 mt-0.5">
+                {gpsStatus === 'denied' ? 'location_disabled' : 'location_searching'}
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="text-caption font-bold">
+                  Showing stations near {activeCity !== 'all' ? CITY_LABELS[activeCity] : homeState || 'Abuja'}
+                </p>
+                <p className="text-micro mt-0.5">
+                  {gpsStatus === 'denied'
+                    ? 'Location is blocked for this site — enable it in your browser or device settings, then reload.'
+                    : "We couldn't get your location. If this isn't where you are:"}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setIsAreaPickerOpen(true)}
+                  className="mt-1.5 min-h-8 text-caption font-bold underline underline-offset-2 active:opacity-70"
+                >
+                  Choose a different area
+                </button>
+              </div>
+              <button
+                type="button"
+                onClick={() => setAreaBannerDismissed(true)}
+                aria-label="Dismiss location notice"
+                className="shrink-0 w-10 h-10 -mt-1.5 -mr-1.5 flex items-center justify-center rounded-full hover:bg-black/5"
+              >
+                <span aria-hidden="true" className="material-symbols-outlined text-[18px]">close</span>
+              </button>
+            </div>
+          )}
 
           {/* Status tabs (like the ride-type tabs in ride-hailing apps) */}
           <div role="tablist" aria-label="Filter by pump status" className="flex gap-1.5 overflow-x-auto hide-scrollbar px-4 pb-2.5 shrink-0">
@@ -1114,11 +1140,13 @@ export const MapScreen: React.FC<MapScreenProps> = ({
             </div>
           ) : sheetMode !== 'expanded' ? (
             <div className="overflow-y-auto flex-1 hide-scrollbar px-5 pt-3 pb-28 flex flex-col gap-1">
+              <h2 className="sr-only">Nearby stations</h2>
               {standardRows[0] && renderNearestCard(standardRows[0])}
               {standardRows.slice(1).map((st) => renderCompactRow(st))}
             </div>
           ) : (
             <div className="px-5 pt-1 pb-28 overflow-y-auto flex-1 hide-scrollbar flex flex-col">
+              <h2 className="sr-only">All stations</h2>
               {filteredStations.slice(0, visibleCount).map((station) => renderPhoneRow(station))}
               {visibleCount < filteredStations.length && (
                 <button
@@ -1157,22 +1185,36 @@ export const MapScreen: React.FC<MapScreenProps> = ({
         />
       )}
 
-      {/* Desktop Persistent Right-Hand Panel (lg: 1024px and above) */}
-      <div className="hidden lg:flex flex-col w-[380px] xl:w-[420px] bg-surface h-full z-20 shadow-[-8px_0_24px_rgba(31,41,35,0.08)] overflow-hidden shrink-0">
-        {/* Right Panel Header: Search & Filter */}
-        <div className="p-4 flex flex-col gap-3 bg-surface-container-high shadow-[0_2px_10px_rgba(31,41,35,0.05)]">
-          <div className="flex items-center justify-between">
-            <h2 className="font-extrabold text-[1rem] text-slate-900 flex items-center gap-2">
-              <span>Stations & Chargers</span>
-            </h2>
-            <span className="text-[0.75rem] font-bold text-primary bg-primary-container px-3 py-1 rounded-full">
-              {filteredStations.length} Results
-            </span>
+      {/* Desktop Persistent Right-Hand Panel (lg: 1024px and above).
+          Rebuilt to the same system as the phone map: rd tokens, Geist, status chips and a
+          freshness-aware list so a station reported minutes ago reads differently from one
+          nobody has reported in days. data-theme="light" like every other redesigned screen
+          (the handoff has no dark values yet). */}
+      <aside
+        data-theme="light"
+        aria-label="Stations"
+        className="hidden lg:flex flex-col w-[380px] xl:w-[420px] bg-rd-bg text-rd-ink h-full z-20 shadow-[-8px_0_24px_rgba(20,32,26,0.08)] overflow-hidden shrink-0"
+      >
+        <div className="p-4 pb-3 flex flex-col gap-3 bg-white border-b border-rd-divider">
+          <div className="flex items-end justify-between gap-3">
+            <div className="min-w-0">
+              <h2 className="font-geist font-bold text-[1.25rem] tracking-tight leading-tight">Stations</h2>
+              <p className="text-caption text-rd-text-tertiary mt-0.5" aria-live="polite">
+                {filteredStations.length} shown · {desktopLiveCount} reported in the last 24h
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsSuggestModalOpen(true)}
+              className="shrink-0 inline-flex items-center gap-1.5 h-9 px-3.5 rounded-full bg-rd-ink text-white font-geist font-semibold text-[0.8125rem] active:scale-95 transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-rd-ink"
+            >
+              <span aria-hidden="true" className="material-symbols-outlined text-[16px]">add_location_alt</span>
+              Suggest station
+            </button>
           </div>
 
-          {/* Desktop Search Input */}
-          <div className="flex items-center bg-surface rounded-full px-4 py-2.5 gap-2 focus-within:ring-2 focus-within:ring-primary/20">
-            <span aria-hidden="true" className="material-symbols-outlined text-slate-400 text-[18px]">search</span>
+          <div className="flex items-center bg-rd-segmented-track rounded-full px-4 h-11 gap-2 focus-within:ring-2 focus-within:ring-rd-ink">
+            <span aria-hidden="true" className="material-symbols-outlined text-rd-text-tertiary text-[18px]">search</span>
             <input
               type="text"
               inputMode="search"
@@ -1182,104 +1224,188 @@ export const MapScreen: React.FC<MapScreenProps> = ({
               aria-label="Search stations, city or state"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search station, city, state..."
-              className="flex-1 bg-transparent border-none outline-none text-[0.875rem] font-medium text-slate-900 placeholder:text-slate-400"
+              placeholder="Search station, city, state…"
+              className="flex-1 bg-transparent border-none outline-none text-[0.875rem] font-medium text-rd-ink placeholder:text-rd-text-tertiary"
             />
             {searchQuery && (
-              <button onClick={() => setSearchQuery('')} className="text-slate-400 hover:text-slate-600">
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                aria-label="Clear search"
+                className="w-6 h-6 rounded-full text-rd-text-tertiary hover:text-rd-ink flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rd-ink"
+              >
                 <span aria-hidden="true" className="material-symbols-outlined text-[16px]">close</span>
               </button>
             )}
           </div>
 
-          {/* Type Filter Segment Bar — EV temporarily hidden app-wide (SHOW_EV_STATIONS in mockData.ts) */}
-          <div className="grid grid-cols-2 gap-1 p-1 bg-surface-container rounded-full">
-            <button
-              onClick={() => setStationTypeFilter('all')}
-              className={`py-2 rounded-full text-micro font-extrabold transition-all ${
-                stationTypeFilter === 'all' ? 'bg-deep-teal text-white' : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              All
-            </button>
-            <button
-              onClick={() => setStationTypeFilter('cng')}
-              className={`py-2 rounded-full text-micro font-extrabold transition-all flex items-center justify-center gap-1 ${
-                stationTypeFilter === 'cng' ? 'bg-deep-teal text-white' : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <span aria-hidden="true" className="material-symbols-outlined text-[14px]">local_gas_station</span>
-              <span>CNG</span>
-            </button>
-          </div>
-
-          <button
-            onClick={() => setIsSuggestModalOpen(true)}
-            className="w-full py-2.5 bg-primary hover:bg-emerald-700 text-white rounded-full text-micro font-extrabold active:scale-98 transition-all flex items-center justify-center gap-2"
-          >
-            <span aria-hidden="true" className="material-symbols-outlined text-[16px]">add_location_alt</span>
-            <span>+ Suggest New Station</span>
-          </button>
-        </div>
-
-        {/* Desktop Station List Container */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-3">
-          {filteredStations.length === 0 ? (
-            <div className="p-8 text-center text-slate-500 font-medium text-[0.875rem]">
-              No stations match your criteria.
-            </div>
-          ) : (
-            filteredStations.map((station) => {
-              const statusInfo = getStatusIndicator(station.status);
-              const isSelected = selectedStation?.id === station.id;
-
-              return (
-                <div
-                  key={`desktop-${station.id}`}
-                  onClick={() => onSelectStation(station)}
-                  className={`p-4 rounded-2xl transition-all cursor-pointer ${flashIds?.has(station.id) ? 'flash-ring ' : ''}${
-                    isSelected
-                      ? 'bg-surface-container-high ring-2 ring-primary shadow-[0_6px_18px_rgba(49,154,63,0.18)]'
-                      : 'bg-surface-container-high shadow-[0_4px_14px_rgba(31,41,35,0.05)] hover:shadow-[0_6px_18px_rgba(31,41,35,0.1)]'
+          {/* Only meaningful once EV stations are shown again (SHOW_EV_STATIONS in mockData.ts) */}
+          {SHOW_EV_STATIONS && (
+            <div role="group" aria-label="Station type" className="grid grid-cols-2 gap-1 p-1 bg-rd-segmented-track rounded-full">
+              {(['all', 'cng'] as const).map((type) => (
+                <button
+                  key={type}
+                  type="button"
+                  aria-pressed={stationTypeFilter === type}
+                  onClick={() => setStationTypeFilter(type)}
+                  className={`h-8 rounded-full text-[0.8125rem] font-geist font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rd-ink ${
+                    stationTypeFilter === type ? 'bg-rd-ink text-white' : 'text-rd-text-tertiary hover:text-rd-ink'
                   }`}
                 >
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${statusInfo.dotColor}`} />
-                      <h3 className="font-extrabold text-body-lg text-slate-900 truncate">
-                        {station.name}
-                      </h3>
-                    </div>
-                    <span className="text-micro font-extrabold text-primary shrink-0">
-                      {station.distance}
-                    </span>
-                  </div>
-
-                  <p className="text-[0.8125rem] font-normal text-slate-500 truncate mt-1">
-                    {station.address}
-                  </p>
-
-                  <div className="flex items-center justify-between mt-3">
-                    <span className={`text-[0.75rem] font-bold px-2 py-1 rounded-full ${statusInfo.badgeBg}`}>
-                      {station.statusLabel}
-                    </span>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onOpenStationDetails(station);
-                      }}
-                      className="text-micro font-extrabold text-primary hover:underline flex items-center gap-1"
-                    >
-                      <span>Group Chat & Specs</span>
-                      <span aria-hidden="true" className="material-symbols-outlined text-[14px]">chevron_right</span>
-                    </button>
-                  </div>
-                </div>
-              );
-            })
+                  {type === 'all' ? 'All' : 'CNG'}
+                </button>
+              ))}
+            </div>
           )}
+
+          <div role="group" aria-label="Filter by status" className="flex flex-wrap gap-1.5">
+            {statusChips.map((chip) => {
+              const active = activeFilter === chip.key;
+              return (
+                <button
+                  key={chip.key}
+                  type="button"
+                  aria-pressed={active}
+                  aria-label={chip.key === 'all' ? chip.full : `${chip.full} only`}
+                  onClick={() => setActiveFilter(chip.key)}
+                  className={`inline-flex items-center gap-1.5 h-9 px-3 rounded-full text-[0.8125rem] font-geist font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-rd-ink ${
+                    active ? 'bg-rd-ink text-white' : 'bg-white text-rd-ink ring-1 ring-[#E3E6E4] hover:ring-rd-ink/40'
+                  }`}
+                >
+                  {chip.icon && (
+                    <span aria-hidden="true" className={`material-symbols-outlined text-[16px] ${active ? 'text-white' : chip.iconColor}`}>
+                      {chip.icon}
+                    </span>
+                  )}
+                  {chip.label}
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="flex items-center justify-between gap-3">
+            <span id="desktop-sort-label" className="font-geist-mono text-[11px] font-medium tracking-[0.08em] uppercase text-rd-text-tertiary">
+              Sort
+            </span>
+            <div role="group" aria-labelledby="desktop-sort-label" className="flex gap-1 p-1 bg-rd-segmented-track rounded-full">
+              {(
+                [
+                  { key: 'nearest', label: 'Nearest' },
+                  { key: 'freshest', label: 'Latest report' },
+                ] as const
+              ).map((opt) => (
+                <button
+                  key={opt.key}
+                  type="button"
+                  aria-pressed={effectiveDesktopSort === opt.key}
+                  onClick={() => setDesktopSort(opt.key)}
+                  className={`h-7 px-3 rounded-full text-[0.75rem] font-geist font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rd-ink ${
+                    effectiveDesktopSort === opt.key ? 'bg-white text-rd-ink shadow-sm' : 'text-rd-text-tertiary hover:text-rd-ink'
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
-      </div>
+
+        {desktopStations.length === 0 ? (
+          <div className="flex-1 flex flex-col items-center justify-center text-center px-8 gap-3">
+            <span aria-hidden="true" className="w-14 h-14 rounded-full bg-rd-segmented-track text-rd-text-tertiary flex items-center justify-center">
+              <span className="material-symbols-outlined text-[28px]">search_off</span>
+            </span>
+            <p className="font-geist font-bold text-[1.0625rem]">No stations match</p>
+            <p className="text-caption text-rd-text-tertiary">Try a different search or clear the filters to see every station again.</p>
+            <button
+              type="button"
+              onClick={resetAllFilters}
+              className="h-10 px-5 rounded-full bg-rd-ink text-white font-geist font-semibold text-[0.875rem] active:scale-95 transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-rd-ink"
+            >
+              Clear filters
+            </button>
+          </div>
+        ) : (
+          <ul className="flex-1 overflow-y-auto p-3 flex flex-col gap-2.5">
+            {desktopStations.map((station, index) => {
+              const isSelected = selectedStation?.id === station.id;
+              const tier = getFreshness(station).tier;
+              const isLive = tier === 'fresh' || tier === 'recent';
+              const prevIsLive = index > 0 && ['fresh', 'recent'].includes(getFreshness(desktopStations[index - 1]).tier);
+              // In "latest report" order the list is split in two; label the seam.
+              const sectionLabel =
+                effectiveDesktopSort === 'freshest' && !searchQuery.trim()
+                  ? index === 0 && isLive
+                    ? 'Reported in the last 24 hours'
+                    : !isLive && (index === 0 || prevIsLive)
+                    ? 'Older or never reported'
+                    : null
+                  : null;
+
+              return (
+                <React.Fragment key={`desktop-${station.id}`}>
+                  {sectionLabel && (
+                    <li className="px-1 pt-1.5 font-geist-mono text-[11px] font-medium tracking-[0.08em] uppercase text-rd-text-tertiary">
+                      {sectionLabel}
+                    </li>
+                  )}
+                  <li>
+                    <div
+                      className={`rounded-2xl bg-white transition-shadow ${flashIds?.has(station.id) ? 'flash-ring ' : ''}${
+                        isSelected
+                          ? 'ring-2 ring-rd-ink shadow-[0_8px_24px_rgba(20,32,26,0.12)]'
+                          : 'ring-1 ring-[#E3E6E4] shadow-[0_1px_2px_rgba(20,32,26,0.04)] hover:shadow-[0_6px_18px_rgba(20,32,26,0.10)]'
+                      }`}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => onSelectStation(station)}
+                        aria-current={isSelected ? 'true' : undefined}
+                        className="w-full text-left p-3 pb-2 flex gap-3 rounded-t-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-rd-ink"
+                      >
+                        <span className="w-16 h-16 rounded-xl overflow-hidden shrink-0 bg-rd-segmented-track">
+                          <img src={station.images?.[0] || ASSETS.stationWide} alt="" className="w-full h-full object-cover" loading="lazy" />
+                        </span>
+                        <span className="min-w-0 flex-1 flex flex-col">
+                          <span className="flex items-start justify-between gap-2">
+                            <span className="font-geist font-bold text-[0.9375rem] leading-snug text-rd-ink line-clamp-2">{station.name}</span>
+                            {userGps && station.distance && (
+                              <span className="font-geist-mono text-[11px] font-medium text-rd-text-tertiary shrink-0 pt-0.5">{station.distance}</span>
+                            )}
+                          </span>
+                          <span className="text-[0.8125rem] text-rd-text-tertiary truncate mt-0.5">{station.area || station.address}</span>
+                          <span className="mt-2 flex">
+                            <StationStatusChip station={station} />
+                          </span>
+                        </span>
+                      </button>
+                      <div className="flex items-center justify-end gap-2 px-3 pb-3">
+                        <button
+                          type="button"
+                          onClick={() => onOpenStationDetails(station)}
+                          className="inline-flex items-center gap-1 h-8 px-3 rounded-full text-[0.8125rem] font-geist font-semibold text-rd-ink hover:bg-rd-segmented-track transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rd-ink"
+                        >
+                          Reports &amp; chat
+                          <span aria-hidden="true" className="material-symbols-outlined text-[16px]">chevron_right</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => onNavigate(station)}
+                          aria-label={`Directions to ${station.name}`}
+                          className="inline-flex items-center gap-1.5 h-8 px-3.5 rounded-full bg-primary text-white text-[0.8125rem] font-geist font-bold active:scale-95 transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary"
+                        >
+                          <span aria-hidden="true" className="material-symbols-outlined text-[16px]">directions</span>
+                          Go
+                        </button>
+                      </div>
+                    </div>
+                  </li>
+                </React.Fragment>
+              );
+            })}
+          </ul>
+        )}
+      </aside>
 
       {/* Suggest Station Modal */}
       <SuggestStationModal
