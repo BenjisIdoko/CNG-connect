@@ -78,7 +78,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
             )}
             <span
               className={`font-geist text-[12px] leading-none ${
-                active ? 'font-bold text-rd-ink' : 'font-medium text-[#6B706D]'
+                active ? 'font-bold text-rd-ink' : 'font-medium text-rd-text-tertiary'
               }`}
             >
               {tab.label}

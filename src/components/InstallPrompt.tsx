@@ -20,7 +20,7 @@ export const InstallPrompt: React.FC = () => {
     // dark-mode values yet. The card itself stays ink-dark by design either way (same
     // "always-dark accent" treatment as the live camera screen), but rd-ink itself has no
     // dark-mode override, so this mainly keeps the hairline/divider legible.
-    <div data-theme="light" className="fixed inset-x-0 bottom-24 z-40 px-4 pointer-events-none">
+    <section aria-label="Install CNG-Connect" data-theme="light" className="fixed inset-x-0 bottom-24 z-40 px-4 pointer-events-none">
       <div className="max-w-md mx-auto pointer-events-auto bg-rd-ink text-white rounded-2xl shadow-[0_10px_30px_rgba(20,32,26,0.3)] p-3">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-primary text-white flex items-center justify-center shrink-0">
@@ -84,6 +84,6 @@ export const InstallPrompt: React.FC = () => {
           </ol>
         )}
       </div>
-    </div>
+    </section>
   );
 };

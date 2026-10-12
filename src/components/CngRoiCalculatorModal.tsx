@@ -74,7 +74,7 @@ export const CngRoiCalculatorModal: React.FC<CngRoiCalculatorModalProps> = ({
               <span>Daily distance</span>
               <span className="text-primary">{dailyKm} km</span>
             </div>
-            <input type="range" min={20} max={400} step={10} value={dailyKm}
+            <input type="range" min={20} max={400} step={10} value={dailyKm} aria-label="Daily distance" aria-valuetext={`${dailyKm} kilometres per day`}
               onChange={(e) => setDailyKm(Number(e.target.value))} className="w-full mt-2 accent-primary" />
           </div>
           <div>
@@ -82,7 +82,7 @@ export const CngRoiCalculatorModal: React.FC<CngRoiCalculatorModalProps> = ({
               <span>Vehicle mileage</span>
               <span className="text-primary">{kmPerLiter} km/l</span>
             </div>
-            <input type="range" min={4} max={20} step={1} value={kmPerLiter}
+            <input type="range" min={4} max={20} step={1} value={kmPerLiter} aria-label="Vehicle mileage" aria-valuetext={`${kmPerLiter} kilometres per litre`}
               onChange={(e) => setKmPerLiter(Number(e.target.value))} className="w-full mt-2 accent-primary" />
           </div>
 

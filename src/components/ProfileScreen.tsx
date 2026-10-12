@@ -327,7 +327,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
             <span className="text-caption font-semibold text-outline">/mo</span>
           </div>
           {onOpenRoiCalculator && (
-            <div className="text-micro font-bold text-emerald-700 mt-1"><span className="inline-flex items-center gap-1">Open full calculator <Icon name="arrow_forward" size={14} /></span></div>
+            <div className="text-micro font-bold text-rd-on-available-container mt-1"><span className="inline-flex items-center gap-1">Open full calculator <Icon name="arrow_forward" size={14} /></span></div>
           )}
         </div>
 

@@ -122,7 +122,7 @@
   --color-status-amber-container: #FFF3DF;
   --color-status-orange: #F85B23;
   --color-status-orange-container: #FFF0EA;
-  --color-status-red: #C0313A; /* AA on white/light grey as text */
+  --color-status-red: #B3262F; /* >=4.5:1 as text on white and on #E4E4E4 */
   --color-status-red-container: #FCE8E9;
   --color-live-pulse: #319A3F;
   --color-whatsapp: #25D366;
@@ -143,7 +143,7 @@
   --color-on-surface: #1F2923;
   --color-on-surface-variant: #5C6B60;
   --color-on-background: #1F2923;
-  --color-outline: #666F67; /* AA on white and light grey for helper text */
+  --color-outline: #5A635C; /* >=4.5:1 on white and on the #E4E4E4 card grey used by Profile (axe-measured) */
   --color-outline-variant: #DFDFDF;
   --color-inverse-surface: #1F2923;
   --color-inverse-on-surface: #F3F3F3;
@@ -349,7 +349,7 @@
   --color-status-amber-container: #FFF3DF;
   --color-status-orange: #F85B23;
   --color-status-orange-container: #FFF0EA;
-  --color-status-red: #C0313A;
+  --color-status-red: #B3262F;
   --color-status-red-container: #FCE8E9;
   --color-live-pulse: #319A3F;
   --color-whatsapp: #25D366;
@@ -368,7 +368,7 @@
   --color-on-surface: #1F2923;
   --color-on-surface-variant: #5C6B60;
   --color-on-background: #1F2923;
-  --color-outline: #666F67;
+  --color-outline: #5A635C;
   --color-outline-variant: #DFDFDF;
   --color-inverse-surface: #1F2923;
   --color-inverse-on-surface: #F3F3F3;

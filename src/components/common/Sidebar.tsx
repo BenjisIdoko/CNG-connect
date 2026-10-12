@@ -44,7 +44,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <h1 className="font-extrabold text-[1.0625rem] text-slate-900 leading-tight">
             CNG-Connect
           </h1>
-          <span className="text-[0.75rem] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+          <span className="text-[0.75rem] font-bold text-rd-on-available-container bg-rd-available-container px-2 py-0.5 rounded-full">
             <span className="inline-flex items-center gap-1"><Icon name="eco" size={12} fill /> Clean Mobility</span>
           </span>
         </div>
@@ -52,7 +52,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Main Navigation Links */}
       <div className="flex-1 py-4 px-3 flex flex-col gap-1 overflow-y-auto">
-        <span className="px-3 text-micro font-bold text-slate-400 uppercase tracking-wider mb-1">
+        <span className="px-3 text-micro font-bold text-rd-text-tertiary uppercase tracking-wider mb-1">
           Navigation
         </span>
 
@@ -82,7 +82,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         })}
 
         {/* Quick Tools Section */}
-        <span className="px-3 text-micro font-bold text-slate-400 uppercase tracking-wider mt-6 mb-1">
+        <span className="px-3 text-micro font-bold text-rd-text-tertiary uppercase tracking-wider mt-6 mb-1">
           Smart Tools
         </span>
 
