@@ -15,13 +15,13 @@ const STALE_CHIP = 'bg-rd-stale-container text-rd-on-stale-container';
 
 /**
  * A station's status, honest about how old it is:
- *   fresh  (<=1h)  tinted chip with a pulsing live dot
+ *   fresh  (<=1h)  tinted chip with a live dot (pulses three times when it appears, then rests)
  *   recent (<=24h) tinted chip with the status icon
  *   stale  (>24h)  grey chip — "Last: Available · 3 days ago" — never a confident colour
  *   none           grey "No report yet"
  */
-export const StationStatusChip: React.FC<{ station: GasStation; className?: string }> = ({ station, className = '' }) => {
-  const f = getFreshness(station);
+export const StationStatusChip: React.FC<{ station: GasStation; className?: string; now?: number }> = ({ station, className = '', now }) => {
+  const f = getFreshness(station, now);
   const base = `inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[0.75rem] font-semibold leading-none max-w-full ${className}`;
 
   if (f.tier === 'none' || !f.lastKnownStatus || f.lastKnownStatus === 'unknown') {
@@ -51,7 +51,7 @@ export const StationStatusChip: React.FC<{ station: GasStation; className?: stri
     <span className={`${base} ${tone.chip}`}>
       {f.tier === 'fresh' ? (
         <span aria-hidden="true" className="relative flex h-2 w-2 shrink-0">
-          <span className={`absolute inline-flex h-full w-full rounded-full opacity-60 animate-ping ${tone.dot}`} />
+          <span className={`absolute inline-flex h-full w-full rounded-full opacity-0 live-ping ${tone.dot}`} />
           <span className={`relative inline-flex h-2 w-2 rounded-full ${tone.dot}`} />
         </span>
       ) : (

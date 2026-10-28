@@ -52,6 +52,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Main Navigation Links */}
       <div className="flex-1 py-4 px-3 flex flex-col gap-1 overflow-y-auto">
+        <nav aria-label="Main" className="flex flex-col gap-1">
         <span className="px-3 text-micro font-bold text-rd-text-tertiary uppercase tracking-wider mb-1">
           Navigation
         </span>
@@ -62,6 +63,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
+              aria-current={isActive ? 'page' : undefined}
               className={`w-full py-3 px-3.5 rounded-2xl font-extrabold text-[0.9375rem] flex items-center justify-between transition-all active:scale-98 ${
                 isActive
                   ? 'bg-primary text-white shadow-md shadow-primary/20'
@@ -80,6 +82,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </button>
           );
         })}
+        </nav>
 
         {/* Quick Tools Section */}
         <span className="px-3 text-micro font-bold text-rd-text-tertiary uppercase tracking-wider mt-6 mb-1">

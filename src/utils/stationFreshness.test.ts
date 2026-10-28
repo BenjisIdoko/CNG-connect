@@ -98,6 +98,16 @@ describe('copy helpers', () => {
     expect([c, b, a].sort((x, y) => freshnessRank(x, NOW) - freshnessRank(y, NOW))).toEqual([a, b, c]);
   });
 
+  it('moves a report through the tiers as the clock advances (what the one-minute tick relies on)', () => {
+    const s = station({ status: 'full', reports: [report('full', minsAgo(55))] });
+    expect(getFreshness(s, NOW).tier).toBe('fresh');
+    expect(describeStatus(s, NOW)).toBe('Available · 55 min ago');
+    expect(getFreshness(s, NOW + 6 * 60000).tier).toBe('recent');
+    expect(describeStatus(s, NOW + 6 * 60000)).toBe('Available · 1 hr ago');
+    expect(getFreshness(s, NOW + 24 * 3600000).tier).toBe('stale');
+    expect(currentStatus(s, NOW + 24 * 3600000)).toBe('unknown');
+  });
+
   it('only counts a report under 24h old as the current status', () => {
     expect(currentStatus(station({ status: 'full', reports: [report('full', minsAgo(120))] }), NOW)).toBe('full');
     expect(currentStatus(station({ status: 'full', reports: [report('full', minsAgo(3 * 1440))] }), NOW)).toBe('unknown');

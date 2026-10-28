@@ -12,6 +12,7 @@ import { Modal } from './common/Modal';
 import { ASSETS, SHOW_EV_STATIONS } from '../data/mockData';
 import { StationStatusChip } from './common/StationStatusChip';
 import { getFreshness, describeStatus, freshnessRank, currentStatus } from '../utils/stationFreshness';
+import { useNow } from '../hooks/useNow';
 import { StationSearchOverlay, rememberRecentStation } from './StationSearchOverlay';
 import { searchTokens, stationMatchesQuery, stationSearchScore } from '../utils/stationSearch';
 import { SuggestStationModal } from './SuggestStationModal';
@@ -63,6 +64,8 @@ export const MapScreen: React.FC<MapScreenProps> = ({
   onShareApp,
   flashIds,
 }) => {
+  // Ticks every minute so a chip's age (and the fresh/recent/stale tier) keeps up with the clock.
+  const now = useNow();
   const [activeFilter, setActiveFilter] = useState<string>('all');
   const [stationTypeFilter, setStationTypeFilter] = useState<'all' | 'cng' | 'ev_charging'>('all');
   // Desktop list order. 'auto' = nearest when we know where the driver is, otherwise the
@@ -297,7 +300,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
   // Same scope as filteredStations but ignoring the status filter — what "All {n}" counts.
   const scopedCount = baseStations.filter(matchesScope).length;
   const filteredStations = baseStations.filter(
-    (st) => matchesScope(st) && (activeFilter === 'all' || currentStatus(st) === activeFilter)
+    (st) => matchesScope(st) && (activeFilter === 'all' || currentStatus(st, now) === activeFilter)
   );
   // While searching, best matches first (then nearest); otherwise keep the natural order.
   if (searchTokens(searchQuery).length > 0) {
@@ -313,10 +316,10 @@ export const MapScreen: React.FC<MapScreenProps> = ({
     : [...filteredStations].sort((a, b) =>
         effectiveDesktopSort === 'nearest'
           ? getDistanceKm(a) - getDistanceKm(b)
-          : freshnessRank(a) - freshnessRank(b) || getDistanceKm(a) - getDistanceKm(b),
+          : freshnessRank(a, now) - freshnessRank(b, now) || getDistanceKm(a) - getDistanceKm(b),
       );
   const desktopLiveCount = filteredStations.filter((st) => {
-    const tier = getFreshness(st).tier;
+    const tier = getFreshness(st, now).tier;
     return tier === 'fresh' || tier === 'recent';
   }).length;
 
@@ -475,7 +478,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
 
       // A report older than 24h (or none at all) is shown grey: a confident green pin for a
       // station nobody has reported on in days is worse than no colour.
-      const freshness = getFreshness(st);
+      const freshness = getFreshness(st, now);
       const liveStatus = freshness.tier === 'fresh' || freshness.tier === 'recent' ? freshness.lastKnownStatus : null;
       let colorClass = '#8B9389';
       const iconSymbol = isEv ? 'bolt' : 'local_gas_station';
@@ -509,7 +512,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       // (ours) is a plain <div>, so without this it has no accessible name at all, and a
       // screen reader falls back to the icon glyph's raw text ("local_gas_station"). Its
       // `title` option, unlike `alt`, is applied to any icon type and doubles as the name.
-      const markerLabel = [st.name, st.area || st.city, describeStatus(st)]
+      const markerLabel = [st.name, st.area || st.city, describeStatus(st, now)]
         .filter(Boolean)
         .join(', ');
       const marker = L.marker([lat, lng], { icon: customIcon, title: markerLabel });
@@ -549,7 +552,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       window.setTimeout(() => container.classList.remove('markers-intro'), 800);
     }
 
-  }, [filteredStations, selectedStation, flashIds]);
+  }, [filteredStations, selectedStation, flashIds, now]);
 
   // The driver's own position: a blue dot with a soft pulse, kept out of the station clusters.
   const userMarkerRef = useRef<L.Marker | null>(null);
@@ -745,7 +748,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
   // Plain list row in the style of ride-hailing apps: icon, name, one quiet line, and a
   // navigate button. The whole row opens the station.
   const renderPhoneRow = (station: GasStation) => {
-    const freshness = getFreshness(station);
+    const freshness = getFreshness(station, now);
     const dotColor =
       freshness.tier === 'fresh' || freshness.tier === 'recent'
         ? getStatusIndicator(freshness.lastKnownStatus ?? 'unknown').dotColor
@@ -777,7 +780,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
           <p className="text-caption text-outline truncate flex items-center gap-1.5 mt-0.5">
             <span aria-hidden="true" className={`w-2 h-2 rounded-full shrink-0 ${dotColor}`} />
             <span className="truncate">
-              {[describeStatus(station), userGps && station.distance ? station.distance : null, station.city]
+              {[describeStatus(station, now), userGps && station.distance ? station.distance : null, station.city]
                 .filter(Boolean)
                 .join(' · ')}
             </span>
@@ -788,7 +791,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
             e.stopPropagation();
             onNavigate(station);
           }}
-          aria-label={`Navigate to ${station.name}`}
+          aria-label={goLabel(station)}
           className="w-10 h-10 rounded-full bg-surface-container text-rd-ink flex items-center justify-center active:scale-95 shrink-0"
         >
           <span aria-hidden="true" className="material-symbols-outlined text-[20px]">navigation</span>
@@ -797,12 +800,16 @@ export const MapScreen: React.FC<MapScreenProps> = ({
     );
   };
 
+  // The visible button text is "Go" (or just an icon), so the accessible name starts with it:
+  // voice control ("click Go") and screen readers then agree on what the button is.
+  const goLabel = (station: GasStation) => `Go to ${station.name}, opens directions`;
+
   // The single prominent "nearest station" hero card at the top of the standard sheet —
   // ink surface, per design_handoff_cng_connect_mobile screen 3b. No report yet today
   // doubles as the incentive-to-report moment (ghost pill + points).
   const renderNearestCard = (station: GasStation) => {
     // A report older than 24h is no longer "today's" status: show it as last-known and ask for a fresh one.
-    const freshness = getFreshness(station);
+    const freshness = getFreshness(station, now);
     const isLive = freshness.tier === 'fresh' || freshness.tier === 'recent';
     const info = getStatusIndicator(isLive && freshness.lastKnownStatus ? freshness.lastKnownStatus : 'unknown');
     const isPinned = pinnedId === station.id;
@@ -843,7 +850,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
               <span aria-hidden="true" className={`material-symbols-outlined text-[13px] ${info.iconColor || ''}`}>
                 {freshness.tier === 'stale' ? 'history' : info.icon}
               </span>
-              {describeStatus(station)}
+              {describeStatus(station, now)}
             </span>
           </div>
         </div>
@@ -858,7 +865,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
           <button
             type="button"
             onClick={() => onNavigate(station)}
-            aria-label={`Navigate to ${station.name}`}
+            aria-label={goLabel(station)}
             className={`relative z-10 shrink-0 inline-flex items-center gap-1.5 rounded-full bg-primary text-white text-[0.8125rem] font-bold px-4 py-2 active:scale-95 transition-transform ${
               noReportToday ? '' : 'flex-1 justify-center'
             }`}
@@ -891,7 +898,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
         </div>
         <div className="min-w-0 flex-1">
           <h3 className="font-geist font-semibold text-[0.9375rem] text-rd-ink truncate">{station.name}</h3>
-          <StationStatusChip station={station} className="mt-1" />
+          <StationStatusChip station={station} now={now} className="mt-1" />
         </div>
         {userGps && station.distance && (
           <span className="shrink-0 text-[0.8125rem] font-semibold text-rd-text-tertiary">{station.distance}</span>
@@ -901,7 +908,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
   };
 
   const statusChips: Array<{ key: string; label: string; full: string; icon: string | null; iconColor: string }> = [
-    { key: 'all', label: `All ${scopedCount}`, full: 'All stations', icon: null, iconColor: '' },
+    { key: 'all', label: `All ${scopedCount}`, full: `All ${scopedCount} stations`, icon: null, iconColor: '' },
     { key: 'full', label: 'Available', full: 'Available', icon: 'check_circle', iconColor: 'text-rd-available' },
     { key: 'queue', label: 'Queuing', full: 'Queuing', icon: 'schedule', iconColor: 'text-rd-queuing' },
     { key: 'low', label: 'Low', full: 'Low pressure', icon: 'speed', iconColor: 'text-rd-low' },
@@ -1206,7 +1213,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
             <button
               type="button"
               onClick={() => setIsSuggestModalOpen(true)}
-              className="shrink-0 inline-flex items-center gap-1.5 h-9 px-3.5 rounded-full bg-rd-ink text-white font-geist font-semibold text-[0.8125rem] active:scale-95 transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-rd-ink"
+              className="shrink-0 inline-flex items-center gap-1.5 h-9 px-3.5 rounded-full bg-rd-ink text-white font-geist font-semibold text-[0.8125rem] hover:bg-rd-ink-2 active:scale-95 transition-[transform,background-color] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-rd-ink"
             >
               <span aria-hidden="true" className="material-symbols-outlined text-[16px]">add_location_alt</span>
               Suggest station
@@ -1320,7 +1327,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
             <button
               type="button"
               onClick={resetAllFilters}
-              className="h-10 px-5 rounded-full bg-rd-ink text-white font-geist font-semibold text-[0.875rem] active:scale-95 transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-rd-ink"
+              className="h-10 px-5 rounded-full bg-rd-ink text-white font-geist font-semibold text-[0.875rem] hover:bg-rd-ink-2 active:scale-95 transition-[transform,background-color] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-rd-ink"
             >
               Clear filters
             </button>
@@ -1329,9 +1336,9 @@ export const MapScreen: React.FC<MapScreenProps> = ({
           <ul className="flex-1 overflow-y-auto p-3 flex flex-col gap-2.5">
             {desktopStations.map((station, index) => {
               const isSelected = selectedStation?.id === station.id;
-              const tier = getFreshness(station).tier;
+              const tier = getFreshness(station, now).tier;
               const isLive = tier === 'fresh' || tier === 'recent';
-              const prevIsLive = index > 0 && ['fresh', 'recent'].includes(getFreshness(desktopStations[index - 1]).tier);
+              const prevIsLive = index > 0 && ['fresh', 'recent'].includes(getFreshness(desktopStations[index - 1], now).tier);
               // In "latest report" order the list is split in two; label the seam.
               const sectionLabel =
                 effectiveDesktopSort === 'freshest' && !searchQuery.trim()
@@ -1375,7 +1382,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                           </span>
                           <span className="text-[0.8125rem] text-rd-text-tertiary truncate mt-0.5">{station.area || station.address}</span>
                           <span className="mt-2 flex">
-                            <StationStatusChip station={station} />
+                            <StationStatusChip station={station} now={now} />
                           </span>
                         </span>
                       </button>
@@ -1391,8 +1398,8 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                         <button
                           type="button"
                           onClick={() => onNavigate(station)}
-                          aria-label={`Directions to ${station.name}`}
-                          className="inline-flex items-center gap-1.5 h-8 px-3.5 rounded-full bg-primary text-white text-[0.8125rem] font-geist font-bold active:scale-95 transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary"
+                          aria-label={goLabel(station)}
+                          className="inline-flex items-center gap-1.5 h-8 px-3.5 rounded-full bg-primary text-white text-[0.8125rem] font-geist font-bold hover:bg-primary/90 active:scale-95 transition-[transform,background-color] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary"
                         >
                           <span aria-hidden="true" className="material-symbols-outlined text-[16px]">directions</span>
                           Go

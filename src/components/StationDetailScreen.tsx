@@ -8,6 +8,7 @@ import { openExternalMaps } from '../utils/navigationHelper';
 import { StationGroupInfoSheet } from './StationGroupInfoSheet';
 import { formatRelativeTime, isIsoTimestamp, minutesSince } from '../utils/timeUtils';
 import { getFreshness, STATUS_SHORT_LABEL } from '../utils/stationFreshness';
+import { useNow } from '../hooks/useNow';
 import { openWhatsAppShare } from '../utils/shareMessageBuilder';
 import { describeLocationPrecision } from '../utils/locationPrecision';
 
@@ -49,6 +50,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
   onToggleFavorite,
 }) => {
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
+  const now = useNow();
   const [reports, setReports] = useState(station.reports || []);
   const [comments, setComments] = useState<CommentItem[]>(
     station.stationComments || [
@@ -362,7 +364,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
           (() => {
             // Only a report from the last 24h counts as the station's current status; anything
             // older is shown as "last known" so a days-old green tick can't pass as live.
-            const freshness = getFreshness(station);
+            const freshness = getFreshness(station, now);
             const isLive = freshness.tier === 'fresh' || freshness.tier === 'recent';
             const isStale = freshness.tier === 'stale' && !!freshness.lastKnownStatus;
             const cardInfo = (isLive && STATUS_CARD_INFO[station.status]) || STATUS_CARD_INFO.unknown;
