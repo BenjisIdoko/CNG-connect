@@ -37,6 +37,7 @@ $$;
 revoke all on function get_leaderboard(int) from public;
 grant execute on function get_leaderboard(int) to anon, authenticated;
 
--- Run this part only once the new app build has been live for a day or two
--- (leave it commented until then):
--- drop view if exists public_profiles;
+-- Run this part only once the new app build has been live for a day or two.
+-- Done on production 2026-10-28 (migration `drop_public_profiles_view`): the app no
+-- longer references the view and get_leaderboard() serves the leaderboard.
+drop view if exists public_profiles;
