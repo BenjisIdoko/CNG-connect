@@ -22,7 +22,7 @@ const STALE_CHIP = 'bg-rd-stale-container text-rd-on-stale-container';
  */
 export const StationStatusChip: React.FC<{ station: GasStation; className?: string; now?: number }> = ({ station, className = '', now }) => {
   const f = getFreshness(station, now);
-  const base = `inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[0.75rem] font-semibold leading-none max-w-full ${className}`;
+  const base = `inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-micro font-semibold leading-none max-w-full ${className}`;
 
   if (f.tier === 'none' || !f.lastKnownStatus || f.lastKnownStatus === 'unknown') {
     return (
@@ -39,8 +39,9 @@ export const StationStatusChip: React.FC<{ station: GasStation; className?: stri
     return (
       <span className={`${base} ${STALE_CHIP}`}>
         <span aria-hidden="true" className="material-symbols-outlined text-[14px] shrink-0">history</span>
-        <span className="truncate">
-          Last: {label} · {f.ageText}
+        <span className="flex min-w-0">
+          <span className="truncate">Last: {label}</span>
+          <span className="shrink-0 whitespace-nowrap">&nbsp;· {f.ageText}</span>
         </span>
       </span>
     );
@@ -57,9 +58,12 @@ export const StationStatusChip: React.FC<{ station: GasStation; className?: stri
       ) : (
         <span aria-hidden="true" className="material-symbols-outlined text-[14px] shrink-0">{tone.icon}</span>
       )}
-      <span className="truncate">
-        {f.tier === 'fresh' && <span className="sr-only">Live: </span>}
-        {label} · {f.ageText}
+      <span className="flex min-w-0">
+        <span className="truncate">
+          {f.tier === 'fresh' && <span className="sr-only">Live: </span>}
+          {label}
+        </span>
+        <span className="shrink-0 whitespace-nowrap">&nbsp;· {f.ageText}</span>
       </span>
     </span>
   );

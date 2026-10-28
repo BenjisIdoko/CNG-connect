@@ -792,7 +792,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
             onNavigate(station);
           }}
           aria-label={goLabel(station)}
-          className="w-10 h-10 rounded-full bg-surface-container text-rd-ink flex items-center justify-center active:scale-95 shrink-0"
+          className="w-11 h-11 rounded-full bg-surface-container text-rd-ink flex items-center justify-center active:scale-95 shrink-0"
         >
           <span aria-hidden="true" className="material-symbols-outlined text-[20px]">navigation</span>
         </button>
@@ -834,7 +834,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
             <img src={station.images?.[0] || ASSETS.stationWide} alt="" className="w-full h-full object-cover" loading="lazy" />
           </div>
           <div className="min-w-0 flex-1 flex flex-col justify-center gap-1.5">
-            <p className="font-geist-mono text-[11px] font-medium tracking-[0.08em] uppercase text-[#B4BAC4] truncate">
+            <p className="font-geist-mono text-micro font-medium text-[#B4BAC4] truncate">
               Nearest{userGps && station.distance ? ` · ${station.distance}` : ''}{station.driveTime ? ` · ${station.driveTime}` : ''}
             </p>
             <h3 className="font-geist font-bold text-[1.0625rem] leading-snug text-white line-clamp-2">
@@ -846,7 +846,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                 {station.name}
               </button>
             </h3>
-            <span className="inline-flex self-start items-center gap-1.5 rounded-lg bg-rd-ink-2 border border-rd-ink-border px-2 py-1 text-[0.75rem] font-semibold text-white/85">
+            <span className="inline-flex self-start items-center gap-1.5 rounded-lg bg-rd-ink-2 border border-rd-ink-border px-2 py-1 text-micro font-semibold text-white/85">
               <span aria-hidden="true" className={`material-symbols-outlined text-[13px] ${info.iconColor || ''}`}>
                 {freshness.tier === 'stale' ? 'history' : info.icon}
               </span>
@@ -856,17 +856,17 @@ export const MapScreen: React.FC<MapScreenProps> = ({
         </div>
         <div className="flex items-center gap-2 px-3 pb-3">
           {noReportToday && (
-            <span className="flex-1 min-w-0 inline-flex items-center gap-1.5 rounded-full bg-rd-ink-2 text-white/90 text-[0.75rem] font-semibold pl-3 pr-2 py-2 truncate">
+            <span className="flex-1 min-w-0 inline-flex items-center gap-1.5 rounded-full bg-rd-ink-2 text-white/90 text-micro font-semibold pl-3 pr-2 py-2 truncate">
               <span aria-hidden="true" className="material-symbols-outlined text-[15px] shrink-0">campaign</span>
               <span className="truncate">First report today</span>
-              <span className="ml-auto shrink-0 text-[0.6875rem] font-bold text-white/60">+10</span>
+              <span className="ml-auto shrink-0 text-micro font-bold text-white/60">+10</span>
             </span>
           )}
           <button
             type="button"
             onClick={() => onNavigate(station)}
             aria-label={goLabel(station)}
-            className={`relative z-10 shrink-0 inline-flex items-center gap-1.5 rounded-full bg-primary text-white text-[0.8125rem] font-bold px-4 py-2 active:scale-95 transition-transform ${
+            className={`relative z-10 shrink-0 inline-flex items-center gap-1.5 rounded-full bg-primary text-white text-micro font-bold px-4 min-h-11 active:scale-95 transition-transform ${
               noReportToday ? '' : 'flex-1 justify-center'
             }`}
           >
@@ -901,7 +901,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
           <StationStatusChip station={station} now={now} className="mt-1" />
         </div>
         {userGps && station.distance && (
-          <span className="shrink-0 text-[0.8125rem] font-semibold text-rd-text-tertiary">{station.distance}</span>
+          <span className="shrink-0 text-micro font-semibold text-rd-text-tertiary">{station.distance}</span>
         )}
       </button>
     );
@@ -1115,7 +1115,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                     setActiveFilter(chip.key);
                     track('filter_applied', { status: chip.key });
                   }}
-                  className={`shrink-0 rounded-full flex items-center gap-1.5 text-[0.8125rem] font-semibold font-geist py-[7px] px-3 transition-colors ${
+                  className={`shrink-0 rounded-full flex items-center gap-1.5 text-micro font-semibold font-geist min-h-10 px-3 transition-colors ${
                     active ? 'bg-rd-ink text-white' : 'bg-rd-chip-grey text-rd-ink'
                   }`}
                 >
@@ -1205,7 +1205,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
         <div className="p-4 pb-3 flex flex-col gap-3 bg-white border-b border-rd-divider">
           <div className="flex items-end justify-between gap-3">
             <div className="min-w-0">
-              <h2 className="font-geist font-bold text-[1.25rem] tracking-tight leading-tight">Stations</h2>
+              <h2 className="font-geist font-bold text-title tracking-tight leading-tight">Stations</h2>
               <p className="text-caption text-rd-text-tertiary mt-0.5" aria-live="polite">
                 {filteredStations.length} shown · {desktopLiveCount} reported in the last 24h
               </p>
@@ -1213,7 +1213,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
             <button
               type="button"
               onClick={() => setIsSuggestModalOpen(true)}
-              className="shrink-0 inline-flex items-center gap-1.5 h-9 px-3.5 rounded-full bg-rd-ink text-white font-geist font-semibold text-[0.8125rem] hover:bg-rd-ink-2 active:scale-95 transition-[transform,background-color] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-rd-ink"
+              className="shrink-0 inline-flex items-center gap-1.5 h-9 px-3.5 rounded-full bg-rd-ink text-white font-geist font-semibold text-micro hover:bg-rd-ink-2 active:scale-95 transition-[transform,background-color] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-rd-ink"
             >
               <span aria-hidden="true" className="material-symbols-outlined text-[16px]">add_location_alt</span>
               Suggest station
@@ -1232,14 +1232,14 @@ export const MapScreen: React.FC<MapScreenProps> = ({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search station, city, state…"
-              className="flex-1 bg-transparent border-none outline-none text-[0.875rem] font-medium text-rd-ink placeholder:text-rd-text-tertiary"
+              className="flex-1 bg-transparent border-none outline-none text-caption font-medium text-rd-ink placeholder:text-rd-text-tertiary"
             />
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery('')}
                 aria-label="Clear search"
-                className="w-6 h-6 rounded-full text-rd-text-tertiary hover:text-rd-ink flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rd-ink"
+                className="w-8 h-8 rounded-full text-rd-text-tertiary hover:text-rd-ink flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rd-ink"
               >
                 <span aria-hidden="true" className="material-symbols-outlined text-[16px]">close</span>
               </button>
@@ -1255,7 +1255,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                   type="button"
                   aria-pressed={stationTypeFilter === type}
                   onClick={() => setStationTypeFilter(type)}
-                  className={`h-8 rounded-full text-[0.8125rem] font-geist font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rd-ink ${
+                  className={`h-8 rounded-full text-micro font-geist font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rd-ink ${
                     stationTypeFilter === type ? 'bg-rd-ink text-white' : 'text-rd-text-tertiary hover:text-rd-ink'
                   }`}
                 >
@@ -1275,7 +1275,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                   aria-pressed={active}
                   aria-label={chip.key === 'all' ? chip.full : `${chip.full} only`}
                   onClick={() => setActiveFilter(chip.key)}
-                  className={`inline-flex items-center gap-1.5 h-9 px-3 rounded-full text-[0.8125rem] font-geist font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-rd-ink ${
+                  className={`inline-flex items-center gap-1.5 h-9 px-3 rounded-full text-micro font-geist font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-rd-ink ${
                     active ? 'bg-rd-ink text-white' : 'bg-white text-rd-ink ring-1 ring-[#E3E6E4] hover:ring-rd-ink/40'
                   }`}
                 >
@@ -1291,8 +1291,8 @@ export const MapScreen: React.FC<MapScreenProps> = ({
           </div>
 
           <div className="flex items-center justify-between gap-3">
-            <span id="desktop-sort-label" className="font-geist-mono text-[11px] font-medium tracking-[0.08em] uppercase text-rd-text-tertiary">
-              Sort
+            <span id="desktop-sort-label" className="font-geist text-micro font-semibold text-rd-text-tertiary">
+              Sort by
             </span>
             <div role="group" aria-labelledby="desktop-sort-label" className="flex gap-1 p-1 bg-rd-segmented-track rounded-full">
               {(
@@ -1306,7 +1306,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                   type="button"
                   aria-pressed={effectiveDesktopSort === opt.key}
                   onClick={() => setDesktopSort(opt.key)}
-                  className={`h-7 px-3 rounded-full text-[0.75rem] font-geist font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rd-ink ${
+                  className={`h-7 px-3 rounded-full text-micro font-geist font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rd-ink ${
                     effectiveDesktopSort === opt.key ? 'bg-white text-rd-ink shadow-sm' : 'text-rd-text-tertiary hover:text-rd-ink'
                   }`}
                 >
@@ -1327,7 +1327,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
             <button
               type="button"
               onClick={resetAllFilters}
-              className="h-10 px-5 rounded-full bg-rd-ink text-white font-geist font-semibold text-[0.875rem] hover:bg-rd-ink-2 active:scale-95 transition-[transform,background-color] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-rd-ink"
+              className="h-10 px-5 rounded-full bg-rd-ink text-white font-geist font-semibold text-caption hover:bg-rd-ink-2 active:scale-95 transition-[transform,background-color] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-rd-ink"
             >
               Clear filters
             </button>
@@ -1352,11 +1352,14 @@ export const MapScreen: React.FC<MapScreenProps> = ({
               return (
                 <React.Fragment key={`desktop-${station.id}`}>
                   {sectionLabel && (
-                    <li className="px-1 pt-1.5 font-geist-mono text-[11px] font-medium tracking-[0.08em] uppercase text-rd-text-tertiary">
+                    <li className="px-1 pt-1.5 font-geist text-micro font-semibold text-rd-text-tertiary">
                       {sectionLabel}
                     </li>
                   )}
-                  <li>
+                  {/* content-visibility keeps ~100 cards from all being laid out and painted up front. It
+                      clips painting to the box, so the padding/negative margin gives the selected ring, hover
+                      shadow and flash-ring room to draw. */}
+                  <li className="shrink-0 p-5 -m-5 [content-visibility:auto] [contain-intrinsic-block-size:auto_140px]">
                     <div
                       className={`rounded-2xl bg-white transition-shadow ${flashIds?.has(station.id) ? 'flash-ring ' : ''}${
                         isSelected
@@ -1377,10 +1380,10 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                           <span className="flex items-start justify-between gap-2">
                             <span className="font-geist font-bold text-[0.9375rem] leading-snug text-rd-ink line-clamp-2">{station.name}</span>
                             {userGps && station.distance && (
-                              <span className="font-geist-mono text-[11px] font-medium text-rd-text-tertiary shrink-0 pt-0.5">{station.distance}</span>
+                              <span className="font-geist-mono text-micro font-medium text-rd-text-tertiary shrink-0">{station.distance}</span>
                             )}
                           </span>
-                          <span className="text-[0.8125rem] text-rd-text-tertiary truncate mt-0.5">{station.area || station.address}</span>
+                          <span className="text-micro text-rd-text-tertiary truncate mt-0.5">{station.area || station.address}</span>
                           <span className="mt-2 flex">
                             <StationStatusChip station={station} now={now} />
                           </span>
@@ -1390,7 +1393,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                         <button
                           type="button"
                           onClick={() => onOpenStationDetails(station)}
-                          className="inline-flex items-center gap-1 h-8 px-3 rounded-full text-[0.8125rem] font-geist font-semibold text-rd-ink hover:bg-rd-segmented-track transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rd-ink"
+                          className="inline-flex items-center gap-1 h-8 px-3 rounded-full text-micro font-geist font-semibold text-rd-ink hover:bg-rd-segmented-track transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rd-ink"
                         >
                           Reports &amp; chat
                           <span aria-hidden="true" className="material-symbols-outlined text-[16px]">chevron_right</span>
@@ -1399,7 +1402,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                           type="button"
                           onClick={() => onNavigate(station)}
                           aria-label={goLabel(station)}
-                          className="inline-flex items-center gap-1.5 h-8 px-3.5 rounded-full bg-primary text-white text-[0.8125rem] font-geist font-bold hover:bg-primary/90 active:scale-95 transition-[transform,background-color] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary"
+                          className="inline-flex items-center gap-1.5 h-8 px-3.5 rounded-full bg-primary text-white text-micro font-geist font-bold hover:bg-primary/90 active:scale-95 transition-[transform,background-color] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary"
                         >
                           <span aria-hidden="true" className="material-symbols-outlined text-[16px]">directions</span>
                           Go
