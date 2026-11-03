@@ -260,7 +260,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
     // which has no dark-mode values defined yet (same reasoning as MapScreen's mobile UI) —
     // forcing light here avoids a half-light/half-dark mix between the new literal bg-white/
     // rd-ink classes and the semantic tokens that still flip dark.
-    <div data-theme="light" className="min-h-screen bg-surface text-on-surface pb-36">
+    <div data-theme="light" className="screen-fade min-h-screen bg-surface text-on-surface pb-36">
       {/* Toast Notification */}
       {copiedNotification && (
         <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-on-surface text-white text-[0.875rem] font-bold px-4 py-2 rounded-full shadow-lg">

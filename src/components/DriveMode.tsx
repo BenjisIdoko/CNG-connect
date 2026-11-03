@@ -89,7 +89,7 @@ export const DriveMode: React.FC<DriveModeProps> = ({ best, alternatives, fallba
       data-theme="light"
       // pb-32 keeps the Exit button above the fixed bottom nav and the floating report button
       // (nav is 68px tall at bottom-4; the report button rises ~117px). Scrolls on short screens.
-      className="lg:hidden absolute bottom-0 left-0 right-0 z-40 max-w-xl mx-auto max-h-[calc(100dvh-4rem)] overflow-y-auto bg-rd-ink text-white rounded-t-[28px] shadow-[0_-10px_30px_rgba(20,32,26,0.35)] px-5 pt-5 pb-32 flex flex-col gap-4"
+      className="screen-in lg:hidden absolute bottom-0 left-0 right-0 z-40 max-w-xl mx-auto max-h-[calc(100dvh-4rem)] overflow-y-auto bg-rd-ink text-white rounded-t-[28px] shadow-[0_-10px_30px_rgba(20,32,26,0.35)] px-5 pt-5 pb-32 flex flex-col gap-4"
     >
       {target ? (
         <>

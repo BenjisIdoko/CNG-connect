@@ -20,7 +20,7 @@ import { useNow } from '../hooks/useNow';
 import { StationSearchOverlay, rememberRecentStation } from './StationSearchOverlay';
 import { searchTokens, stationMatchesQuery, stationSearchScore } from '../utils/stationSearch';
 import { SuggestStationModal } from './SuggestStationModal';
-import { prefersReducedMotion } from '../utils/haptics';
+import { haptic, prefersReducedMotion } from '../utils/haptics';
 import { getPinConfidence, getAccuracyRadiusM } from '../utils/locationPrecision';
 import { isSameState } from '../utils/proximityAlertEngine';
 import { track } from '../services/analytics';
@@ -96,6 +96,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
     const el = sheetRef.current;
     if (!el) return;
     const newH = el.offsetHeight;
+    if (lastModeRef.current !== sheetMode && sheetHeightRef.current) haptic(8);
     if (lastModeRef.current !== sheetMode && sheetHeightRef.current && !prefersReducedMotion()) {
       // The layout already jumped to the new height; start visually where the old top edge
       // was (plus any drag offset), then glide to the resting position.
@@ -833,6 +834,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
         <button
           onClick={(e) => {
             e.stopPropagation();
+            haptic(10);
             onNavigate(station);
           }}
           aria-label={goLabel(station)}
@@ -917,7 +919,10 @@ export const MapScreen: React.FC<MapScreenProps> = ({
           )}
           <button
             type="button"
-            onClick={() => onNavigate(station)}
+            onClick={() => {
+              haptic(10);
+              onNavigate(station);
+            }}
             aria-label={goLabel(station)}
             className={`relative z-10 shrink-0 inline-flex items-center gap-1.5 rounded-full bg-primary text-white text-micro font-bold px-4 min-h-11 active:scale-95 transition-transform ${
               noReportToday ? '' : 'flex-1 justify-center'
@@ -1113,7 +1118,10 @@ export const MapScreen: React.FC<MapScreenProps> = ({
           fallback={driveFallback}
           now={now}
           hasGps={!!userGps}
-          onGo={onNavigate}
+          onGo={(st) => {
+            haptic(10);
+            onNavigate(st);
+          }}
           onExit={() => setIsDriveMode(false)}
         />
       )}
@@ -1121,6 +1129,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
         <button
           onClick={() => {
             track('drive_mode_opened');
+            haptic(12);
             setIsDriveMode(true);
           }}
           className={`pointer-events-auto absolute left-4 -top-16 h-12 pl-3.5 pr-4 rounded-full bg-rd-ink text-white inline-flex items-center gap-2 font-geist font-bold text-caption shadow-[0_6px_20px_rgba(20,32,26,0.25)] active:scale-95 transition-all ${
@@ -1226,6 +1235,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                   aria-selected={active}
                   aria-label={chip.full}
                   onClick={() => {
+                    haptic(6);
                     setActiveFilter(chip.key);
                     track('filter_applied', { status: chip.key });
                   }}
@@ -1264,9 +1274,13 @@ export const MapScreen: React.FC<MapScreenProps> = ({
               {/* shrink-0 on every child: a card with overflow-hidden would otherwise collapse to 0px
                   once the list is taller than the sheet */}
               <h2 className="sr-only">Nearby stations</h2>
-              {standardHero && renderNearestCard(standardHero.station, standardHero.kind)}
+              {standardHero && <div className="rise-in">{renderNearestCard(standardHero.station, standardHero.kind)}</div>}
               {!standardHero && quietRows[0] && reportedRows.length === 0 && renderFirstReportCard(quietRows[0], quietRows.length, true)}
-              {standardReportedRows.map((st) => renderCompactRow(st))}
+              {standardReportedRows.map((st, i) => (
+                <div key={st.id} className="rise-in" style={{ '--d': `${(i + 1) * 45}ms` } as React.CSSProperties}>
+                  {renderCompactRow(st)}
+                </div>
+              ))}
               {quietRows[0] && reportedRows.length > 0 && (
                 <div className="mt-2">{renderFirstReportCard(quietRows[0], quietRows.length, false)}</div>
               )}
