@@ -15,6 +15,7 @@ export type EventName =
   | 'station_viewed'
   | 'search_used'
   | 'filter_applied'
+  | 'drive_mode_opened'
   | 'directions_clicked'
   | 'share_clicked'
   | 'login_code_requested'

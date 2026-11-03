@@ -13,8 +13,9 @@ import { ASSETS, SHOW_EV_STATIONS } from '../data/mockData';
 import { StationStatusChip } from './common/StationStatusChip';
 import {
   getFreshness, describeStatus, freshnessRank, currentStatus,
-  rankByUsefulness, pickBestStation, pinEmphasis,
+  rankByUsefulness, pickBestStation, pinEmphasis, usabilityCost,
 } from '../utils/stationFreshness';
+import { DriveMode } from './DriveMode';
 import { useNow } from '../hooks/useNow';
 import { StationSearchOverlay, rememberRecentStation } from './StationSearchOverlay';
 import { searchTokens, stationMatchesQuery, stationSearchScore } from '../utils/stationSearch';
@@ -155,6 +156,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
     }
   };
   const [isRecentering, setIsRecentering] = useState(false);
+  const [isDriveMode, setIsDriveMode] = useState(false);
 
   // Analytics: a search counts once the driver pauses typing (never the text itself).
   useEffect(() => {
@@ -427,6 +429,11 @@ export const MapScreen: React.FC<MapScreenProps> = ({
   };
   const reportedRows = rankedStations.filter(isReportedRecently);
   const quietRows = rankedStations.filter((st) => !isReportedRecently(st));
+  // Drive mode shows the best option plus up to two more stations a driver could actually use.
+  const driveAlternatives = rankedStations.filter(
+    (st) => st.id !== bestStation?.id && Number.isFinite(usabilityCost(st, distanceOrNull(st), now)),
+  );
+  const driveFallback = userGps ? nearestTop5Stations[0] ?? null : quietRows[0] ?? null;
 
   useEffect(() => {
     if (!mapContainerRef.current || mapInstanceRef.current) return;
@@ -1099,7 +1106,30 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       )}
 
       {/* Mobile bottom sheet — data-theme="light", see the top overlay's comment above. */}
-      <div data-theme="light" className="lg:hidden absolute bottom-0 left-0 right-0 z-30 max-w-xl mx-auto pointer-events-none">
+      {isDriveMode && (
+        <DriveMode
+          best={bestStation}
+          alternatives={driveAlternatives}
+          fallback={driveFallback}
+          now={now}
+          hasGps={!!userGps}
+          onGo={onNavigate}
+          onExit={() => setIsDriveMode(false)}
+        />
+      )}
+      <div data-theme="light" className={`lg:hidden absolute bottom-0 left-0 right-0 z-30 max-w-xl mx-auto pointer-events-none ${isDriveMode ? 'hidden' : ''}`}>
+        <button
+          onClick={() => {
+            track('drive_mode_opened');
+            setIsDriveMode(true);
+          }}
+          className={`pointer-events-auto absolute left-4 -top-16 h-12 pl-3.5 pr-4 rounded-full bg-rd-ink text-white inline-flex items-center gap-2 font-geist font-bold text-caption shadow-[0_6px_20px_rgba(20,32,26,0.25)] active:scale-95 transition-all ${
+            sheetMode === 'expanded' ? 'opacity-0 pointer-events-none! scale-75' : ''
+          }`}
+        >
+          <span aria-hidden="true" className="material-symbols-outlined text-[22px]">directions_car</span>
+          Drive
+        </button>
         <button
           onClick={handleRecenter}
           aria-label="My Location"
