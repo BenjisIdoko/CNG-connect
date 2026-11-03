@@ -74,15 +74,15 @@ export const ProximityAlertBanner: React.FC<ProximityAlertBannerProps> = ({
   ];
 
   return (
-    // data-theme="light": same reasoning as the other rebuilt screens — the handoff has no
+    //: same reasoning as the other rebuilt screens — the handoff has no
     // dark-mode values yet.
-    <div data-theme="light" className="fixed bottom-0 left-0 right-0 z-[60] max-w-xl mx-auto pointer-events-none animate-slide-down">
-      <div className="bg-white rounded-t-[28px] shadow-[0_-14px_40px_rgba(0,0,0,0.3)] px-5 pt-2.5 pb-7 pointer-events-auto">
-        <div className="w-10 h-1 bg-[#E3E6E4] rounded-full mx-auto mb-4" />
+    <div className="fixed bottom-0 left-0 right-0 z-[60] max-w-xl mx-auto pointer-events-none animate-slide-down">
+      <div className="bg-rd-surface rounded-t-[28px] shadow-[0_-14px_40px_rgba(0,0,0,0.3)] px-5 pt-2.5 pb-7 pointer-events-auto">
+        <div className="w-10 h-1 bg-rd-handle rounded-full mx-auto mb-4" />
 
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <h2 className="font-geist text-[1.0625rem] font-extrabold text-rd-ink leading-snug">
+            <h2 className="font-geist text-[1.0625rem] font-extrabold text-rd-fg leading-snug">
               {variant === 'followup' ? `Did you fill up at ${station.name}?` : `Arrived near ${station.name}`}
             </h2>
             <div className="flex items-center gap-1.5 mt-1.5">
@@ -117,7 +117,7 @@ export const ProximityAlertBanner: React.FC<ProximityAlertBannerProps> = ({
                   <span className={`w-[26px] h-[26px] rounded-full text-white flex items-center justify-center shrink-0 ${opt.dot}`}>
                     <span aria-hidden="true" className="material-symbols-outlined text-[15px] material-symbols-fill">{opt.icon}</span>
                   </span>
-                  <span className="text-caption font-semibold text-rd-ink">{opt.label}</span>
+                  <span className="text-caption font-semibold text-rd-fg">{opt.label}</span>
                 </button>
               ))}
             </div>
@@ -141,7 +141,7 @@ export const ProximityAlertBanner: React.FC<ProximityAlertBannerProps> = ({
             <div className="w-11 h-11 rounded-full bg-rd-available-container text-rd-available flex items-center justify-center">
               <span aria-hidden="true" className="material-symbols-outlined text-[26px]">check_circle</span>
             </div>
-            <p className="font-geist font-extrabold text-body-lg text-rd-ink">Thanks for the update!</p>
+            <p className="font-geist font-extrabold text-body-lg text-rd-fg">Thanks for the update!</p>
             <p className="text-caption text-primary font-bold">+50 reputation points earned</p>
           </div>
         )}

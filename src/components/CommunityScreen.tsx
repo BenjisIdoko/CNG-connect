@@ -160,10 +160,10 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
     });
 
   return (
-    // data-theme="light": same reasoning as the other rebuilt screens — the handoff has no
+    //: same reasoning as the other rebuilt screens — the handoff has no
     // dark-mode values yet, and this screen now mixes literal bg-white/rd-ink with tokens
     // that'd otherwise flip dark on their own.
-    <div data-theme="light" className="min-h-screen bg-rd-bg text-rd-ink pb-28 relative">
+    <div className="min-h-screen bg-rd-bg text-rd-fg pb-28 relative">
       {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-on-surface/90 text-white text-body font-bold px-4 py-2 rounded-full shadow-lg backdrop-blur-md">
@@ -175,7 +175,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
       <div className="sticky top-0 z-30 bg-surface/95 backdrop-blur-md py-3 px-4 md:px-6 shadow-[0_2px_10px_rgba(31,41,35,0.04)] max-w-4xl mx-auto flex flex-col gap-3">
         {/* Title row: Community + share + bell, per design_handoff_cng_connect_mobile 3d */}
         <div className="flex items-center justify-between gap-2">
-          <h1 className="font-geist text-[1.75rem] font-bold text-rd-ink tracking-tight">Community</h1>
+          <h1 className="font-geist text-[1.75rem] font-bold text-rd-fg tracking-tight">Community</h1>
           <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={() => {
@@ -189,7 +189,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                 }
               }}
               aria-label="Share the community"
-              className="w-11 h-11 rounded-full bg-surface-container-high text-rd-ink flex items-center justify-center active:scale-95 transition-transform"
+              className="w-11 h-11 rounded-full bg-surface-container-high text-rd-fg flex items-center justify-center active:scale-95 transition-transform"
             >
               <span aria-hidden="true" className="material-symbols-outlined text-[20px]">share</span>
             </button>
@@ -203,7 +203,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                 }
               }}
               aria-label="Notifications"
-              className="relative w-11 h-11 rounded-full bg-surface-container-high text-rd-ink flex items-center justify-center active:scale-95 transition-transform"
+              className="relative w-11 h-11 rounded-full bg-surface-container-high text-rd-fg flex items-center justify-center active:scale-95 transition-transform"
             >
               <span aria-hidden="true" className="material-symbols-outlined text-[20px]">notifications</span>
               <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-error rounded-full border-2 border-white" />
@@ -216,7 +216,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
           {/* Sliding pill behind the active tab */}
           <span
             aria-hidden
-            className="absolute top-1 bottom-1 left-1 rounded-full bg-rd-ink shadow-xs transition-transform duration-300 ease-[cubic-bezier(0.3,1,0.4,1)]"
+            className="absolute top-1 bottom-1 left-1 rounded-full bg-rd-selected shadow-xs transition-transform duration-300 ease-[cubic-bezier(0.3,1,0.4,1)]"
             style={{
               width: `calc((100% - 8px) / ${SHOW_LEADERBOARD ? 3 : 2})`,
               transform: `translateX(${['station_groups', 'general', 'leaderboard'].indexOf(activeMainTab) * 100}%)`,
@@ -226,7 +226,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
             onClick={() => setActiveMainTab('station_groups')}
             className={`relative z-10 flex-1 py-2.5 rounded-full text-caption font-bold transition-colors text-center ${
               activeMainTab === 'station_groups'
-                ? 'text-white'
+                ? 'text-rd-on-selected'
                 : 'text-on-surface-variant hover:text-on-surface'
             }`}
           >
@@ -237,7 +237,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
             onClick={() => setActiveMainTab('general')}
             className={`relative z-10 flex-1 py-2.5 rounded-full text-caption font-bold transition-colors text-center ${
               activeMainTab === 'general'
-                ? 'text-white'
+                ? 'text-rd-on-selected'
                 : 'text-on-surface-variant hover:text-on-surface'
             }`}
           >
@@ -249,7 +249,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
               onClick={() => setActiveMainTab('leaderboard')}
               className={`relative z-10 flex-1 py-2.5 rounded-full text-caption font-bold transition-colors text-center flex items-center justify-center gap-1 ${
                 activeMainTab === 'leaderboard'
-                  ? 'text-white'
+                  ? 'text-rd-on-selected'
                   : 'text-on-surface-variant hover:text-on-surface'
               }`}
             >
@@ -291,7 +291,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
               onClick={() => setSortByNearest((v) => !v)}
               aria-pressed={sortByNearest}
               className={`shrink-0 flex items-center gap-1.5 px-3.5 py-2.5 rounded-full text-caption font-bold transition-colors active:scale-95 ${
-                sortByNearest ? 'bg-rd-ink text-white' : 'bg-surface-container text-rd-ink'
+                sortByNearest ? 'bg-rd-selected text-rd-on-selected' : 'bg-surface-container text-rd-fg'
               }`}
             >
               <span aria-hidden="true" className="material-symbols-outlined text-[18px]">near_me</span>
@@ -401,7 +401,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                     <div
                       key={st.id}
                       onClick={() => onOpenStationGroup && onOpenStationGroup(st)}
-                      className="flex items-center gap-3 py-4 cursor-pointer transition-colors active:bg-surface-container/40 md:bg-white md:p-4 md:rounded-2xl md:border md:border-slate-200/80 md:shadow-2xs md:hover:border-primary/60 md:active:bg-transparent"
+                      className="flex items-center gap-3 py-4 cursor-pointer transition-colors active:bg-surface-container/40 md:bg-rd-surface md:p-4 md:rounded-2xl md:border md:border-slate-200/80 md:shadow-2xs md:hover:border-primary/60 md:active:bg-transparent"
                     >
                       <div className="w-12 h-12 rounded-2xl overflow-hidden shrink-0 bg-emerald-50 flex items-center justify-center text-primary">
                         {st.images?.[0] ? (
@@ -413,7 +413,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
 
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-1.5">
-                          <h3 className="text-body font-semibold text-rd-ink leading-tight truncate">{st.name}</h3>
+                          <h3 className="text-body font-semibold text-rd-fg leading-tight truncate">{st.name}</h3>
                           {st.verifiedByCommunity && (
                             <span className="shrink-0 inline-flex items-center gap-0.5 rounded-md bg-rd-available-container text-rd-on-available-container px-1.5 py-0.5 text-[0.6875rem] font-bold">
                               <span aria-hidden="true" className="material-symbols-outlined text-[11px] material-symbols-fill">verified</span>
@@ -425,7 +425,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                           {st.status !== 'unknown' && (
                             <span className="inline-flex items-center gap-1 shrink-0">
                               <span aria-hidden="true" className={`w-1.5 h-1.5 rounded-full ${dotColor}`} />
-                              <span className="text-rd-ink font-semibold">{st.statusLabel}</span>
+                              <span className="text-rd-fg font-semibold">{st.statusLabel}</span>
                             </span>
                           )}
                           <span className="truncate">{st.city}, {st.state}</span>
@@ -471,7 +471,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                       setActiveCategory(chip.id === activeCategory ? 'all' : chip.id);
                     }}
                     className={`shrink-0 h-11 flex items-center gap-1.5 px-4 rounded-full text-caption font-bold transition-colors active:scale-95 ${
-                      active ? 'bg-rd-ink text-white' : 'bg-white text-rd-ink ring-1 ring-[#E3E6E4]'
+                      active ? 'bg-rd-selected text-rd-on-selected' : 'bg-rd-surface text-rd-fg ring-1 ring-rd-divider'
                     }`}
                   >
                     {chip.icon && <span aria-hidden="true" className="material-symbols-outlined text-[16px]">{chip.icon}</span>}
@@ -489,7 +489,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
               </p>
               <button
                 onClick={() => setActiveMainTab('station_groups')}
-                className="shrink-0 rounded-full bg-white text-rd-on-available-container text-[0.75rem] font-bold px-3 py-1.5 active:scale-95 transition-transform"
+                className="shrink-0 rounded-full bg-white text-primary text-[0.75rem] font-bold px-3 py-1.5 active:scale-95 transition-transform"
               >
                 Find group
               </button>

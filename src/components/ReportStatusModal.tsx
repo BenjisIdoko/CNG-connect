@@ -155,8 +155,8 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
       ];
 
   return (
-    <Modal isOpen={true} onClose={onClose} title={`Report status for ${station.name}`} bare className="bg-white max-h-[90vh] overflow-y-auto">
-      <div data-theme="light" className="relative w-full max-w-lg bg-white rounded-t-[28px] sm:rounded-3xl z-10 max-h-[90vh] overflow-y-auto pb-safe">
+    <Modal isOpen={true} onClose={onClose} title={`Report status for ${station.name}`} bare className="bg-rd-surface max-h-[90vh] overflow-y-auto">
+      <div className="relative w-full max-w-lg bg-rd-surface rounded-t-[28px] sm:rounded-3xl z-10 max-h-[90vh] overflow-y-auto pb-safe">
         <div className="px-5 pb-6 pt-7">
           <div className="flex items-start justify-between gap-3 mb-4">
             <div className="min-w-0 flex-1">
@@ -171,7 +171,7 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
                   <span aria-hidden="true" className="material-symbols-outlined text-[14px]">info</span>
                 </button>
               </p>
-              <h1 className="font-geist text-[1.625rem] font-bold text-rd-ink tracking-tight leading-tight mt-0.5">
+              <h1 className="font-geist text-[1.625rem] font-bold text-rd-fg tracking-tight leading-tight mt-0.5">
                 {isEv ? "How's the charger now?" : "How's the pump now?"}
               </h1>
             </div>
@@ -179,7 +179,7 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
               type="button"
               onClick={onClose}
               aria-label="Close"
-              className="shrink-0 w-10 h-10 rounded-full bg-surface-container text-rd-ink flex items-center justify-center active:scale-95 transition-transform"
+              className="shrink-0 w-10 h-10 rounded-full bg-surface-container text-rd-fg flex items-center justify-center active:scale-95 transition-transform"
             >
               <span aria-hidden="true" className="material-symbols-outlined text-[20px]">close</span>
             </button>
@@ -217,17 +217,17 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
                     role="radio"
                     aria-checked={on}
                     className={`w-full min-h-[76px] px-[18px] rounded-[20px] flex items-center gap-3 transition-all active:scale-[0.98] ${
-                      on ? 'bg-white ring-[2.5px] ring-rd-ink' : 'bg-[#FAFBFA] ring-1 ring-[#E3E6E4]'
+                      on ? 'bg-rd-surface ring-[2.5px] ring-rd-fg' : 'bg-rd-bg ring-1 ring-rd-divider'
                     }`}
                   >
                     <span className={`w-11 h-11 rounded-full flex items-center justify-center shrink-0 text-white ${opt.solid}`}>
                       <span aria-hidden="true" className="material-symbols-outlined text-[22px] material-symbols-fill">{opt.icon}</span>
                     </span>
                     <span className="flex-1 text-left min-w-0">
-                      <span className="block font-geist text-[1.125rem] font-bold text-rd-ink truncate">{opt.title}</span>
+                      <span className="block font-geist text-[1.125rem] font-bold text-rd-fg truncate">{opt.title}</span>
                       <span className="block text-[0.8125rem] text-rd-text-tertiary truncate">{opt.meaning}</span>
                     </span>
-                    <span aria-hidden="true" className="material-symbols-outlined text-[22px] text-rd-ink shrink-0" style={{ fontVariationSettings: on ? "'FILL' 1" : "'FILL' 0" }}>
+                    <span aria-hidden="true" className="material-symbols-outlined text-[22px] text-rd-fg shrink-0" style={{ fontVariationSettings: on ? "'FILL' 1" : "'FILL' 0" }}>
                       {on ? 'radio_button_checked' : 'radio_button_unchecked'}
                     </span>
                   </button>
@@ -240,11 +240,11 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
               <button
                 type="button"
                 onClick={() => setShowMoreDetails(true)}
-                className="w-full bg-white ring-1 ring-[#E3E6E4] rounded-[20px] px-[18px] py-4 flex items-center gap-3 text-left active:scale-[0.99] transition-transform"
+                className="w-full bg-rd-surface ring-1 ring-rd-divider rounded-[20px] px-[18px] py-4 flex items-center gap-3 text-left active:scale-[0.99] transition-transform"
               >
                 <span aria-hidden="true" className="material-symbols-outlined text-[20px] text-primary shrink-0">add_a_photo</span>
                 <span className="flex-1 min-w-0">
-                  <span className="block font-geist text-[0.9375rem] font-semibold text-rd-ink">
+                  <span className="block font-geist text-[0.9375rem] font-semibold text-rd-fg">
                     {isEv ? 'Add wait time, live photo or note' : 'Add price, wait time, live photo or note'}
                   </span>
                   <span className="block text-[0.75rem] text-rd-text-tertiary">Optional · a live photo earns 100 pts instead of 50</span>
@@ -267,7 +267,7 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
                         type="button"
                         onClick={() => setWaitTime(chip.v)}
                         className={`rounded-lg px-3 py-1.5 text-micro font-semibold transition-colors ${
-                          waitTime === chip.v ? 'bg-rd-ink text-white' : 'bg-surface-container-high text-slate-500'
+                          waitTime === chip.v ? 'bg-rd-selected text-rd-on-selected' : 'bg-surface-container-high text-slate-500'
                         }`}
                       >
                         {chip.label}
@@ -282,7 +282,7 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
                       CNG price per kg (optional)
                     </label>
                     <div className="mt-2 flex items-center gap-2 bg-surface-container-high rounded-xl px-3 min-h-11">
-                      <span aria-hidden="true" className="font-geist font-bold text-rd-ink">₦</span>
+                      <span aria-hidden="true" className="font-geist font-bold text-rd-fg">₦</span>
                       <input
                         id="report-cng-price"
                         type="text"
@@ -291,7 +291,7 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
                         placeholder="e.g. 230"
                         value={priceText}
                         onChange={(e) => setPriceText(e.target.value.replace(/[^0-9.,]/g, ''))}
-                        className="flex-1 min-w-0 bg-transparent text-body font-semibold text-rd-ink placeholder:text-outline placeholder:font-normal focus:outline-none"
+                        className="flex-1 min-w-0 bg-transparent text-body font-semibold text-rd-fg placeholder:text-outline placeholder:font-normal focus:outline-none"
                       />
                       <span aria-hidden="true" className="text-caption text-outline">/kg</span>
                     </div>

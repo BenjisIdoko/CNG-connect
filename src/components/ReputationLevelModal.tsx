@@ -20,14 +20,14 @@ export const ReputationLevelModal: React.FC<ReputationLevelModalProps> = ({
 }) => {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Level up" bare className="max-w-sm">
-      {/* data-theme="light" + explicit bg-white: same reasoning as the other rebuilt screens
+      {/* + explicit bg-rd-surface: same reasoning as the other rebuilt screens
           (the handoff has no dark-mode values yet) — without the explicit bg, Modal's own
           dark-mode background would show through on a dark system theme. */}
-      <div data-theme="light" className="flex flex-col items-center text-center bg-white px-6 pt-8 pb-6">
-        <div className="w-[76px] h-[76px] rounded-full bg-[#FDF6E3] flex items-center justify-center text-[2.125rem]">
+      <div className="flex flex-col items-center text-center bg-rd-surface px-6 pt-8 pb-6">
+        <div className="w-[76px] h-[76px] rounded-full bg-rd-queuing-container flex items-center justify-center text-[2.125rem]">
           <TierBadge tierId={tier.id} size={40} />
         </div>
-        <h3 className="font-geist font-extrabold text-heading text-rd-ink leading-tight mt-4">
+        <h3 className="font-geist font-extrabold text-heading text-rd-fg leading-tight mt-4">
           You&apos;ve reached
           <br />
           {tier.title}

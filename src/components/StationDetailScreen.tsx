@@ -257,11 +257,11 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
   };
 
   return (
-    // data-theme="light": this screen is being rebuilt to design_handoff_cng_connect_mobile,
+    //: this screen is being rebuilt to design_handoff_cng_connect_mobile,
     // which has no dark-mode values defined yet (same reasoning as MapScreen's mobile UI) —
     // forcing light here avoids a half-light/half-dark mix between the new literal bg-white/
     // rd-ink classes and the semantic tokens that still flip dark.
-    <div data-theme="light" className="screen-fade min-h-screen bg-surface text-on-surface pb-36">
+    <div className="screen-fade min-h-screen bg-surface text-on-surface pb-36">
       {/* Toast Notification */}
       {copiedNotification && (
         <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-on-surface text-white text-[0.875rem] font-bold px-4 py-2 rounded-full shadow-lg">
@@ -327,7 +327,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
           <h1
             onClick={() => setShowFullTitle(!showFullTitle)}
             title={station.name}
-            className={`font-geist text-[1.625rem] font-bold text-rd-ink tracking-tight leading-tight cursor-pointer mt-0.5 ${
+            className={`font-geist text-[1.625rem] font-bold text-rd-fg tracking-tight leading-tight cursor-pointer mt-0.5 ${
               showFullTitle ? '' : 'truncate'
             }`}
           >
@@ -344,7 +344,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
             </button>
           </p>
           {describeLocationPrecision(station) && (
-            <p className="text-micro font-medium text-[#B5380A] mt-1">
+            <p className="text-micro font-medium text-rd-on-low-container mt-1">
               {describeLocationPrecision(station)}
             </p>
           )}
@@ -371,12 +371,12 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
             const cardInfo = (isLive && STATUS_CARD_INFO[station.status]) || STATUS_CARD_INFO.unknown;
             return (
               <div className="flex flex-col gap-3">
-                <div className="rounded-[22px] bg-white shadow-[0_1px_2px_rgba(20,32,26,0.05),0_8px_24px_rgba(20,32,26,0.05)] p-4 flex items-center gap-3">
+                <div className="rounded-[22px] bg-rd-surface shadow-[0_1px_2px_rgba(20,32,26,0.05),0_8px_24px_rgba(20,32,26,0.05)] p-4 flex items-center gap-3">
                   <span className={`w-[46px] h-[46px] rounded-2xl flex items-center justify-center shrink-0 ${cardInfo.tileBg} ${cardInfo.tileColor}`}>
                     <span aria-hidden="true" className="material-symbols-outlined text-[22px]">{cardInfo.icon}</span>
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="font-geist font-bold text-[1.25rem] text-rd-ink leading-tight truncate">
+                    <p className="font-geist font-bold text-[1.25rem] text-rd-fg leading-tight truncate">
                       {isLive
                         ? getFormattedStatusPillText(station)
                         : isStale
@@ -395,11 +395,11 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                 {(() => {
                   const price = latestReportedPrice(station, now);
                   return (
-                    <div className="rounded-2xl bg-white ring-1 ring-[#E3E6E4] px-4 py-3 flex items-center gap-3">
+                    <div className="rounded-2xl bg-rd-surface ring-1 ring-rd-divider px-4 py-3 flex items-center gap-3">
                       <span aria-hidden="true" className="material-symbols-outlined text-rd-text-tertiary text-[20px] shrink-0">local_offer</span>
                       {price ? (
                         <p className="flex-1 min-w-0 text-caption text-rd-text-tertiary">
-                          <span className="font-geist font-bold text-body-lg text-rd-ink">{price.text}</span>
+                          <span className="font-geist font-bold text-body-lg text-rd-fg">{price.text}</span>
                           {' · reported '}{formatAgeShort(price.ageMinutes)}
                         </p>
                       ) : (
@@ -447,19 +447,19 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
           <TabsPrimitive.List ref={tabListRef} className="relative flex gap-6 border-b border-surface-container-highest">
             <TabsPrimitive.Trigger
               value="reports"
-              className="pb-2.5 -mb-px font-geist text-[0.9375rem] font-semibold text-rd-text-tertiary border-b-2 border-transparent transition-colors data-[state=active]:text-rd-ink data-[state=active]:font-bold focus:outline-none"
+              className="pb-2.5 -mb-px font-geist text-[0.9375rem] font-semibold text-rd-text-tertiary border-b-2 border-transparent transition-colors data-[state=active]:text-rd-fg data-[state=active]:font-bold focus:outline-none"
             >
               Reports{reports.length > 0 ? ` · ${reports.length}` : ''}
             </TabsPrimitive.Trigger>
             <TabsPrimitive.Trigger
               value="feed"
-              className="pb-2.5 -mb-px font-geist text-[0.9375rem] font-semibold text-rd-text-tertiary border-b-2 border-transparent transition-colors data-[state=active]:text-rd-ink data-[state=active]:font-bold focus:outline-none"
+              className="pb-2.5 -mb-px font-geist text-[0.9375rem] font-semibold text-rd-text-tertiary border-b-2 border-transparent transition-colors data-[state=active]:text-rd-fg data-[state=active]:font-bold focus:outline-none"
             >
               Chat{comments.length > 0 ? ` · ${comments.length}` : ''}
             </TabsPrimitive.Trigger>
             <TabsPrimitive.Trigger
               value="photos"
-              className="pb-2.5 -mb-px font-geist text-[0.9375rem] font-semibold text-rd-text-tertiary border-b-2 border-transparent transition-colors data-[state=active]:text-rd-ink data-[state=active]:font-bold focus:outline-none"
+              className="pb-2.5 -mb-px font-geist text-[0.9375rem] font-semibold text-rd-text-tertiary border-b-2 border-transparent transition-colors data-[state=active]:text-rd-fg data-[state=active]:font-bold focus:outline-none"
             >
               Photos{images.length > 0 ? ` · ${images.length}` : ''}
             </TabsPrimitive.Trigger>
@@ -495,7 +495,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                           className={`px-3.5 py-2.5 text-[0.9375rem] leading-relaxed ${
                             mine
                               ? 'bg-primary text-white rounded-[18px] rounded-br-[6px]'
-                              : 'bg-white text-rd-ink shadow-[0_1px_2px_rgba(20,32,26,0.05),0_2px_8px_rgba(20,32,26,0.06)] rounded-[18px] rounded-bl-[6px]'
+                              : 'bg-rd-surface text-rd-fg shadow-[0_1px_2px_rgba(20,32,26,0.05),0_2px_8px_rgba(20,32,26,0.06)] rounded-[18px] rounded-bl-[6px]'
                           }`}
                         >
                           {comment.content}
@@ -508,7 +508,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                           <div className="mt-1.5 pl-3 border-l-2 border-surface-container-highest flex flex-col gap-1.5">
                             {comment.replies.map((reply) => (
                               <div key={reply.id}>
-                                <span className="text-micro font-bold text-rd-ink">{reply.author}</span>
+                                <span className="text-micro font-bold text-rd-fg">{reply.author}</span>
                                 <span className="text-micro text-rd-text-tertiary"> · {reply.timeAgo}</span>
                                 <p className="text-caption text-on-surface-variant">{reply.content}</p>
                               </div>
@@ -563,14 +563,14 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-2">
-                          <span className="font-geist text-[0.9375rem] font-semibold text-rd-ink truncate">{report.author}</span>
+                          <span className="font-geist text-[0.9375rem] font-semibold text-rd-fg truncate">{report.author}</span>
                           <span className="shrink-0 inline-flex items-center rounded-md bg-surface-container-high px-1.5 py-0.5 text-[0.6875rem] font-bold uppercase tracking-wide text-rd-text-tertiary">
                             {freshness.label}
                           </span>
                         </div>
                         <div className="flex items-center gap-1.5 mt-1">
                           <span className={`w-1.5 h-1.5 rounded-full ${dot}`} />
-                          <span className="text-caption font-bold text-rd-ink">
+                          <span className="text-caption font-bold text-rd-fg">
                             {report.statusLabel}
                             {report.waitMinutes ? ` · ${report.waitMinutes}m wait` : ''}
                           </span>
@@ -606,7 +606,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                           <button
                             onClick={() => setFlaggingReport(report)}
                             aria-label={`Report a problem with ${report.author}'s report`}
-                            className="flex items-center gap-1 text-micro font-semibold text-outline hover:text-rd-ink transition-colors"
+                            className="flex items-center gap-1 text-micro font-semibold text-outline hover:text-rd-fg transition-colors"
                           >
                             <span aria-hidden="true" className="material-symbols-outlined text-[15px]">flag</span>
                             <span>Report</span>
@@ -635,7 +635,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                     aria-selected={photoFilter === 'all'}
                     onClick={() => setPhotoFilter('all')}
                     className={`rounded-full px-3 py-1.5 text-[0.8125rem] font-semibold transition-colors ${
-                      photoFilter === 'all' ? 'bg-rd-ink text-white' : 'bg-rd-chip-grey text-rd-ink'
+                      photoFilter === 'all' ? 'bg-rd-selected text-rd-on-selected' : 'bg-rd-chip-grey text-rd-fg'
                     }`}
                   >
                     All {photoItems.length}
@@ -647,7 +647,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                       aria-selected={photoFilter === 'live'}
                       onClick={() => setPhotoFilter('live')}
                       className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-[0.8125rem] font-semibold transition-colors ${
-                        photoFilter === 'live' ? 'bg-rd-ink text-white' : 'bg-rd-chip-grey text-rd-available'
+                        photoFilter === 'live' ? 'bg-rd-selected text-rd-on-selected' : 'bg-rd-chip-grey text-rd-available'
                       }`}
                     >
                       <span aria-hidden="true" className="material-symbols-outlined text-[14px]">photo_camera</span>
@@ -697,7 +697,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                               <img src={item.url} alt="Station photo" className="w-full h-full object-cover" />
                               <span
                                 className={`absolute top-2 left-2 inline-flex items-center gap-1 rounded-md text-[0.6875rem] font-bold px-1.5 py-0.5 ${
-                                  item.isLive ? 'bg-rd-available text-white' : 'bg-white text-rd-ink'
+                                  item.isLive ? 'bg-rd-available text-white' : 'bg-rd-surface text-rd-fg'
                                 }`}
                               >
                                 {item.isLive ? 'Live' : 'Station listing'}
@@ -743,7 +743,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
       </div>
 
       {/* Sticky bottom actions: one primary CTA, two quiet secondaries */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white px-5 pt-3 shadow-[0_-10px_30px_rgba(20,32,26,0.12)] z-40 pb-safe">
+      <div className="fixed bottom-0 left-0 right-0 bg-rd-surface px-5 pt-3 shadow-[0_-10px_30px_rgba(20,32,26,0.12)] z-40 pb-safe">
         <div className="max-w-xl mx-auto flex flex-col gap-2">
           {activeTab === 'feed' && (
             <>
@@ -792,13 +792,13 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
               }}
               aria-label="Directions"
               title="Directions"
-              className="w-14 h-14 rounded-full bg-surface-container text-rd-ink flex items-center justify-center active:scale-95 transition-transform shrink-0"
+              className="w-14 h-14 rounded-full bg-surface-container text-rd-fg flex items-center justify-center active:scale-95 transition-transform shrink-0"
             >
               <span aria-hidden="true" className="material-symbols-outlined text-[24px]">navigation</span>
             </button>
             <button
               onClick={() => onOpenReportModal(station)}
-              className="flex-1 h-14 bg-rd-ink text-white rounded-full font-geist font-bold text-body flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
+              className="flex-1 h-14 bg-rd-selected text-rd-on-selected rounded-full font-geist font-bold text-body flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
             >
               <span aria-hidden="true" className="material-symbols-outlined text-[18px]">campaign</span>
               Report status
@@ -807,7 +807,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
               onClick={() => openWhatsAppShare(station)}
               aria-label="Share station on WhatsApp"
               title="Share on WhatsApp"
-              className="w-14 h-14 rounded-full bg-surface-container text-rd-ink flex items-center justify-center active:scale-95 transition-transform shrink-0"
+              className="w-14 h-14 rounded-full bg-surface-container text-rd-fg flex items-center justify-center active:scale-95 transition-transform shrink-0"
             >
               <span aria-hidden="true" className="material-symbols-outlined text-[22px]">ios_share</span>
             </button>

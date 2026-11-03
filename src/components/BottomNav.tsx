@@ -30,7 +30,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
   return (
     <nav
       aria-label="Primary"
-      className="lg:hidden fixed left-3.5 right-3.5 bottom-4 z-50 mx-auto max-w-[380px] h-[68px] rounded-[34px] bg-[rgba(232,233,232,0.94)] backdrop-blur-lg grid grid-cols-4"
+      className="lg:hidden fixed left-3.5 right-3.5 bottom-4 z-50 mx-auto max-w-[380px] h-[68px] rounded-[34px] bg-rd-nav backdrop-blur-lg grid grid-cols-4"
       style={{ boxShadow: '0 10px 30px rgba(20,32,26,.14), inset 0 1px 0 rgba(255,255,255,.7)' }}
     >
       {TABS.map((tab) => {
@@ -68,7 +68,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
               <span className="relative flex items-center justify-center w-11 h-7">
                 <span
                   aria-hidden="true"
-                  className="material-symbols-outlined text-[27px] text-[#3F4642]"
+                  className="material-symbols-outlined text-[27px] text-rd-nav-icon"
                   style={{ fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24" }}
                 >
                   {tab.icon}
@@ -78,7 +78,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
             )}
             <span
               className={`font-geist text-[12px] leading-none ${
-                active ? 'font-bold text-rd-ink' : 'font-medium text-rd-text-tertiary'
+                active ? 'font-bold text-rd-fg' : 'font-medium text-rd-text-tertiary'
               }`}
             >
               {tab.label}

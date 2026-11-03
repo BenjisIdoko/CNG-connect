@@ -161,14 +161,14 @@ export const MapScreen: React.FC<MapScreenProps> = ({
   const [isRecentering, setIsRecentering] = useState(false);
   const [isDriveMode, setIsDriveMode] = useState(false);
   const isDarkTheme = useIsDarkTheme();
-  // Night + drive mode: darken the map tiles. Toggled on the element directly because Leaflet
-  // owns the container's class list (a React className would overwrite its classes).
+  // Dark theme: darken the map tiles (pins stay as they are). Toggled on the element directly
+  // because Leaflet owns the container's class list (a React className would overwrite it).
   useEffect(() => {
     const el = mapContainerRef.current;
     if (!el) return;
-    el.classList.toggle('cng-map-dark', isDriveMode && isDarkTheme);
+    el.classList.toggle('cng-map-dark', isDarkTheme);
     return () => el.classList.remove('cng-map-dark');
-  }, [isDriveMode, isDarkTheme]);
+  }, [isDarkTheme]);
 
   // Analytics: a search counts once the driver pauses typing (never the text itself).
   useEffect(() => {
@@ -832,7 +832,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       >
         {renderStatusTile(station)}
         <div className="min-w-0 flex-1">
-          <h3 className="font-geist font-semibold text-[0.9375rem] text-rd-ink truncate leading-snug">{station.name}</h3>
+          <h3 className="font-geist font-semibold text-[0.9375rem] text-rd-fg truncate leading-snug">{station.name}</h3>
           <p className="text-caption text-outline truncate flex items-center gap-1.5 mt-0.5">
             <span aria-hidden="true" className={`w-2 h-2 rounded-full shrink-0 ${dotColor}`} />
             <span className="truncate">
@@ -849,7 +849,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
             onNavigate(station);
           }}
           aria-label={goLabel(station)}
-          className="w-11 h-11 rounded-full bg-surface-container text-rd-ink flex items-center justify-center active:scale-95 shrink-0"
+          className="w-11 h-11 rounded-full bg-surface-container text-rd-fg flex items-center justify-center active:scale-95 shrink-0"
         >
           <span aria-hidden="true" className="material-symbols-outlined text-[20px]">navigation</span>
         </button>
@@ -969,7 +969,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       >
         {renderStatusTile(station)}
         <div className="min-w-0 flex-1">
-          <h3 className="font-geist font-semibold text-[0.9375rem] text-rd-ink truncate">{station.name}</h3>
+          <h3 className="font-geist font-semibold text-[0.9375rem] text-rd-fg truncate">{station.name}</h3>
           <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
             <StationStatusChip station={station} now={now} />
             {price && <span className="text-micro font-semibold text-rd-text-tertiary">{price.compact}</span>}
@@ -985,10 +985,10 @@ export const MapScreen: React.FC<MapScreenProps> = ({
   // The cold-start moment: most stations have no recent report, and only a driver standing at
   // the pump (within 800 m) can file one. Say so, name the nearest candidate and what it earns.
   const renderFirstReportCard = (station: GasStation, count: number, asHero: boolean) => (
-    <div className={`relative rounded-[22px] ${asHero ? 'bg-rd-ink text-white' : 'bg-rd-chip-grey text-rd-ink'} p-4 flex items-start gap-3`}>
+    <div className={`relative rounded-[22px] ${asHero ? 'bg-rd-ink text-white' : 'bg-rd-chip-grey text-rd-fg'} p-4 flex items-start gap-3`}>
       <span
         aria-hidden="true"
-        className={`material-symbols-outlined text-[22px] shrink-0 mt-0.5 ${asHero ? 'text-white' : 'text-rd-ink'}`}
+        className={`material-symbols-outlined text-[22px] shrink-0 mt-0.5 ${asHero ? 'text-white' : 'text-rd-fg'}`}
       >
         campaign
       </span>
@@ -1006,7 +1006,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
             onOpenStationDetails(station);
           }}
           className={`mt-2.5 inline-flex items-center gap-1.5 rounded-full min-h-11 px-4 text-micro font-bold active:scale-95 transition-transform ${
-            asHero ? 'bg-primary text-white' : 'bg-rd-ink text-white'
+            asHero ? 'bg-primary text-white' : 'bg-rd-selected text-rd-on-selected'
           }`}
         >
           <span className="truncate">{userGps && station.distance ? `Nearest: ${station.name} · ${station.distance}` : `Open ${station.name}`}</span>
@@ -1075,18 +1075,17 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       )}
 
       {/* Mobile top overlay: search pill + round Share button, no logo pill (redesign: "the map is the hero").
-          data-theme="light" because the redesign handoff only specifies a light palette — forcing light
-          here and on the desktop panel avoids a half-light/half-dark mismatch until a dark variant of the
-          new design exists. */}
-      <div data-theme="light" className="lg:hidden absolute top-0 inset-x-0 z-30 pointer-events-none pt-safe px-4">
+          Follows the light/dark theme through the rd-* tokens. The desktop panel below is still forced
+          light (data-theme="light"): it has not been dark-audited. */}
+      <div className="lg:hidden absolute top-0 inset-x-0 z-30 pointer-events-none pt-safe px-4">
         <div className="flex items-center gap-2.5 pt-3">
           <button
             onClick={() => setIsSearchOpen(true)}
             aria-label="Search stations, city or state"
-            className="pointer-events-auto flex-1 min-w-0 h-[52px] pl-4 pr-4 rounded-full bg-white flex items-center gap-2.5 text-left shadow-[0_6px_20px_rgba(20,32,26,0.12)] font-geist"
+            className="pointer-events-auto flex-1 min-w-0 h-[52px] pl-4 pr-4 rounded-full bg-rd-surface flex items-center gap-2.5 text-left shadow-[0_6px_20px_rgba(20,32,26,0.12)] font-geist"
           >
-            <span aria-hidden="true" className="material-symbols-outlined text-rd-ink text-[22px] shrink-0">search</span>
-            <span className={`flex-1 min-w-0 truncate text-[0.9375rem] ${searchQuery ? 'font-semibold text-rd-ink' : 'font-normal text-rd-text-tertiary'}`}>
+            <span aria-hidden="true" className="material-symbols-outlined text-rd-fg text-[22px] shrink-0">search</span>
+            <span className={`flex-1 min-w-0 truncate text-[0.9375rem] ${searchQuery ? 'font-semibold text-rd-fg' : 'font-normal text-rd-text-tertiary'}`}>
               {searchQuery || 'Where do you want to fill up?'}
             </span>
           </button>
@@ -1094,9 +1093,9 @@ export const MapScreen: React.FC<MapScreenProps> = ({
             <button
               onClick={onShareApp}
               aria-label="Share the app with other drivers"
-              className="pointer-events-auto shrink-0 w-[52px] h-[52px] rounded-full bg-white flex items-center justify-center shadow-[0_6px_20px_rgba(20,32,26,0.12)] active:scale-95 transition-transform"
+              className="pointer-events-auto shrink-0 w-[52px] h-[52px] rounded-full bg-rd-surface flex items-center justify-center shadow-[0_6px_20px_rgba(20,32,26,0.12)] active:scale-95 transition-transform"
             >
-              <span aria-hidden="true" className="material-symbols-outlined text-rd-ink text-[20px]">share</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-rd-fg text-[20px]">share</span>
             </button>
           )}
         </div>
@@ -1129,7 +1128,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
         </Modal>
       )}
 
-      {/* Mobile bottom sheet — data-theme="light", see the top overlay's comment above. */}
+      {/* Mobile bottom sheet — themed through the rd-* tokens like the top overlay. */}
       {isDriveMode && (
         <DriveMode
           best={bestStation}
@@ -1144,14 +1143,14 @@ export const MapScreen: React.FC<MapScreenProps> = ({
           onExit={() => setIsDriveMode(false)}
         />
       )}
-      <div data-theme="light" className={`lg:hidden absolute bottom-0 left-0 right-0 z-30 max-w-xl mx-auto pointer-events-none ${isDriveMode ? 'hidden' : ''}`}>
+      <div className={`lg:hidden absolute bottom-0 left-0 right-0 z-30 max-w-xl mx-auto pointer-events-none ${isDriveMode ? 'hidden' : ''}`}>
         <button
           onClick={() => {
             track('drive_mode_opened');
             haptic(12);
             setIsDriveMode(true);
           }}
-          className={`pointer-events-auto absolute left-4 -top-16 h-12 pl-3.5 pr-4 rounded-full bg-rd-ink text-white inline-flex items-center gap-2 font-geist font-bold text-caption shadow-[0_6px_20px_rgba(20,32,26,0.25)] active:scale-95 transition-all ${
+          className={`pointer-events-auto absolute left-4 -top-16 h-12 pl-3.5 pr-4 rounded-full bg-rd-selected text-rd-on-selected inline-flex items-center gap-2 font-geist font-bold text-caption shadow-[0_6px_20px_rgba(20,32,26,0.25)] active:scale-95 transition-all ${
             sheetMode === 'expanded' ? 'opacity-0 pointer-events-none! scale-75' : ''
           }`}
         >
@@ -1162,7 +1161,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
           onClick={handleRecenter}
           aria-label="My Location"
           title={gpsStatusText}
-          className={`pointer-events-auto absolute right-4 -top-16 w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-[0_6px_20px_rgba(20,32,26,0.12)] active:scale-95 transition-all ${
+          className={`pointer-events-auto absolute right-4 -top-16 w-12 h-12 rounded-full bg-rd-surface flex items-center justify-center shadow-[0_6px_20px_rgba(20,32,26,0.12)] active:scale-95 transition-all ${
             sheetMode === 'expanded' ? 'opacity-0 pointer-events-none! scale-75' : ''
           } ${gpsStatus === 'active' ? 'text-primary' : gpsStatus === 'denied' ? 'text-status-red' : 'text-status-amber'}`}
         >
@@ -1173,7 +1172,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
 
         <div
           ref={sheetRef}
-          className={`w-full bg-white rounded-t-[28px] shadow-[0_-10px_30px_rgba(20,32,26,0.12),0_100vh_0_0_#FFFFFF] pointer-events-auto flex flex-col overflow-hidden will-change-transform max-h-[calc(100dvh-8rem)] ${
+          className={`w-full bg-rd-surface rounded-t-[28px] shadow-[0_-10px_30px_rgba(20,32,26,0.12),0_100vh_0_0_var(--color-rd-surface)] pointer-events-auto flex flex-col overflow-hidden will-change-transform max-h-[calc(100dvh-8rem)] ${
             sheetMode === 'expanded' ? 'h-[calc(100dvh-8rem)]' : sheetMode === 'collapsed' ? 'pb-24' : ''
           }`}
         >
@@ -1191,7 +1190,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
               aria-label="Station list size — drag or tap to change"
               className="w-full pt-3 pb-4 flex flex-col items-center"
             >
-              <div className="w-10 h-1.5 bg-[#D5D8D6] rounded-full" />
+              <div className="w-10 h-1.5 bg-rd-handle rounded-full" />
             </button>
             {filteredStations.length > 0 && sheetMode !== 'collapsed' && (
               <button
@@ -1259,7 +1258,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                     track('filter_applied', { status: chip.key });
                   }}
                   className={`shrink-0 rounded-full flex items-center gap-1.5 text-micro font-semibold font-geist min-h-10 px-3 transition-colors ${
-                    active ? 'bg-rd-ink text-white' : 'bg-rd-chip-grey text-rd-ink'
+                    active ? 'bg-rd-selected text-rd-on-selected' : 'bg-rd-chip-grey text-rd-fg'
                   }`}
                 >
                   {chip.icon && (
@@ -1363,14 +1362,14 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       {/* Desktop Persistent Right-Hand Panel (lg: 1024px and above).
           Rebuilt to the same system as the phone map: rd tokens, Geist, status chips and a
           freshness-aware list so a station reported minutes ago reads differently from one
-          nobody has reported in days. data-theme="light" like every other redesigned screen
-          (the handoff has no dark values yet). */}
+          nobody has reported in days. data-theme="light": the desktop layout has no dark
+          variant yet, only the phone screens do. */}
       <aside
         data-theme="light"
         aria-label="Stations"
-        className="hidden lg:flex flex-col w-[380px] xl:w-[420px] bg-rd-bg text-rd-ink h-full z-20 shadow-[-8px_0_24px_rgba(20,32,26,0.08)] overflow-hidden shrink-0"
+        className="hidden lg:flex flex-col w-[380px] xl:w-[420px] bg-rd-bg text-rd-fg h-full z-20 shadow-[-8px_0_24px_rgba(20,32,26,0.08)] overflow-hidden shrink-0"
       >
-        <div className="p-4 pb-3 flex flex-col gap-3 bg-white border-b border-rd-divider">
+        <div className="p-4 pb-3 flex flex-col gap-3 bg-rd-surface border-b border-rd-divider">
           <div className="flex items-end justify-between gap-3">
             <div className="min-w-0">
               <h2 className="font-geist font-bold text-title tracking-tight leading-tight">Stations</h2>
@@ -1381,14 +1380,14 @@ export const MapScreen: React.FC<MapScreenProps> = ({
             <button
               type="button"
               onClick={() => setIsSuggestModalOpen(true)}
-              className="shrink-0 inline-flex items-center gap-1.5 h-9 px-3.5 rounded-full bg-rd-ink text-white font-geist font-semibold text-micro hover:bg-rd-ink-2 active:scale-95 transition-[transform,background-color] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-rd-ink"
+              className="shrink-0 inline-flex items-center gap-1.5 h-9 px-3.5 rounded-full bg-rd-selected text-rd-on-selected font-geist font-semibold text-micro hover:bg-rd-ink-2 active:scale-95 transition-[transform,background-color] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-rd-fg"
             >
               <span aria-hidden="true" className="material-symbols-outlined text-[16px]">add_location_alt</span>
               Suggest station
             </button>
           </div>
 
-          <div className="flex items-center bg-rd-segmented-track rounded-full px-4 h-11 gap-2 focus-within:ring-2 focus-within:ring-rd-ink">
+          <div className="flex items-center bg-rd-segmented-track rounded-full px-4 h-11 gap-2 focus-within:ring-2 focus-within:ring-rd-fg">
             <span aria-hidden="true" className="material-symbols-outlined text-rd-text-tertiary text-[18px]">search</span>
             <input
               type="text"
@@ -1400,14 +1399,14 @@ export const MapScreen: React.FC<MapScreenProps> = ({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search station, city, state…"
-              className="flex-1 bg-transparent border-none outline-none text-caption font-medium text-rd-ink placeholder:text-rd-text-tertiary"
+              className="flex-1 bg-transparent border-none outline-none text-caption font-medium text-rd-fg placeholder:text-rd-text-tertiary"
             />
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery('')}
                 aria-label="Clear search"
-                className="w-8 h-8 rounded-full text-rd-text-tertiary hover:text-rd-ink flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rd-ink"
+                className="w-8 h-8 rounded-full text-rd-text-tertiary hover:text-rd-fg flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rd-fg"
               >
                 <span aria-hidden="true" className="material-symbols-outlined text-[16px]">close</span>
               </button>
@@ -1423,8 +1422,8 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                   type="button"
                   aria-pressed={stationTypeFilter === type}
                   onClick={() => setStationTypeFilter(type)}
-                  className={`h-8 rounded-full text-micro font-geist font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rd-ink ${
-                    stationTypeFilter === type ? 'bg-rd-ink text-white' : 'text-rd-text-tertiary hover:text-rd-ink'
+                  className={`h-8 rounded-full text-micro font-geist font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rd-fg ${
+                    stationTypeFilter === type ? 'bg-rd-selected text-rd-on-selected' : 'text-rd-text-tertiary hover:text-rd-fg'
                   }`}
                 >
                   {type === 'all' ? 'All' : 'CNG'}
@@ -1443,8 +1442,8 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                   aria-pressed={active}
                   aria-label={chip.key === 'all' ? chip.full : `${chip.full} only`}
                   onClick={() => setActiveFilter(chip.key)}
-                  className={`inline-flex items-center gap-1.5 h-9 px-3 rounded-full text-micro font-geist font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-rd-ink ${
-                    active ? 'bg-rd-ink text-white' : 'bg-white text-rd-ink ring-1 ring-[#E3E6E4] hover:ring-rd-ink/40'
+                  className={`inline-flex items-center gap-1.5 h-9 px-3 rounded-full text-micro font-geist font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-rd-fg ${
+                    active ? 'bg-rd-selected text-rd-on-selected' : 'bg-rd-surface text-rd-fg ring-1 ring-rd-divider hover:ring-rd-fg/40'
                   }`}
                 >
                   {chip.icon && (
@@ -1474,8 +1473,8 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                   type="button"
                   aria-pressed={effectiveDesktopSort === opt.key}
                   onClick={() => setDesktopSort(opt.key)}
-                  className={`h-7 px-3 rounded-full text-micro font-geist font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rd-ink ${
-                    effectiveDesktopSort === opt.key ? 'bg-white text-rd-ink shadow-sm' : 'text-rd-text-tertiary hover:text-rd-ink'
+                  className={`h-7 px-3 rounded-full text-micro font-geist font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rd-fg ${
+                    effectiveDesktopSort === opt.key ? 'bg-rd-surface text-rd-fg shadow-sm' : 'text-rd-text-tertiary hover:text-rd-fg'
                   }`}
                 >
                   {opt.label}
@@ -1495,7 +1494,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
             <button
               type="button"
               onClick={resetAllFilters}
-              className="h-10 px-5 rounded-full bg-rd-ink text-white font-geist font-semibold text-caption hover:bg-rd-ink-2 active:scale-95 transition-[transform,background-color] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-rd-ink"
+              className="h-10 px-5 rounded-full bg-rd-selected text-rd-on-selected font-geist font-semibold text-caption hover:bg-rd-ink-2 active:scale-95 transition-[transform,background-color] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-rd-fg"
             >
               Clear filters
             </button>
@@ -1529,24 +1528,24 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                       shadow and flash-ring room to draw. */}
                   <li className="shrink-0 p-5 -m-5 [content-visibility:auto] [contain-intrinsic-block-size:auto_140px]">
                     <div
-                      className={`rounded-2xl bg-white transition-shadow ${flashIds?.has(station.id) ? 'flash-ring ' : ''}${
+                      className={`rounded-2xl bg-rd-surface transition-shadow ${flashIds?.has(station.id) ? 'flash-ring ' : ''}${
                         isSelected
-                          ? 'ring-2 ring-rd-ink shadow-[0_8px_24px_rgba(20,32,26,0.12)]'
-                          : 'ring-1 ring-[#E3E6E4] shadow-[0_1px_2px_rgba(20,32,26,0.04)] hover:shadow-[0_6px_18px_rgba(20,32,26,0.10)]'
+                          ? 'ring-2 ring-rd-fg shadow-[0_8px_24px_rgba(20,32,26,0.12)]'
+                          : 'ring-1 ring-rd-divider shadow-[0_1px_2px_rgba(20,32,26,0.04)] hover:shadow-[0_6px_18px_rgba(20,32,26,0.10)]'
                       }`}
                     >
                       <button
                         type="button"
                         onClick={() => onSelectStation(station)}
                         aria-current={isSelected ? 'true' : undefined}
-                        className="w-full text-left p-3 pb-2 flex gap-3 rounded-t-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-rd-ink"
+                        className="w-full text-left p-3 pb-2 flex gap-3 rounded-t-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-rd-fg"
                       >
                         <span className="w-16 h-16 rounded-xl overflow-hidden shrink-0 bg-rd-segmented-track">
                           <img src={station.images?.[0] || ASSETS.stationWide} alt="" className="w-full h-full object-cover" loading="lazy" />
                         </span>
                         <span className="min-w-0 flex-1 flex flex-col">
                           <span className="flex items-start justify-between gap-2">
-                            <span className="font-geist font-bold text-[0.9375rem] leading-snug text-rd-ink line-clamp-2">{station.name}</span>
+                            <span className="font-geist font-bold text-[0.9375rem] leading-snug text-rd-fg line-clamp-2">{station.name}</span>
                             {userGps && station.distance && (
                               <span className="font-geist-mono text-micro font-medium text-rd-text-tertiary shrink-0">{station.distance}</span>
                             )}
@@ -1561,7 +1560,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                         <button
                           type="button"
                           onClick={() => onOpenStationDetails(station)}
-                          className="inline-flex items-center gap-1 h-8 px-3 rounded-full text-micro font-geist font-semibold text-rd-ink hover:bg-rd-segmented-track transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rd-ink"
+                          className="inline-flex items-center gap-1 h-8 px-3 rounded-full text-micro font-geist font-semibold text-rd-fg hover:bg-rd-segmented-track transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rd-fg"
                         >
                           Reports &amp; chat
                           <span aria-hidden="true" className="material-symbols-outlined text-[16px]">chevron_right</span>

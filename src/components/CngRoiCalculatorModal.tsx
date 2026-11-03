@@ -48,9 +48,9 @@ export const CngRoiCalculatorModal: React.FC<CngRoiCalculatorModalProps> = ({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Fuel Savings Calculator" bare className="max-w-lg">
-      {/* data-theme="light": same reasoning as the other rebuilt screens — the handoff has no
+      {/*: same reasoning as the other rebuilt screens — the handoff has no
           dark-mode values yet. */}
-      <div data-theme="light" className="flex flex-col bg-white text-on-surface">
+      <div className="flex flex-col bg-rd-surface text-on-surface">
         <div className="bg-rd-ink text-white px-5 pt-5 pb-6">
           <div className="flex items-center justify-between">
             <span className="font-geist font-bold text-[0.9375rem]">Fuel Savings Calculator</span>
@@ -70,7 +70,7 @@ export const CngRoiCalculatorModal: React.FC<CngRoiCalculatorModalProps> = ({
 
         <div className="px-5 py-5 flex flex-col gap-4">
           <div>
-            <div className="flex justify-between text-caption font-semibold text-rd-ink">
+            <div className="flex justify-between text-caption font-semibold text-rd-fg">
               <span>Daily distance</span>
               <span className="text-primary">{dailyKm} km</span>
             </div>
@@ -78,7 +78,7 @@ export const CngRoiCalculatorModal: React.FC<CngRoiCalculatorModalProps> = ({
               onChange={(e) => setDailyKm(Number(e.target.value))} className="w-full mt-2 accent-primary" />
           </div>
           <div>
-            <div className="flex justify-between text-caption font-semibold text-rd-ink">
+            <div className="flex justify-between text-caption font-semibold text-rd-fg">
               <span>Vehicle mileage</span>
               <span className="text-primary">{kmPerLiter} km/l</span>
             </div>
@@ -93,12 +93,12 @@ export const CngRoiCalculatorModal: React.FC<CngRoiCalculatorModalProps> = ({
             <label className="block">
               <span className="text-micro font-semibold text-rd-text-tertiary">Petrol (₦/L)</span>
               <input type="number" value={petrolPrice} onChange={(e) => setPetrolPrice(Number(e.target.value))}
-                className="mt-1 w-full bg-white ring-1 ring-[#E3E6E4] rounded-xl px-3 py-2 text-caption font-bold text-rd-ink outline-none focus:ring-2 focus:ring-primary/30" />
+                className="mt-1 w-full bg-rd-surface ring-1 ring-rd-divider rounded-xl px-3 py-2 text-caption font-bold text-rd-fg outline-none focus:ring-2 focus:ring-primary/30" />
             </label>
             <label className="block">
               <span className="text-micro font-semibold text-rd-text-tertiary">CNG (₦/kg)</span>
               <input type="number" value={cngPrice} onChange={(e) => setCngPrice(Number(e.target.value))}
-                className="mt-1 w-full bg-white ring-1 ring-[#E3E6E4] rounded-xl px-3 py-2 text-caption font-bold text-rd-ink outline-none focus:ring-2 focus:ring-primary/30" />
+                className="mt-1 w-full bg-rd-surface ring-1 ring-rd-divider rounded-xl px-3 py-2 text-caption font-bold text-rd-fg outline-none focus:ring-2 focus:ring-primary/30" />
             </label>
           </div>
 
@@ -109,7 +109,7 @@ export const CngRoiCalculatorModal: React.FC<CngRoiCalculatorModalProps> = ({
             ].map((opt) => (
               <button key={String(opt.on)} type="button" onClick={() => setIsCommercialGrant(opt.on)}
                 className={`flex-1 rounded-full py-2.5 text-caption font-semibold transition-colors ${
-                  isCommercialGrant === opt.on ? 'bg-rd-ink text-white' : 'text-rd-text-tertiary'
+                  isCommercialGrant === opt.on ? 'bg-rd-selected text-rd-on-selected' : 'text-rd-text-tertiary'
                 }`}>
                 {opt.label}
               </button>
@@ -119,11 +119,11 @@ export const CngRoiCalculatorModal: React.FC<CngRoiCalculatorModalProps> = ({
           <div className="grid grid-cols-2 gap-2.5">
             <div className="bg-surface-container rounded-2xl p-3">
               <div className="text-micro font-semibold text-rd-text-tertiary">Payback</div>
-              <div className="font-geist font-bold text-body text-rd-ink mt-0.5">{paybackMonths}</div>
+              <div className="font-geist font-bold text-body text-rd-fg mt-0.5">{paybackMonths}</div>
             </div>
             <div className="bg-surface-container rounded-2xl p-3">
               <div className="text-micro font-semibold text-rd-text-tertiary">CO₂ avoided</div>
-              <div className="font-geist font-bold text-body text-rd-ink mt-0.5">{annualCo2SavedTons} t/yr</div>
+              <div className="font-geist font-bold text-body text-rd-fg mt-0.5">{annualCo2SavedTons} t/yr</div>
             </div>
           </div>
 

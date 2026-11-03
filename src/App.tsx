@@ -910,7 +910,6 @@ export const App: React.FC = () => {
           onBack={onHeaderBack}
           onShareApp={FEATURES.ENABLE_REFERRALS ? handleShareApp : undefined}
           mobileHidden={isMapHome || isProfileHome || isStationDetail}
-          forceLight
         />
       )}
 

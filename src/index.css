@@ -195,6 +195,18 @@
   --color-rd-on-stale-container: #3F4550;
   --color-rd-stale-inset: #C3C8C5;
 
+  /* Roles that change between light and dark. rd-ink itself stays the constant dark brand
+     surface (hero card, Drive pill); these are the roles that must flip around it:
+     text on the page, card/sheet surface, selected chip/button, nav bar. Dark values live in
+     the dark blocks below; forced-light regions restore them in [data-theme="light"]. */
+  --color-rd-fg: #14201A;
+  --color-rd-surface: #FFFFFF;
+  --color-rd-selected: #14201A;
+  --color-rd-on-selected: #FFFFFF;
+  --color-rd-nav: rgba(232, 233, 232, 0.94);
+  --color-rd-nav-icon: #3F4642;
+  --color-rd-handle: #D5D8D6;
+
   /* Remap Tailwind's raw palettes so the many `emerald-*` / `slate-*` classes
      across the app pick up the brand green and neutral greys too. */
   --color-emerald-50: #F0FAF1;
@@ -234,6 +246,7 @@
    safe to flip it here without a separate pass. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
+      color-scheme: dark;
       --color-deep-teal: #1E2E26;
       --color-primary-container: #16301F;
       --color-on-primary-container: #9AD9A8;
@@ -277,9 +290,37 @@
       --color-slate-800: #DEDFE0;
       --color-slate-900: #EDEDEE;
       --color-slate-950: #F7F7F8;
+      --color-rd-bg: #18191B;
+      --color-rd-bg-map: #1B1F1D;
+      --color-rd-chip-grey: #2A2C2E;
+      --color-rd-segmented-track: #2A2C2E;
+      --color-rd-divider: #35363A;
+      --color-rd-divider-2: #2A2C2E;
+      --color-rd-text-secondary: #B4B6B8;
+      --color-rd-text-tertiary: #A0A2A4;
+      --color-rd-available-container: #16281B;
+      --color-rd-on-available-container: #86DCA6;
+      --color-rd-queuing-container: #332A12;
+      --color-rd-on-queuing-container: #E8CE7A;
+      --color-rd-low-container: #33200F;
+      --color-rd-on-low-container: #F2AA7C;
+      --color-rd-out-container: #331519;
+      --color-rd-on-out-container: #F3A6AA;
+      --color-rd-stale-container: #2A2C2E;
+      --color-rd-on-stale-container: #B4B6B8;
+      --color-rd-stale-inset: #4A4C4F;
+      --color-rd-proximity-text: #D2A8FF;
+      --color-rd-fg: #EDEDEE;
+      --color-rd-surface: #222426;
+      --color-rd-selected: #EDEDEE;
+      --color-rd-on-selected: #14201A;
+      --color-rd-nav: rgba(34, 36, 38, 0.92);
+      --color-rd-nav-icon: #B4B6B8;
+      --color-rd-handle: #4A4C4F;
   }
 }
 :root[data-theme="dark"] {
+    color-scheme: dark;
     --color-deep-teal: #1E2E26;
     --color-primary-container: #16301F;
     --color-on-primary-container: #9AD9A8;
@@ -323,6 +364,33 @@
     --color-slate-800: #DEDFE0;
     --color-slate-900: #EDEDEE;
     --color-slate-950: #F7F7F8;
+    --color-rd-bg: #18191B;
+    --color-rd-bg-map: #1B1F1D;
+    --color-rd-chip-grey: #2A2C2E;
+    --color-rd-segmented-track: #2A2C2E;
+    --color-rd-divider: #35363A;
+    --color-rd-divider-2: #2A2C2E;
+    --color-rd-text-secondary: #B4B6B8;
+    --color-rd-text-tertiary: #A0A2A4;
+    --color-rd-available-container: #16281B;
+    --color-rd-on-available-container: #86DCA6;
+    --color-rd-queuing-container: #332A12;
+    --color-rd-on-queuing-container: #E8CE7A;
+    --color-rd-low-container: #33200F;
+    --color-rd-on-low-container: #F2AA7C;
+    --color-rd-out-container: #331519;
+    --color-rd-on-out-container: #F3A6AA;
+    --color-rd-stale-container: #2A2C2E;
+    --color-rd-on-stale-container: #B4B6B8;
+    --color-rd-stale-inset: #4A4C4F;
+    --color-rd-proximity-text: #D2A8FF;
+    --color-rd-fg: #EDEDEE;
+    --color-rd-surface: #222426;
+    --color-rd-selected: #EDEDEE;
+    --color-rd-on-selected: #14201A;
+    --color-rd-nav: rgba(34, 36, 38, 0.92);
+    --color-rd-nav-icon: #B4B6B8;
+    --color-rd-handle: #4A4C4F;
 }
 /* Escape hatch: forces the light palette on a subtree regardless of the page's
    theme (used by the admin dashboard, which isn't dark-mode-audited). */
@@ -330,6 +398,33 @@
   /* Native scrollbars, inputs and form controls inside a forced-light region stay light even if
      the page itself is ever given `color-scheme: dark`. */
   color-scheme: light;
+  --color-rd-bg: #FCFCFC;
+  --color-rd-bg-map: #E7EAE8;
+  --color-rd-chip-grey: #ECEEED;
+  --color-rd-segmented-track: #E6E8E7;
+  --color-rd-divider: #E1E4E2;
+  --color-rd-divider-2: #EEF0EF;
+  --color-rd-text-secondary: #4A505B;
+  --color-rd-text-tertiary: #5B616B;
+  --color-rd-available-container: #E2F4E8;
+  --color-rd-on-available-container: #0A6B34;
+  --color-rd-queuing-container: #FBF0D6;
+  --color-rd-on-queuing-container: #7A5200;
+  --color-rd-low-container: #FCE8DA;
+  --color-rd-on-low-container: #9A3D06;
+  --color-rd-out-container: #FCE4E2;
+  --color-rd-on-out-container: #A1201A;
+  --color-rd-stale-container: #EEF0EF;
+  --color-rd-on-stale-container: #3F4550;
+  --color-rd-stale-inset: #C3C8C5;
+  --color-rd-proximity-text: #6A2FB0;
+  --color-rd-fg: #14201A;
+  --color-rd-surface: #FFFFFF;
+  --color-rd-selected: #14201A;
+  --color-rd-on-selected: #FFFFFF;
+  --color-rd-nav: rgba(232, 233, 232, 0.94);
+  --color-rd-nav-icon: #3F4642;
+  --color-rd-handle: #D5D8D6;
   --color-primary: #288435;
   --color-primary-container: #E3F5E6;
   --color-on-primary-container: #1F6129;
@@ -493,13 +588,22 @@
 
 /* ---- Accessibility & touch ---- */
 
-/* Drive mode at night: darken the map tiles (not the pins) so a dark panel is not sitting under a
-   glaring map. Inverting the tile layer is the standard trick; hue-rotate puts the colours back
-   in roughly their original hues, and the brightness drop keeps it from being a white-on-black
-   negative. */
-.cng-map-dark { background: #1b1f1d; }
-.cng-map-dark .leaflet-tile-pane {
-  filter: invert(1) hue-rotate(180deg) brightness(0.82) contrast(0.92) saturate(0.7);
+/* Dark theme: darken the map tiles (not the pins). Inverting the tile layer is the standard
+   trick; hue-rotate puts the colours back in roughly their original hues, and the brightness
+   drop keeps it from being a white-on-black negative. */
+/* Phone widths only: the desktop panels are still forced light, so a dark map beside them would
+   look mismatched. */
+@media (max-width: 1023.98px) {
+  .cng-map-dark { background: #1b1f1d; }
+  .cng-map-dark .leaflet-tile-pane {
+    filter: invert(1) hue-rotate(180deg) brightness(0.82) contrast(0.92) saturate(0.7);
+  }
+  /* The selected-station name bubble and Leaflet's own chrome follow the theme. */
+  .cng-map-dark .cng-pin-label { background: var(--color-rd-surface); box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5); }
+  .cng-map-dark .pin-label-title { color: var(--color-rd-fg); }
+  .cng-map-dark .pin-label-sub { color: var(--color-rd-text-tertiary); }
+  .cng-map-dark .leaflet-control-attribution { background: rgba(34, 36, 38, 0.8); color: #A0A2A4; }
+  .cng-map-dark .leaflet-control-attribution a { color: #B4B6B8; }
 }
 .leaflet-tile-pane { transition: filter 300ms ease; }
 
