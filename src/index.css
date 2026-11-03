@@ -493,6 +493,16 @@
 
 /* ---- Accessibility & touch ---- */
 
+/* Drive mode at night: darken the map tiles (not the pins) so a dark panel is not sitting under a
+   glaring map. Inverting the tile layer is the standard trick; hue-rotate puts the colours back
+   in roughly their original hues, and the brightness drop keeps it from being a white-on-black
+   negative. */
+.cng-map-dark { background: #1b1f1d; }
+.cng-map-dark .leaflet-tile-pane {
+  filter: invert(1) hue-rotate(180deg) brightness(0.82) contrast(0.92) saturate(0.7);
+}
+.leaflet-tile-pane { transition: filter 300ms ease; }
+
 /* Respect the OS "Reduce motion" setting. */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

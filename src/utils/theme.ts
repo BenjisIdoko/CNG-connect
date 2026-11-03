@@ -21,6 +21,16 @@ export function getThemePref(): ThemePref {
   return 'system';
 }
 
+/**
+ * Whether the dark palette is actually showing: an explicit "dark" on <html>, or no explicit
+ * choice and the system prefers dark. (An explicit "light" always wins, as in index.css.)
+ */
+export function isDarkTheme(dataTheme: string | null, systemPrefersDark: boolean): boolean {
+  if (dataTheme === 'dark') return true;
+  if (dataTheme === 'light') return false;
+  return systemPrefersDark;
+}
+
 export function applyThemePref(pref: ThemePref): void {
   const root = document.documentElement;
   if (pref === 'system') root.removeAttribute('data-theme');

@@ -16,6 +16,7 @@ import {
   rankByUsefulness, pickBestStation, pinEmphasis, usabilityCost,
 } from '../utils/stationFreshness';
 import { DriveMode } from './DriveMode';
+import { useIsDarkTheme } from '../hooks/useIsDarkTheme';
 import { latestReportedPrice } from '../utils/stationPrice';
 import { useNow } from '../hooks/useNow';
 import { StationSearchOverlay, rememberRecentStation } from './StationSearchOverlay';
@@ -159,6 +160,15 @@ export const MapScreen: React.FC<MapScreenProps> = ({
   };
   const [isRecentering, setIsRecentering] = useState(false);
   const [isDriveMode, setIsDriveMode] = useState(false);
+  const isDarkTheme = useIsDarkTheme();
+  // Night + drive mode: darken the map tiles. Toggled on the element directly because Leaflet
+  // owns the container's class list (a React className would overwrite its classes).
+  useEffect(() => {
+    const el = mapContainerRef.current;
+    if (!el) return;
+    el.classList.toggle('cng-map-dark', isDriveMode && isDarkTheme);
+    return () => el.classList.remove('cng-map-dark');
+  }, [isDriveMode, isDarkTheme]);
 
   // Analytics: a search counts once the driver pauses typing (never the text itself).
   useEffect(() => {

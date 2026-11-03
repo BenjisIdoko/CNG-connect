@@ -307,7 +307,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
           <div className="rounded-2xl bg-rd-available-container px-4 py-3 flex items-center gap-3">
             <span aria-hidden="true" className="material-symbols-outlined text-rd-on-available-container text-[20px] shrink-0">bolt</span>
             <p className="flex-1 text-caption font-semibold text-rd-on-available-container">
-              Your first station report is worth +10 pts. It's the fastest way to Verified Reporter.
+              Your first station report is worth +50 pts. It's the fastest way to Verified Reporter.
             </p>
           </div>
         )}
@@ -333,36 +333,41 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
 
         {/* Settings */}
         <div className="bg-surface-container-high rounded-2xl shadow-[0_4px_14px_rgba(14,20,32,0.05)] divide-y divide-surface-container overflow-hidden">
-          <Row
-            icon="dark_mode"
-            label="Appearance"
-            right={
-              <div role="radiogroup" aria-label="Appearance" className="flex gap-0.5 bg-surface-container rounded-full p-0.5">
-                {(
-                  [
-                    ['system', 'Auto'],
-                    ['light', 'Light'],
-                    ['dark', 'Dark'],
-                  ] as const
-                ).map(([pref, label]) => (
-                  <button
-                    key={pref}
-                    role="radio"
-                    aria-checked={themePref === pref}
-                    onClick={() => {
-                      setThemePref(pref);
-                      setThemePrefState(pref);
-                    }}
-                    className={`px-3 py-1.5 rounded-full text-[0.75rem] font-bold transition-colors ${
-                      themePref === pref ? 'bg-rd-ink text-white' : 'text-outline'
-                    }`}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-            }
-          />
+          <div>
+            <Row
+              icon="dark_mode"
+              label="Appearance"
+              right={
+                <div role="radiogroup" aria-label="Appearance" className="flex gap-0.5 bg-surface-container rounded-full p-0.5">
+                  {(
+                    [
+                      ['system', 'Auto'],
+                      ['light', 'Light'],
+                      ['dark', 'Dark'],
+                    ] as const
+                  ).map(([pref, label]) => (
+                    <button
+                      key={pref}
+                      role="radio"
+                      aria-checked={themePref === pref}
+                      onClick={() => {
+                        setThemePref(pref);
+                        setThemePrefState(pref);
+                      }}
+                      className={`px-3 py-1.5 rounded-full text-[0.75rem] font-bold transition-colors ${
+                        themePref === pref ? 'bg-rd-ink text-white' : 'text-outline'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              }
+            />
+            <p className="px-4 pb-3.5 -mt-1.5 text-micro text-outline">
+              Dark covers search, menus and Drive mode. Other screens stay light for now.
+            </p>
+          </div>
           <Row
             icon="location_on"
             label="Home state"
