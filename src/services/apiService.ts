@@ -225,6 +225,7 @@ export const apiService = {
               status: r.status as StationStatus,
               statusLabel: r.status_label,
               waitMinutes: r.wait_minutes,
+              cngPriceNaira: r.cng_price_naira != null ? Number(r.cng_price_naira) : undefined,
               comment: r.comment,
               likes: r.likes ?? 0,
               dislikes: r.dislikes ?? 0,
@@ -382,6 +383,9 @@ export const apiService = {
           likes: enrichedReport.likes,
           dislikes: enrichedReport.dislikes || 0,
           photo: enrichedReport.photo,
+          // Only sent when a driver entered a price, so reports still insert on a database
+          // that has not had supabase/add-report-cng-price.sql applied yet.
+          ...(enrichedReport.cngPriceNaira != null ? { cng_price_naira: enrichedReport.cngPriceNaira } : {}),
         });
 
         if (reportError) {

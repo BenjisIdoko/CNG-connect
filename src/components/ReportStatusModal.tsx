@@ -6,6 +6,7 @@ import { checkLiveUpdatePermission } from '../utils/permissionManager';
 import { StationGroupInfoSheet } from './StationGroupInfoSheet';
 import { Modal } from './common/Modal';
 import { compressImageToDataUrl } from '../utils/compressImage';
+import { isPlausiblePrice, PRICE_MIN_NAIRA, PRICE_MAX_NAIRA } from '../utils/stationPrice';
 
 interface ReportStatusModalProps {
   station: GasStation;
@@ -24,6 +25,7 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
 }) => {
   const [selectedStatus, setSelectedStatus] = useState<StationStatus>('full');
   const [waitTime, setWaitTime] = useState<number>(15);
+  const [priceText, setPriceText] = useState<string>('');
   const [comment, setComment] = useState<string>('');
   const [attachedPhoto, setAttachedPhoto] = useState<string | null>(null);
   const [photoError, setPhotoError] = useState<string | null>(null);
@@ -79,6 +81,13 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
       setFormError(perm.reason || 'You need to be at the station to report its status');
       return;
     }
+    // The price is optional; if one is typed it has to be a plausible ₦/kg figure.
+    const typedPrice = priceText.trim() === '' ? null : Number(priceText.replace(/,/g, ''));
+    if (typedPrice != null && !isPlausiblePrice(typedPrice)) {
+      setFormError(`Price per kg should be between ₦${PRICE_MIN_NAIRA} and ₦${PRICE_MAX_NAIRA.toLocaleString('en-NG')}, or leave it blank`);
+      setShowMoreDetails(true);
+      return;
+    }
     setFormError(null);
 
     const isEv = station.stationType === 'ev_charging';
@@ -115,6 +124,7 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
       status: selectedStatus,
       statusLabel: statusLabels[selectedStatus],
       waitMinutes: waitTime,
+      cngPriceNaira: !isEv && typedPrice != null ? typedPrice : undefined,
       comment: comment.trim() || undefined,
       likes: 1,
       userVoted: 'up',
@@ -234,8 +244,10 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
               >
                 <span aria-hidden="true" className="material-symbols-outlined text-[20px] text-primary shrink-0">add_a_photo</span>
                 <span className="flex-1 min-w-0">
-                  <span className="block font-geist text-[0.9375rem] font-semibold text-rd-ink">Add wait time, live photo or note</span>
-                  <span className="block text-[0.75rem] text-rd-text-tertiary">Optional · verified photos earn +15 pts</span>
+                  <span className="block font-geist text-[0.9375rem] font-semibold text-rd-ink">
+                    {isEv ? 'Add wait time, live photo or note' : 'Add price, wait time, live photo or note'}
+                  </span>
+                  <span className="block text-[0.75rem] text-rd-text-tertiary">Optional · a live photo earns 100 pts instead of 50</span>
                 </span>
                 <span aria-hidden="true" className="material-symbols-outlined text-[20px] text-rd-text-tertiary shrink-0">expand_more</span>
               </button>
@@ -263,6 +275,28 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
                     ))}
                   </div>
                 </div>
+
+                {!isEv && (
+                  <div>
+                    <label htmlFor="report-cng-price" className="text-[0.75rem] font-bold text-outline uppercase tracking-wider">
+                      CNG price per kg (optional)
+                    </label>
+                    <div className="mt-2 flex items-center gap-2 bg-surface-container-high rounded-xl px-3 min-h-11">
+                      <span aria-hidden="true" className="font-geist font-bold text-rd-ink">₦</span>
+                      <input
+                        id="report-cng-price"
+                        type="text"
+                        inputMode="decimal"
+                        autoComplete="off"
+                        placeholder="e.g. 230"
+                        value={priceText}
+                        onChange={(e) => setPriceText(e.target.value.replace(/[^0-9.,]/g, ''))}
+                        className="flex-1 min-w-0 bg-transparent text-body font-semibold text-rd-ink placeholder:text-outline placeholder:font-normal focus:outline-none"
+                      />
+                      <span aria-hidden="true" className="text-caption text-outline">/kg</span>
+                    </div>
+                  </div>
+                )}
 
                 <div>
                   {photoError && (

@@ -26,6 +26,8 @@ export interface DriverReport {
   status: StationStatus;
   statusLabel: string;
   waitMinutes?: number;
+  /** What the driver paid per kg of CNG at the pump, in naira. Optional. */
+  cngPriceNaira?: number;
   comment?: string;
   likes: number;
   dislikes?: number;

@@ -16,6 +16,7 @@ import {
   rankByUsefulness, pickBestStation, pinEmphasis, usabilityCost,
 } from '../utils/stationFreshness';
 import { DriveMode } from './DriveMode';
+import { latestReportedPrice } from '../utils/stationPrice';
 import { useNow } from '../hooks/useNow';
 import { StationSearchOverlay, rememberRecentStation } from './StationSearchOverlay';
 import { searchTokens, stationMatchesQuery, stationSearchScore } from '../utils/stationSearch';
@@ -825,7 +826,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
           <p className="text-caption text-outline truncate flex items-center gap-1.5 mt-0.5">
             <span aria-hidden="true" className={`w-2 h-2 rounded-full shrink-0 ${dotColor}`} />
             <span className="truncate">
-              {[describeStatus(station, now), userGps && station.distance ? station.distance : null, station.city]
+              {[describeStatus(station, now), latestReportedPrice(station, now)?.compact, userGps && station.distance ? station.distance : null, station.city]
                 .filter(Boolean)
                 .join(' · ')}
             </span>
@@ -860,6 +861,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
     const info = getStatusIndicator(isLive && freshness.lastKnownStatus ? freshness.lastKnownStatus : 'unknown');
     const isPinned = pinnedId === station.id;
     const noReportToday = !isLive;
+    const price = latestReportedPrice(station, now);
     const openDetails = () => {
       onSelectStation(station);
       onOpenStationDetails(station);
@@ -897,16 +899,19 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                 {station.name}
               </button>
             </h3>
-            <span
-              className={`inline-flex self-start items-center gap-1.5 rounded-lg px-2 py-1 text-micro font-semibold ${
-                kind === 'best' ? 'bg-white text-rd-ink' : 'bg-rd-ink-2 border border-rd-ink-border text-white/85'
-              }`}
-            >
-              <span aria-hidden="true" className={`material-symbols-outlined text-[13px] ${info.iconColor || ''}`}>
-                {freshness.tier === 'stale' ? 'history' : info.icon}
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+              <span
+                className={`inline-flex self-start items-center gap-1.5 rounded-lg px-2 py-1 text-micro font-semibold ${
+                  kind === 'best' ? 'bg-white text-rd-ink' : 'bg-rd-ink-2 border border-rd-ink-border text-white/85'
+                }`}
+              >
+                <span aria-hidden="true" className={`material-symbols-outlined text-[13px] ${info.iconColor || ''}`}>
+                  {freshness.tier === 'stale' ? 'history' : info.icon}
+                </span>
+                {describeStatus(station, now)}
               </span>
-              {describeStatus(station, now)}
-            </span>
+              {price && <span className="text-micro font-semibold text-white/85">{price.compact}</span>}
+            </div>
           </div>
         </div>
         <div className="flex items-center gap-2 px-3 pb-3">
@@ -940,6 +945,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
   // thumbnail, name, solid status chip, distance — per design_handoff_cng_connect_mobile 3b.
   const renderCompactRow = (station: GasStation) => {
     const isPinned = pinnedId === station.id;
+    const price = latestReportedPrice(station, now);
     return (
       <button
         key={station.id}
@@ -954,7 +960,10 @@ export const MapScreen: React.FC<MapScreenProps> = ({
         {renderStatusTile(station)}
         <div className="min-w-0 flex-1">
           <h3 className="font-geist font-semibold text-[0.9375rem] text-rd-ink truncate">{station.name}</h3>
-          <StationStatusChip station={station} now={now} className="mt-1" />
+          <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
+            <StationStatusChip station={station} now={now} />
+            {price && <span className="text-micro font-semibold text-rd-text-tertiary">{price.compact}</span>}
+          </div>
         </div>
         {userGps && station.distance && (
           <span className="shrink-0 text-micro font-semibold text-rd-text-tertiary">{station.distance}</span>

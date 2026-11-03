@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { GasStation, StationStatus } from '../types';
 import { getFreshness, STATUS_SHORT_LABEL } from '../utils/stationFreshness';
+import { latestReportedPrice } from '../utils/stationPrice';
 
 // Drive mode: the one decision a driver in a queue, at night, with one hand free needs —
 // where to fill up now — in large type on a dark surface, with every control in the bottom
@@ -75,6 +76,7 @@ export const DriveMode: React.FC<DriveModeProps> = ({ best, alternatives, fallba
 
   const target = best ?? fallback;
   const f = target ? getFreshness(target, now) : null;
+  const price = target ? latestReportedPrice(target, now) : null;
   const live = !!best && (f?.tier === 'fresh' || f?.tier === 'recent');
   const status: StationStatus = live && f?.lastKnownStatus ? f.lastKnownStatus : 'unknown';
   const meta = target
@@ -105,6 +107,7 @@ export const DriveMode: React.FC<DriveModeProps> = ({ best, alternatives, fallba
             <p className="text-body-lg text-white/80 mt-0.5">
               {live && f ? f.ageText : 'Nobody has reported here today. Report from the pump to help the next driver.'}
             </p>
+            {price && <p className="font-geist font-bold text-title mt-1">{price.label}</p>}
           </div>
           <button
             type="button"
@@ -128,7 +131,8 @@ export const DriveMode: React.FC<DriveModeProps> = ({ best, alternatives, fallba
           {alternatives.slice(0, 2).map((st) => {
             const af = getFreshness(st, now);
             const s: StationStatus = af.lastKnownStatus ?? 'unknown';
-            const extra = hasGps && st.distance ? ` · ${st.distance}` : '';
+            const altPrice = latestReportedPrice(st, now);
+            const extra = `${altPrice ? ` · ${altPrice.compact}` : ''}${hasGps && st.distance ? ` · ${st.distance}` : ''}`;
             return (
               <li key={st.id} className="flex items-center gap-3 rounded-2xl bg-rd-ink-2 pl-4 pr-2 min-h-16">
                 <div className="min-w-0 flex-1 py-2">

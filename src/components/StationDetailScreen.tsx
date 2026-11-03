@@ -7,7 +7,8 @@ import { ASSETS } from '../data/mockData';
 import { openExternalMaps } from '../utils/navigationHelper';
 import { StationGroupInfoSheet } from './StationGroupInfoSheet';
 import { formatRelativeTime, isIsoTimestamp, minutesSince } from '../utils/timeUtils';
-import { getFreshness, STATUS_SHORT_LABEL } from '../utils/stationFreshness';
+import { getFreshness, STATUS_SHORT_LABEL, formatAgeShort } from '../utils/stationFreshness';
+import { latestReportedPrice } from '../utils/stationPrice';
 import { useNow } from '../hooks/useNow';
 import { openWhatsAppShare } from '../utils/shareMessageBuilder';
 import { describeLocationPrecision } from '../utils/locationPrecision';
@@ -391,13 +392,29 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                     </p>
                   </div>
                 </div>
+                {(() => {
+                  const price = latestReportedPrice(station, now);
+                  return (
+                    <div className="rounded-2xl bg-white ring-1 ring-[#E3E6E4] px-4 py-3 flex items-center gap-3">
+                      <span aria-hidden="true" className="material-symbols-outlined text-rd-text-tertiary text-[20px] shrink-0">local_offer</span>
+                      {price ? (
+                        <p className="flex-1 min-w-0 text-caption text-rd-text-tertiary">
+                          <span className="font-geist font-bold text-body-lg text-rd-ink">{price.text}</span>
+                          {' · reported '}{formatAgeShort(price.ageMinutes)}
+                        </p>
+                      ) : (
+                        <p className="flex-1 min-w-0 text-caption text-rd-text-tertiary">No price reported yet. Add what you paid when you report.</p>
+                      )}
+                    </div>
+                  );
+                })()}
                 {!isLive && (
                   <div className="rounded-2xl bg-rd-available-container px-4 py-3 flex items-center gap-3">
                     <span aria-hidden="true" className="material-symbols-outlined text-rd-on-available-container text-[20px] shrink-0">bolt</span>
                     <p className="flex-1 text-caption font-semibold text-rd-on-available-container">
                       {isStale ? 'At the station? Tell drivers how it is now.' : 'At the station? Be the first to report today.'}
                     </p>
-                    <span className="shrink-0 text-[0.75rem] font-bold text-rd-on-available-container">+10 pts</span>
+                    <span className="shrink-0 text-[0.75rem] font-bold text-rd-on-available-container">+50 pts</span>
                   </div>
                 )}
               </div>
