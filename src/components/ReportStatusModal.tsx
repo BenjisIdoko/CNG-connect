@@ -332,7 +332,7 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
               ) : (
                 <>
                   <span>Submit report</span>
-                  <span className="text-[0.75rem] font-bold bg-white/20 rounded-full px-2 py-0.5">+10 pts</span>
+                  <span className="text-micro font-bold bg-white/20 rounded-full px-2 py-0.5">+{attachedPhoto ? 100 : 50} pts</span>
                 </>
               )}
             </button>

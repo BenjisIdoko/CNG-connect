@@ -11,7 +11,10 @@ import { GasStation, StationStatus, StationSuggestion } from '../types';
 import { Modal } from './common/Modal';
 import { ASSETS, SHOW_EV_STATIONS } from '../data/mockData';
 import { StationStatusChip } from './common/StationStatusChip';
-import { getFreshness, describeStatus, freshnessRank, currentStatus } from '../utils/stationFreshness';
+import {
+  getFreshness, describeStatus, freshnessRank, currentStatus,
+  rankByUsefulness, pickBestStation, pinEmphasis,
+} from '../utils/stationFreshness';
 import { useNow } from '../hooks/useNow';
 import { StationSearchOverlay, rememberRecentStation } from './StationSearchOverlay';
 import { searchTokens, stationMatchesQuery, stationSearchScore } from '../utils/stationSearch';
@@ -413,6 +416,18 @@ export const MapScreen: React.FC<MapScreenProps> = ({
 
   const nearestStation = nearestTop5Stations[0] || selectedStation || stations[0];
 
+  // Answer-first ordering for the phone sheet: stations a driver can act on come first, then
+  // those with no report in the last 24h. Distance only counts once we know where the driver is.
+  const distanceOrNull = (st: GasStation) => (userGps ? getDistanceKm(st) : null);
+  const rankedStations = rankByUsefulness(filteredStations, distanceOrNull, now);
+  const bestStation = pickBestStation(filteredStations, distanceOrNull, now);
+  const isReportedRecently = (st: GasStation) => {
+    const tier = getFreshness(st, now).tier;
+    return tier === 'fresh' || tier === 'recent';
+  };
+  const reportedRows = rankedStations.filter(isReportedRecently);
+  const quietRows = rankedStations.filter((st) => !isReportedRecently(st));
+
   useEffect(() => {
     if (!mapContainerRef.current || mapInstanceRef.current) return;
 
@@ -491,15 +506,17 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       // dots, approximate ones are hollow/dashed with an accuracy ring.
       const confidence = getPinConfidence(st.locationPrecision);
       const isApprox = confidence !== 'confident';
+      // The older the report, the quieter the pin: only a report from the last hour glows.
+      const emphasis = pinEmphasis(freshness.tier);
 
       const customIcon = L.divIcon({
         className: 'custom-leaflet-marker',
         html: `
           <div class="relative flex items-center justify-center" style="width:40px;height:40px;" title="${isApprox ? 'Approximate location' : ''}">
-            ${isApprox ? '<div style="position:absolute;inset:0;border:1.5px dashed ${colorClass}99;border-radius:9999px"></div>' : ''}
+            ${isApprox ? `<div style="position:absolute;inset:0;border:1.5px dashed ${colorClass}99;border-radius:9999px"></div>` : ''}
             ${flashIds?.has(st.id) ? `<div class="marker-ring" style="--ring:${colorClass}"></div>` : ''}
-            <div class="rounded-full flex items-center justify-center transition-transform ${isSelected ? 'scale-125' : ''} ${bounceIdRef.current === st.id ? 'marker-bounce' : ''}" style="width:30px;height:30px;background:${isApprox ? '#ffffff' : colorClass};border:${isApprox ? '2.5px dashed ' + colorClass : '3px solid #ffffff'};box-shadow:0 2px 8px rgba(31,41,35,0.35), 0 0 0 4px ${colorClass}${isApprox ? '00' : '44'}${isSelected ? ', 0 0 0 7px rgba(31,41,35,0.85)' : ''};">
-              <span aria-hidden="true" class="material-symbols-outlined" style="font-size:15px;color:${isApprox ? colorClass : '#fff'}">${iconSymbol}</span>
+            <div class="rounded-full flex items-center justify-center transition-transform ${isSelected ? 'scale-125' : ''} ${bounceIdRef.current === st.id ? 'marker-bounce' : ''}" style="width:${emphasis.size}px;height:${emphasis.size}px;opacity:${isSelected ? 1 : emphasis.opacity};background:${isApprox ? '#ffffff' : colorClass};border:${isApprox ? '2.5px dashed ' + colorClass : '3px solid #ffffff'};box-shadow:0 2px 8px rgba(31,41,35,0.35)${emphasis.halo && !isApprox ? ', 0 0 0 5px ' + colorClass + '44' : ''}${isSelected ? ', 0 0 0 7px rgba(31,41,35,0.85)' : ''};">
+              <span aria-hidden="true" class="material-symbols-outlined" style="font-size:${emphasis.size >= 28 ? 15 : 13}px;color:${isApprox ? colorClass : '#fff'}">${iconSymbol}</span>
             </div>
           </div>
         `,
@@ -515,7 +532,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       const markerLabel = [st.name, st.area || st.city, describeStatus(st, now)]
         .filter(Boolean)
         .join(', ');
-      const marker = L.marker([lat, lng], { icon: customIcon, title: markerLabel });
+      const marker = L.marker([lat, lng], { icon: customIcon, title: markerLabel, zIndexOffset: isSelected ? 1000 : emphasis.zIndexOffset });
       marker.on('click', () => {
         userSelectedRef.current = true;
         setPinnedId(st.id);
@@ -807,7 +824,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
   // The single prominent "nearest station" hero card at the top of the standard sheet —
   // ink surface, per design_handoff_cng_connect_mobile screen 3b. No report yet today
   // doubles as the incentive-to-report moment (ghost pill + points).
-  const renderNearestCard = (station: GasStation) => {
+  const renderNearestCard = (station: GasStation, kind: 'best' | 'nearest' | 'selected' = 'nearest') => {
     // A report older than 24h is no longer "today's" status: show it as last-known and ask for a fresh one.
     const freshness = getFreshness(station, now);
     const isLive = freshness.tier === 'fresh' || freshness.tier === 'recent';
@@ -835,7 +852,8 @@ export const MapScreen: React.FC<MapScreenProps> = ({
           </div>
           <div className="min-w-0 flex-1 flex flex-col justify-center gap-1.5">
             <p className="font-geist-mono text-micro font-medium text-[#B4BAC4] truncate">
-              Nearest{userGps && station.distance ? ` · ${station.distance}` : ''}{station.driveTime ? ` · ${station.driveTime}` : ''}
+              {kind === 'best' ? 'Best option now' : kind === 'selected' ? 'Selected' : 'Nearest'}
+              {userGps && station.distance ? ` · ${station.distance}` : ''}{userGps && station.driveTime ? ` · ${station.driveTime}` : ''}
             </p>
             <h3 className="font-geist font-bold text-[1.0625rem] leading-snug text-white line-clamp-2">
               <button
@@ -846,7 +864,11 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                 {station.name}
               </button>
             </h3>
-            <span className="inline-flex self-start items-center gap-1.5 rounded-lg bg-rd-ink-2 border border-rd-ink-border px-2 py-1 text-micro font-semibold text-white/85">
+            <span
+              className={`inline-flex self-start items-center gap-1.5 rounded-lg px-2 py-1 text-micro font-semibold ${
+                kind === 'best' ? 'bg-white text-rd-ink' : 'bg-rd-ink-2 border border-rd-ink-border text-white/85'
+              }`}
+            >
               <span aria-hidden="true" className={`material-symbols-outlined text-[13px] ${info.iconColor || ''}`}>
                 {freshness.tier === 'stale' ? 'history' : info.icon}
               </span>
@@ -858,8 +880,8 @@ export const MapScreen: React.FC<MapScreenProps> = ({
           {noReportToday && (
             <span className="flex-1 min-w-0 inline-flex items-center gap-1.5 rounded-full bg-rd-ink-2 text-white/90 text-micro font-semibold pl-3 pr-2 py-2 truncate">
               <span aria-hidden="true" className="material-symbols-outlined text-[15px] shrink-0">campaign</span>
-              <span className="truncate">First report today</span>
-              <span className="ml-auto shrink-0 text-micro font-bold text-white/60">+10</span>
+              <span className="truncate">Report it at the pump</span>
+              <span className="ml-auto shrink-0 text-micro font-bold text-white/60">+50</span>
             </span>
           )}
           <button
@@ -907,6 +929,40 @@ export const MapScreen: React.FC<MapScreenProps> = ({
     );
   };
 
+  // The cold-start moment: most stations have no recent report, and only a driver standing at
+  // the pump (within 800 m) can file one. Say so, name the nearest candidate and what it earns.
+  const renderFirstReportCard = (station: GasStation, count: number, asHero: boolean) => (
+    <div className={`relative rounded-[22px] ${asHero ? 'bg-rd-ink text-white' : 'bg-rd-chip-grey text-rd-ink'} p-4 flex items-start gap-3`}>
+      <span
+        aria-hidden="true"
+        className={`material-symbols-outlined text-[22px] shrink-0 mt-0.5 ${asHero ? 'text-white' : 'text-rd-ink'}`}
+      >
+        campaign
+      </span>
+      <div className="min-w-0 flex-1">
+        <h3 className="font-geist font-bold text-[1.0625rem] leading-snug">
+          {asHero ? 'No live reports here yet' : `${count} ${count === 1 ? 'station has' : 'stations have'} no report today`}
+        </h3>
+        <p className={`text-caption mt-1 ${asHero ? 'text-white/80' : 'text-rd-text-tertiary'}`}>
+          Report from the pump and drivers nearby see it within seconds. You earn 50 points, 100 with a live photo.
+        </p>
+        <button
+          type="button"
+          onClick={() => {
+            onSelectStation(station);
+            onOpenStationDetails(station);
+          }}
+          className={`mt-2.5 inline-flex items-center gap-1.5 rounded-full min-h-11 px-4 text-micro font-bold active:scale-95 transition-transform ${
+            asHero ? 'bg-primary text-white' : 'bg-rd-ink text-white'
+          }`}
+        >
+          <span className="truncate">{userGps && station.distance ? `Nearest: ${station.name} · ${station.distance}` : `Open ${station.name}`}</span>
+          <span aria-hidden="true" className="material-symbols-outlined text-[16px] shrink-0">arrow_forward</span>
+        </button>
+      </div>
+    </div>
+  );
+
   const statusChips: Array<{ key: string; label: string; full: string; icon: string | null; iconColor: string }> = [
     { key: 'all', label: `All ${scopedCount}`, full: `All ${scopedCount} stations`, icon: null, iconColor: '' },
     { key: 'full', label: 'Available', full: 'Available', icon: 'check_circle', iconColor: 'text-rd-available' },
@@ -931,11 +987,17 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       })()
     : [];
 
-  const standardRows = useMemo(() => {
+  // The sheet's lead card: the station the driver tapped, else the best live option, else (when
+  // we know where they are) the nearest station. With neither a live report nor a position there
+  // is no honest lead, so the first-report card stands in.
+  const standardHero: { station: GasStation; kind: 'best' | 'nearest' | 'selected' } | null = (() => {
     const pinned = pinnedId ? filteredStations.find((st) => st.id === pinnedId) : undefined;
-    const rest = nearestTop5Stations.filter((st) => st.id !== pinned?.id);
-    return (pinned ? [pinned, ...rest] : rest).slice(0, 5);
-  }, [filteredStations, pinnedId]);
+    if (pinned) return { station: pinned, kind: 'selected' };
+    if (bestStation) return { station: bestStation, kind: 'best' };
+    if (userGps && nearestTop5Stations[0]) return { station: nearestTop5Stations[0], kind: 'nearest' };
+    return null;
+  })();
+  const standardReportedRows = reportedRows.filter((st) => st.id !== standardHero?.station.id).slice(0, 4);
 
 
   // One reset for everything the driver can narrow the map by (search, status, city, distance, type).
@@ -1146,15 +1208,36 @@ export const MapScreen: React.FC<MapScreenProps> = ({
               </button>
             </div>
           ) : sheetMode !== 'expanded' ? (
-            <div className="overflow-y-auto flex-1 hide-scrollbar px-5 pt-3 pb-28 flex flex-col gap-1">
+            <div className="overflow-y-auto flex-1 hide-scrollbar px-5 pt-3 pb-28 flex flex-col gap-1 [&>*]:shrink-0">
+              {/* shrink-0 on every child: a card with overflow-hidden would otherwise collapse to 0px
+                  once the list is taller than the sheet */}
               <h2 className="sr-only">Nearby stations</h2>
-              {standardRows[0] && renderNearestCard(standardRows[0])}
-              {standardRows.slice(1).map((st) => renderCompactRow(st))}
+              {standardHero && renderNearestCard(standardHero.station, standardHero.kind)}
+              {!standardHero && quietRows[0] && reportedRows.length === 0 && renderFirstReportCard(quietRows[0], quietRows.length, true)}
+              {standardReportedRows.map((st) => renderCompactRow(st))}
+              {quietRows[0] && reportedRows.length > 0 && (
+                <div className="mt-2">{renderFirstReportCard(quietRows[0], quietRows.length, false)}</div>
+              )}
             </div>
           ) : (
             <div className="px-5 pt-1 pb-28 overflow-y-auto flex-1 hide-scrollbar flex flex-col">
               <h2 className="sr-only">All stations</h2>
-              {filteredStations.slice(0, visibleCount).map((station) => renderPhoneRow(station))}
+              {rankedStations.slice(0, visibleCount).map((station, index) => {
+                const groupStart = (st: GasStation) => (isReportedRecently(st) ? 'live' : 'quiet');
+                const startsGroup = index === 0 || groupStart(station) !== groupStart(rankedStations[index - 1]);
+                const heading =
+                  groupStart(station) === 'live'
+                    ? `Reported in the last 24h · ${reportedRows.length}`
+                    : `No report today · ${quietRows.length}`;
+                return (
+                  <React.Fragment key={station.id}>
+                    {startsGroup && reportedRows.length > 0 && quietRows.length > 0 && (
+                      <h3 className="pt-3 pb-1 text-micro font-semibold text-rd-text-tertiary">{heading}</h3>
+                    )}
+                    {renderPhoneRow(station)}
+                  </React.Fragment>
+                );
+              })}
               {visibleCount < filteredStations.length && (
                 <button
                   onClick={() => setVisibleCount((c) => c + 25)}

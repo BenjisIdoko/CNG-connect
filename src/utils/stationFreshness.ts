@@ -101,3 +101,84 @@ export function currentStatus(station: GasStation, now = Date.now()): StationSta
   const f = getFreshness(station, now);
   return (f.tier === 'fresh' || f.tier === 'recent') && f.lastKnownStatus ? f.lastKnownStatus : 'unknown';
 }
+
+// ---- "Which station should I go to?" -------------------------------------------------------
+// A station only has an answer when it has a report under 24h old that isn't "out of service".
+// Among those, a driver trades distance against how good the news is, so each shortfall is
+// priced in kilometres of driving: a queue is worth about 5 km, low pressure about 8 km, and a
+// report older than an hour about 3 km of doubt.
+const STATUS_COST_KM: Record<StationStatus, number> = {
+  full: 0,
+  queue: 5,
+  low: 8,
+  out: Number.POSITIVE_INFINITY,
+  unknown: Number.POSITIVE_INFINITY,
+};
+const RECENT_COST_KM = 3;
+
+/** Distance-equivalent cost of going to a station; Infinity when there is no usable report. */
+export function usabilityCost(station: GasStation, distanceKm: number | null, now = Date.now()): number {
+  const f = getFreshness(station, now);
+  if ((f.tier !== 'fresh' && f.tier !== 'recent') || !f.lastKnownStatus) return Number.POSITIVE_INFINITY;
+  return (distanceKm ?? 0) + STATUS_COST_KM[f.lastKnownStatus] + (f.tier === 'recent' ? RECENT_COST_KM : 0);
+}
+
+/**
+ * Stations a driver can act on first (cheapest to reach, freshest on ties), then everything with
+ * no usable report: nearest first when the position is known, otherwise by name.
+ * `distanceKm` returns null when we don't know where the driver is.
+ */
+export function rankByUsefulness(
+  stations: GasStation[],
+  distanceKm: (station: GasStation) => number | null,
+  now = Date.now(),
+): GasStation[] {
+  const rows = stations.map((station) => {
+    const distance = distanceKm(station);
+    return { station, distance, cost: usabilityCost(station, distance, now), age: freshnessRank(station, now) };
+  });
+  rows.sort((a, b) => {
+    const aLive = Number.isFinite(a.cost);
+    const bLive = Number.isFinite(b.cost);
+    if (aLive !== bLive) return aLive ? -1 : 1;
+    if (aLive) return a.cost - b.cost || a.age - b.age;
+    if (a.distance !== null && b.distance !== null && a.distance !== b.distance) return a.distance - b.distance;
+    return a.station.name.localeCompare(b.station.name);
+  });
+  return rows.map((row) => row.station);
+}
+
+/** The one station worth recommending right now, or null when nobody has a usable report. */
+export function pickBestStation(
+  stations: GasStation[],
+  distanceKm: (station: GasStation) => number | null,
+  now = Date.now(),
+): GasStation | null {
+  const [first] = rankByUsefulness(stations, distanceKm, now);
+  return first && Number.isFinite(usabilityCost(first, distanceKm(first), now)) ? first : null;
+}
+
+// ---- Map pins ------------------------------------------------------------------------------
+export interface PinEmphasis {
+  /** Diameter of the round pin, px. */
+  size: number;
+  opacity: number;
+  /** Soft halo in the status colour: only for reports an hour old or less. */
+  halo: boolean;
+  /** Leaflet z-index offset so trustworthy pins sit above doubtful ones. */
+  zIndexOffset: number;
+}
+
+/** How loudly a pin should speak: the older the report, the quieter the pin. */
+export function pinEmphasis(tier: FreshnessTier): PinEmphasis {
+  switch (tier) {
+    case 'fresh':
+      return { size: 32, opacity: 1, halo: true, zIndexOffset: 300 };
+    case 'recent':
+      return { size: 28, opacity: 0.8, halo: false, zIndexOffset: 200 };
+    case 'stale':
+      return { size: 24, opacity: 0.65, halo: false, zIndexOffset: 100 };
+    default:
+      return { size: 22, opacity: 0.6, halo: false, zIndexOffset: 0 };
+  }
+}

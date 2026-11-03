@@ -1,6 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import { GasStation, DriverReport, StationStatus } from '../types';
-import { getFreshness, describeStatus, formatAgeShort, parseAgeMinutes, freshnessRank, currentStatus } from './stationFreshness';
+import {
+  getFreshness, describeStatus, formatAgeShort, parseAgeMinutes, freshnessRank, currentStatus,
+  usabilityCost, rankByUsefulness, pickBestStation, pinEmphasis,
+} from './stationFreshness';
 
 const NOW = Date.parse('2026-10-12T12:00:00.000Z');
 const minsAgo = (m: number) => new Date(NOW - m * 60000).toISOString();
@@ -112,5 +115,63 @@ describe('copy helpers', () => {
     expect(currentStatus(station({ status: 'full', reports: [report('full', minsAgo(120))] }), NOW)).toBe('full');
     expect(currentStatus(station({ status: 'full', reports: [report('full', minsAgo(3 * 1440))] }), NOW)).toBe('unknown');
     expect(currentStatus(station(), NOW)).toBe('unknown');
+  });
+});
+
+describe('which station to go to', () => {
+  const live = (id: string, status: StationStatus, ageMin: number) =>
+    station({ id, name: id, status, reports: [report(status, minsAgo(ageMin))] });
+  const km = (table: Record<string, number>) => (s: GasStation) => table[s.id] ?? null;
+
+  it('has no answer for a station with no report, a stale one, or one that is out of service', () => {
+    expect(usabilityCost(station(), 1, NOW)).toBe(Number.POSITIVE_INFINITY);
+    expect(usabilityCost(live('a', 'full', 3 * 1440), 1, NOW)).toBe(Number.POSITIVE_INFINITY);
+    expect(usabilityCost(live('a', 'out', 5), 1, NOW)).toBe(Number.POSITIVE_INFINITY);
+  });
+
+  it('prices a queue, low pressure and an older report in kilometres', () => {
+    expect(usabilityCost(live('a', 'full', 5), 2, NOW)).toBe(2);
+    expect(usabilityCost(live('a', 'queue', 5), 2, NOW)).toBe(7);
+    expect(usabilityCost(live('a', 'low', 5), 2, NOW)).toBe(10);
+    expect(usabilityCost(live('a', 'full', 120), 2, NOW)).toBe(5);
+  });
+
+  it('prefers a farther available station over a nearby queue, and a close one over a far one', () => {
+    const near = live('near', 'queue', 5);
+    const far = live('far', 'full', 5);
+    expect(pickBestStation([near, far], km({ near: 1, far: 4 }), NOW)?.id).toBe('far');
+    expect(pickBestStation([near, far], km({ near: 1, far: 9 }), NOW)?.id).toBe('near');
+  });
+
+  it('without a position, ranks by status and then by how new the report is', () => {
+    const a = live('a', 'full', 40);
+    const b = live('b', 'full', 10);
+    const c = live('c', 'queue', 1);
+    expect(rankByUsefulness([a, c, b], () => null, NOW).map((s) => s.id)).toEqual(['b', 'a', 'c']);
+  });
+
+  it('puts unreported stations last: nearest first with a position, by name without one', () => {
+    const none1 = station({ id: 'z', name: 'Zed' });
+    const none2 = station({ id: 'a', name: 'Alpha' });
+    const one = live('x', 'full', 5);
+    expect(rankByUsefulness([none1, none2, one], () => null, NOW).map((s) => s.id)).toEqual(['x', 'a', 'z']);
+    expect(rankByUsefulness([none1, none2, one], km({ z: 1, a: 9, x: 50 }), NOW).map((s) => s.id)).toEqual(['x', 'z', 'a']);
+  });
+
+  it('recommends nothing when no station has a usable report', () => {
+    expect(pickBestStation([station(), live('s', 'full', 3 * 1440), live('o', 'out', 5)], () => 1, NOW)).toBeNull();
+    expect(pickBestStation([], () => 1, NOW)).toBeNull();
+  });
+});
+
+describe('pin emphasis', () => {
+  it('gets quieter as the report ages and only glows while it is fresh', () => {
+    const tiers = (['fresh', 'recent', 'stale', 'none'] as const).map(pinEmphasis);
+    for (let i = 1; i < tiers.length; i++) {
+      expect(tiers[i].size).toBeLessThanOrEqual(tiers[i - 1].size);
+      expect(tiers[i].opacity).toBeLessThanOrEqual(tiers[i - 1].opacity);
+      expect(tiers[i].zIndexOffset).toBeLessThan(tiers[i - 1].zIndexOffset);
+    }
+    expect(tiers.map((t) => t.halo)).toEqual([true, false, false, false]);
   });
 });
