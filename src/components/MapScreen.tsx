@@ -762,6 +762,28 @@ export const MapScreen: React.FC<MapScreenProps> = ({
     setIsSearchOpen(false);
   };
 
+  // Leading tile for list rows: the station's status, not its photo. Almost every station shares
+  // one stock image, so a thumbnail told the driver nothing; the tile shows the status icon on
+  // its tint, a grey history/help icon once the report is stale or missing, and a solid dot
+  // for a report from the last hour. Dark "on-container" icons keep the contrast the pale
+  // status colours (amber especially) would not give white.
+  const renderStatusTile = (station: GasStation, sizeClass = 'w-12 h-12 rounded-xl') => {
+    const freshness = getFreshness(station, now);
+    const isLive = freshness.tier === 'fresh' || freshness.tier === 'recent';
+    const status = isLive && freshness.lastKnownStatus ? freshness.lastKnownStatus : 'unknown';
+    const info = getStatusIndicator(status);
+    const icon = isLive ? info.icon : freshness.tier === 'stale' ? 'history' : 'help';
+    const tone = isLive ? info.badgeBg : 'bg-rd-stale-container text-rd-on-stale-container';
+    return (
+      <div className={`relative shrink-0 flex items-center justify-center ${sizeClass} ${tone}`}>
+        <span aria-hidden="true" className="material-symbols-outlined text-[24px]">{icon}</span>
+        {freshness.tier === 'fresh' && (
+          <span aria-hidden="true" className={`absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white ${info.dotColor}`} />
+        )}
+      </div>
+    );
+  };
+
   // Plain list row in the style of ride-hailing apps: icon, name, one quiet line, and a
   // navigate button. The whole row opens the station.
   const renderPhoneRow = (station: GasStation) => {
@@ -789,9 +811,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
         }}
         className={`flex items-center gap-3 py-2.5 px-2 -mx-2 rounded-2xl cursor-pointer active:bg-surface-container transition-colors ${isPinned ? 'bg-primary-container/50' : ''} ${flashIds?.has(station.id) ? 'flash-ring' : ''}`}
       >
-        <div className="w-12 h-12 rounded-xl overflow-hidden shrink-0 bg-surface-container-high">
-          <img src={station.images?.[0] || ASSETS.stationWide} alt="" className="w-full h-full object-cover" loading="lazy" />
-        </div>
+        {renderStatusTile(station)}
         <div className="min-w-0 flex-1">
           <h3 className="font-geist font-semibold text-[0.9375rem] text-rd-ink truncate leading-snug">{station.name}</h3>
           <p className="text-caption text-outline truncate flex items-center gap-1.5 mt-0.5">
@@ -847,9 +867,13 @@ export const MapScreen: React.FC<MapScreenProps> = ({
         } ${isPinned ? 'ring-2 ring-primary' : ''}`}
       >
         <div className="flex gap-3 p-3">
-          <div className="w-[84px] h-[84px] rounded-2xl overflow-hidden shrink-0 bg-rd-ink-2">
-            <img src={station.images?.[0] || ASSETS.stationWide} alt="" className="w-full h-full object-cover" loading="lazy" />
-          </div>
+          {station.images?.[0] ? (
+            <div className="w-[84px] h-[84px] rounded-2xl overflow-hidden shrink-0 bg-rd-ink-2">
+              <img src={station.images[0]} alt="" className="w-full h-full object-cover" loading="lazy" />
+            </div>
+          ) : (
+            renderStatusTile(station, 'w-[84px] h-[84px] rounded-2xl')
+          )}
           <div className="min-w-0 flex-1 flex flex-col justify-center gap-1.5">
             <p className="font-geist-mono text-micro font-medium text-[#B4BAC4] truncate">
               {kind === 'best' ? 'Best option now' : kind === 'selected' ? 'Selected' : 'Nearest'}
@@ -915,9 +939,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
           flashIds?.has(station.id) ? 'flash-ring' : ''
         } ${isPinned ? 'bg-primary-container/40' : ''}`}
       >
-        <div className="w-12 h-12 rounded-xl overflow-hidden shrink-0 bg-surface-container-high">
-          <img src={station.images?.[0] || ASSETS.stationWide} alt="" className="w-full h-full object-cover" loading="lazy" />
-        </div>
+        {renderStatusTile(station)}
         <div className="min-w-0 flex-1">
           <h3 className="font-geist font-semibold text-[0.9375rem] text-rd-ink truncate">{station.name}</h3>
           <StationStatusChip station={station} now={now} className="mt-1" />
