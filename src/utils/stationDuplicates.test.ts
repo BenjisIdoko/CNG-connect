@@ -7,6 +7,8 @@ import {
   normalizeStationName,
   type StationRef,
 } from './stationDuplicates';
+import { deduplicateStations } from '../data/mockData';
+import type { GasStation } from '../types';
 
 // One degree of latitude is about 111,195 m, so 0.00108 degrees is about 120 m north.
 const BASE = { lat: 9.0, lng: 7.4 };
@@ -19,6 +21,19 @@ describe('normalizeStationName', () => {
     expect(normalizeStationName('N.I.P.C.O - Ikeja!')).toBe('nipcoikeja');
     expect(normalizeStationName('  NIPCO   Ikeja ')).toBe('nipcoikeja');
     expect(normalizeStationName('Station 4A')).toBe('station4a');
+  });
+});
+
+describe('name rule parity with the app', () => {
+  it('uses the same key deduplicateStations uses to hide duplicate stations', () => {
+    const a = { id: 'a', name: 'NIPCO - Ikeja', lat: 6.6, lng: 3.35 } as unknown as GasStation;
+    const b = { id: 'b', name: 'n.i.p.c.o  IKEJA!', lat: 6.6, lng: 3.35 } as unknown as GasStation;
+    expect(normalizeStationName(a.name)).toBe(normalizeStationName(b.name));
+    // The app keeps only the first of two stations whose names normalise the same.
+    expect(deduplicateStations([a, b]).map((s) => s.id)).toEqual(['a']);
+    // ...and keeps both when the names really differ.
+    const c = { id: 'c', name: 'NIPCO Lekki', lat: 6.6, lng: 3.35 } as unknown as GasStation;
+    expect(deduplicateStations([a, c]).map((s) => s.id)).toEqual(['a', 'c']);
   });
 });
 
