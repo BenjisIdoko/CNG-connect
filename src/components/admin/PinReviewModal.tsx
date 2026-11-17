@@ -4,40 +4,8 @@ import { useSupabaseClient } from '../../hooks/useSupabaseClient';
 import { loadGoogleMaps, hasGoogleMapsKey } from '../../utils/googleMaps';
 import { Icon } from '../common/Icon';
 
-type Tier = 'source_exact' | 'rooftop' | 'street' | 'area' | 'city';
-const TIERS: Tier[] = ['rooftop', 'street', 'area', 'source_exact', 'city'];
-const TIER_LABEL: Record<Tier, string> = {
-  source_exact: 'Source exact (±15m)',
-  rooftop: 'Rooftop (±30m)',
-  street: 'Street (±150m)',
-  area: 'Area (±700m)',
-  city: 'City centroid (±4km)',
-};
-
-const NG = { minLat: 4, maxLat: 14, minLng: 2.5, maxLng: 15 };
-
-/** Pulls lat,lng out of a pasted "9.07, 7.48", a Google Maps URL, or a place link. */
-function parseLatLng(raw: string): { lat: number; lng: number } | null {
-  const s = raw.trim();
-  const pats = [
-    /@(-?\d{1,2}\.\d+),\s*(-?\d{1,3}\.\d+)/,
-    /!3d(-?\d{1,2}\.\d+)!4d(-?\d{1,3}\.\d+)/,
-    /[?&](?:q|ll|center|destination)=(-?\d{1,2}\.\d+),\s*(-?\d{1,3}\.\d+)/,
-    /^\s*(-?\d{1,2}(?:\.\d+)?)\s*,\s*(-?\d{1,3}(?:\.\d+)?)\s*$/,
-  ];
-  for (const p of pats) {
-    const m = s.match(p);
-    if (m) {
-      const lat = parseFloat(m[1]);
-      const lng = parseFloat(m[2]);
-      if (lat >= NG.minLat && lat <= NG.maxLat && lng >= NG.minLng && lng <= NG.maxLng) {
-        return { lat: Number(lat.toFixed(6)), lng: Number(lng.toFixed(6)) };
-      }
-      return null;
-    }
-  }
-  return null;
-}
+// Tier list, labels, Nigeria bounds and coordinate parsing are shared with the Add station form.
+import { PIN_TIERS as TIERS, PIN_TIER_LABEL as TIER_LABEL, parseLatLng, type PinTier as Tier } from '../../utils/geoInput';
 
 function haversineM(a: [number, number], b: [number, number]) {
   const R = 6371000;
