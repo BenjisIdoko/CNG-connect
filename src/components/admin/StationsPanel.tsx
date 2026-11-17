@@ -3,6 +3,7 @@ import { useSupabaseClient } from '../../hooks/useSupabaseClient';
 import { parseCsv, toCsv } from '../../utils/csv';
 import { FullStationEditorModal } from '../FullStationEditorModal';
 import { PinReviewModal } from './PinReviewModal';
+import { AddStationModal } from './AddStationModal';
 import { Icon } from '../common/Icon';
 
 type Tier = 'source_exact' | 'rooftop' | 'street' | 'area' | 'city';
@@ -214,6 +215,8 @@ export const StationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash 
   const [fullEditorId, setFullEditorId] = useState<string | null>(null);
   // pin-location review
   const [pinReviewId, setPinReviewId] = useState<string | null>(null);
+  // add a new station
+  const [adding, setAdding] = useState(false);
 
   // bulk delete
   const [selectedForDelete, setSelectedForDelete] = useState<Set<string>>(new Set());
@@ -420,6 +423,12 @@ export const StationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash 
           </label>
         </div>
         <div className="flex items-center gap-2 shrink-0">
+          <button
+            onClick={() => setAdding(true)}
+            className="text-xs px-3 py-1.5 rounded-full bg-emerald-600 text-white font-bold hover:bg-emerald-700"
+          >
+            Add station
+          </button>
           <button onClick={exportCsv} className="text-xs px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200">
             Export CSV
           </button>
@@ -623,6 +632,20 @@ export const StationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash 
             </div>
           </div>
         </div>
+      )}
+
+      {adding && (
+        <AddStationModal
+          stations={rows.map((r) => ({ id: r.id, name: r.name, lat: r.lat, lng: r.lng }))}
+          flash={flash}
+          onClose={() => setAdding(false)}
+          onCreated={async (id) => {
+            await load();
+            setAdding(false);
+            // Straight into the full editor for price, hours, photos and phone.
+            setFullEditorId(id);
+          }}
+        />
       )}
 
       {pinReviewRow && (
