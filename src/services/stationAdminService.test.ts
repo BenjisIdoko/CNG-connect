@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import {
   createStation,
   friendlyCreateError,
+  rejectSuggestion,
   validateNewStation,
   type NewStationInput,
   type RpcClient,
@@ -107,6 +108,49 @@ describe('friendlyCreateError', () => {
     const text = friendlyCreateError('duplicate key value violates unique constraint "stations_pkey"');
     expect(text).toBe('Could not add the station, try again.');
     expect(text).not.toMatch(/stations_pkey/);
+  });
+});
+
+describe('suggestions', () => {
+  it('createStation sends p_suggestion_id when approving a suggestion', async () => {
+    const { client, rpc } = fakeClient({ data: 'admin-x-aaaaaa', error: null });
+    await createStation(client, { ...valid, suggestionId: 'suggestion-123' });
+    expect(rpc.mock.calls[0][1]).toMatchObject({ p_suggestion_id: 'suggestion-123' });
+  });
+
+  it('createStation leaves p_suggestion_id out when there is no suggestion', async () => {
+    const { client, rpc } = fakeClient({ data: 'admin-x-aaaaaa', error: null });
+    await createStation(client, valid);
+    expect(Object.keys(rpc.mock.calls[0][1])).not.toContain('p_suggestion_id');
+  });
+
+  it('rejectSuggestion calls admin_reject_station_suggestion with p_suggestion_id', async () => {
+    const { client, rpc } = fakeClient({ data: null, error: null });
+    const result = await rejectSuggestion(client, 'suggestion-123');
+    expect(result).toEqual({ ok: true });
+    expect(rpc).toHaveBeenCalledWith('admin_reject_station_suggestion', { p_suggestion_id: 'suggestion-123' });
+  });
+
+  it('turns "suggestion already reviewed" into a plain sentence for both actions', async () => {
+    const message = 'suggestion already reviewed';
+    expect(friendlyCreateError(message)).toBe('Someone already reviewed this suggestion.');
+    const { client } = fakeClient({ data: null, error: { message } });
+    expect(await rejectSuggestion(client, 'suggestion-123')).toEqual({
+      ok: false,
+      error: 'Someone already reviewed this suggestion.',
+    });
+    expect(await createStation(client, { ...valid, suggestionId: 'suggestion-123' })).toEqual({
+      ok: false,
+      error: 'Someone already reviewed this suggestion.',
+    });
+  });
+
+  it('never shows an unknown database message when rejecting', async () => {
+    const { client } = fakeClient({ data: null, error: { message: 'deadlock detected' } });
+    expect(await rejectSuggestion(client, 'suggestion-123')).toEqual({
+      ok: false,
+      error: 'Could not reject the suggestion, try again.',
+    });
   });
 });
 

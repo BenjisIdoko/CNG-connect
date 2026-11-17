@@ -7,11 +7,13 @@ import { StationsPanel } from './StationsPanel';
 import { ReportsPanel } from './ReportsPanel';
 import { UsersPanel } from './UsersPanel';
 import { MyStationsPanel } from './MyStationsPanel';
+import { SuggestionsPanel } from './SuggestionsPanel';
 import { AirtimePayouts } from '../AirtimePayouts';
 import { FEATURES } from '../../config/features';
 
 const ADMIN_NAV: AdminNavItem[] = [
   { key: 'stations', label: 'Stations', icon: 'pin_drop' },
+  { key: 'suggestions', label: 'Suggestions', icon: 'add_location_alt' },
   { key: 'reports', label: 'Report moderation', icon: 'flag' },
   { key: 'users', label: 'Users', icon: 'groups' },
   ...(FEATURES.ENABLE_REFERRALS ? [{ key: 'payouts', label: 'Airtime payouts', icon: 'call' }] : []),
@@ -30,9 +32,29 @@ export const AdminScreen: React.FC<{ onExit: () => void }> = ({ onExit }) => {
   const { driverProfile, signOut } = useAuth();
   const supabase = useSupabaseClient();
   const isAdmin = Boolean(driverProfile.isAdmin);
-  const navItems = isAdmin ? ADMIN_NAV : MANAGER_NAV;
+  // How many driver suggestions are waiting; shown as a badge on the "Suggestions" tab.
+  const [pendingSuggestions, setPendingSuggestions] = useState(0);
+  const navItems = isAdmin
+    ? ADMIN_NAV.map((n) => (n.key === 'suggestions' ? { ...n, badge: pendingSuggestions } : n))
+    : MANAGER_NAV;
 
   const [activeKey, setActiveKey] = useState(navItems[0].key);
+
+  // Load the pending count up front so the badge is right before the tab is opened.
+  useEffect(() => {
+    if (!isAdmin || !supabase) return;
+    let cancelled = false;
+    supabase
+      .from('station_suggestions')
+      .select('id', { count: 'exact', head: true })
+      .eq('status', 'pending')
+      .then(({ count }) => {
+        if (!cancelled && count !== null) setPendingSuggestions(count);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [isAdmin, supabase]);
   // The profile (and so `isAdmin`) can still be loading when this first renders; once it
   // settles, make sure the selected tab is one this driver actually has in their sidebar.
   useEffect(() => {
@@ -57,6 +79,9 @@ export const AdminScreen: React.FC<{ onExit: () => void }> = ({ onExit }) => {
         onExit={onExit}
       >
         {isAdmin && activeKey === 'stations' && <StationsPanel flash={flash} />}
+        {isAdmin && activeKey === 'suggestions' && (
+          <SuggestionsPanel flash={flash} onCountChange={setPendingSuggestions} />
+        )}
         {isAdmin && activeKey === 'reports' && <ReportsPanel flash={flash} />}
         {isAdmin && activeKey === 'users' && <UsersPanel flash={flash} />}
         {FEATURES.ENABLE_REFERRALS && isAdmin && activeKey === 'payouts' && (

@@ -52,6 +52,7 @@ export const AddStationModal: React.FC<Props> = ({ stations, prefill, onClose, o
     lat: position?.lat ?? null,
     lng: position?.lng ?? null,
     precision: tier,
+    suggestionId: prefill?.suggestionId,
   };
 
   const hits = useMemo(

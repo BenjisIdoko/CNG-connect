@@ -16,6 +16,8 @@ export interface NewStationInput {
   lat: number | null;
   lng: number | null;
   precision: PinTier;
+  /** Set when approving a driver's suggestion: the same transaction marks it approved. */
+  suggestionId?: string;
 }
 
 export type CreateResult = { ok: true; id: string } | { ok: false; error: string };
@@ -57,7 +59,16 @@ export function friendlyCreateError(message: string): string {
   if (/already exists/i.test(message)) {
     return 'A station with this name already exists. Check the map, or use a more specific name.';
   }
+  const review = reviewError(message);
+  if (review) return review;
   return 'Could not add the station, try again.';
+}
+
+/** Errors that only the suggestion functions raise, or null for anything else. */
+function reviewError(message: string): string | null {
+  if (/already reviewed/i.test(message)) return 'Someone already reviewed this suggestion.';
+  if (/suggestion not found/i.test(message)) return 'That suggestion no longer exists.';
+  return null;
 }
 
 const orNull = (value: string | undefined): string | null => {
@@ -81,9 +92,21 @@ export async function createStation(client: RpcClient, input: NewStationInput): 
     p_operator: orNull(input.operator),
     p_station_type: input.stationType ?? 'cng',
     p_area: orNull(input.area),
+    ...(input.suggestionId ? { p_suggestion_id: input.suggestionId } : {}),
   });
 
   if (error) return { ok: false, error: friendlyCreateError(error.message) };
   if (typeof data !== 'string' || data === '') return { ok: false, error: friendlyCreateError('') };
   return { ok: true, id: data };
+}
+
+/** Marks a pending driver suggestion as rejected. */
+export async function rejectSuggestion(
+  client: RpcClient,
+  suggestionId: string,
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const { error } = await client.rpc('admin_reject_station_suggestion', { p_suggestion_id: suggestionId });
+  if (!error) return { ok: true };
+  if (/not authorized/i.test(error.message)) return { ok: false, error: 'Only admins can review suggestions.' };
+  return { ok: false, error: reviewError(error.message) ?? 'Could not reject the suggestion, try again.' };
 }
