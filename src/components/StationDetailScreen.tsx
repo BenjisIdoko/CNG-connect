@@ -7,7 +7,7 @@ import { ASSETS } from '../data/mockData';
 import { openExternalMaps } from '../utils/navigationHelper';
 import { StationGroupInfoSheet } from './StationGroupInfoSheet';
 import { formatRelativeTime, isIsoTimestamp, minutesSince } from '../utils/timeUtils';
-import { getFreshness, STATUS_SHORT_LABEL, formatAgeShort } from '../utils/stationFreshness';
+import { getFreshness, describeStatus, STATUS_SHORT_LABEL, formatAgeShort } from '../utils/stationFreshness';
 import { latestReportedPrice } from '../utils/stationPrice';
 import { useNow } from '../hooks/useNow';
 import { openWhatsAppShare } from '../utils/shareMessageBuilder';
@@ -235,14 +235,14 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
       navigator
         .share({
           title: `${station.name} Station Group`,
-          text: `Join ${station.name} Station Group on CNG-Connect! Status: ${station.statusLabel}.`,
+          text: `Join ${station.name} Station Group on CNG-Connect! Status: ${describeStatus(station, now)}.`,
           url: window.location.href,
         })
         .catch(() => {});
     } else {
       navigator.clipboard
         .writeText(
-          `${station.name} Station Group (${station.address}): Status: ${station.statusLabel}`
+          `${station.name} Station Group (${station.address}): Status: ${describeStatus(station, now)}`
         )
         .then(() => {
           setCopiedNotification(true);

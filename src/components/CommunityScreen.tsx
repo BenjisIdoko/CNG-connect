@@ -5,6 +5,8 @@ import { EmptyState } from './common/EmptyState';
 import type { LeaderboardDriver } from '../utils/reputationEngine';
 import { apiService } from '../services/apiService';
 import { isSameState } from '../utils/proximityAlertEngine';
+import { currentStatus, describeStatus } from '../utils/stationFreshness';
+import { useNow } from '../hooks/useNow';
 import { Icon } from './common/Icon';
 
 // Legends leaderboard is built but hidden for now; flip to true to bring the tab back.
@@ -44,6 +46,8 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
   onToggleLikePost,
   onOpenConversions,
 }) => {
+  // Station status shown here follows report age, not the station row's never-expiring column.
+  const now = useNow();
   const [activeMainTab, setActiveMainTab] = useState<'station_groups' | 'general' | 'leaderboard'>('station_groups');
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -148,7 +152,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
         st.address.toLowerCase().includes(q) ||
         (st.operator && st.operator.toLowerCase().includes(q));
 
-      const matchesStatus = statusFilter === 'all' || st.status === statusFilter;
+      const matchesStatus = statusFilter === 'all' || currentStatus(st, now) === statusFilter;
       return matchesSearch && matchesStatus;
     })
     .sort((a, b) => {
@@ -386,12 +390,14 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
             ) : (
               <div className="flex flex-col divide-y divide-outline-variant/50 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-3 md:divide-y-0">
                 {filteredStations.map((st) => {
+                  const current = currentStatus(st, now);
+                  const statusText = describeStatus(st, now);
                   const dotColor =
-                    st.status === 'full'
+                    current === 'full'
                       ? 'bg-rd-available'
-                      : st.status === 'queue'
+                      : current === 'queue'
                       ? 'bg-rd-queuing'
-                      : st.status === 'out'
+                      : current === 'out'
                       ? 'bg-rd-out'
                       : 'bg-slate-400';
                   return (
@@ -419,10 +425,10 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                           )}
                         </div>
                         <p className="text-caption text-rd-text-tertiary font-medium mt-1 flex items-center gap-1.5 truncate">
-                          {st.status !== 'unknown' && (
+                          {statusText !== 'No report yet' && (
                             <span className="inline-flex items-center gap-1 shrink-0">
                               <span aria-hidden="true" className={`w-1.5 h-1.5 rounded-full ${dotColor}`} />
-                              <span className="text-rd-fg font-semibold">{st.statusLabel}</span>
+                              <span className="text-rd-fg font-semibold">{statusText}</span>
                             </span>
                           )}
                           <span className="truncate">{st.city}, {st.state}</span>

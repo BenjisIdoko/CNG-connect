@@ -44,7 +44,7 @@ describe('shareMessageBuilder', () => {
     const message = buildStationShareMessage(sampleStation);
     expect(message).toContain('⛽ *CNG Station Alert*');
     expect(message).toContain('📍 *NIPCO CNG Station* (Abuja FCT)');
-    expect(message).toContain('📊 Status: *Full stock*');
+    expect(message).toContain('📊 Status: *Available · just now*');
     expect(message).toContain('⏱️ Est. Wait: *10 mins*');
     expect(message).toContain('⚡ Pump Pressure: *215 bar*');
     expect(message).toContain('https://cngconnect.com.ng?station=nipc-001');
@@ -58,8 +58,29 @@ describe('shareMessageBuilder', () => {
     };
     const message = buildStationShareMessage(minimalStation);
     expect(message).toContain('⛽ *CNG Station Alert*');
-    expect(message).toContain('📊 Status: *Full stock*');
+    expect(message).toContain('📊 Status: *Available · 5 min ago*');
     expect(message).not.toContain('⚡ Pump Pressure');
     expect(message).toContain('https://cngconnect.com.ng?station=nipc-001');
+  });
+
+  it('does not present an old report as the current status or wait', () => {
+    const fortyDaysAgo = new Date(Date.now() - 40 * 24 * 60 * 60 * 1000).toISOString();
+    const stale: GasStation = {
+      ...sampleStation,
+      // The station row still says "full / Full stock" long after the last report.
+      status: 'full',
+      statusLabel: 'Full stock',
+      lastUpdated: 'Just now',
+      reports: [{ ...sampleStation.reports[0], timestamp: fortyDaysAgo, waitMinutes: 45 }],
+    };
+    const message = buildStationShareMessage(stale);
+    expect(message).toMatch(/📊 Status: \*Last: Available · \d+ wks? ago\*/);
+    expect(message).not.toContain('Full stock');
+    expect(message).not.toContain('Est. Wait');
+  });
+
+  it('says there is no report yet for a station nobody has reported on', () => {
+    const never: GasStation = { ...sampleStation, status: 'unknown', statusLabel: 'No recent reports', reports: [] };
+    expect(buildStationShareMessage(never)).toContain('📊 Status: *No report yet*');
   });
 });

@@ -1,5 +1,6 @@
 import { GasStation } from '../types';
 import { track } from '../services/analytics';
+import { describeStatus, getFreshness } from './stationFreshness';
 
 // Share links point at whatever origin the app is actually served from
 // (cngconnect.com.ng in prod, a preview URL, or localhost in dev). The
@@ -14,9 +15,14 @@ export function buildStationShareUrl(stationId: string): string {
 }
 
 export function buildStationShareMessage(station: GasStation): string {
-  const status = station.statusLabel || 'Unknown status';
+  // The station row's own status text ("Full stock") never ages, so a weeks-old report would be
+  // shared as if it were live. Use the age-aware line ("Available · 5 min ago", "Last: ... 5 wks ago").
+  const status = describeStatus(station);
+  const freshness = getFreshness(station);
+  const isCurrent = freshness.tier === 'fresh' || freshness.tier === 'recent';
   const latestReport = station.reports?.[0];
-  const waitMinutes = latestReport?.waitMinutes;
+  // A wait time only means something while the report it came from is current.
+  const waitMinutes = isCurrent ? latestReport?.waitMinutes : undefined;
   const shareUrl = buildStationShareUrl(station.id);
 
   const lines: string[] = [

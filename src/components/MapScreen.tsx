@@ -567,7 +567,9 @@ export const MapScreen: React.FC<MapScreenProps> = ({
         t.textContent = st.name;
         const sub = document.createElement('div');
         sub.className = 'pin-label-sub';
-        sub.textContent = [getStatusIndicator(st.status).shortLabel, st.city].filter(Boolean).join(' · ');
+        // Age-aware ("Queuing · 3 min ago", "Last: Available · 5 wks ago"): the station row's own
+        // status column never expires, so it must not be shown as if it were current.
+        sub.textContent = [describeStatus(st, now), st.city].filter(Boolean).join(' · ');
         label.append(t, sub);
         marker.bindTooltip(label, { permanent: true, direction: 'top', offset: [0, -24], className: 'cng-pin-label', interactive: true });
         marker.on('tooltipopen', (ev: L.TooltipEvent) => {
@@ -1336,8 +1338,10 @@ export const MapScreen: React.FC<MapScreenProps> = ({
           suggestions={closestSuggestions}
           suggestionsTitle={userGps ? 'Closest to you' : 'Closest to this part of the map'}
           statusMeta={(st) => {
-            const info = getStatusIndicator(st.status);
-            return { dot: info.dotColor, label: info.shortLabel };
+            // Only a report under 24 h old counts as the status; older or missing ones show grey.
+            const current = currentStatus(st, now);
+            const info = getStatusIndicator(current);
+            return { dot: info.dotColor, label: current === 'unknown' ? describeStatus(st, now) : info.shortLabel };
           }}
           initialQuery={searchQuery}
           onPick={handlePickFromSearch}
