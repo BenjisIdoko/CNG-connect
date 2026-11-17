@@ -39,7 +39,7 @@ Three questions drivers could not answer from a phone:
 
 ## What I built
 
-- **A live map** of 100+ stations with filters for availability (full, queuing, low pressure, out of gas), pump pressure and distance, plus one-tap directions in Google Maps, Apple Maps or Waze.
+- **A live map** of 100+ stations with filters for availability (available, queuing, out of gas), pump pressure and distance, plus one-tap directions in Google Maps, Apple Maps or Waze.
 - **An answer first, not a list.** The phone sheet opens on a "Best option now" card, chosen by trading distance against report quality. Pins are sized and faded by how fresh their report is, and a station with no report shows a quiet grey tile instead of a confident one.
 - **Drive mode.** One tap swaps the sheet for a large, dark panel built for a driver in a queue at night: the best station's name, status and age in big type, a thumb-height Go button, two alternatives, and the screen kept awake.
 - **One-tap reporting.** A driver at the pump picks a status, optionally adds a wait time, a live camera photo and what they paid per kg in naira, and submits in a few seconds. The price then shows on the map, with its age.
@@ -69,7 +69,7 @@ An automated axe-core audit of every main screen drove a round of WCAG 2.2 AA fi
 The desktop station list skips layout and paint for off-screen cards, which keeps scrolling smooth without virtualising the list.
 
 **6. Answer the question instead of listing the data.**
-A list of 100 stations, mostly with no report, makes the driver do the work. The "best option" is the station with the lowest cost, priced in kilometres: its distance, plus about 5 km for a queue, about 8 km for low pressure, and about 3 km if the report is over an hour old. A station with no usable report gets no recommendation at all, rather than a guess. Those weights are my judgement, kept in one place so they are easy to tune; they have not been tested against real drivers' trips, and I would not claim more for them than that. The empty state is honest too: with no live reports it says so, and says that a report has to be filed within about 800 m of the pump.
+A list of 100 stations, mostly with no report, makes the driver do the work. The "best option" is the station with the lowest cost, priced in kilometres: its distance, plus about 5 km for a queue and about 3 km if the report is over an hour old. A station with no usable report gets no recommendation at all, rather than a guess. Those weights are my judgement, kept in one place so they are easy to tune; they have not been tested against real drivers' trips, and I would not claim more for them than that. The empty state is honest too: with no live reports it says so, and says that a report has to be filed within about 800 m of the pump.
 
 **7. A price is a report, and it ages like one.**
 Price per kg is the other number a driver cares about before driving, but production had no prices at all. Rather than an admin-maintained field that would go stale and look current, the price rides on the driver's own report. It is shown with its age, hidden after a week, bounded to a plausible range in both the app and the database, and sent only when a driver typed one, so an app update could never break ordinary reports. I wrote the migration, applied it to production only after approval, and tested it with inserts that were rolled back.

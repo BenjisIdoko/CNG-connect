@@ -20,7 +20,7 @@
 
 ### ⛽ Live Station Map
 - Crowdsourced CNG station tracker across Nigeria, rendered on a Leaflet map with marker clustering for dense areas.
-- Filter by pump pressure, distance radius, and live availability (*Full Stock*, *Queuing*, *Low Pressure*, *Out of Gas*).
+- Filter by pump pressure, distance radius, and live availability (*Available*, *Queuing*, *Out of Gas*).
 - One-tap turn-by-turn navigation via Google Maps, Apple Maps, or Waze.
 - Every station shows a plain-language report age (`"Updated 5 min ago"`, `"No recent report"`) so drivers know how fresh a status actually is.
 
@@ -28,7 +28,7 @@
 - Background location watch detects when a driver is near a station they'd want to know about, and surfaces a push notification/in-app banner — the point being drivers find out about a nearby restock without needing to have the app open.
 
 ### ⏱️ Fast Driver Status Reporting
-- One-tap status buttons (Full stock / Queuing / Low pressure / Out of gas) with optional wait-time, live camera photo attachment, and notes.
+- One-tap status buttons (Available / Queuing / Out of gas) with optional wait-time, live camera photo attachment, and notes.
 - Reports build a driver's reputation score and community points, with unlockable tiers as they contribute more.
 
 ### 🛠️ Conversion Centre Directory

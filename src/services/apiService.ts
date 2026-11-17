@@ -3,6 +3,7 @@ import { INITIAL_STATIONS, INITIAL_POSTS, deduplicateStations, SHOW_EV_STATIONS 
 import { getSupabase, isSupabaseConfigured, restSelect } from './supabaseClient';
 import { checkNotificationPermission } from '../utils/permissionManager';
 import { formatRelativeTime } from '../utils/timeUtils';
+import { normalizeStatus } from '../utils/stationFreshness';
 import { buildLeaderboard, LeaderboardDriver, LeaderboardProfileRow } from '../utils/reputationEngine';
 
 // Helper: Calculate verification level and weight according to schema rules
@@ -222,7 +223,7 @@ export const apiService = {
               // `timestamp` is stored as the literal text 'Just now' (never advances), so
               // derive the real time from created_at.
               timestamp: r.created_at || (r.timestamp === 'Just now' ? '' : r.timestamp),
-              status: r.status as StationStatus,
+              status: normalizeStatus(r.status),
               statusLabel: r.status_label,
               waitMinutes: r.wait_minutes,
               cngPriceNaira: r.cng_price_naira != null ? Number(r.cng_price_naira) : undefined,
@@ -265,7 +266,7 @@ export const apiService = {
             state: s.state,
             distance: s.distance || '',
             driveTime: s.drive_time || '',
-            status: (s.status as StationStatus) || 'unknown',
+            status: normalizeStatus(s.status),
             statusLabel: s.status_label || 'No recent reports',
             cngPrice: s.cng_price != null ? Number(s.cng_price) : undefined,
             priceTrend: s.price_trend || undefined,
@@ -336,7 +337,6 @@ export const apiService = {
 
     const statusLabels: Record<StationStatus, string> = {
       full: 'Full stock',
-      low: 'Low pressure',
       queue: 'Queuing',
       out: 'Out of gas',
       unknown: 'No recent reports',
@@ -708,7 +708,6 @@ export const apiService = {
   ): { title: string; message: string; state: string; isDelivered: boolean; reason?: string } {
     const statusLabels: Record<StationStatus, string> = {
       full: 'Full Stock',
-      low: 'Low Pressure',
       queue: 'Queuing Line',
       out: 'Out of Gas',
       unknown: 'No recent reports',

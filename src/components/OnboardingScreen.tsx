@@ -17,7 +17,7 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
   const slides = [
     {
       id: 'stations',
-      title: 'Live pressure and queue status, before you drive there.',
+      title: 'Live availability and queue status, before you drive there.',
       description:
         'See which stations actually have gas right now — reported by drivers who are there.',
       image: '/onboarding/slide-stations.webp',

@@ -14,7 +14,6 @@ const STATUS_OPTIONS: { id: string; label: string; dotColor?: string }[] = [
   { id: 'all', label: 'All Statuses' },
   { id: 'full', label: 'Full Stock', dotColor: 'bg-status-green' },
   { id: 'queue', label: 'Queuing', dotColor: 'bg-status-orange' },
-  { id: 'low', label: 'Low Pressure', dotColor: 'bg-status-orange' },
   { id: 'out', label: 'Out of Gas', dotColor: 'bg-status-red' },
 ];
 
@@ -392,8 +391,6 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                       ? 'bg-rd-available'
                       : st.status === 'queue'
                       ? 'bg-rd-queuing'
-                      : st.status === 'low'
-                      ? 'bg-rd-low'
                       : st.status === 'out'
                       ? 'bg-rd-out'
                       : 'bg-slate-400';
@@ -647,7 +644,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                   Gas Finder Legends of Nigeria
                 </h2>
                 <p className="text-xs text-emerald-100/90 mt-1 max-w-xl leading-relaxed">
-                  Top drivers earning reputation points & badges by reporting real-time pump pressures, queue wait times, and station stock status.
+                  Top drivers earning reputation points & badges by reporting real-time queue wait times and station stock status.
                 </p>
               </div>
             </div>

@@ -1,4 +1,6 @@
-export type StationStatus = 'full' | 'low' | 'queue' | 'out' | 'unknown';
+// 'full' is shown as "Available"; 'out' as "Out of gas". Low pressure was retired: old rows that
+// still carry 'low' are read as 'queue' (see normalizeStatus in utils/stationFreshness).
+export type StationStatus = 'full' | 'queue' | 'out' | 'unknown';
 export type VerificationLevel = 'unverified_text' | 'quick_tap_geofence' | 'verified_live_photo';
 
 export interface StationMedia {

@@ -51,7 +51,7 @@ export function isPushNotificationGranted(): boolean {
 
 /**
  * Detects if a station status change represents a recovery (back to Full Stock)
- * or a depletion (Out of Gas / Low Pressure).
+ * or a depletion (Out of Gas).
  */
 export function detectStatusTransition(
   oldStatus?: StationStatus,
@@ -66,12 +66,8 @@ export function detectStatusTransition(
     return 'recovered';
   }
 
-  // Station depleted (became Out of Gas / 'out' or Low Pressure / 'low' from 'full' or 'queue')
-  if (
-    (newStatus === 'out' || newStatus === 'low') &&
-    oldStatus !== 'out' &&
-    oldStatus !== 'low'
-  ) {
+  // Station depleted (became Out of Gas / 'out' from 'full' or 'queue')
+  if (newStatus === 'out' && oldStatus !== 'out') {
     return 'depleted';
   }
 
@@ -141,9 +137,8 @@ export function sendStationPushAlert(
     title = `🟢 Pump Online: ${station.name}`;
     body = `${station.name} in ${cityStateCopy} is back at Full Stock (220 bar)!${distCopy} Ready for fast refuelling.`;
   } else if (transitionType === 'depleted') {
-    const statusText = station.status === 'out' ? 'Out of Gas' : 'Low Pressure';
     title = `🔴 Station Alert: ${station.name}`;
-    body = `${station.name} in ${cityStateCopy} is now ${statusText}.${distCopy} Tap to check alternative stations nearby.`;
+    body = `${station.name} in ${cityStateCopy} is now Out of Gas.${distCopy} Tap to check alternative stations nearby.`;
   }
 
   try {

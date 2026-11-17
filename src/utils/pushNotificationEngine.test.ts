@@ -47,19 +47,17 @@ describe('pushNotificationEngine', () => {
     it('returns "recovered" when station transitions from queue/out to full', () => {
       expect(detectStatusTransition('queue', 'full')).toBe('recovered');
       expect(detectStatusTransition('out', 'full')).toBe('recovered');
-      expect(detectStatusTransition('low', 'full')).toBe('recovered');
     });
 
-    it('returns "depleted" when station transitions from full/queue to out or low', () => {
+    it('returns "depleted" when station transitions from full/queue to out', () => {
       expect(detectStatusTransition('full', 'out')).toBe('depleted');
-      expect(detectStatusTransition('full', 'low')).toBe('depleted');
       expect(detectStatusTransition('queue', 'out')).toBe('depleted');
     });
 
     it('returns null when status remains unchanged or transitions between neutral states', () => {
       expect(detectStatusTransition('full', 'full')).toBeNull();
       expect(detectStatusTransition('queue', 'queue')).toBeNull();
-      expect(detectStatusTransition('out', 'low')).toBeNull();
+      expect(detectStatusTransition('out', 'unknown')).toBeNull();
     });
   });
 

@@ -518,7 +518,6 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       const iconSymbol = isEv ? 'bolt' : 'local_gas_station';
       if (liveStatus === 'full') colorClass = '#12A150';
       if (liveStatus === 'queue') colorClass = '#E0A106';
-      if (liveStatus === 'low') colorClass = '#E0600B';
       if (liveStatus === 'out') colorClass = '#D92D20';
 
       // Precision tier drives the pin's confidence: exact pins are solid glowing
@@ -700,7 +699,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
     setTimeout(() => setIsRecentering(false), 600);
   };
 
-  // Colors/icon per the 2026-10 redesign's 4-status system (design_handoff_cng_connect_mobile).
+  // Colors/icon per the 2026-10 redesign's 3-status system (design_handoff_cng_connect_mobile).
   const getStatusIndicator = (status: StationStatus) => {
     switch (status) {
       case 'full':
@@ -724,17 +723,6 @@ export const MapScreen: React.FC<MapScreenProps> = ({
           icon: 'schedule',
           shortLabel: 'Queuing',
           label: 'Queuing',
-        };
-      case 'low':
-        return {
-          barColor: 'bg-rd-low',
-          badgeBg: 'bg-rd-low-container border-transparent text-rd-on-low-container',
-          dotColor: 'bg-rd-low',
-          solidBg: 'bg-rd-low',
-          iconColor: 'text-rd-low',
-          icon: 'speed',
-          shortLabel: 'Low pressure',
-          label: 'Low pressure',
         };
       case 'out':
         return {
@@ -1020,7 +1008,6 @@ export const MapScreen: React.FC<MapScreenProps> = ({
     { key: 'all', label: `All ${scopedCount}`, full: `All ${scopedCount} stations`, icon: null, iconColor: '' },
     { key: 'full', label: 'Available', full: 'Available', icon: 'check_circle', iconColor: 'text-rd-available' },
     { key: 'queue', label: 'Queuing', full: 'Queuing', icon: 'schedule', iconColor: 'text-rd-queuing' },
-    { key: 'low', label: 'Low', full: 'Low pressure', icon: 'speed', iconColor: 'text-rd-low' },
   ];
 
 

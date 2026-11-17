@@ -10,7 +10,6 @@ import { latestReportedPrice } from '../utils/stationPrice';
 const STATUS_TEXT: Record<StationStatus, string> = {
   full: 'text-rd-available',
   queue: 'text-rd-queuing',
-  low: 'text-rd-low',
   out: 'text-rd-out',
   unknown: 'text-white/70',
 };

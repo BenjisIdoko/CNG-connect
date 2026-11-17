@@ -278,7 +278,7 @@ export const App: React.FC = () => {
             if (transition === 'recovered') {
               showToast(`Pump Online: ${st.name} is back at Full Stock!`, 'ok');
             } else {
-              showToast(`Alert: ${st.name} reported Out of Gas / Low Pressure!`, 'alert');
+              showToast(`Alert: ${st.name} reported Out of Gas!`, 'alert');
             }
           }
         }

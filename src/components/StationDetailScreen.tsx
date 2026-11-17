@@ -13,11 +13,10 @@ import { useNow } from '../hooks/useNow';
 import { openWhatsAppShare } from '../utils/shareMessageBuilder';
 import { describeLocationPrecision } from '../utils/locationPrecision';
 
-// Status-card icon/tile colors per the 2026-10 redesign's 4-status system.
+// Status-card icon/tile colors per the 2026-10 redesign's 3-status system.
 const STATUS_CARD_INFO: Record<string, { icon: string; tileBg: string; tileColor: string }> = {
   full: { icon: 'check_circle', tileBg: 'bg-rd-available-container', tileColor: 'text-rd-on-available-container' },
   queue: { icon: 'schedule', tileBg: 'bg-rd-queuing-container', tileColor: 'text-rd-on-queuing-container' },
-  low: { icon: 'speed', tileBg: 'bg-rd-low-container', tileColor: 'text-rd-on-low-container' },
   out: { icon: 'block', tileBg: 'bg-rd-out-container', tileColor: 'text-rd-on-out-container' },
   unknown: { icon: 'history', tileBg: 'bg-surface-container-high', tileColor: 'text-outline' },
 };
@@ -60,7 +59,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
         author: 'Obinna N.',
         authorAvatar: ASSETS.obinnaAvatar,
         timeAgo: '20 min ago',
-        content: `Welcoming everyone to the official ${station.name} Station Group! Please post real-time updates on queue lengths, pump pressures, and gas stock status here.`,
+        content: `Welcoming everyone to the official ${station.name} Station Group! Please post real-time updates on queue lengths and gas stock status here.`,
       },
     ]
   );
@@ -82,8 +81,6 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
       baseLabel = 'Available';
     } else if (st.status === 'queue') {
       baseLabel = 'Queuing';
-    } else if (st.status === 'low') {
-      baseLabel = isEv ? 'Low availability' : 'Low pressure';
     } else if (st.status === 'out') {
       baseLabel = isEv ? 'Out of service' : 'Out of gas';
     } else {
@@ -537,8 +534,6 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                       ? 'bg-status-green'
                       : report.status === 'queue'
                       ? 'bg-status-amber'
-                      : report.status === 'low'
-                      ? 'bg-status-orange'
                       : 'bg-status-red';
                   const verified = Boolean(report.verified && report.isPhotoVerified);
                   const freshness = getFreshnessBadgeInfo(report.timestamp);

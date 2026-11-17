@@ -7,7 +7,7 @@ type QueueRow = {
   station_id: string;
   station_name: string;
   author: string;
-  status: 'full' | 'low' | 'queue' | 'out';
+  status: 'full' | 'low' | 'queue' | 'out'; // 'low' only on reports filed before low pressure was retired
   status_label: string;
   comment: string | null;
   photo: string | null;

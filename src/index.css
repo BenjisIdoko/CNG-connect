@@ -115,7 +115,7 @@
   --color-on-tertiary-container: #8A6809;
   --color-electric-amber: #F5A623;
 
-  /* Status: green = available, amber = queuing, orange = low pressure, red = out */
+  /* Status: green = available, amber = queuing, red = out */
   --color-status-green: #319A3F;
   --color-status-green-container: #E7F6ED;
   --color-status-amber: #F5A623;

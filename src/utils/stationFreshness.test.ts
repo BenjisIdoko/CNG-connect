@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { GasStation, DriverReport, StationStatus } from '../types';
 import {
   getFreshness, describeStatus, formatAgeShort, parseAgeMinutes, freshnessRank, currentStatus,
-  usabilityCost, rankByUsefulness, pickBestStation, pinEmphasis,
+  usabilityCost, rankByUsefulness, pickBestStation, pinEmphasis, normalizeStatus,
 } from './stationFreshness';
 
 const NOW = Date.parse('2026-10-12T12:00:00.000Z');
@@ -48,10 +48,10 @@ describe('getFreshness tiers', () => {
 
   it('uses the newest report even if the array is not sorted', () => {
     const f = getFreshness(
-      station({ status: 'low', reports: [report('out', minsAgo(500)), report('low', minsAgo(10)), report('full', minsAgo(900))] }),
+      station({ status: 'queue', reports: [report('out', minsAgo(500)), report('queue', minsAgo(10)), report('full', minsAgo(900))] }),
       NOW
     );
-    expect(f.lastKnownStatus).toBe('low');
+    expect(f.lastKnownStatus).toBe('queue');
     expect(f.tier).toBe('fresh');
   });
 
@@ -65,6 +65,27 @@ describe('getFreshness tiers', () => {
     const f = getFreshness(station({ status: 'full', lastUpdated: '12 min ago' }), NOW);
     expect(f.tier).toBe('fresh');
     expect(f.lastKnownStatus).toBe('full');
+  });
+});
+
+describe('retired low-pressure status', () => {
+  it('reads a stored "low" as a queue and anything unknown as unknown', () => {
+    expect(normalizeStatus('low')).toBe('queue');
+    expect(normalizeStatus('full')).toBe('full');
+    expect(normalizeStatus('queue')).toBe('queue');
+    expect(normalizeStatus('out')).toBe('out');
+    expect(normalizeStatus('unknown')).toBe('unknown');
+    expect(normalizeStatus('bogus')).toBe('unknown');
+    expect(normalizeStatus(null)).toBe('unknown');
+    expect(normalizeStatus(undefined)).toBe('unknown');
+  });
+
+  it('treats an old cached low report as a queue everywhere a status is read', () => {
+    const legacy = station({ reports: [report('low' as StationStatus, minsAgo(10))] });
+    expect(getFreshness(legacy, NOW).lastKnownStatus).toBe('queue');
+    expect(currentStatus(legacy, NOW)).toBe('queue');
+    expect(describeStatus(legacy, NOW)).toBe('Queuing · 10 min ago');
+    expect(usabilityCost(legacy, 2, NOW)).toBe(7);
   });
 });
 
@@ -129,10 +150,9 @@ describe('which station to go to', () => {
     expect(usabilityCost(live('a', 'out', 5), 1, NOW)).toBe(Number.POSITIVE_INFINITY);
   });
 
-  it('prices a queue, low pressure and an older report in kilometres', () => {
+  it('prices a queue and an older report in kilometres', () => {
     expect(usabilityCost(live('a', 'full', 5), 2, NOW)).toBe(2);
     expect(usabilityCost(live('a', 'queue', 5), 2, NOW)).toBe(7);
-    expect(usabilityCost(live('a', 'low', 5), 2, NOW)).toBe(10);
     expect(usabilityCost(live('a', 'full', 120), 2, NOW)).toBe(5);
   });
 

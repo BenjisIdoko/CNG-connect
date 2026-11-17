@@ -35,7 +35,6 @@ export const ProximityAlertBanner: React.FC<ProximityAlertBannerProps> = ({
 
     const statusLabels: Record<StationStatus, string> = {
       full: 'Full Stock',
-      low: 'Low Pressure',
       queue: 'Queuing',
       out: 'Out of Gas',
       unknown: 'No recent reports',
@@ -69,7 +68,6 @@ export const ProximityAlertBanner: React.FC<ProximityAlertBannerProps> = ({
   const options: { key: StationStatus; label: string; icon: string; dot: string }[] = [
     { key: 'full', label: 'Full Stock (Fast)', icon: 'check', dot: 'bg-rd-available' },
     { key: 'queue', label: 'Queuing (<15m)', icon: 'schedule', dot: 'bg-rd-queuing' },
-    { key: 'low', label: 'Low Pressure', icon: 'warning', dot: 'bg-rd-low' },
     { key: 'out', label: 'Out of Gas', icon: 'close', dot: 'bg-outline' },
   ];
 
@@ -128,7 +126,7 @@ export const ProximityAlertBanner: React.FC<ProximityAlertBannerProps> = ({
                 onClick={() => onShareStatus(station)}
                 className="text-caption font-bold text-primary flex items-center gap-1.5"
               >
-                Add pressure &amp; photo report
+                Add a photo &amp; more detail
                 <span aria-hidden="true" className="material-symbols-outlined text-[16px]">arrow_forward</span>
               </button>
               <button onClick={onDismiss} className="text-caption font-semibold text-rd-text-tertiary">

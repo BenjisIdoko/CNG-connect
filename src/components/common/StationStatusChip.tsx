@@ -7,7 +7,6 @@ type KnownStatus = Exclude<StationStatus, 'unknown'>;
 const TONE: Record<KnownStatus, { chip: string; dot: string; icon: string }> = {
   full: { chip: 'bg-rd-available-container text-rd-on-available-container', dot: 'bg-rd-available', icon: 'check_circle' },
   queue: { chip: 'bg-rd-queuing-container text-rd-on-queuing-container', dot: 'bg-rd-queuing', icon: 'schedule' },
-  low: { chip: 'bg-rd-low-container text-rd-on-low-container', dot: 'bg-rd-low', icon: 'speed' },
   out: { chip: 'bg-rd-out-container text-rd-on-out-container', dot: 'bg-rd-out', icon: 'block' },
 };
 

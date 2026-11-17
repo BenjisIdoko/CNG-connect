@@ -3,7 +3,7 @@ import { buildInviteUrl } from './referral';
 
 export const APP_SHARE_TITLE = 'CNG-Connect';
 export const APP_SHARE_TEXT =
-  'Find CNG stations near you and see live pressure and queue updates from drivers. Free on CNG-Connect:';
+  'Find CNG stations near you and see live availability and queue updates from drivers. Free on CNG-Connect:';
 
 export type ShareAppResult = 'shared' | 'copied' | 'cancelled' | 'failed';
 

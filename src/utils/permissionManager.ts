@@ -86,7 +86,7 @@ export function checkChatPermission(isAuthenticated: boolean): PermissionCheckRe
 
 /**
  * PERMISSION CHECK 3: Presence-Gated Live Status Updates
- * Submitting structured status reports (Full Stock / Low Pressure / Queuing / Out of Gas)
+ * Submitting structured status reports (Available / Queuing / Out of Gas)
  * or live camera updates requires active station_presence (user GPS within geofence radius).
  */
 export function checkLiveUpdatePermission(

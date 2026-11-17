@@ -4,7 +4,6 @@ import type { StationStatus } from '../../types';
 const COLORS: Record<string, string> = {
   full: '#288435',
   queue: '#F5A623',
-  low: '#D0420C',
   out: '#E5484D',
 };
 

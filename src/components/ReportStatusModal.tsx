@@ -95,14 +95,12 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
     const statusLabels: Record<StationStatus, string> = isEv
       ? {
           full: 'Reported Available',
-          low: 'Reported Busy',
-          queue: 'Reported Full (All Ports Occupied)',
+          queue: 'Reported Busy',
           out: 'Reported Out of Service',
           unknown: 'No recent reports',
         }
       : {
           full: 'Reported Full stock',
-          low: 'Reported Low pressure',
           queue: 'Reported Queuing',
           out: 'Reported Out of gas',
           unknown: 'No recent reports',
@@ -144,13 +142,11 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
     ? [
         { key: 'full', title: 'Available', meaning: 'Charger free, plug in now', icon: 'check_circle', solid: 'bg-rd-available', container: 'bg-rd-available-container' },
         { key: 'queue', title: 'Busy', meaning: 'Charging, expect a wait', icon: 'schedule', solid: 'bg-rd-queuing', container: 'bg-rd-queuing-container' },
-        { key: 'low', title: 'All ports occupied', meaning: 'Every port is in use', icon: 'speed', solid: 'bg-rd-low', container: 'bg-rd-low-container' },
         { key: 'out', title: 'Out of service', meaning: 'Not charging right now', icon: 'block', solid: 'bg-rd-out', container: 'bg-rd-out-container' },
       ]
     : [
         { key: 'full', title: 'Available', meaning: 'Full stock, no wait', icon: 'check_circle', solid: 'bg-rd-available', container: 'bg-rd-available-container' },
         { key: 'queue', title: 'Queuing', meaning: 'Gas is flowing, expect a wait', icon: 'schedule', solid: 'bg-rd-queuing', container: 'bg-rd-queuing-container' },
-        { key: 'low', title: 'Low pressure', meaning: "Slow fill, tank won't top up", icon: 'speed', solid: 'bg-rd-low', container: 'bg-rd-low-container' },
         { key: 'out', title: 'Out of gas', meaning: 'Not dispensing right now', icon: 'block', solid: 'bg-rd-out', container: 'bg-rd-out-container' },
       ];
 

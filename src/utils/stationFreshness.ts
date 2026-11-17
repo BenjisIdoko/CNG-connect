@@ -50,6 +50,17 @@ export function formatAgeShort(minutes: number): string {
   return `${months} mo ago`;
 }
 
+/**
+ * Reads a status string from the database, local cache or an old client. "Low pressure" was
+ * retired, so a stored 'low' is read as 'queue' (a slow fill is a wait); anything unrecognised
+ * is 'unknown'.
+ */
+export function normalizeStatus(raw: string | null | undefined): StationStatus {
+  if (raw === 'full' || raw === 'queue' || raw === 'out') return raw;
+  if (raw === 'low') return 'queue';
+  return 'unknown';
+}
+
 export function getFreshness(station: GasStation, now = Date.now()): Freshness {
   let best: { age: number; status: StationStatus } | null = null;
 
@@ -57,13 +68,13 @@ export function getFreshness(station: GasStation, now = Date.now()): Freshness {
     if (!report.status || report.status === 'unknown') continue;
     const age = parseAgeMinutes(report.timestamp, now);
     if (age === null) continue;
-    if (!best || age < best.age) best = { age, status: report.status };
+    if (!best || age < best.age) best = { age, status: normalizeStatus(report.status) };
   }
 
   // Seeded/local stations carry no report rows — fall back to the station's own stamp.
   if (!best && station.status !== 'unknown') {
     const age = parseAgeMinutes(station.lastUpdated, now);
-    if (age !== null) best = { age, status: station.status };
+    if (age !== null) best = { age, status: normalizeStatus(station.status) };
   }
 
   if (!best) return { tier: 'none', ageMinutes: null, lastKnownStatus: null, ageText: null };
@@ -75,7 +86,6 @@ export function getFreshness(station: GasStation, now = Date.now()): Freshness {
 export const STATUS_SHORT_LABEL: Record<StationStatus, string> = {
   full: 'Available',
   queue: 'Queuing',
-  low: 'Low pressure',
   out: 'Out of service',
   unknown: 'No report yet',
 };
@@ -105,12 +115,11 @@ export function currentStatus(station: GasStation, now = Date.now()): StationSta
 // ---- "Which station should I go to?" -------------------------------------------------------
 // A station only has an answer when it has a report under 24h old that isn't "out of service".
 // Among those, a driver trades distance against how good the news is, so each shortfall is
-// priced in kilometres of driving: a queue is worth about 5 km, low pressure about 8 km, and a
-// report older than an hour about 3 km of doubt.
+// priced in kilometres of driving: a queue is worth about 5 km and a report older than an hour
+// about 3 km of doubt.
 const STATUS_COST_KM: Record<StationStatus, number> = {
   full: 0,
   queue: 5,
-  low: 8,
   out: Number.POSITIVE_INFINITY,
   unknown: Number.POSITIVE_INFINITY,
 };
