@@ -1,5 +1,6 @@
 import { ShareAppSheet } from './components/ShareAppSheet';
 import { captureReferralFromUrl, clearPendingReferral, getPendingReferral } from './utils/referral';
+import { shareApp, shareAppToast } from './utils/shareApp';
 import { FEATURES } from './config/features';
 import React, { useState, useEffect, useMemo, useCallback, useRef, Suspense } from 'react';
 import { safeLazy } from './utils/safeLazy';
@@ -544,6 +545,13 @@ export const App: React.FC = () => {
     setIsShareSheetOpen(true);
   };
 
+  // The round share button on the map always shares the bare app link, whatever ENABLE_REFERRALS
+  // says: there is no working referral system, so it never carries a code or opens the promo sheet.
+  const handleShareAppLink = async () => {
+    const message = shareAppToast(await shareApp(null));
+    if (message) showToast(message);
+  };
+
   // Browsing (map, stations, community feed) stays open to guests; writing
   // (reports, comments, likes, suggestions) requires a verified session —
   // the backend enforces this too (RLS requires `authenticated`), so this is
@@ -968,7 +976,7 @@ export const App: React.FC = () => {
               onNavigate={handleNavigate}
               gpsStatus={gpsStatus}
               userGps={userCoords}
-              onShareApp={FEATURES.ENABLE_REFERRALS ? handleShareApp : undefined}
+              onShareApp={handleShareAppLink}
               onGpsStatusChange={(status, coords) => {
                 setGpsStatus(status);
                 if (coords) setUserCoords(coords);

@@ -6,8 +6,9 @@
 export const FEATURES = {
   /**
    * "Share the app, earn ₦500 airtime" referral and rewards program.
+   * Note: the map screen's round share button is NOT part of this flag. It always shares the bare
+   * app link, with no referral code and no promo sheet.
    * When false:
-   *   - Map screen round share button is hidden
    *   - Top header "Share the App" button is hidden
    *   - Desktop sidebar "Share app with drivers" button is hidden
    *   - Profile screen InviteCard is hidden
