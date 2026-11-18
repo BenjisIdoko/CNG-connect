@@ -21,6 +21,8 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isAuthLoading: boolean;
   driverProfile: UserProfile;
+  /** True once the saved profile (and so its is_admin flag) has been read for the signed-in user. */
+  isProfileLoaded: boolean;
   /** True once a session exists but the profile has no name yet — i.e. this is their first sign-in and they need the "complete your profile" step. */
   isNewDriver: boolean;
   /** Signed in and the saved profile has no phone number yet (a phone number is compulsory). */
@@ -99,6 +101,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // as a brand-new driver rather than surfacing an error.
       setDriverProfile({ ...INITIAL_USER, name: '', reportsCount: 0, communityPoints: 0, email: fallbackEmail });
       setIsNewDriver(true);
+      // No profile row means no admin flag either, so the profile counts as read.
+      setIsProfileLoaded(true);
       return true;
     }
     setDriverProfile(mapProfileRow(data, fallbackEmail));
@@ -305,6 +309,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isAuthenticated: Boolean(session),
         isAuthLoading,
         driverProfile,
+        isProfileLoaded,
         isNewDriver,
         needsPhone: Boolean(session) && isProfileLoaded && !driverProfile.phone.trim(),
         sendLoginCode,

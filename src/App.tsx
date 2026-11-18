@@ -3,6 +3,7 @@ import { captureReferralFromUrl, clearPendingReferral, getPendingReferral } from
 import { shareApp, shareAppToast } from './utils/shareApp';
 import { FEATURES } from './config/features';
 import React, { useState, useEffect, useMemo, useCallback, useRef, Suspense } from 'react';
+import { Entrance, resolveEntrance } from './utils/adminRoutes';
 import { safeLazy } from './utils/safeLazy';
 import {
   GasStation,
@@ -81,18 +82,22 @@ const TOAST_COLORS: Record<ToastTone, string> = {
 };
 
 const AdminScreen = safeLazy(() => import('./components/admin/AdminScreen'), (m) => m.AdminScreen);
+const StationManagerEntrance = safeLazy(
+  () => import('./components/admin/StationManagerEntrance'),
+  (m) => m.StationManagerEntrance,
+);
 
 export const App: React.FC = () => {
-  // Hidden admin route — one dashboard (sidebar + main content) covering the pin/station
-  // editor, report moderation, airtime payouts and the station-manager view, gated inside
-  // AdminScreen itself (profiles.is_admin vs. a station_managers row). ?admin=1 is the
-  // current link; the older ?moderation=1 / ?manager=1 links still land here too.
-  const [adminMode] = useState(() => {
+  // Two hidden entrances: /admin (the super admin's dashboard) and /station-manager (a manager's
+  // own stations). The old ?admin=1 / ?moderation=1 / ?manager=1 links still land on the right one
+  // and the address bar is swapped to the new path. Who may use each is enforced by the database.
+  const [entrance] = useState<Entrance | null>(() => {
     try {
-      const q = new URLSearchParams(window.location.search);
-      return q.has('admin') || q.has('moderation') || q.has('manager');
+      const resolved = resolveEntrance(window.location.pathname, window.location.search);
+      if (resolved.canonicalPath) window.history.replaceState({}, '', resolved.canonicalPath);
+      return resolved.entrance;
     } catch {
-      return false;
+      return null;
     }
   });
 
@@ -896,14 +901,13 @@ export const App: React.FC = () => {
     return <PasswordResetScreen />;
   }
 
-  if (adminMode) {
+  if (entrance) {
+    const exitToApp = () => {
+      window.location.href = '/';
+    };
     return (
-      <Suspense fallback={<div className="fixed inset-0 grid place-items-center text-slate-500">Loading admin…</div>}>
-        <AdminScreen
-          onExit={() => {
-            window.location.href = window.location.pathname;
-          }}
-        />
+      <Suspense fallback={<div className="fixed inset-0 grid place-items-center text-slate-500">Loading…</div>}>
+        {entrance === 'admin' ? <AdminScreen onExit={exitToApp} /> : <StationManagerEntrance onExit={exitToApp} />}
       </Suspense>
     );
   }
