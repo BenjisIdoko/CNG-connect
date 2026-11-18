@@ -22,6 +22,14 @@ export interface Freshness {
 const FRESH_MINUTES = 60;
 const RECENT_MINUTES = 24 * 60;
 
+/**
+ * A queue only exists while cars are standing at the station, so a Queuing report is current for
+ * a short grace period after it is filed, and after that only while a car is at the station's
+ * geofence (`station.activePresenceCount`), up to a hard limit. Past that it is last-known.
+ */
+export const QUEUE_GRACE_MINUTES = 30;
+export const QUEUE_MAX_MINUTES = 180;
+
 /** Minutes since a report time that may be an ISO stamp or legacy relative copy ("5 min ago"). */
 export function parseAgeMinutes(raw: string | undefined | null, now = Date.now()): number | null {
   const value = (raw || '').trim().toLowerCase();
@@ -79,7 +87,14 @@ export function getFreshness(station: GasStation, now = Date.now()): Freshness {
 
   if (!best) return { tier: 'none', ageMinutes: null, lastKnownStatus: null, ageText: null };
 
-  const tier: FreshnessTier = best.age <= FRESH_MINUTES ? 'fresh' : best.age <= RECENT_MINUTES ? 'recent' : 'stale';
+  let tier: FreshnessTier;
+  if (best.status === 'queue') {
+    const carsHere = station.activePresenceCount ?? 0;
+    const current = best.age <= QUEUE_GRACE_MINUTES || (carsHere > 0 && best.age <= QUEUE_MAX_MINUTES);
+    tier = !current ? 'stale' : best.age <= FRESH_MINUTES ? 'fresh' : 'recent';
+  } else {
+    tier = best.age <= FRESH_MINUTES ? 'fresh' : best.age <= RECENT_MINUTES ? 'recent' : 'stale';
+  }
   return { tier, ageMinutes: best.age, lastKnownStatus: best.status, ageText: formatAgeShort(best.age) };
 }
 

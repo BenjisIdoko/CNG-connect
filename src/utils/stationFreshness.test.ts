@@ -3,6 +3,7 @@ import { GasStation, DriverReport, StationStatus } from '../types';
 import {
   getFreshness, describeStatus, formatAgeShort, parseAgeMinutes, freshnessRank, currentStatus,
   usabilityCost, rankByUsefulness, pickBestStation, pinEmphasis, normalizeStatus,
+  QUEUE_GRACE_MINUTES, QUEUE_MAX_MINUTES,
 } from './stationFreshness';
 
 const NOW = Date.parse('2026-10-12T12:00:00.000Z');
@@ -193,5 +194,77 @@ describe('pin emphasis', () => {
       expect(tiers[i].zIndexOffset).toBeLessThan(tiers[i - 1].zIndexOffset);
     }
     expect(tiers.map((t) => t.halo)).toEqual([true, false, false, false]);
+  });
+});
+
+describe('queue statuses follow cars at the station', () => {
+  const queued = (ageMin: number, cars = 0) =>
+    station({ id: 'q', name: 'q', status: 'queue', activePresenceCount: cars, reports: [report('queue', minsAgo(ageMin))] });
+  const km = (table: Record<string, number>) => (s: GasStation) => table[s.id] ?? null;
+
+  it('uses a 30 minute grace and a 3 hour limit', () => {
+    expect(QUEUE_GRACE_MINUTES).toBe(30);
+    expect(QUEUE_MAX_MINUTES).toBe(180);
+  });
+
+  it('a queue report is current at 29 minutes with nobody there', () => {
+    const s = queued(29, 0);
+    expect(getFreshness(s, NOW).tier).toBe('fresh');
+    expect(currentStatus(s, NOW)).toBe('queue');
+  });
+
+  it('a queue report is still current at exactly 30 minutes', () => {
+    expect(currentStatus(queued(30, 0), NOW)).toBe('queue');
+  });
+
+  it('a queue report is last-known at 31 minutes with nobody there', () => {
+    const s = queued(31, 0);
+    expect(getFreshness(s, NOW).tier).toBe('stale');
+    expect(currentStatus(s, NOW)).toBe('unknown');
+    expect(describeStatus(s, NOW)).toBe('Last: Queuing · 31 min ago');
+  });
+
+  it('a queue report between 30 and 60 minutes stays fresh while a car is there', () => {
+    expect(getFreshness(queued(45, 1), NOW).tier).toBe('fresh');
+  });
+
+  it('a queue report at 2 hours stays current while a car is there', () => {
+    const s = queued(120, 1);
+    expect(getFreshness(s, NOW).tier).toBe('recent');
+    expect(currentStatus(s, NOW)).toBe('queue');
+  });
+
+  it('a queue report at 181 minutes is last-known even with cars there', () => {
+    const s = queued(181, 3);
+    expect(getFreshness(s, NOW).tier).toBe('stale');
+    expect(currentStatus(s, NOW)).toBe('unknown');
+  });
+
+  it('Available and Out of gas keep their 24 hour window with nobody there', () => {
+    for (const status of ['full', 'out'] as StationStatus[]) {
+      const s = station({ status, activePresenceCount: 0, reports: [report(status, minsAgo(300))] });
+      expect(getFreshness(s, NOW).tier).toBe('recent');
+      expect(currentStatus(s, NOW)).toBe(status);
+    }
+  });
+
+  it('a newer Available report replaces an old queue whatever the car count', () => {
+    const s = station({
+      status: 'full',
+      activePresenceCount: 0,
+      reports: [report('queue', minsAgo(10)), report('full', minsAgo(1))],
+    });
+    expect(currentStatus(s, NOW)).toBe('full');
+  });
+
+  it('usabilityCost is Infinity for a 40 minute queue with nobody there and finite with a car', () => {
+    expect(usabilityCost(queued(40, 0), 2, NOW)).toBe(Number.POSITIVE_INFINITY);
+    expect(usabilityCost(queued(40, 1), 2, NOW)).toBe(7);
+  });
+
+  it('pickBestStation skips a last-known queue', () => {
+    const a = { ...queued(120, 0), id: 'a', name: 'a' } as GasStation;
+    const b = station({ id: 'b', name: 'b', status: 'full', reports: [report('full', minsAgo(180))] });
+    expect(pickBestStation([a, b], km({ a: 1, b: 20 }), NOW)?.id).toBe('b');
   });
 });
