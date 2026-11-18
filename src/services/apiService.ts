@@ -232,6 +232,8 @@ export const apiService = {
               likes: r.likes ?? 0,
               dislikes: r.dislikes ?? 0,
               photo: r.photo,
+              photoLat: r.photo_lat != null ? Number(r.photo_lat) : undefined,
+              photoLng: r.photo_lng != null ? Number(r.photo_lng) : undefined,
             }));
 
           const stationMedia: StationMedia[] = (mediaData || [])
@@ -388,6 +390,10 @@ export const apiService = {
           // Only sent when a driver entered a price, so reports still insert on a database
           // that has not had supabase/add-report-cng-price.sql applied yet.
           ...(enrichedReport.cngPriceNaira != null ? { cng_price_naira: enrichedReport.cngPriceNaira } : {}),
+          // Where the phone was when the photo was taken (a report needs it to be within 150 m of the station).
+          ...(enrichedReport.photoLat != null && enrichedReport.photoLng != null
+            ? { photo_lat: enrichedReport.photoLat, photo_lng: enrichedReport.photoLng }
+            : {}),
         });
 
         if (reportError) {
