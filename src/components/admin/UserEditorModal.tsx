@@ -34,8 +34,8 @@ const inputCls = 'w-full border border-slate-300 rounded-lg px-2.5 py-1.5 text-s
 const labelCls = 'text-xs font-semibold text-slate-500 mb-1 block';
 
 /**
- * Full edit for one driver's profile — name/phone/state/vehicle/CNG kit plus
- * the admin flag. Email isn't editable here: it's the Supabase Auth identity
+ * Full edit for one driver's profile — name/phone/state/vehicle/CNG kit. The admin flag is
+ * shown read-only: nobody can change it from the app, only SQL can. Email isn't editable here: it's the Supabase Auth identity
  * itself, not just a profile field, so changing it needs Auth's own
  * email-change flow, not a plain profile patch.
  */
@@ -46,7 +46,6 @@ export const UserEditorModal: React.FC<Props> = ({ user, onClose, onSaved, flash
   const [state, setState] = useState(user.state || '');
   const [vehicle, setVehicle] = useState(user.vehicle || '');
   const [cngKit, setCngKit] = useState(user.cng_kit || '');
-  const [isAdmin, setIsAdmin] = useState(Boolean(user.is_admin));
   const [saving, setSaving] = useState(false);
 
   const save = async () => {
@@ -59,7 +58,6 @@ export const UserEditorModal: React.FC<Props> = ({ user, onClose, onSaved, flash
       p_state: state,
       p_vehicle: vehicle,
       p_cng_kit: cngKit,
-      p_is_admin: isAdmin,
     });
     setSaving(false);
     if (error) {
@@ -70,7 +68,7 @@ export const UserEditorModal: React.FC<Props> = ({ user, onClose, onSaved, flash
       );
       return;
     }
-    onSaved(user.id, { name, phone, state, vehicle, cng_kit: cngKit, is_admin: isAdmin });
+    onSaved(user.id, { name, phone, state, vehicle, cng_kit: cngKit });
     flash(`Saved · ${name || user.email}`);
     onClose();
   };
@@ -116,10 +114,11 @@ export const UserEditorModal: React.FC<Props> = ({ user, onClose, onSaved, flash
               {cngKit && !CNG_KIT_PRESETS.includes(cngKit) && <option value={cngKit}>{cngKit}</option>}
             </select>
           </div>
-          <label className="flex items-center gap-2 text-sm font-semibold text-slate-700">
-            <input type="checkbox" checked={isAdmin} onChange={(e) => setIsAdmin(e.target.checked)} />
-            Admin access
-          </label>
+          {user.is_admin && (
+            <p className="text-xs font-semibold text-slate-500">
+              App admin. The admin flag can only be changed in the database.
+            </p>
+          )}
         </div>
 
         <div className="p-4 border-t border-slate-200 flex justify-end gap-2 shrink-0">
