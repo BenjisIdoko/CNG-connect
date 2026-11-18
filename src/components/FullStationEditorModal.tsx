@@ -280,7 +280,7 @@ export const FullStationEditorModal: React.FC<Props> = ({ station, onClose, onSa
 
           {/* Photos */}
           <section className="flex flex-col gap-2">
-            <h3 className="text-xs font-bold text-adm-mute-text uppercase tracking-wide">Photos</h3>
+            <h3 className="text-sm font-semibold text-adm-ink">Photos</h3>
             <div className="grid grid-cols-3 gap-2">
               {images.map((url) => (
                 <div key={url} className="relative aspect-video rounded-lg overflow-hidden border border-adm-line bg-adm-muted group">
@@ -308,7 +308,7 @@ export const FullStationEditorModal: React.FC<Props> = ({ station, onClose, onSa
 
           {/* Core Info */}
           <section className="flex flex-col gap-3">
-            <h3 className="text-xs font-bold text-adm-mute-text uppercase tracking-wide">Core info</h3>
+            <h3 className="text-sm font-semibold text-adm-ink">Core info</h3>
             <div>
               <label className={labelCls}>Name</label>
               <input className={inputCls} value={name} onChange={(e) => setName(e.target.value)} />
@@ -358,7 +358,7 @@ export const FullStationEditorModal: React.FC<Props> = ({ station, onClose, onSa
 
           {/* Pricing & Specs */}
           <section className="flex flex-col gap-3">
-            <h3 className="text-xs font-bold text-adm-mute-text uppercase tracking-wide">Pricing & specs</h3>
+            <h3 className="text-sm font-semibold text-adm-ink">Pricing & specs</h3>
             {isEv ? (
               <>
                 <div>
@@ -405,7 +405,7 @@ export const FullStationEditorModal: React.FC<Props> = ({ station, onClose, onSa
 
           {/* Hours */}
           <section className="flex flex-col gap-3">
-            <h3 className="text-xs font-bold text-adm-mute-text uppercase tracking-wide">Hours</h3>
+            <h3 className="text-sm font-semibold text-adm-ink">Hours</h3>
             <label className="flex items-center gap-2 text-sm font-medium text-adm-ink">
               <input type="checkbox" checked={is24Hours} onChange={(e) => setIs24Hours(e.target.checked)} />
               Open 24 hours
@@ -430,7 +430,7 @@ export const FullStationEditorModal: React.FC<Props> = ({ station, onClose, onSa
 
           {isAdmin && (
             <section className="flex flex-col gap-2">
-              <h3 className="text-xs font-bold text-adm-mute-text uppercase tracking-wide">
+              <h3 className="text-sm font-semibold text-adm-ink">
                 Station managers
               </h3>
               <p className="text-xs text-adm-mute-text -mt-1">

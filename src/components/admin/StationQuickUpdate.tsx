@@ -81,7 +81,7 @@ export const StationQuickUpdate: React.FC<Props> = ({
   return (
     <div className="mt-3 flex flex-col gap-3 border-t border-adm-line pt-3">
       <div>
-        <p className="text-xs font-bold text-adm-mute-text uppercase tracking-wide">Station status</p>
+        <p className="text-sm font-semibold text-adm-ink">Station status</p>
         <div className="mt-1.5 flex gap-2">
           <button
             type="button"
@@ -118,7 +118,7 @@ export const StationQuickUpdate: React.FC<Props> = ({
       </div>
 
       <div>
-        <p className="text-xs font-bold text-adm-mute-text uppercase tracking-wide">Gas pressure</p>
+        <p className="text-sm font-semibold text-adm-ink">Gas pressure</p>
         <div className="mt-1.5 flex items-center gap-2">
           <button
             type="button"

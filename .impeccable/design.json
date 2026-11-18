@@ -1,0 +1,144 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-18T00:00:00Z",
+  "title": "Design System: CNG-Connect Admin (Security Print)",
+  "extensions": {
+    "colorMeta": {
+      "note-green": { "role": "primary", "displayName": "Note Green", "canonical": "#0d3b2e", "tonalRamp": ["#04130e", "#0d3b2e", "#17503f", "#2f6a58", "#5a8e7c", "#8fb5a5", "#bfd7cc", "#e3efe9"] },
+      "note-green-2": { "role": "primary", "displayName": "Note Green Raised", "canonical": "#17503f", "tonalRamp": ["#04130e", "#0d3b2e", "#17503f", "#2f6a58", "#5a8e7c", "#8fb5a5", "#bfd7cc", "#e3efe9"] },
+      "note-text": { "role": "primary", "displayName": "Note Text", "canonical": "#cfe3d8", "tonalRamp": ["#17503f", "#4c7c6a", "#76a08e", "#9dbfae", "#b6d2c4", "#cfe3d8", "#e0eee6", "#f0f7f3"] },
+      "foil-gold": { "role": "secondary", "displayName": "Foil Gold", "canonical": "#c9a227", "tonalRamp": ["#2e2606", "#59480c", "#7f6710", "#a5841a", "#c9a227", "#dcbf5a", "#ecd994", "#f6edc9"] },
+      "foil-gold-hover": { "role": "secondary", "displayName": "Foil Gold Pressed", "canonical": "#b8921f", "tonalRamp": ["#2e2606", "#59480c", "#7f6710", "#b8921f", "#c9a227", "#dcbf5a", "#ecd994", "#f6edc9"] },
+      "new-tint": { "role": "secondary", "displayName": "Gold Wash", "canonical": "#f3e7b8", "tonalRamp": ["#7f6710", "#a5841a", "#c9a227", "#dcbf5a", "#e8d68e", "#f3e7b8", "#f8f0d3", "#fcf8ea"] },
+      "celadon-paper": { "role": "neutral", "displayName": "Celadon Paper", "canonical": "#e7f0ea", "tonalRamp": ["#1a1f1c", "#4a5a52", "#7c9186", "#9db8a8", "#b9cfc2", "#d6e5dc", "#e7f0ea", "#f6faf7"] },
+      "card-paper": { "role": "neutral", "displayName": "Card Paper", "canonical": "#f6faf7", "tonalRamp": ["#1a1f1c", "#4a5a52", "#7c9186", "#b9cfc2", "#d6e5dc", "#e7f0ea", "#f6faf7", "#ffffff"] },
+      "ink": { "role": "neutral", "displayName": "Ink", "canonical": "#1a1f1c", "tonalRamp": ["#0a0c0b", "#1a1f1c", "#2c342f", "#4a5a52", "#6e7f76", "#93a39a", "#bccac2", "#e3ebe6"] },
+      "mute-text": { "role": "neutral", "displayName": "Mute Text", "canonical": "#4a5a52", "tonalRamp": ["#1a1f1c", "#2c342f", "#3b4740", "#4a5a52", "#6e7f76", "#93a39a", "#bccac2", "#e3ebe6"] },
+      "muted-wash": { "role": "neutral", "displayName": "Muted Wash", "canonical": "#d6e5dc", "tonalRamp": ["#4a5a52", "#7c9186", "#9db8a8", "#b9cfc2", "#d6e5dc", "#e3eee7", "#eef5f0", "#f6faf7"] },
+      "engraved-line": { "role": "neutral", "displayName": "Engraved Line", "canonical": "#b9cfc2", "tonalRamp": ["#4a5a52", "#6e8678", "#86a193", "#9db8a8", "#b9cfc2", "#d0e0d6", "#e3eee7", "#f2f7f4"] },
+      "danger": { "role": "status", "displayName": "Danger", "canonical": "#a4262c", "tonalRamp": ["#2e0a0c", "#5a1418", "#7f1c21", "#a4262c", "#c4585d", "#dc8e92", "#eebcbe", "#f6dcdc"] },
+      "danger-soft": { "role": "status", "displayName": "Danger Wash", "canonical": "#f6dcdc", "tonalRamp": ["#a4262c", "#c4585d", "#dc8e92", "#eebcbe", "#f6dcdc", "#f9e8e8", "#fcf1f1", "#fef8f8"] },
+      "warn": { "role": "status", "displayName": "Warn", "canonical": "#7a5200", "tonalRamp": ["#241800", "#4a3100", "#7a5200", "#a06c0c", "#c28f3a", "#dcb472", "#efd6a8", "#f6e6bf"] },
+      "warn-soft": { "role": "status", "displayName": "Warn Wash", "canonical": "#f6e6bf", "tonalRamp": ["#7a5200", "#a06c0c", "#c28f3a", "#dcb472", "#efd6a8", "#f6e6bf", "#faf0d9", "#fdf8ec"] }
+    },
+    "typographyMeta": {
+      "page-title": { "displayName": "Page title", "purpose": "The h1 in the header bar." },
+      "brand": { "displayName": "Brand", "purpose": "Sidebar wordmark." },
+      "card-title": { "displayName": "Card title", "purpose": "CardTitle headings." },
+      "body": { "displayName": "Body", "purpose": "All prose and table text, tabular figures on." },
+      "label": { "displayName": "Label", "purpose": "Table headers, badges, nav counts, sidebar buttons." },
+      "mono": { "displayName": "Mono", "purpose": "Identifiers and code in Geist Mono." }
+    },
+    "shadows": [
+      { "name": "dialog", "value": "0 12px 32px rgba(13,59,46,0.22)", "purpose": "Modal dialog over a Note Green 55% scrim." },
+      { "name": "drawer", "value": "0 0 32px rgba(13,59,46,0.3)", "purpose": "Mobile navigation drawer." },
+      { "name": "toast", "value": "0 6px 20px rgba(13,59,46,0.3)", "purpose": "Transient toast." }
+    ],
+    "motion": [
+      { "name": "color-transition", "value": "transition-colors (Tailwind default, 150ms ease)", "purpose": "Hover and state color changes on buttons, rows, nav, tabs." },
+      { "name": "reduced-motion", "value": "animation-duration and transition-duration 0.01ms under prefers-reduced-motion", "purpose": "Collapses all admin motion for users who ask." }
+    ],
+    "breakpoints": [
+      { "name": "md", "value": "768px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Foil gold with ink text: the one pressable action in a view.",
+      "html": "<button class=\"ds-btn-primary\">Approve</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 36px; padding: 8px 16px; border: 0; border-radius: 6px; background: var(--color-adm-foil, #c9a227); color: var(--color-adm-ink, #1a1f1c); font-family: Geist, sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: background-color 150ms; } .ds-btn-primary:hover { background: var(--color-adm-foil-hover, #b8921f); } .ds-btn-primary:focus-visible { outline: 2px solid #0d3b2e; outline-offset: 2px; } .ds-btn-primary:disabled { opacity: 0.5; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Note green with white text for supporting actions, keeping gold rare.",
+      "html": "<button class=\"ds-btn-secondary\">Open station</button>",
+      "css": ".ds-btn-secondary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 36px; padding: 8px 16px; border: 0; border-radius: 6px; background: #0d3b2e; color: #fff; font-family: Geist, sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: background-color 150ms; } .ds-btn-secondary:hover { background: #17503f; } .ds-btn-secondary:focus-visible { outline: 2px solid #0d3b2e; outline-offset: 2px; }"
+    },
+    {
+      "name": "Outline Button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Quiet card-paper button with an engraved border.",
+      "html": "<button class=\"ds-btn-outline\">Retry</button>",
+      "css": ".ds-btn-outline { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 36px; padding: 8px 16px; border: 1px solid #b9cfc2; border-radius: 6px; background: #f6faf7; color: #1a1f1c; font-family: Geist, sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: background-color 150ms; } .ds-btn-outline:hover { background: #d6e5dc; } .ds-btn-outline:focus-visible { outline: 2px solid #0d3b2e; outline-offset: 2px; }"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "36px field on card paper; focus shifts border and ring to note green.",
+      "html": "<input class=\"ds-input\" placeholder=\"Search stations\" />",
+      "css": ".ds-input { height: 36px; width: 240px; padding: 0 12px; border: 1px solid #b9cfc2; border-radius: 6px; background: #f6faf7; color: #1a1f1c; caret-color: #0d3b2e; font-family: Geist, sans-serif; font-size: 14px; outline: none; transition: border-color 150ms; } .ds-input::placeholder { color: #4a5a52; } .ds-input:focus-visible { border-color: #0d3b2e; box-shadow: 0 0 0 2px #0d3b2e; } .ds-input[aria-invalid=true] { border-color: #a4262c; }"
+    },
+    {
+      "name": "Sidebar Nav Item",
+      "kind": "nav",
+      "refersTo": "nav-item",
+      "description": "Green-ground nav row with icon, label and pending-count chip; active state is a raised green, not gold.",
+      "html": "<div class=\"ds-nav\"><a class=\"ds-nav-item ds-nav-active\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><rect x=\"3\" y=\"3\" width=\"7\" height=\"9\"/><rect x=\"14\" y=\"3\" width=\"7\" height=\"5\"/><rect x=\"14\" y=\"12\" width=\"7\" height=\"9\"/><rect x=\"3\" y=\"16\" width=\"7\" height=\"5\"/></svg><span>Overview</span><b class=\"ds-nav-chip\">4</b></a><a class=\"ds-nav-item\"><span>Stations</span></a></div>",
+      "css": ".ds-nav { width: 216px; padding: 12px; background: #0d3b2e; border-radius: 8px; display: flex; flex-direction: column; gap: 2px; font-family: Geist, sans-serif; } .ds-nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 6px; color: #cfe3d8; font-size: 14px; font-weight: 600; cursor: pointer; transition: background-color 150ms; } .ds-nav-item span { flex: 1; } .ds-nav-item:hover { background: rgba(23,80,63,0.6); color: #fff; } .ds-nav-item:focus-visible { outline: 2px solid #c9a227; } .ds-nav-active { background: #17503f; color: #fff; } .ds-nav-chip { padding: 2px 6px; border-radius: 6px; background: #cfe3d8; color: #0d3b2e; font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; }"
+    },
+    {
+      "name": "Badge",
+      "kind": "chip",
+      "refersTo": "badge-new",
+      "description": "Status chips; the gold wash variant marks new or changed items.",
+      "html": "<span class=\"ds-badge ds-badge-new\">New</span> <span class=\"ds-badge ds-badge-danger\">Flagged</span> <span class=\"ds-badge ds-badge-warn\">Pin review</span>",
+      "css": ".ds-badge { display: inline-flex; align-items: center; padding: 2px 8px; border: 1px solid transparent; border-radius: 6px; font-family: Geist, sans-serif; font-size: 12px; font-weight: 600; white-space: nowrap; } .ds-badge-new { background: #f3e7b8; color: #1a1f1c; border-color: rgba(201,162,39,0.6); } .ds-badge-danger { background: #f6dcdc; color: #a4262c; border-color: rgba(164,38,44,0.3); } .ds-badge-warn { background: #f6e6bf; color: #7a5200; border-color: rgba(122,82,0,0.3); }"
+    },
+    {
+      "name": "Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Card-paper container with engraved border and ruled header; no shadow.",
+      "html": "<div class=\"ds-card\"><div class=\"ds-card-head\"><h2>3 things need you</h2><p>Each notch is one item.</p></div><div class=\"ds-card-body\">Content</div></div>",
+      "css": ".ds-card { width: 320px; border: 1px solid #b9cfc2; border-radius: 8px; background: #f6faf7; color: #1a1f1c; font-family: Geist, sans-serif; } .ds-card-head { display: flex; flex-direction: column; gap: 4px; padding: 16px 20px; border-bottom: 1px solid #b9cfc2; } .ds-card-head h2 { margin: 0; font-size: 16px; font-weight: 700; line-height: 1.25; } .ds-card-head p { margin: 0; font-size: 14px; color: #4a5a52; } .ds-card-body { padding: 16px 20px; font-size: 14px; }"
+    },
+    {
+      "name": "Thread",
+      "kind": "custom",
+      "refersTo": "card",
+      "description": "Signature: a green hairline carrying one notch per pending item, colored by kind. Unbroken when the queue is clear.",
+      "html": "<div class=\"ds-thread\"><span class=\"ds-thread-line\"></span><span class=\"ds-thread-notches\"><span class=\"ds-notch ds-notch-danger\"></span><span class=\"ds-notch ds-notch-danger\"></span><span class=\"ds-notch ds-notch-ok\"></span><span class=\"ds-notch ds-notch-ok\"></span><span class=\"ds-notch ds-notch-ok\"></span><span class=\"ds-notch ds-notch-warn\"></span></span></div>",
+      "css": ".ds-thread { position: relative; display: flex; align-items: center; width: 320px; height: 32px; background: #f6faf7; } .ds-thread-line { position: absolute; left: 0; right: 0; top: 50%; height: 2px; transform: translateY(-50%); background: #0d3b2e; } .ds-thread-notches { position: relative; display: flex; align-items: center; gap: 3px; padding-right: 12px; background: #f6faf7; } .ds-notch { width: 6px; height: 28px; border-radius: 4px; } .ds-notch-danger { background: #a4262c; } .ds-notch-ok { background: #17503f; } .ds-notch-warn { background: #7a5200; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Security Thread",
+    "overview": "The admin desk is dressed like banknote security print: a deep note-green sidebar, celadon paper for the page, ink for text, engraved hairline rules for every divider, and foil gold as the single mark of \"you can press this\". The signature is the thread on the Overview: a 2px green line carrying one notch per pending item (flagged reports red, suggestions green, pin reviews amber). Clearing the queue closes the thread into an unbroken line. It replaces the category default of grey sidebar over stat cards.\n\nDensity is operator-grade: plain, fast tables, 14px body, 36px controls, tabular figures everywhere. Nothing is decorative; depth comes from tone (card paper on celadon) and 1px rules, not shadows. The world is light only (color-scheme: light, data-theme=\"light\" forced by AdminRoot).",
+    "keyCharacteristics": [
+      "Green ground (sidebar), celadon page, card-paper surfaces, 1px green-tinted rules.",
+      "Gold is rationed: pressable primary actions, the new-row tint, selection highlight, and focus rings on dark ground.",
+      "One family (Geist) plus Geist Mono for ids; tabular numerals on by default.",
+      "Radius 6px on controls, 8px on cards and dialogs.",
+      "Flat at rest; soft shadow only on floating layers (dialog, drawer, toast)."
+    ],
+    "rules": [
+      { "name": "The Foil Rule", "body": "Gold (#c9a227) is for things that can be pressed and for new rows, always with ink text, never white. A gold element that cannot be acted on, or a gold button with white text, is a defect.", "section": "colors" },
+      { "name": "The Prefix Rule", "body": "Admin colors are adm- tokens only. Never reuse the driver app's tokens in admin screens, and never use adm- tokens outside admin and the kit.", "section": "colors" },
+      { "name": "The Weight Ladder Rule", "body": "Hierarchy is weight and size, not new faces. 700 titles, 600 controls and labels, 400 prose; no other family enters the admin.", "section": "typography" },
+      { "name": "The Flat-At-Rest Rule", "body": "Cards, rows, inputs and buttons carry no shadow. Shadow appears only when a layer floats above the page.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do use Foil Gold (#c9a227) with Ink text for the one primary action in a view, and for new or changed rows (Gold Wash #f3e7b8).",
+      "Do draw every divider as 1px Engraved Line (#b9cfc2).",
+      "Do build new admin screens from the kit in src/components/ui and the adm- tokens, in AdminRoot.",
+      "Do keep text AA on its ground: Ink or Mute Text on paper, Note Text or white on Note Green.",
+      "Do keep tabular figures on counts and tables, and Geist Mono on ids.",
+      "Do respect reduced motion (transitions collapse to 0.01ms under prefers-reduced-motion)."
+    ],
+    "donts": [
+      "Don't use gold on anything that cannot be pressed, or pair gold with white text.",
+      "Don't put shadows on cards, rows, buttons or inputs; shadows belong to dialog, drawer and toast only.",
+      "Don't fill the active tab or nav state with gold.",
+      "Don't introduce another type family or dark mode in the admin.",
+      "Don't use driver-app tokens or styles inside admin screens.",
+      "Don't treat the legacy look of AirtimePayouts.tsx (behind an off feature flag) as part of this system."
+    ]
+  }
+}
