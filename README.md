@@ -8,7 +8,7 @@
 [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4-38B2AC.svg?logo=tailwind-css)](https://tailwindcss.com/)
 [![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL%2C%20Auth%20%26%20Storage-emerald.svg?logo=supabase)](https://supabase.com/)
 [![Vercel](https://img.shields.io/badge/Vercel-Serverless-black.svg?logo=vercel)](https://vercel.com/)
-[![Tests](https://img.shields.io/badge/Tests-215%2F215%20Passed-success.svg)](https://vitest.dev/)
+[![Tests](https://img.shields.io/badge/Tests-260%2F260%20Passed-success.svg)](https://vitest.dev/)
 
 **CNG-Connect** is a driver-facing PWA built for Nigerian commercial (Bolt, Uber, inDrive) and private drivers running on Compressed Natural Gas. Built in support of the Presidential CNG & EV Initiative (Pi-CNG), it provides a live, crowdsourced map of CNG refuelling stations, a directory of accredited conversion centres, a fuel-savings calculator, a driver community, and an internal toolset for keeping the underlying station data accurate.
 
@@ -23,6 +23,7 @@
 - Filter by pump pressure, distance radius, and live availability (*Available*, *Queuing*, *Out of Gas*).
 - One-tap turn-by-turn navigation via Google Maps, Apple Maps, or Waze.
 - Every station shows a plain-language report age (`"Updated 5 min ago"`, `"No recent report"`) so drivers know how fresh a status actually is.
+- A *Queuing* status only stays current while a car is actually at the station (a signed-in driver's phone within 250 m), or for 30 minutes after it is reported. Otherwise it reads `"Last: Queuing · 6 hr ago"` in grey. A driver who reported a queue is asked once, when they leave, whether it is still there. Only counts of cars per station are public; who is where stays private.
 
 ### 📍 Proximity Alerts
 - Background location watch detects when a driver is near a station they'd want to know about, and surfaces a push notification/in-app banner — the point being drivers find out about a nearby restock without needing to have the app open.
@@ -72,7 +73,7 @@ Two hidden, authentication-gated routes exist for keeping station data accurate 
 | **AI Assistant** | Vercel Serverless Function (`api/chat.ts`) calling Gemini |
 | **PWA** | `vite-plugin-pwa` (Workbox) — offline caching, installability |
 | **State Management** | React Context (`AuthContext`) + component state; no global store |
-| **Test Runner** | Vitest (215 tests) |
+| **Test Runner** | Vitest (260 tests) |
 
 The app runs as a client-only SPA — there's no traditional application server. The React client talks to Supabase directly with a public anon key; every write that needs privilege beyond "any signed-in driver" (station edits, admin actions, point awards) goes through a Postgres RPC function that checks authorization server-side, rather than trusting the client.
 
@@ -159,7 +160,7 @@ Open [http://localhost:3002](http://localhost:3002).
 ## 🧪 Verification & Testing
 
 ```bash
-npm test           # Vitest — 215 tests across formatting, validation, proximity/push logic, etc.
+npm test           # Vitest — 260 tests across formatting, validation, proximity/push logic, etc.
 npx tsc --noEmit   # TypeScript compiler check
 npm run build      # Production build
 ```
