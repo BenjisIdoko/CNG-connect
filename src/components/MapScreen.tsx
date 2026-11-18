@@ -900,16 +900,14 @@ export const MapScreen: React.FC<MapScreenProps> = ({
               </button>
             </h3>
             <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-              <span
-                className={`inline-flex self-start items-center gap-1.5 rounded-lg px-2 py-1 text-micro font-semibold ${
-                  kind === 'best' ? 'bg-white text-rd-ink' : 'bg-rd-ink-2 border border-rd-ink-border text-white/85'
-                }`}
-              >
-                <span aria-hidden="true" className={`material-symbols-outlined text-[13px] ${info.iconColor || ''}`}>
-                  {freshness.tier === 'stale' ? 'history' : info.icon}
+              {kind !== 'best' && (
+                <span className="inline-flex self-start items-center gap-1.5 rounded-lg px-2 py-1 text-micro font-semibold bg-rd-ink-2 border border-rd-ink-border text-white/85">
+                  <span aria-hidden="true" className={`material-symbols-outlined text-[13px] ${info.iconColor || ''}`}>
+                    {freshness.tier === 'stale' ? 'history' : info.icon}
+                  </span>
+                  {describeStatus(station, now)}
                 </span>
-                {describeStatus(station, now)}
-              </span>
+              )}
               {price && <span className="text-micro font-semibold text-white/85">{price.compact}</span>}
             </div>
           </div>
@@ -972,44 +970,27 @@ export const MapScreen: React.FC<MapScreenProps> = ({
     );
   };
 
-  // The cold-start moment: most stations have no recent report, and only a driver standing at
-  // the pump (within 800 m) can file one. Say so, name the nearest candidate and what it earns.
-  const renderFirstReportCard = (station: GasStation, count: number, asHero: boolean) => (
-    <div className={`relative rounded-[22px] ${asHero ? 'bg-rd-ink text-white' : 'bg-rd-chip-grey text-rd-fg'} p-4 flex items-start gap-3`}>
-      <span
-        aria-hidden="true"
-        className={`material-symbols-outlined text-[22px] shrink-0 mt-0.5 ${asHero ? 'text-white' : 'text-rd-fg'}`}
-      >
-        campaign
-      </span>
-      <div className="min-w-0 flex-1">
-        <h3 className="font-geist font-bold text-[1.0625rem] leading-snug">
-          {asHero ? 'No live reports here yet' : `${count} ${count === 1 ? 'station has' : 'stations have'} no report today`}
-        </h3>
-        <p className={`text-caption mt-1 ${asHero ? 'text-white/80' : 'text-rd-text-tertiary'}`}>
-          Report from the pump and drivers nearby see it within seconds. You earn 50 points, 100 with a live photo.
-        </p>
-        <button
-          type="button"
-          onClick={() => {
-            onSelectStation(station);
-            onOpenStationDetails(station);
-          }}
-          className={`mt-2.5 inline-flex items-center gap-1.5 rounded-full min-h-11 px-4 text-micro font-bold active:scale-95 transition-transform ${
-            asHero ? 'bg-primary text-white' : 'bg-rd-selected text-rd-on-selected'
-          }`}
-        >
-          <span className="truncate">{userGps && station.distance ? `Nearest: ${station.name} · ${station.distance}` : `Open ${station.name}`}</span>
-          <span aria-hidden="true" className="material-symbols-outlined text-[16px] shrink-0">arrow_forward</span>
-        </button>
-      </div>
-    </div>
+  // The cold-start moment: most stations have no recent report. Just offer the nearest candidate;
+  // only a driver standing at the pump (within 800 m) can file one.
+  const renderFirstReportCard = (station: GasStation, _count: number, asHero: boolean) => (
+    <button
+      type="button"
+      onClick={() => {
+        onSelectStation(station);
+        onOpenStationDetails(station);
+      }}
+      className={`w-full inline-flex items-center justify-between gap-1.5 rounded-full min-h-11 px-4 text-micro font-bold active:scale-95 transition-transform ${
+        asHero ? 'bg-primary text-white' : 'bg-rd-selected text-rd-on-selected'
+      }`}
+    >
+      <span className="truncate">{userGps && station.distance ? `Nearest: ${station.name} · ${station.distance}` : `Open ${station.name}`}</span>
+      <span aria-hidden="true" className="material-symbols-outlined text-[16px] shrink-0">arrow_forward</span>
+    </button>
   );
 
   const statusChips: Array<{ key: string; label: string; full: string; icon: string | null; iconColor: string }> = [
     { key: 'all', label: `All ${scopedCount}`, full: `All ${scopedCount} stations`, icon: null, iconColor: '' },
     { key: 'full', label: 'Available', full: 'Available', icon: 'check_circle', iconColor: 'text-rd-available' },
-    { key: 'queue', label: 'Queuing', full: 'Queuing', icon: 'schedule', iconColor: 'text-rd-queuing' },
   ];
 
 
@@ -1133,19 +1114,6 @@ export const MapScreen: React.FC<MapScreenProps> = ({
         />
       )}
       <div className={`lg:hidden absolute bottom-0 left-0 right-0 z-30 max-w-xl mx-auto pointer-events-none ${isDriveMode ? 'hidden' : ''}`}>
-        <button
-          onClick={() => {
-            track('drive_mode_opened');
-            haptic(12);
-            setIsDriveMode(true);
-          }}
-          className={`pointer-events-auto absolute left-4 -top-16 h-12 pl-3.5 pr-4 rounded-full bg-rd-selected text-rd-on-selected inline-flex items-center gap-2 font-geist font-bold text-caption shadow-[0_6px_20px_rgba(20,32,26,0.25)] active:scale-95 transition-all ${
-            sheetMode === 'expanded' ? 'opacity-0 pointer-events-none! scale-75' : ''
-          }`}
-        >
-          <span aria-hidden="true" className="material-symbols-outlined text-[22px]">directions_car</span>
-          Drive
-        </button>
         <button
           onClick={handleRecenter}
           aria-label="My Location"
