@@ -112,6 +112,8 @@ export const App: React.FC = () => {
   // Modals & Overlays
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [reportingStation, setReportingStation] = useState<GasStation | null>(null);
+  // The status a one-tap prompt chose, so the report sheet opens on it.
+  const [reportInitialStatus, setReportInitialStatus] = useState<StationStatus | undefined>(undefined);
   const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
   const [isRoiModalOpen, setIsRoiModalOpen] = useState(false);
   const [unlockedTierModal, setUnlockedTierModal] = useState<DriverTier | null>(null);
@@ -671,12 +673,35 @@ export const App: React.FC = () => {
     setActiveDetailStation(updatedStation);
   };
 
-  const handleOpenReportModal = (station: GasStation) => {
+  const handleOpenReportModal = (station: GasStation, initialStatus?: StationStatus) => {
     if (!requireAuth()) return;
     track('report_started', { station_id: station.id });
     setReportingStation(station);
+    setReportInitialStatus(initialStatus);
     setIsReportModalOpen(true);
   };
+
+  // A fresh GPS fix for the report sheet, asked for when the photo is taken and when the report is
+  // submitted, so the 150 m rule is checked against where the driver is at that moment.
+  const getFreshPosition = useCallback(
+    (): Promise<PingPosition | null> =>
+      new Promise((resolve) => {
+        if (!('geolocation' in navigator)) {
+          resolve(null);
+          return;
+        }
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            const fix: PingPosition = { lat: pos.coords.latitude, lng: pos.coords.longitude, accuracy: pos.coords.accuracy };
+            lastFixRef.current = fix;
+            resolve(fix);
+          },
+          () => resolve(null),
+          { enableHighAccuracy: true, maximumAge: 15000, timeout: 10000 },
+        );
+      }),
+    [],
+  );
 
   const submitReportFor = async (
     station: GasStation,
@@ -1170,16 +1195,13 @@ export const App: React.FC = () => {
           <ReportStatusModal
             station={reportingStation}
             user={userProfile}
-            isPresenceActive={
-              Boolean(
-                gpsStatus === 'active' &&
-                reportingStation.distance &&
-                parseFloat(reportingStation.distance) <= 0.8
-              )
-            }
+            getPosition={() => lastFixRef.current}
+            getFreshPosition={getFreshPosition}
+            initialStatus={reportInitialStatus}
             onClose={() => {
               setIsReportModalOpen(false);
               setReportingStation(null);
+              setReportInitialStatus(undefined);
             }}
             onSubmitReport={handleSubmitReport}
           />

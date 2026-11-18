@@ -2,10 +2,10 @@ import React, { useEffect, useRef, useState } from 'react';
 import { GasStation, StationStatus, DriverReport, UserProfile } from '../types';
 import { verifyImageMetadata, registerSharedImageHash } from '../utils/imageMetadataVerifier';
 import { LiveCameraCaptureModal } from './LiveCameraCaptureModal';
-import { checkLiveUpdatePermission } from '../utils/permissionManager';
+import { checkReportPosition, type PingPosition } from '../utils/geofencePresence';
+import { reportPhotoHint, reportProofProblem } from '../utils/reportProof';
 import { StationGroupInfoSheet } from './StationGroupInfoSheet';
 import { Modal } from './common/Modal';
-import { compressImageToDataUrl } from '../utils/compressImage';
 import { isPlausiblePrice, PRICE_MIN_NAIRA, PRICE_MAX_NAIRA } from '../utils/stationPrice';
 
 interface ReportStatusModalProps {
@@ -13,7 +13,12 @@ interface ReportStatusModalProps {
   user?: UserProfile;
   onClose: () => void;
   onSubmitReport: (newReport: DriverReport, updatedStationStatus: StationStatus) => void;
-  isPresenceActive?: boolean;
+  /** The driver's latest GPS fix as the app last saw it; drives the banner and the buttons. */
+  getPosition: () => PingPosition | null;
+  /** A fresh GPS fix, asked for when taking the photo and when submitting. Null when none could be had. */
+  getFreshPosition: () => Promise<PingPosition | null>;
+  /** The status to start on, when the driver tapped one in a prompt. */
+  initialStatus?: StationStatus;
 }
 
 export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
@@ -21,25 +26,35 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
   user,
   onClose,
   onSubmitReport,
-  isPresenceActive = true,
+  getPosition,
+  getFreshPosition,
+  initialStatus,
 }) => {
-  const [selectedStatus, setSelectedStatus] = useState<StationStatus>('full');
+  const [selectedStatus, setSelectedStatus] = useState<StationStatus>(initialStatus ?? 'full');
   const [waitTime, setWaitTime] = useState<number>(15);
   const [priceText, setPriceText] = useState<string>('');
   const [comment, setComment] = useState<string>('');
   const [attachedPhoto, setAttachedPhoto] = useState<string | null>(null);
+  // Where the phone was when the photo was taken; it travels with the report as proof.
+  const [photoPosition, setPhotoPosition] = useState<PingPosition | null>(null);
   const [photoError, setPhotoError] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [presenceActive, setPresenceActive] = useState<boolean>(isPresenceActive);
   const [showLiveCamera, setShowLiveCamera] = useState(false);
   const [showInfoSheet, setShowInfoSheet] = useState(false);
   const [showMoreDetails, setShowMoreDetails] = useState(false);
   const submitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  React.useEffect(() => {
-    setPresenceActive(isPresenceActive);
-  }, [isPresenceActive]);
+  // Where the driver is right now, for the banner and the buttons: refreshed every few seconds.
+  const getPositionRef = useRef(getPosition);
+  getPositionRef.current = getPosition;
+  const [position, setPosition] = useState<PingPosition | null>(() => getPosition());
+  useEffect(() => {
+    const timer = setInterval(() => setPosition(getPositionRef.current()), 3000);
+    return () => clearInterval(timer);
+  }, []);
+  const positionCheck = checkReportPosition(position, station);
+  const canReport = positionCheck.allowed;
 
   // Clear pending submit timer if the modal unmounts mid-submit
   useEffect(() => {
@@ -48,45 +63,74 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
     };
   }, []);
 
-  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      // Run anti-misinformation metadata verification
-      const verification = verifyImageMetadata(file, undefined, 30);
-      if (!verification.isValid) {
-        setPhotoError(verification.reason || 'Gallery photo rejected. Live camera capture required.');
-        setAttachedPhoto(null);
-        return;
-      }
-
-      compressImageToDataUrl(file).then((dataUrl) => {
-        const urlVerification = verifyImageMetadata(undefined, dataUrl);
-        if (!urlVerification.isValid) {
-          setPhotoError(urlVerification.reason || 'Duplicate old photo detected.');
-          setAttachedPhoto(null);
-          return;
-        }
-
-        setPhotoError(null);
-        setAttachedPhoto(dataUrl);
-      });
+  // The photo is proof for one status, so choosing another means taking a new one.
+  const chooseStatus = (status: StationStatus) => {
+    if (status === selectedStatus) return;
+    setSelectedStatus(status);
+    if (attachedPhoto) {
+      setAttachedPhoto(null);
+      setPhotoPosition(null);
+      setPhotoError('Take a new photo for this status.');
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const perm = checkLiveUpdatePermission(presenceActive);
-    if (!perm.allowed) {
-      setFormError(perm.reason || 'You need to be at the station to report its status');
+  // Ask for a fresh fix before opening the camera, so a driver who has already left is told so.
+  const openCamera = async () => {
+    setPhotoError(null);
+    const check = checkReportPosition(await getFreshPosition(), station);
+    if (!check.allowed) {
+      setPhotoError(check.reason);
       return;
     }
+    setShowLiveCamera(true);
+  };
+
+  const handleCapturedPhoto = async (dataUrl: string) => {
+    setShowLiveCamera(false);
+    // The position is taken again at the moment the photo comes back, and saved with it.
+    const fix = await getFreshPosition();
+    const check = checkReportPosition(fix, station);
+    if (!check.allowed || !fix) {
+      setPhotoError(check.allowed ? 'Turn on location to report.' : check.reason);
+      return;
+    }
+    // Freshness/duplicate CHECK at capture time (registration happens only when the report is submitted).
+    const verification = verifyImageMetadata(undefined, dataUrl);
+    if (!verification.isValid) {
+      setPhotoError(verification.reason || 'Photo rejected by anti-misinformation check.');
+      return;
+    }
+    setAttachedPhoto(dataUrl);
+    setPhotoPosition(fix);
+    setPhotoError(null);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+    const fail = (message: string) => {
+      setFormError(message);
+      setIsSubmitting(false);
+    };
+
+    // The driver must still be at the station when they press Submit, not only when the photo was taken.
+    const check = checkReportPosition(await getFreshPosition(), station);
+    if (!check.allowed) return fail(check.reason);
+
+    const proofProblem = reportProofProblem(
+      { photo: attachedPhoto ?? undefined, photoLat: photoPosition?.lat, photoLng: photoPosition?.lng },
+      station,
+    );
+    if (proofProblem || !attachedPhoto || !photoPosition) {
+      return fail(proofProblem || 'Take a live photo at the station to post this report.');
+    }
+
     // The price is optional; if one is typed it has to be a plausible ₦/kg figure.
     const typedPrice = priceText.trim() === '' ? null : Number(priceText.replace(/,/g, ''));
     if (typedPrice != null && !isPlausiblePrice(typedPrice)) {
-      setFormError(`Price per kg should be between ₦${PRICE_MIN_NAIRA} and ₦${PRICE_MAX_NAIRA.toLocaleString('en-NG')}, or leave it blank`);
       setShowMoreDetails(true);
-      return;
+      return fail(`Price per kg should be between ₦${PRICE_MIN_NAIRA} and ₦${PRICE_MAX_NAIRA.toLocaleString('en-NG')}, or leave it blank`);
     }
     setFormError(null);
 
@@ -106,18 +150,15 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
           unknown: 'No recent reports',
         };
 
-    const isPhotoVerified = Boolean(attachedPhoto);
     // Register the photo hash only NOW (at publish time), not at capture time.
-    if (attachedPhoto) {
-      registerSharedImageHash(attachedPhoto);
-    }
+    registerSharedImageHash(attachedPhoto);
 
     const newReport: DriverReport = {
       id: `report-${Date.now()}`,
       author: user?.name || 'Anonymous Driver',
       authorAvatar: user?.avatar || '',
-      verified: isPhotoVerified,
-      isPhotoVerified: isPhotoVerified,
+      verified: true,
+      isPhotoVerified: true,
       timestamp: new Date().toISOString(),
       status: selectedStatus,
       statusLabel: statusLabels[selectedStatus],
@@ -126,10 +167,12 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
       comment: comment.trim() || undefined,
       likes: 1,
       userVoted: 'up',
-      photo: attachedPhoto || undefined,
+      photo: attachedPhoto,
+      photoLat: photoPosition.lat,
+      photoLng: photoPosition.lng,
+      photoAccuracyM: photoPosition.accuracy,
     };
 
-    setIsSubmitting(true);
     submitTimerRef.current = setTimeout(() => {
       onSubmitReport(newReport, selectedStatus);
       setIsSubmitting(false);
@@ -181,22 +224,20 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
             </button>
           </div>
 
-          {/* Geofence banner — positive when presence is confirmed, blocking otherwise */}
+          {/* Geofence banner — positive when the driver is at the station, blocking otherwise */}
           <div
             className={`mb-4 rounded-2xl p-3.5 flex items-start gap-2.5 ${
-              presenceActive ? 'bg-rd-available-container' : 'bg-rd-out-container'
+              canReport ? 'bg-rd-available-container' : 'bg-rd-out-container'
             }`}
           >
             <span
               aria-hidden="true"
-              className={`material-symbols-outlined text-[20px] shrink-0 ${presenceActive ? 'text-rd-on-available-container' : 'text-rd-on-out-container'}`}
+              className={`material-symbols-outlined text-[20px] shrink-0 ${canReport ? 'text-rd-on-available-container' : 'text-rd-on-out-container'}`}
             >
-              {presenceActive ? 'my_location' : 'location_off'}
+              {canReport ? 'my_location' : 'location_off'}
             </span>
-            <p className={`flex-1 text-caption font-semibold ${presenceActive ? 'text-rd-on-available-container' : 'text-rd-on-out-container'}`}>
-              {presenceActive
-                ? "You're at this station · reporting unlocked"
-                : 'Reports unlock within 150 m of the station so every status comes from someone actually there.'}
+            <p className={`flex-1 text-caption font-semibold ${canReport ? 'text-rd-on-available-container' : 'text-rd-on-out-container'}`}>
+              {positionCheck.allowed ? "You're at this station · reporting unlocked" : positionCheck.reason}
             </p>
           </div>
 
@@ -209,7 +250,7 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
                   <button
                     key={opt.key}
                     type="button"
-                    onClick={() => setSelectedStatus(opt.key)}
+                    onClick={() => chooseStatus(opt.key)}
                     role="radio"
                     aria-checked={on}
                     className={`w-full min-h-[76px] px-[18px] rounded-[20px] flex items-center gap-3 transition-all active:scale-[0.98] ${
@@ -231,6 +272,52 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
               })}
             </div>
 
+            {/* Photo proof — required for every status */}
+            <div className="bg-surface-container rounded-2xl p-3.5 flex flex-col gap-2.5">
+              <div>
+                <p className="text-[0.75rem] font-bold text-outline uppercase tracking-wider">Photo required</p>
+                <p className="text-caption font-semibold text-rd-fg mt-0.5">{reportPhotoHint(selectedStatus, isEv)}</p>
+              </div>
+              {photoError && (
+                <div role="alert" className="p-2.5 bg-status-red-container rounded-xl text-rose-700 text-micro font-medium flex items-start gap-2">
+                  <span aria-hidden="true" className="material-symbols-outlined text-[16px] shrink-0 text-status-red">gpp_bad</span>
+                  <span>{photoError}</span>
+                </div>
+              )}
+              {attachedPhoto ? (
+                <div className="relative rounded-xl overflow-hidden bg-black/10">
+                  <img src={attachedPhoto} alt="Live photo taken at the station" className="w-full h-32 object-cover" />
+                  <div className="absolute bottom-2 left-2 bg-slate-900/85 text-white text-[0.75rem] font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
+                    <span aria-hidden="true" className="material-symbols-outlined text-[14px] text-status-green">verified</span>
+                    Live photo at the station
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAttachedPhoto(null);
+                      setPhotoPosition(null);
+                      setPhotoError(null);
+                    }}
+                    aria-label="Delete attached photo"
+                    className="absolute top-2 right-2 w-9 h-9 bg-black/70 text-white rounded-full flex items-center justify-center"
+                  >
+                    <span aria-hidden="true" className="material-symbols-outlined text-[16px]">delete</span>
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={openCamera}
+                  disabled={!canReport}
+                  className="w-full flex items-center gap-2 bg-surface-container-high rounded-xl p-3 text-left active:scale-[0.99] transition-transform disabled:opacity-50"
+                >
+                  <span aria-hidden="true" className="material-symbols-outlined text-[20px] text-slate-700">photo_camera</span>
+                  <span className="text-caption font-semibold flex-1">Take photo</span>
+                  <span className="text-[0.75rem] text-outline">Live camera only</span>
+                </button>
+              )}
+            </div>
+
             {/* Optional details — collapsed by default (handoff: "happy path = 2 taps") */}
             {!showMoreDetails ? (
               <button
@@ -241,9 +328,9 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
                 <span aria-hidden="true" className="material-symbols-outlined text-[20px] text-primary shrink-0">add_a_photo</span>
                 <span className="flex-1 min-w-0">
                   <span className="block font-geist text-[0.9375rem] font-semibold text-rd-fg">
-                    {isEv ? 'Add wait time, live photo or note' : 'Add price, wait time, live photo or note'}
+                    {isEv ? 'Add wait time or a note' : 'Add price, wait time or a note'}
                   </span>
-                  <span className="block text-[0.75rem] text-rd-text-tertiary">Optional · a live photo earns 100 pts instead of 50</span>
+                  <span className="block text-[0.75rem] text-rd-text-tertiary">Optional</span>
                 </span>
                 <span aria-hidden="true" className="material-symbols-outlined text-[20px] text-rd-text-tertiary shrink-0">expand_more</span>
               </button>
@@ -294,45 +381,6 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
                   </div>
                 )}
 
-                <div>
-                  {photoError && (
-                    <div role="alert" className="mb-2 p-2.5 bg-status-red-container rounded-xl text-rose-700 text-micro font-medium flex items-start gap-2">
-                      <span aria-hidden="true" className="material-symbols-outlined text-[16px] shrink-0 text-status-red">gpp_bad</span>
-                      <span>{photoError}</span>
-                    </div>
-                  )}
-                  {attachedPhoto ? (
-                    <div className="relative rounded-xl overflow-hidden bg-black/10">
-                      <img src={attachedPhoto} alt="Verified meter snapshot" className="w-full h-32 object-cover" />
-                      <div className="absolute bottom-2 left-2 bg-slate-900/85 text-white text-[0.75rem] font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
-                        <span aria-hidden="true" className="material-symbols-outlined text-[14px] text-status-green">verified</span>
-                        Live camera verified
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setAttachedPhoto(null);
-                          setPhotoError(null);
-                        }}
-                        aria-label="Delete attached photo"
-                        className="absolute top-2 right-2 w-9 h-9 bg-black/70 text-white rounded-full flex items-center justify-center"
-                      >
-                        <span aria-hidden="true" className="material-symbols-outlined text-[16px]">delete</span>
-                      </button>
-                    </div>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => setShowLiveCamera(true)}
-                      className="w-full flex items-center gap-2 bg-surface-container-high rounded-xl p-2.5 text-left active:scale-[0.99] transition-transform"
-                    >
-                      <span aria-hidden="true" className="material-symbols-outlined text-[20px] text-slate-700">photo_camera</span>
-                      <span className="text-caption font-semibold flex-1">Add live photo</span>
-                      <span className="text-[0.75rem] text-outline">Gallery blocked</span>
-                    </button>
-                  )}
-                </div>
-
                 <input
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
@@ -351,7 +399,7 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
 
             <button
               type="submit"
-              disabled={!presenceActive || isSubmitting}
+              disabled={!canReport || !attachedPhoto || isSubmitting}
               className="w-full h-[58px] flex items-center justify-center gap-2 bg-primary text-white rounded-full font-geist font-bold text-body active:scale-[0.98] transition-all disabled:bg-[#B9BCC2] disabled:opacity-100"
             >
               {isSubmitting ? (
@@ -362,7 +410,7 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
               ) : (
                 <>
                   <span>Submit report</span>
-                  <span className="text-micro font-bold bg-white/20 rounded-full px-2 py-0.5">+{attachedPhoto ? 100 : 50} pts</span>
+                  <span className="text-micro font-bold bg-white/20 rounded-full px-2 py-0.5">+100 pts</span>
                 </>
               )}
             </button>
@@ -373,19 +421,7 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
       {showLiveCamera && (
         <LiveCameraCaptureModal
           title={`Live Photo of ${station.name}`}
-          onCapture={(dataUrl) => {
-            // Freshness/duplicate CHECK at capture time (registration happens
-            // only when the report is actually submitted).
-            const verification = verifyImageMetadata(undefined, dataUrl);
-            if (!verification.isValid) {
-              setPhotoError(verification.reason || 'Photo rejected by anti-misinformation check.');
-              setShowLiveCamera(false);
-              return;
-            }
-            setAttachedPhoto(dataUrl);
-            setPhotoError(null);
-            setShowLiveCamera(false);
-          }}
+          onCapture={handleCapturedPhoto}
           onClose={() => setShowLiveCamera(false)}
         />
       )}
