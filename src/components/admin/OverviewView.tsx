@@ -146,7 +146,7 @@ export const OverviewView: React.FC<Props> = ({ data, loading, errors, lastVisit
           <Card className="overflow-hidden">
             <CardHeader>
               <CardTitle>Work queue</CardTitle>
-              <CardDescription>Oldest first, so nothing waits forever. Flags and suggestions that arrived since you last opened the Overview are tinted gold.</CardDescription>
+              <CardDescription>Oldest first. Gold marks flags and suggestions new since you last opened this page.</CardDescription>
             </CardHeader>
             {loading && items.length === 0 ? (
               <CardContent className="flex flex-col gap-3">

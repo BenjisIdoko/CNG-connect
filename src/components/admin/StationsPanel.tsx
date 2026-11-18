@@ -597,16 +597,12 @@ export const StationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash 
               This permanently deletes each station and its reports, photos, and comments. This can't be undone.
             </p>
             <div className="flex justify-end gap-2 mt-1">
-              <button onClick={() => setConfirmingDelete(false)} className="text-xs px-4 py-1.5 rounded-lg bg-adm-muted hover:bg-adm-line">
+              <Button variant="outline" onClick={() => setConfirmingDelete(false)}>
                 Cancel
-              </button>
-              <button
-                onClick={deleteSelected}
-                disabled={deleting}
-                className="text-xs px-4 py-1.5 rounded-lg bg-adm-danger text-white font-bold disabled:opacity-50"
-              >
+              </Button>
+              <Button variant="destructive" onClick={deleteSelected} disabled={deleting}>
                 {deleting ? 'Deleting…' : 'Delete permanently'}
-              </button>
+              </Button>
             </div>
           </div>
         </ModalFrame>
@@ -620,9 +616,9 @@ export const StationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash 
                 Review bulk update — {csvDiffs.filter((d) => d.current && !d.error).length} station(s) to change
                 {csvDiffs.some((d) => d.error || !d.current) ? `, ${csvDiffs.filter((d) => d.error || !d.current).length} problem row(s)` : ''}
               </h2>
-              <button onClick={() => setCsvDiffs(null)} className="text-xs px-3 py-1.5 rounded-md bg-adm-muted hover:bg-adm-line shrink-0">
+              <Button variant="outline" size="sm" className="shrink-0" onClick={() => setCsvDiffs(null)}>
                 Cancel
-              </button>
+              </Button>
             </div>
             <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-2.5">
               {csvDiffs.map((d) => (
@@ -640,18 +636,14 @@ export const StationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash 
               ))}
             </div>
             <div className="p-4 border-t border-adm-line flex justify-end gap-2 shrink-0">
-              <button onClick={() => setCsvDiffs(null)} className="text-xs px-4 py-1.5 rounded-lg bg-adm-muted hover:bg-adm-line">
+              <Button variant="outline" onClick={() => setCsvDiffs(null)}>
                 Cancel
-              </button>
-              <button
-                onClick={applyCsv}
-                disabled={applyingCsv || csvDiffs.every((d) => d.error || !d.current)}
-                className="text-xs px-4 py-1.5 rounded-lg bg-adm-foil text-adm-ink font-bold disabled:opacity-50"
-              >
+              </Button>
+              <Button onClick={applyCsv} disabled={applyingCsv || csvDiffs.every((d) => d.error || !d.current)}>
                 {applyingCsv
                   ? 'Applying…'
                   : `Apply ${csvDiffs.filter((d) => d.current && !d.error && Object.keys(d.changes).length > 0).length} change(s)`}
-              </button>
+              </Button>
             </div>
           </div>
         </ModalFrame>

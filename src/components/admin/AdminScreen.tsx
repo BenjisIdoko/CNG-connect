@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Flag, Fuel, LayoutDashboard, MapPinned, MapPinPlus, Phone, Users } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useSupabaseClient } from '../../hooks/useSupabaseClient';
 import { AdminAuthGate } from './AdminAuthGate';
 import { AdminSidebarLayout, AdminNavItem } from './AdminSidebarLayout';
 import { OverviewPanel } from './OverviewPanel';
-import type { ThreadCounts } from '../../utils/adminThread';
 import { StationsPanel } from './StationsPanel';
 import { ReportsPanel } from './ReportsPanel';
 import { UsersPanel } from './UsersPanel';
@@ -40,8 +39,9 @@ export const AdminScreen: React.FC<{ onExit: () => void }> = ({ onExit }) => {
   const isAdmin = Boolean(driverProfile.isAdmin);
   // How many driver suggestions are waiting; shown as a badge on the "Suggestions" tab.
   const [pendingSuggestions, setPendingSuggestions] = useState(0);
-  // Counts the Overview found, so the sidebar can badge flagged reports and pin reviews too.
-  const [queueCounts, setQueueCounts] = useState<ThreadCounts | null>(null);
+  // Flagged reports and pin reviews waiting, for the sidebar badges; recounted after every action.
+  const [queueCounts, setQueueCounts] = useState<{ flagged: number; pin: number } | null>(null);
+  const [recount, setRecount] = useState(0);
   const navItems = ADMIN_NAV.map((n) =>
     n.key === 'suggestions'
       ? { ...n, badge: pendingSuggestions }
@@ -69,7 +69,33 @@ export const AdminScreen: React.FC<{ onExit: () => void }> = ({ onExit }) => {
       cancelled = true;
     };
   }, [isAdmin, supabase]);
-  const { flash, toast } = useAdminToast();
+  const { flash: showToast, toast } = useAdminToast();
+  // Every panel announces its actions through flash, so a flash is also the cue to recount the badges.
+  // Kept stable (useCallback): some panels reload whenever the identity of `flash` changes.
+  const flash = useCallback(
+    (m: string) => {
+      showToast(m);
+      setRecount((n) => n + 1);
+    },
+    [showToast],
+  );
+
+  // Recount flagged reports and pin reviews on arrival and after every action.
+  useEffect(() => {
+    if (!isAdmin || !supabase) return;
+    let cancelled = false;
+    (async () => {
+      const [flagged, pins] = await Promise.all([
+        supabase.rpc('admin_moderation_queue', { p_view: 'review' }),
+        supabase.from('stations').select('id', { count: 'exact', head: true }).eq('needs_pin_review', true),
+      ]);
+      if (cancelled || flagged.error || pins.error) return;
+      setQueueCounts({ flagged: (flagged.data || []).length, pin: pins.count ?? 0 });
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [isAdmin, supabase, recount]);
 
   return (
     <AdminAuthGate title="CNG-Connect Admin" onExit={onExit}>
@@ -94,7 +120,7 @@ export const AdminScreen: React.FC<{ onExit: () => void }> = ({ onExit }) => {
         onSignOut={signOut}
         onExit={onExit}
       >
-        {isAdmin && activeKey === 'overview' && <OverviewPanel onNavigate={setActiveKey} onCounts={setQueueCounts} />}
+        {isAdmin && activeKey === 'overview' && <OverviewPanel onNavigate={setActiveKey} />}
         {isAdmin && activeKey === 'stations' && <StationsPanel flash={flash} />}
         {isAdmin && activeKey === 'suggestions' && (
           <SuggestionsPanel flash={flash} onCountChange={setPendingSuggestions} />
