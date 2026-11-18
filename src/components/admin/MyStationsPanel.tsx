@@ -64,9 +64,14 @@ export const MyStationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flas
         {loadErr && <p className="text-sm text-rose-600 font-semibold">{loadErr}</p>}
         {!loading && !loadErr && stations.length === 0 && (
           <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 text-center text-sm text-slate-500">
-            No stations are assigned to you yet. Ask an admin to add your email ({driverProfile.email}) as a manager for
-            your station — or, if you're the app admin, run{' '}
-            <code className="text-xs">update profiles set is_admin = true where email = '…';</code> in Supabase.
+            No stations are assigned to you yet. Ask the app admin to add your email ({driverProfile.email}) as the
+            manager of your station.
+            {driverProfile.isAdmin && (
+              <>
+                {' '}
+                You're the app admin: your dashboard is at <a className="underline font-semibold" href="/admin">/admin</a>.
+              </>
+            )}
           </div>
         )}
         {stations.map((s) => (

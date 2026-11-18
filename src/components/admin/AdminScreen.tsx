@@ -6,7 +6,8 @@ import { AdminSidebarLayout, AdminNavItem } from './AdminSidebarLayout';
 import { StationsPanel } from './StationsPanel';
 import { ReportsPanel } from './ReportsPanel';
 import { UsersPanel } from './UsersPanel';
-import { MyStationsPanel } from './MyStationsPanel';
+import { NotForYou } from './NotForYou';
+import { MANAGER_PATH } from '../../utils/adminRoutes';
 import { SuggestionsPanel } from './SuggestionsPanel';
 import { AirtimePayouts } from '../AirtimePayouts';
 import { FEATURES } from '../../config/features';
@@ -16,30 +17,22 @@ const ADMIN_NAV: AdminNavItem[] = [
   { key: 'suggestions', label: 'Suggestions', icon: 'add_location_alt' },
   { key: 'reports', label: 'Report moderation', icon: 'flag' },
   { key: 'users', label: 'Users', icon: 'groups' },
-  // An admin who is also assigned to a station (they can assign themselves in the station editor)
-  // posts its selling status and pressure here, the same page a station manager gets.
-  { key: 'mystations', label: 'My stations', icon: 'local_gas_station' },
   ...(FEATURES.ENABLE_REFERRALS ? [{ key: 'payouts', label: 'Airtime payouts', icon: 'call' }] : []),
 ];
-const MANAGER_NAV: AdminNavItem[] = [{ key: 'mystations', label: 'My stations', icon: 'local_gas_station' }];
 
 /**
- * One dashboard for everyone with any admin-side access — previously three separate
- * hidden routes (?admin=1 pin editor, ?moderation=1 report queue + payouts, ?manager=1
- * station-manager editor), each with its own sign-in screen and full-screen layout.
- * A full admin (profiles.is_admin) gets Stations / Report moderation / Airtime payouts
- * in the sidebar; anyone else signed in gets just "My stations" — the same stations a
- * `station_managers` row assigns them, or an empty state if none.
+ * The super admin's dashboard (/admin): Stations, Suggestions, Report moderation, Users and the
+ * Station managers list. Only a profile with `is_admin` may use it; anyone else who signs in here
+ * (a station manager, say) is told it is not for them and pointed at /station-manager. The database
+ * enforces every action as well, so this screen is the front door, not the lock.
  */
 export const AdminScreen: React.FC<{ onExit: () => void }> = ({ onExit }) => {
-  const { driverProfile, signOut } = useAuth();
+  const { driverProfile, isProfileLoaded, signOut } = useAuth();
   const supabase = useSupabaseClient();
   const isAdmin = Boolean(driverProfile.isAdmin);
   // How many driver suggestions are waiting; shown as a badge on the "Suggestions" tab.
   const [pendingSuggestions, setPendingSuggestions] = useState(0);
-  const navItems = isAdmin
-    ? ADMIN_NAV.map((n) => (n.key === 'suggestions' ? { ...n, badge: pendingSuggestions } : n))
-    : MANAGER_NAV;
+  const navItems = ADMIN_NAV.map((n) => (n.key === 'suggestions' ? { ...n, badge: pendingSuggestions } : n));
 
   const [activeKey, setActiveKey] = useState(navItems[0].key);
 
@@ -58,12 +51,6 @@ export const AdminScreen: React.FC<{ onExit: () => void }> = ({ onExit }) => {
       cancelled = true;
     };
   }, [isAdmin, supabase]);
-  // The profile (and so `isAdmin`) can still be loading when this first renders; once it
-  // settles, make sure the selected tab is one this driver actually has in their sidebar.
-  useEffect(() => {
-    if (!navItems.some((n) => n.key === activeKey)) setActiveKey(navItems[0].key);
-  }, [isAdmin]);
-
   const [toast, setToast] = useState<string | null>(null);
   const flash = (m: string) => {
     setToast(m);
@@ -72,6 +59,20 @@ export const AdminScreen: React.FC<{ onExit: () => void }> = ({ onExit }) => {
 
   return (
     <AdminAuthGate title="CNG-Connect Admin" onExit={onExit}>
+      {!isProfileLoaded ? (
+        // The profile (and so `isAdmin`) is still being read: never show "no access" to an admin yet.
+        <div data-theme="light" className="fixed inset-0 z-[200] grid place-items-center bg-white text-sm text-slate-500">
+          Loading…
+        </div>
+      ) : !isAdmin ? (
+        <NotForYou
+          title="This page is for the app admin"
+          message="You're signed in, but this dashboard is only for the app admin. If you manage a station, your page is the station manager page."
+          linkLabel="Go to the station manager page"
+          linkHref={MANAGER_PATH}
+          onSignOut={signOut}
+        />
+      ) : (
       <AdminSidebarLayout
         brand="CNG-Connect"
         navItems={navItems}
@@ -94,8 +95,8 @@ export const AdminScreen: React.FC<{ onExit: () => void }> = ({ onExit }) => {
             </div>
           </div>
         )}
-        {activeKey === 'mystations' && <MyStationsPanel flash={flash} />}
       </AdminSidebarLayout>
+      )}
 
       {toast && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[210] bg-slate-900 text-white text-xs font-semibold px-4 py-2 rounded-full shadow-lg">
