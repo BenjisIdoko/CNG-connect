@@ -64,7 +64,7 @@ import { SuccessBurst } from './components/common/SuccessBurst';
 import { haptic } from './utils/haptics';
 import { track } from './services/analytics';
 import { takeDueFollowUp } from './utils/followUp';
-import { isAtStation, stationsToPing, PRESENCE_TTL_MINUTES } from './utils/geofencePresence';
+import { isAtStation, stationsToPing, PRESENCE_TTL_MINUTES, type PingPosition } from './utils/geofencePresence';
 import { clearQueueWatchFor, rememberQueueReport, takeDueLeftPrompt } from './utils/queueWatch';
 import { useBackLayer } from './utils/backLayer';
 import { Icon } from './components/common/Icon';
@@ -407,6 +407,36 @@ export const App: React.FC = () => {
     busy: !!proximityAlertStation || isReportModalOpen || authMode !== null || showSplash,
   };
   const lastPresencePingRef = useRef<Record<string, number>>({});
+  const lastFixRef = useRef<PingPosition | null>(null);
+
+  // Tells the database this driver is at any station their fix is inside (guests are never counted).
+  const pingPresenceFromFix = useCallback((fix: PingPosition, now: number) => {
+    const presence = presenceCtxRef.current;
+    if (!presence.isAuthenticated) return;
+    for (const stationId of stationsToPing(fix, presence.stations, lastPresencePingRef.current, now)) {
+      lastPresencePingRef.current[stationId] = now;
+      void apiService
+        .pingStationPresence(stationId, presence.userKey, PRESENCE_TTL_MINUTES)
+        .then((count) => {
+          // 0 means the count could not be read (the driver's own ping makes it at least 1).
+          if (count > 0) {
+            setStations((prev) => prev.map((st) => (st.id === stationId ? { ...st, activePresenceCount: count } : st)));
+          }
+        })
+        .catch(() => {});
+    }
+  }, []);
+
+  // A driver standing in a queue may get no new GPS callbacks (browsers stay quiet when the position
+  // does not change), and a presence record lapses after 6 minutes. While the app is on screen,
+  // keep announcing presence from the last fix so a car that is still there keeps counting.
+  useEffect(() => {
+    const timer = setInterval(() => {
+      if (document.visibilityState !== 'visible' || !lastFixRef.current) return;
+      pingPresenceFromFix(lastFixRef.current, Date.now());
+    }, 60_000);
+    return () => clearInterval(timer);
+  }, [pingPresenceFromFix]);
 
   useEffect(() => {
     if (!('geolocation' in navigator)) {
@@ -427,22 +457,11 @@ export const App: React.FC = () => {
 
       // Presence: tell the database this driver is at a station (guests are never counted).
       const presence = presenceCtxRef.current;
+      const now = Date.now();
+      const fix: PingPosition = { lat: latitude, lng: longitude, accuracy: pos.coords.accuracy };
+      lastFixRef.current = fix;
+      pingPresenceFromFix(fix, now);
       if (presence.isAuthenticated) {
-        const now = Date.now();
-        const fix = { lat: latitude, lng: longitude, accuracy: pos.coords.accuracy };
-        for (const stationId of stationsToPing(fix, presence.stations, lastPresencePingRef.current, now)) {
-          lastPresencePingRef.current[stationId] = now;
-          void apiService
-            .pingStationPresence(stationId, presence.userKey, PRESENCE_TTL_MINUTES)
-            .then((count) => {
-              // 0 means the count could not be read (the driver's own ping makes it at least 1).
-              if (count > 0) {
-                setStations((prev) => prev.map((st) => (st.id === stationId ? { ...st, activePresenceCount: count } : st)));
-              }
-            })
-            .catch(() => {});
-        }
-
         // The driver who reported a queue has moved away from that station: ask once if it is still there.
         if (!presence.busy) {
           const due = takeDueLeftPrompt(fix, now);
