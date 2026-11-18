@@ -5,8 +5,11 @@ interface ProximityAlertBannerProps {
   station: GasStation;
   /** Return false to signal the report was NOT sent (e.g. driver not signed in). */
   onQuickSubmitReport?: (station: GasStation, newReport: DriverReport, newStatus: StationStatus) => boolean | void;
-  /** 'arrival' = geofence says you're here; 'followup' = you tapped Directions earlier. */
-  variant?: 'arrival' | 'followup';
+  /**
+   * 'arrival' = geofence says you're here; 'followup' = you tapped Directions earlier;
+   * 'left' = you reported a queue here and have now moved away.
+   */
+  variant?: 'arrival' | 'followup' | 'left';
   onShareStatus: (station: GasStation) => void;
   onDismiss: () => void;
 }
@@ -65,11 +68,18 @@ export const ProximityAlertBanner: React.FC<ProximityAlertBannerProps> = ({
 
   // 'out' uses a neutral grey circle, not the alarming red the full Report flow uses elsewhere —
   // per design_handoff_cng_connect 9, this quick nudge is deliberately "lighter-weight."
-  const options: { key: StationStatus; label: string; icon: string; dot: string }[] = [
-    { key: 'full', label: 'Full Stock (Fast)', icon: 'check', dot: 'bg-rd-available' },
-    { key: 'queue', label: 'Queuing (<15m)', icon: 'schedule', dot: 'bg-rd-queuing' },
-    { key: 'out', label: 'Out of Gas', icon: 'close', dot: 'bg-outline' },
-  ];
+  const options: { key: StationStatus; label: string; icon: string; dot: string }[] =
+    variant === 'left'
+      ? [
+          { key: 'full', label: 'Queue cleared', icon: 'check', dot: 'bg-rd-available' },
+          { key: 'queue', label: 'Still queuing', icon: 'schedule', dot: 'bg-rd-queuing' },
+          { key: 'out', label: 'Out of gas', icon: 'close', dot: 'bg-outline' },
+        ]
+      : [
+          { key: 'full', label: 'Full Stock (Fast)', icon: 'check', dot: 'bg-rd-available' },
+          { key: 'queue', label: 'Queuing (<15m)', icon: 'schedule', dot: 'bg-rd-queuing' },
+          { key: 'out', label: 'Out of Gas', icon: 'close', dot: 'bg-outline' },
+        ];
 
   return (
     //: same reasoning as the other rebuilt screens — the handoff has no
@@ -81,12 +91,18 @@ export const ProximityAlertBanner: React.FC<ProximityAlertBannerProps> = ({
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <h2 className="font-geist text-[1.0625rem] font-extrabold text-rd-fg leading-snug">
-              {variant === 'followup' ? `Did you fill up at ${station.name}?` : `Arrived near ${station.name}`}
+              {variant === 'left'
+                ? `Left ${station.name}?`
+                : variant === 'followup'
+                ? `Did you fill up at ${station.name}?`
+                : `Arrived near ${station.name}`}
             </h2>
             <div className="flex items-center gap-1.5 mt-1.5">
               <span className="w-2 h-2 rounded-full bg-rd-available animate-pulse" />
               <span className="text-caption font-semibold text-primary">
-                {variant === 'followup'
+                {variant === 'left'
+                  ? 'Is the queue still there?'
+                  : variant === 'followup'
                   ? 'One tap tells the drivers behind you'
                   : station.activePresenceCount
                   ? `${station.activePresenceCount} drivers here — share what you see`
@@ -121,16 +137,18 @@ export const ProximityAlertBanner: React.FC<ProximityAlertBannerProps> = ({
             </div>
 
             <div className="h-px bg-surface-container-highest mt-4" />
-            <div className="flex items-center justify-between mt-3.5">
-              <button
-                onClick={() => onShareStatus(station)}
-                className="text-caption font-bold text-primary flex items-center gap-1.5"
-              >
-                Add a photo &amp; more detail
-                <span aria-hidden="true" className="material-symbols-outlined text-[16px]">arrow_forward</span>
-              </button>
+            <div className={`flex items-center mt-3.5 ${variant === 'left' ? 'justify-end' : 'justify-between'}`}>
+              {variant !== 'left' && (
+                <button
+                  onClick={() => onShareStatus(station)}
+                  className="text-caption font-bold text-primary flex items-center gap-1.5"
+                >
+                  Add a photo &amp; more detail
+                  <span aria-hidden="true" className="material-symbols-outlined text-[16px]">arrow_forward</span>
+                </button>
+              )}
               <button onClick={onDismiss} className="text-caption font-semibold text-rd-text-tertiary">
-                Not now
+                {variant === 'left' ? 'Not sure' : 'Not now'}
               </button>
             </div>
           </>
@@ -140,7 +158,7 @@ export const ProximityAlertBanner: React.FC<ProximityAlertBannerProps> = ({
               <span aria-hidden="true" className="material-symbols-outlined text-[26px]">check_circle</span>
             </div>
             <p className="font-geist font-extrabold text-body-lg text-rd-fg">Thanks for the update!</p>
-            <p className="text-caption text-primary font-bold">+50 reputation points earned</p>
+            {variant !== 'left' && <p className="text-caption text-primary font-bold">+50 reputation points earned</p>}
           </div>
         )}
       </div>

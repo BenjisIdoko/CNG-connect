@@ -65,6 +65,7 @@ import { haptic } from './utils/haptics';
 import { track } from './services/analytics';
 import { takeDueFollowUp } from './utils/followUp';
 import { isAtStation, stationsToPing, PRESENCE_TTL_MINUTES } from './utils/geofencePresence';
+import { clearQueueWatchFor, rememberQueueReport, takeDueLeftPrompt } from './utils/queueWatch';
 import { useBackLayer } from './utils/backLayer';
 import { Icon } from './components/common/Icon';
 
@@ -115,7 +116,7 @@ export const App: React.FC = () => {
   const [isRoiModalOpen, setIsRoiModalOpen] = useState(false);
   const [unlockedTierModal, setUnlockedTierModal] = useState<DriverTier | null>(null);
   const [proximityAlertStation, setProximityAlertStation] = useState<GasStation | null>(null);
-  const [proximityVariant, setProximityVariant] = useState<'arrival' | 'followup'>('arrival');
+  const [proximityVariant, setProximityVariant] = useState<'arrival' | 'followup' | 'left'>('arrival');
   const [globalToast, setGlobalToast] = useState<{ msg: string; tone?: ToastTone } | null>(null);
   const [gpsStatus, setGpsStatus] = useState<GpsStatus>('unavailable');
 
@@ -397,11 +398,13 @@ export const App: React.FC = () => {
   // handler below refreshes that presence automatically (at most every 2 minutes per station), so
   // the queue status can tell whether anyone is actually at the station. Read through a ref because
   // the GPS watch is created once per profile and must see the latest stations and sign-in state.
-  const presenceCtxRef = useRef({ stations, isAuthenticated, userKey: '' });
+  const presenceCtxRef = useRef({ stations, isAuthenticated, userKey: '', busy: false });
   presenceCtxRef.current = {
     stations,
     isAuthenticated,
     userKey: userProfile.email || userProfile.phone || 'default_driver',
+    // Another prompt or screen is already in front of the driver.
+    busy: !!proximityAlertStation || isReportModalOpen || authMode !== null || showSplash,
   };
   const lastPresencePingRef = useRef<Record<string, number>>({});
 
@@ -438,6 +441,17 @@ export const App: React.FC = () => {
               }
             })
             .catch(() => {});
+        }
+
+        // The driver who reported a queue has moved away from that station: ask once if it is still there.
+        if (!presence.busy) {
+          const due = takeDueLeftPrompt(fix, now);
+          const dueStation = due ? presence.stations.find((st) => st.id === due.stationId) : undefined;
+          if (dueStation) {
+            setProximityVariant('left');
+            track('queue_left_prompt_shown', { station_id: dueStation.id });
+            setProximityAlertStation(dueStation);
+          }
         }
       }
 
@@ -649,9 +663,15 @@ export const App: React.FC = () => {
     station: GasStation,
     newReport: DriverReport,
     newStatus: StationStatus,
-    source: 'form' | 'arrival' | 'followup' = 'form'
+    source: 'form' | 'arrival' | 'followup' | 'left' = 'form'
   ) => {
     track('report_submitted', { status: newStatus, has_photo: Boolean(newReport.photo), source, station_id: station.id });
+
+    // Remember a fresh queue report so we can ask if it is still there once the driver leaves. An
+    // answer from that very question never starts a new watch (it would ask again at once).
+    if (newStatus === 'queue' && source !== 'left') rememberQueueReport(station);
+    else clearQueueWatchFor(station.id);
+    if (source === 'left') track('queue_left_answer', { station_id: station.id, answer: newStatus });
 
     // The arrival/follow-up sheet shows its own confirmation.
     if (source === 'form') setBurst({ status: newStatus, key: Date.now() });
@@ -677,6 +697,12 @@ export const App: React.FC = () => {
       newStatus,
       userProfile.state || 'Abuja FCT'
     );
+
+    // Answers to "is the queue still there?" are not worth points (so the question cannot be farmed).
+    if (source === 'left') {
+      showToast('Thanks, station updated.');
+      return;
+    }
 
     const oldPoints = userProfile.communityPoints || 0;
     const oldTier = getDriverTier(oldPoints).currentTier;
