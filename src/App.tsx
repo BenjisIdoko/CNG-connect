@@ -64,7 +64,7 @@ import { SuccessBurst } from './components/common/SuccessBurst';
 import { haptic } from './utils/haptics';
 import { track } from './services/analytics';
 import { takeDueFollowUp } from './utils/followUp';
-import { isAtStation, stationsToPing, PRESENCE_TTL_MINUTES, type PingPosition } from './utils/geofencePresence';
+import { isAtStation, stationsToPing, PRESENCE_TTL_MINUTES, REPORT_GEOFENCE_METERS, type PingPosition } from './utils/geofencePresence';
 import { reportProofProblem } from './utils/reportProof';
 import { useBackLayer } from './utils/backLayer';
 import { Icon } from './components/common/Icon';
@@ -490,7 +490,8 @@ export const App: React.FC = () => {
         if (st.lat == null || st.lng == null) return false;
 
         const distKm = getDistanceInKm(latitude, longitude, st.lat, st.lng);
-        if (distKm > 0.8) return false;
+        // Same 150 m as the report sheet this prompt leads to, so "arrived" means a report is possible.
+        if (distKm * 1000 > REPORT_GEOFENCE_METERS) return false;
 
         if (!isStationStale(st.lastUpdated, 30)) return false;
         if (isStationOnCooldown(userKey, st.id, 2)) return false;

@@ -307,7 +307,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
           <div className="rounded-2xl bg-rd-available-container px-4 py-3 flex items-center gap-3">
             <span aria-hidden="true" className="material-symbols-outlined text-rd-on-available-container text-[20px] shrink-0">bolt</span>
             <p className="flex-1 text-caption font-semibold text-rd-on-available-container">
-              Your first station report is worth +50 pts. It's the fastest way to Verified Reporter.
+              Your first station report is worth +100 pts. It's the fastest way to Verified Reporter.
             </p>
           </div>
         )}

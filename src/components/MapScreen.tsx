@@ -917,7 +917,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
             <span className="flex-1 min-w-0 inline-flex items-center gap-1.5 rounded-full bg-rd-ink-2 text-white/90 text-micro font-semibold pl-3 pr-2 py-2 truncate">
               <span aria-hidden="true" className="material-symbols-outlined text-[15px] shrink-0">campaign</span>
               <span className="truncate">Report it at the pump</span>
-              <span className="ml-auto shrink-0 text-micro font-bold text-white/60">+50</span>
+              <span className="ml-auto shrink-0 text-micro font-bold text-white/60">+100</span>
             </span>
           )}
           <button
@@ -971,7 +971,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
   };
 
   // The cold-start moment: most stations have no recent report. Just offer the nearest candidate;
-  // only a driver standing at the pump (within 800 m) can file one.
+  // only a driver standing at the pump (within 150 m) can file one.
   const renderFirstReportCard = (station: GasStation, _count: number, asHero: boolean) => (
     <button
       type="button"

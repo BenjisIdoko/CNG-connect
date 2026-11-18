@@ -409,7 +409,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                     <p className="flex-1 text-caption font-semibold text-rd-on-available-container">
                       {isStale ? 'At the station? Tell drivers how it is now.' : 'At the station? Be the first to report today.'}
                     </p>
-                    <span className="shrink-0 text-[0.75rem] font-bold text-rd-on-available-container">+50 pts</span>
+                    <span className="shrink-0 text-[0.75rem] font-bold text-rd-on-available-container">+100 pts</span>
                   </div>
                 )}
               </div>
