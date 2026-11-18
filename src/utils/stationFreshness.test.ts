@@ -3,7 +3,7 @@ import { GasStation, DriverReport, StationStatus } from '../types';
 import {
   getFreshness, describeStatus, formatAgeShort, parseAgeMinutes, freshnessRank, currentStatus,
   usabilityCost, rankByUsefulness, pickBestStation, pinEmphasis, normalizeStatus,
-  QUEUE_GRACE_MINUTES, QUEUE_MAX_MINUTES, isReportVisible, visibleReports,
+  QUEUE_GRACE_MINUTES, REPORT_LIFETIME_MINUTES, isReportVisible, visibleReports, newestVisibleReport,
 } from './stationFreshness';
 
 const NOW = Date.parse('2026-10-12T12:00:00.000Z');
@@ -32,22 +32,20 @@ const station = (over: Partial<GasStation> = {}): GasStation =>
   }) as GasStation;
 
 describe('getFreshness tiers', () => {
-  it('fresh within the hour, recent within the day, nothing after (a report over 24 h old is not shown at all)', () => {
+  it('fresh for 45 minutes, nothing after (a report over 45 min old is not shown at all)', () => {
     expect(getFreshness(station({ status: 'full', reports: [report('full', minsAgo(5))] }), NOW).tier).toBe('fresh');
-    expect(getFreshness(station({ status: 'full', reports: [report('full', minsAgo(60))] }), NOW).tier).toBe('fresh');
-    expect(getFreshness(station({ status: 'full', reports: [report('full', minsAgo(61))] }), NOW).tier).toBe('recent');
-    expect(getFreshness(station({ status: 'full', reports: [report('full', minsAgo(24 * 60))] }), NOW).tier).toBe('recent');
-    expect(getFreshness(station({ status: 'full', reports: [report('full', minsAgo(24 * 60 + 1))] }), NOW).tier).toBe('none');
+    expect(getFreshness(station({ status: 'full', reports: [report('full', minsAgo(45))] }), NOW).tier).toBe('fresh');
+    expect(getFreshness(station({ status: 'full', reports: [report('full', minsAgo(46))] }), NOW).tier).toBe('none');
   });
 
-  it('keeps the last known status for an expired queue, but not once it is over 24 h old', () => {
-    // A queue between 30 minutes and 24 hours with nobody there is last-known (grey)...
-    const expired = getFreshness(station({ status: 'queue', reports: [report('queue', minsAgo(5 * 60))] }), NOW);
+  it('keeps the last known status for an expired queue, but not once it is over 45 min old', () => {
+    // A queue between 30 and 45 minutes with nobody there is last-known (grey)...
+    const expired = getFreshness(station({ status: 'queue', reports: [report('queue', minsAgo(35))] }), NOW);
     expect(expired.tier).toBe('stale');
     expect(expired.lastKnownStatus).toBe('queue');
-    expect(expired.ageText).toBe('5 hr ago');
-    // ...and after 24 hours nothing is shown at all.
-    const old = getFreshness(station({ status: 'queue', reports: [report('queue', minsAgo(3 * 24 * 60))] }), NOW);
+    expect(expired.ageText).toBe('35 min ago');
+    // ...and after 45 minutes nothing is shown at all.
+    const old = getFreshness(station({ status: 'queue', reports: [report('queue', minsAgo(50))] }), NOW);
     expect(old.tier).toBe('none');
     expect(old.lastKnownStatus).toBeNull();
     expect(old.ageText).toBeNull();
@@ -118,31 +116,31 @@ describe('copy helpers', () => {
 
   it('describes status honestly by age', () => {
     expect(describeStatus(station({ status: 'full', reports: [report('full', minsAgo(12))] }), NOW)).toBe('Available · 12 min ago');
-    // Over 24 hours old: nothing is shown, not even a "Last: ..." line.
+    // Over 45 minutes old: nothing is shown, not even a "Last: ..." line.
     expect(describeStatus(station({ status: 'out', reports: [report('out', minsAgo(2 * 1440))] }), NOW)).toBe('No report yet');
     expect(describeStatus(station(), NOW)).toBe('No report yet');
   });
 
   it('ranks freshest first and never-reported last', () => {
     const a = station({ status: 'full', reports: [report('full', minsAgo(5))] });
-    const b = station({ status: 'full', reports: [report('full', minsAgo(500))] });
+    const b = station({ status: 'full', reports: [report('full', minsAgo(30))] });
     const c = station();
     expect([c, b, a].sort((x, y) => freshnessRank(x, NOW) - freshnessRank(y, NOW))).toEqual([a, b, c]);
   });
 
-  it('moves a report through the tiers as the clock advances (what the one-minute tick relies on)', () => {
-    const s = station({ status: 'full', reports: [report('full', minsAgo(55))] });
+  it('moves a report through its life as the clock advances (what the one-minute tick relies on)', () => {
+    const s = station({ status: 'full', reports: [report('full', minsAgo(25))] });
     expect(getFreshness(s, NOW).tier).toBe('fresh');
-    expect(describeStatus(s, NOW)).toBe('Available · 55 min ago');
-    expect(getFreshness(s, NOW + 6 * 60000).tier).toBe('recent');
-    expect(describeStatus(s, NOW + 6 * 60000)).toBe('Available · 1 hr ago');
-    // A day later the report is over 24 hours old, so nothing is shown.
-    expect(getFreshness(s, NOW + 24 * 3600000).tier).toBe('none');
-    expect(currentStatus(s, NOW + 24 * 3600000)).toBe('unknown');
+    expect(describeStatus(s, NOW)).toBe('Available · 25 min ago');
+    expect(describeStatus(s, NOW + 10 * 60000)).toBe('Available · 35 min ago');
+    // 21 minutes later the report is 46 minutes old, so nothing is shown.
+    expect(getFreshness(s, NOW + 21 * 60000).tier).toBe('none');
+    expect(currentStatus(s, NOW + 21 * 60000)).toBe('unknown');
   });
 
-  it('only counts a report under 24h old as the current status', () => {
-    expect(currentStatus(station({ status: 'full', reports: [report('full', minsAgo(120))] }), NOW)).toBe('full');
+  it('only counts a report under 45 minutes old as the current status', () => {
+    expect(currentStatus(station({ status: 'full', reports: [report('full', minsAgo(30))] }), NOW)).toBe('full');
+    expect(currentStatus(station({ status: 'full', reports: [report('full', minsAgo(120))] }), NOW)).toBe('unknown');
     expect(currentStatus(station({ status: 'full', reports: [report('full', minsAgo(3 * 1440))] }), NOW)).toBe('unknown');
     expect(currentStatus(station(), NOW)).toBe('unknown');
   });
@@ -159,10 +157,10 @@ describe('which station to go to', () => {
     expect(usabilityCost(live('a', 'out', 5), 1, NOW)).toBe(Number.POSITIVE_INFINITY);
   });
 
-  it('prices a queue and an older report in kilometres', () => {
+  it('prices a queue in kilometres, and has no answer for a report over 45 minutes old', () => {
     expect(usabilityCost(live('a', 'full', 5), 2, NOW)).toBe(2);
     expect(usabilityCost(live('a', 'queue', 5), 2, NOW)).toBe(7);
-    expect(usabilityCost(live('a', 'full', 120), 2, NOW)).toBe(5);
+    expect(usabilityCost(live('a', 'full', 120), 2, NOW)).toBe(Number.POSITIVE_INFINITY);
   });
 
   it('prefers a farther available station over a nearby queue, and a close one over a far one', () => {
@@ -205,58 +203,68 @@ describe('pin emphasis', () => {
   });
 });
 
-describe('queue statuses follow cars at the station', () => {
+describe('a report lasts 45 minutes', () => {
   const queued = (ageMin: number, cars = 0) =>
     station({ id: 'q', name: 'q', status: 'queue', activePresenceCount: cars, reports: [report('queue', minsAgo(ageMin))] });
   const km = (table: Record<string, number>) => (s: GasStation) => table[s.id] ?? null;
 
-  it('uses a 30 minute grace and a 3 hour limit', () => {
+  it('lasts 45 minutes, with a 30 minute grace for a queue', () => {
+    expect(REPORT_LIFETIME_MINUTES).toBe(45);
     expect(QUEUE_GRACE_MINUTES).toBe(30);
-    expect(QUEUE_MAX_MINUTES).toBe(180);
   });
 
-  it('a queue report is current at 29 minutes with nobody there', () => {
-    const s = queued(29, 0);
-    expect(getFreshness(s, NOW).tier).toBe('fresh');
-    expect(currentStatus(s, NOW)).toBe('queue');
+  it('a report 44 min old still counts, one 46 min old gives tier "none" and no last-known status', () => {
+    const young = station({ status: 'full', reports: [report('full', minsAgo(44))] });
+    expect(getFreshness(young, NOW).tier).toBe('fresh');
+    expect(currentStatus(young, NOW)).toBe('full');
+
+    const old = station({ status: 'full', reports: [report('full', minsAgo(46))] });
+    const f = getFreshness(old, NOW);
+    expect(f.tier).toBe('none');
+    expect(f.lastKnownStatus).toBeNull();
+    expect(currentStatus(old, NOW)).toBe('unknown');
   });
 
-  it('a queue report is still current at exactly 30 minutes', () => {
+  it('a report exactly 45 minutes old still counts', () => {
+    expect(currentStatus(station({ status: 'full', reports: [report('full', minsAgo(45))] }), NOW)).toBe('full');
+  });
+
+  it('Available and Out of gas last the full 45 minutes with nobody there', () => {
+    for (const status of ['full', 'out'] as StationStatus[]) {
+      const s = station({ status, activePresenceCount: 0, reports: [report(status, minsAgo(44))] });
+      expect(getFreshness(s, NOW).tier).toBe('fresh');
+      expect(currentStatus(s, NOW)).toBe(status);
+    }
+  });
+
+  it('a station last reported an hour ago reads "No report yet" with no age', () => {
+    const s = station({ status: 'full', reports: [report('full', minsAgo(60))] });
+    expect(describeStatus(s, NOW)).toBe('No report yet');
+    expect(getFreshness(s, NOW).ageText).toBeNull();
+  });
+
+  it('a queue is current up to 30 minutes with nobody there, and last-known from 31 to 45 minutes', () => {
+    expect(currentStatus(queued(29, 0), NOW)).toBe('queue');
     expect(currentStatus(queued(30, 0), NOW)).toBe('queue');
-  });
-
-  it('a queue report is last-known at 31 minutes with nobody there', () => {
     const s = queued(31, 0);
     expect(getFreshness(s, NOW).tier).toBe('stale');
     expect(currentStatus(s, NOW)).toBe('unknown');
     expect(describeStatus(s, NOW)).toBe('Last: Queuing · 31 min ago');
   });
 
-  it('a queue report between 30 and 60 minutes stays fresh while a car is there', () => {
-    expect(getFreshness(queued(45, 1), NOW).tier).toBe('fresh');
+  it('a queue stays current from 31 to 45 minutes while a car is there', () => {
+    expect(getFreshness(queued(31, 1), NOW).tier).toBe('fresh');
+    expect(currentStatus(queued(45, 1), NOW)).toBe('queue');
   });
 
-  it('a queue report at 2 hours stays current while a car is there', () => {
-    const s = queued(120, 1);
-    expect(getFreshness(s, NOW).tier).toBe('recent');
-    expect(currentStatus(s, NOW)).toBe('queue');
-  });
-
-  it('a queue report at 181 minutes is last-known even with cars there', () => {
-    const s = queued(181, 3);
-    expect(getFreshness(s, NOW).tier).toBe('stale');
+  it('a queue is gone after 45 minutes even with cars there', () => {
+    const s = queued(46, 3);
+    expect(getFreshness(s, NOW).tier).toBe('none');
     expect(currentStatus(s, NOW)).toBe('unknown');
+    expect(describeStatus(s, NOW)).toBe('No report yet');
   });
 
-  it('Available and Out of gas keep their 24 hour window with nobody there', () => {
-    for (const status of ['full', 'out'] as StationStatus[]) {
-      const s = station({ status, activePresenceCount: 0, reports: [report(status, minsAgo(300))] });
-      expect(getFreshness(s, NOW).tier).toBe('recent');
-      expect(currentStatus(s, NOW)).toBe(status);
-    }
-  });
-
-  it('a newer Available report replaces an old queue whatever the car count', () => {
+  it('a newer report replaces an older one whatever the car count', () => {
     const s = station({
       status: 'full',
       activePresenceCount: 0,
@@ -270,56 +278,57 @@ describe('queue statuses follow cars at the station', () => {
     expect(usabilityCost(queued(40, 1), 2, NOW)).toBe(7);
   });
 
-  it('pickBestStation skips a last-known queue', () => {
-    const a = { ...queued(120, 0), id: 'a', name: 'a' } as GasStation;
-    const b = station({ id: 'b', name: 'b', status: 'full', reports: [report('full', minsAgo(180))] });
-    expect(pickBestStation([a, b], km({ a: 1, b: 20 }), NOW)?.id).toBe('b');
-  });
-});
-
-describe('nothing is shown after 24 hours', () => {
-  it('a report 23 h 59 min old still counts, one 24 h 01 min old gives tier "none" and no last-known status', () => {
-    const young = station({ status: 'full', reports: [report('full', minsAgo(24 * 60 - 1))] });
-    expect(getFreshness(young, NOW).tier).toBe('recent');
-    expect(currentStatus(young, NOW)).toBe('full');
-
-    const old = station({ status: 'full', reports: [report('full', minsAgo(24 * 60 + 1))] });
-    const f = getFreshness(old, NOW);
-    expect(f.tier).toBe('none');
-    expect(f.lastKnownStatus).toBeNull();
-    expect(currentStatus(old, NOW)).toBe('unknown');
+  it('pickBestStation skips a last-known queue and a report over 45 minutes old', () => {
+    const a = { ...queued(35, 0), id: 'a', name: 'a' } as GasStation;
+    const b = station({ id: 'b', name: 'b', status: 'full', reports: [report('full', minsAgo(40))] });
+    const c = station({ id: 'c', name: 'c', status: 'full', reports: [report('full', minsAgo(50))] });
+    expect(pickBestStation([a, b, c], km({ a: 1, b: 20, c: 1 }), NOW)?.id).toBe('b');
   });
 
-  it('a station last reported 3 days ago reads "No report yet" with no age', () => {
-    const s = station({ status: 'full', reports: [report('full', minsAgo(3 * 1440))] });
-    expect(describeStatus(s, NOW)).toBe('No report yet');
-    expect(getFreshness(s, NOW).ageText).toBeNull();
-  });
-
-  it('an expired queue shows grey "Last: Queuing" at 5 hours and nothing at 24 h 01 min', () => {
-    const at = (mins: number) => station({ status: 'queue', activePresenceCount: 0, reports: [report('queue', minsAgo(mins))] });
-    expect(describeStatus(at(300), NOW)).toBe('Last: Queuing · 5 hr ago');
-    expect(describeStatus(at(24 * 60 + 1), NOW)).toBe('No report yet');
-  });
-
-  it('a station-level stamp over 24 h old (no report rows) is not shown either', () => {
-    const s = station({ status: 'full', lastUpdated: minsAgo(3 * 1440), reports: [] });
+  it('a station-level stamp over 45 minutes old (no report rows) is not shown either', () => {
+    const s = station({ status: 'full', lastUpdated: minsAgo(120), reports: [] });
     expect(getFreshness(s, NOW).tier).toBe('none');
   });
 
-  it('isReportVisible is true just under 24 h and for "just now", false just over 24 h and for an unreadable timestamp', () => {
-    expect(isReportVisible({ timestamp: minsAgo(24 * 60 - 1) }, NOW)).toBe(true);
+  it('isReportVisible is true at 44 minutes and for "just now", false at 46 minutes and for an unreadable timestamp', () => {
+    expect(isReportVisible({ timestamp: minsAgo(44) }, NOW)).toBe(true);
     expect(isReportVisible({ timestamp: 'Just now' }, NOW)).toBe(true);
-    expect(isReportVisible({ timestamp: minsAgo(24 * 60 + 1) }, NOW)).toBe(false);
+    expect(isReportVisible({ timestamp: minsAgo(46) }, NOW)).toBe(false);
     expect(isReportVisible({ timestamp: 'garbage' }, NOW)).toBe(false);
     expect(isReportVisible({ timestamp: '' }, NOW)).toBe(false);
   });
 
   it('visibleReports keeps the order and drops old and unreadable reports', () => {
     const a = report('full', minsAgo(10));
-    const b = report('queue', minsAgo(24 * 60 + 5));
-    const c = report('out', minsAgo(300));
+    const b = report('queue', minsAgo(50));
+    const c = report('out', minsAgo(40));
     const d = report('full', 'garbage');
     expect(visibleReports([a, b, c, d], NOW)).toEqual([a, c]);
+  });
+});
+
+describe('only the newest report is shown', () => {
+  it('returns the newest visible report whatever the order of the list', () => {
+    const older = report('queue', minsAgo(30));
+    const newest = report('full', minsAgo(5));
+    const middle = report('out', minsAgo(12));
+    expect(newestVisibleReport([older, newest, middle], NOW)).toBe(newest);
+    expect(newestVisibleReport([newest, middle, older], NOW)).toBe(newest);
+  });
+
+  it('is replaced as soon as a newer report arrives', () => {
+    const first = report('queue', minsAgo(20));
+    expect(newestVisibleReport([first], NOW)).toBe(first);
+    const second = report('full', minsAgo(1));
+    expect(newestVisibleReport([second, first], NOW)).toBe(second);
+  });
+
+  it('ignores reports over 45 minutes old and unreadable ones, and returns null when none is left', () => {
+    const old = report('full', minsAgo(50));
+    const bad = report('queue', 'garbage');
+    expect(newestVisibleReport([old, bad], NOW)).toBeNull();
+    expect(newestVisibleReport([], NOW)).toBeNull();
+    const young = report('out', minsAgo(44));
+    expect(newestVisibleReport([old, bad, young], NOW)).toBe(young);
   });
 });

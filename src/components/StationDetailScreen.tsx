@@ -7,7 +7,7 @@ import { ASSETS } from '../data/mockData';
 import { openExternalMaps } from '../utils/navigationHelper';
 import { StationGroupInfoSheet } from './StationGroupInfoSheet';
 import { formatRelativeTime, isIsoTimestamp, minutesSince } from '../utils/timeUtils';
-import { getFreshness, currentStatus, describeStatus, visibleReports, STATUS_SHORT_LABEL, formatAgeShort } from '../utils/stationFreshness';
+import { getFreshness, currentStatus, describeStatus, newestVisibleReport, STATUS_SHORT_LABEL, formatAgeShort } from '../utils/stationFreshness';
 import { latestReportedPrice } from '../utils/stationPrice';
 import { useNow } from '../hooks/useNow';
 import { openWhatsAppShare } from '../utils/shareMessageBuilder';
@@ -181,8 +181,10 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
     const mm = String(d.getMinutes()).padStart(2, '0');
     return `${day} ${month} ${d.getFullYear()} · ${hh}:${mm} WAT`;
   };
-  // Only the last 24 hours of reports are listed; older ones are gone from every screen.
-  const listedReports = visibleReports(reports, now);
+  // A station shows one report: the newest, while it is under 45 minutes old. A newer report replaces it;
+  // older ones stay stored but are never listed.
+  const newestReport = newestVisibleReport(reports, now);
+  const listedReports = newestReport ? [newestReport] : [];
   const presenceCount = station.activePresenceCount || 0;
   const presenceLabel = describePresence(presenceCount, currentStatus(station, now));
 
@@ -358,7 +360,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
             this pass doesn't add; see the age line used elsewhere in the app instead. */}
         {station.stationType !== 'ev_charging' &&
           (() => {
-            // Only a report from the last 24h counts as the station's current status; anything
+            // Only a report from the last 45 minutes counts as the station's current status; anything
             // older is shown as "last known" so a days-old green tick can't pass as live.
             const freshness = getFreshness(station, now);
             const isLive = freshness.tier === 'fresh' || freshness.tier === 'recent';
@@ -376,7 +378,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                         ? getFormattedStatusPillText(station)
                         : isStale
                         ? `Last reported: ${STATUS_SHORT_LABEL[freshness.lastKnownStatus!]}`
-                        : 'No report today'}
+                        : 'No report in the last 45 min'}
                     </p>
                     <p className="text-caption text-rd-text-tertiary mt-0.5">
                       {isLive
@@ -522,7 +524,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
           <TabsPrimitive.Content value="reports" className="mt-4 outline-none">
             {listedReports.length === 0 ? (
               <p className="text-caption text-outline py-6 text-center">
-                No reports in the last 24 hours. Be the first to report stock &amp; queue.
+                No report in the last 45 minutes. Be the first to report stock &amp; queue.
               </p>
             ) : (
               <div className="flex flex-col gap-4">

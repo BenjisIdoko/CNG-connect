@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
  * The current time, refreshed every minute and whenever the tab becomes visible again.
  *
  * Station freshness is computed from "now", so without a tick a chip reading
- * "Available · 55 min ago" would never become "Available · 1 hr ago" (or turn grey at 24h)
+ * "Available · 55 min ago" would never become "Available · 1 hr ago" (or vanish at 45 min)
  * until something unrelated re-rendered the screen. Pass the returned value into
  * `getFreshness` / `describeStatus` / `currentStatus` and list it in memo/effect dependencies.
  */

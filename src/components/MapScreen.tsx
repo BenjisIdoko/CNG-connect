@@ -431,7 +431,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
   const nearestStation = nearestTop5Stations[0] || selectedStation || stations[0];
 
   // Answer-first ordering for the phone sheet: stations a driver can act on come first, then
-  // those with no report in the last 24h. Distance only counts once we know where the driver is.
+  // those with no report in the last 45 minutes. Distance only counts once we know where the driver is.
   const distanceOrNull = (st: GasStation) => (userGps ? getDistanceKm(st) : null);
   const rankedStations = rankByUsefulness(filteredStations, distanceOrNull, now);
   const bestStation = pickBestStation(filteredStations, distanceOrNull, now);
@@ -510,7 +510,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       const isSelected = selectedStation?.id === st.id;
       const isEv = st.stationType === 'ev_charging';
 
-      // A report older than 24h (or none at all) is shown grey: a confident green pin for a
+      // A report older than 45 minutes (or none at all) is shown grey: a confident green pin for a
       // station nobody has reported on in days is worse than no colour.
       const freshness = getFreshness(st, now);
       const liveStatus = freshness.tier === 'fresh' || freshness.tier === 'recent' ? freshness.lastKnownStatus : null;
@@ -855,7 +855,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
   // ink surface, per design_handoff_cng_connect_mobile screen 3b. No report yet today
   // doubles as the incentive-to-report moment (ghost pill + points).
   const renderNearestCard = (station: GasStation, kind: 'best' | 'nearest' | 'selected' = 'nearest') => {
-    // A report older than 24h is no longer "today's" status: show it as last-known and ask for a fresh one.
+    // A report older than 45 minutes is no longer current: show it as last-known and ask for a fresh one.
     const freshness = getFreshness(station, now);
     const isLive = freshness.tier === 'fresh' || freshness.tier === 'recent';
     const info = getStatusIndicator(isLive && freshness.lastKnownStatus ? freshness.lastKnownStatus : 'unknown');
@@ -1268,8 +1268,8 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                 const startsGroup = index === 0 || groupStart(station) !== groupStart(rankedStations[index - 1]);
                 const heading =
                   groupStart(station) === 'live'
-                    ? `Reported in the last 24h · ${reportedRows.length}`
-                    : `No report today · ${quietRows.length}`;
+                    ? `Reported in the last 45 min · ${reportedRows.length}`
+                    : `No report in 45 min · ${quietRows.length}`;
                 return (
                   <React.Fragment key={station.id}>
                     {startsGroup && reportedRows.length > 0 && quietRows.length > 0 && (
@@ -1333,7 +1333,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
             <div className="min-w-0">
               <h2 className="font-geist font-bold text-title tracking-tight leading-tight">Stations</h2>
               <p className="text-caption text-rd-text-tertiary mt-0.5" aria-live="polite">
-                {filteredStations.length} shown · {desktopLiveCount} reported in the last 24h
+                {filteredStations.length} shown · {desktopLiveCount} reported in the last 45 min
               </p>
             </div>
             <button
@@ -1469,7 +1469,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
               const sectionLabel =
                 effectiveDesktopSort === 'freshest' && !searchQuery.trim()
                   ? index === 0 && isLive
-                    ? 'Reported in the last 24 hours'
+                    ? 'Reported in the last 45 minutes'
                     : !isLive && (index === 0 || prevIsLive)
                     ? 'Older or never reported'
                     : null

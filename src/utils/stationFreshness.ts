@@ -3,12 +3,12 @@ import { isIsoTimestamp } from './timeUtils';
 
 /**
  * How much a driver should trust a station's status, from the age of its newest
- * real report (design tokens: solid <=1h, tint 1-24h, grey >24h).
- *   fresh  — reported within the last hour
- *   recent — within the last 24 hours
- *   stale  — a Queuing report past its short window (nobody there); only a "last known" hint
- *            (anything older than 24 hours is 'none': not shown at all)
- *   none   — never reported (or only seeded data with no real timestamp)
+ * real report. A report lasts 45 minutes; after that nothing is shown.
+ *   fresh  — a report within its 45 minutes (and, for Queuing, still backed by a car or the grace period)
+ *   recent — no longer produced (a report never outlives 45 minutes); kept so pin styling stays complete
+ *   stale  — a Queuing report past its short window with nobody there; only a "last known" hint
+ *            (anything older than 45 minutes is 'none': not shown at all)
+ *   none   — no report in the last 45 minutes (or only seeded data with no real timestamp)
  */
 export type FreshnessTier = 'fresh' | 'recent' | 'stale' | 'none';
 
@@ -20,16 +20,15 @@ export interface Freshness {
   ageText: string | null;
 }
 
-const FRESH_MINUTES = 60;
-const RECENT_MINUTES = 24 * 60;
+/** A report counts for this long; after that it is gone from every screen (the row stays stored). */
+export const REPORT_LIFETIME_MINUTES = 45;
 
 /**
  * A queue only exists while cars are standing at the station, so a Queuing report is current for
- * a short grace period after it is filed, and after that only while a car is at the station's
- * geofence (`station.activePresenceCount`), up to a hard limit. Past that it is last-known.
+ * a short grace period after it is filed, and until its 45 minutes are up only while a car is at
+ * the station's geofence (`station.activePresenceCount`). Otherwise it is last-known (grey).
  */
 export const QUEUE_GRACE_MINUTES = 30;
-export const QUEUE_MAX_MINUTES = 180;
 
 /** Minutes since a report time that may be an ISO stamp or legacy relative copy ("5 min ago"). */
 export function parseAgeMinutes(raw: string | undefined | null, now = Date.now()): number | null {
@@ -70,15 +69,29 @@ export function normalizeStatus(raw: string | null | undefined): StationStatus {
   return 'unknown';
 }
 
-/** A report counts for 24 hours; after that it is gone from every screen (the row stays stored). */
+/** A report counts for 45 minutes; after that it is gone from every screen (the row stays stored). */
 export function isReportVisible(report: { timestamp: string }, now = Date.now()): boolean {
   const age = parseAgeMinutes(report.timestamp, now);
-  return age !== null && age <= RECENT_MINUTES;
+  return age !== null && age <= REPORT_LIFETIME_MINUTES;
 }
 
-/** The reports a station's list may show: the last 24 hours, in their original order. */
+/** The reports within their 45 minutes, in their original order. */
 export function visibleReports<T extends { timestamp: string }>(reports: T[], now = Date.now()): T[] {
   return reports.filter((r) => isReportVisible(r, now));
+}
+
+/**
+ * The one report a station shows: the newest one still within its 45 minutes, or null. A newer
+ * report replaces the one before it; older reports stay stored but are never listed.
+ */
+export function newestVisibleReport<T extends { timestamp: string }>(reports: T[], now = Date.now()): T | null {
+  let best: { report: T; age: number } | null = null;
+  for (const report of reports) {
+    const age = parseAgeMinutes(report.timestamp, now);
+    if (age === null || age > REPORT_LIFETIME_MINUTES) continue;
+    if (!best || age < best.age) best = { report, age };
+  }
+  return best ? best.report : null;
 }
 
 export function getFreshness(station: GasStation, now = Date.now()): Freshness {
@@ -97,16 +110,15 @@ export function getFreshness(station: GasStation, now = Date.now()): Freshness {
     if (age !== null) best = { age, status: normalizeStatus(station.status) };
   }
 
-  // Nothing older than 24 hours is shown, not even as "last known".
-  if (!best || best.age > RECENT_MINUTES) return { tier: 'none', ageMinutes: null, lastKnownStatus: null, ageText: null };
+  // Nothing older than 45 minutes is shown, not even as "last known".
+  if (!best || best.age > REPORT_LIFETIME_MINUTES) return { tier: 'none', ageMinutes: null, lastKnownStatus: null, ageText: null };
 
-  let tier: FreshnessTier;
+  // Within its 45 minutes a report is fresh; a Queuing report is only grey (last-known) once its
+  // grace period is over and no car is at the station.
+  let tier: FreshnessTier = 'fresh';
   if (best.status === 'queue') {
     const carsHere = station.activePresenceCount ?? 0;
-    const current = best.age <= QUEUE_GRACE_MINUTES || (carsHere > 0 && best.age <= QUEUE_MAX_MINUTES);
-    tier = !current ? 'stale' : best.age <= FRESH_MINUTES ? 'fresh' : 'recent';
-  } else {
-    tier = best.age <= FRESH_MINUTES ? 'fresh' : 'recent';
+    if (best.age > QUEUE_GRACE_MINUTES && carsHere <= 0) tier = 'stale';
   }
   return { tier, ageMinutes: best.age, lastKnownStatus: best.status, ageText: formatAgeShort(best.age) };
 }
@@ -133,7 +145,7 @@ export function freshnessRank(station: GasStation, now = Date.now()): number {
 
 /**
  * The station's status for filtering/sorting purposes: its newest report only counts as
- * "current" if it is under 24h old. A days-old "Available" must not match an "Available" filter.
+ * "current" if it is under 45 minutes old. An old "Available" must not match an "Available" filter.
  */
 export function currentStatus(station: GasStation, now = Date.now()): StationStatus {
   const f = getFreshness(station, now);
@@ -141,23 +153,21 @@ export function currentStatus(station: GasStation, now = Date.now()): StationSta
 }
 
 // ---- "Which station should I go to?" -------------------------------------------------------
-// A station only has an answer when it has a report under 24h old that isn't "out of service".
+// A station only has an answer when it has a report under 45 minutes old that isn't "out of service".
 // Among those, a driver trades distance against how good the news is, so each shortfall is
-// priced in kilometres of driving: a queue is worth about 5 km and a report older than an hour
-// about 3 km of doubt.
+// priced in kilometres of driving: a queue is worth about 5 km.
 const STATUS_COST_KM: Record<StationStatus, number> = {
   full: 0,
   queue: 5,
   out: Number.POSITIVE_INFINITY,
   unknown: Number.POSITIVE_INFINITY,
 };
-const RECENT_COST_KM = 3;
 
 /** Distance-equivalent cost of going to a station; Infinity when there is no usable report. */
 export function usabilityCost(station: GasStation, distanceKm: number | null, now = Date.now()): number {
   const f = getFreshness(station, now);
   if ((f.tier !== 'fresh' && f.tier !== 'recent') || !f.lastKnownStatus) return Number.POSITIVE_INFINITY;
-  return (distanceKm ?? 0) + STATUS_COST_KM[f.lastKnownStatus] + (f.tier === 'recent' ? RECENT_COST_KM : 0);
+  return (distanceKm ?? 0) + STATUS_COST_KM[f.lastKnownStatus];
 }
 
 /**

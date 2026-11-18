@@ -15,8 +15,8 @@ const STALE_CHIP = 'bg-rd-stale-container text-rd-on-stale-container';
 /**
  * A station's status, honest about how old it is:
  *   fresh  (<=1h)  tinted chip with a live dot (pulses three times when it appears, then rests)
- *   recent (<=24h) tinted chip with the status icon
- *   stale  (>24h)  grey chip — "Last: Available · 3 days ago" — never a confident colour
+ *   recent (not produced any more: a report lasts 45 minutes)
+ *   stale  (an expired Queuing report) grey chip — "Last: Queuing · 35 min ago" — never a confident colour
  *   none           grey "No report yet"
  */
 export const StationStatusChip: React.FC<{ station: GasStation; className?: string; now?: number }> = ({ station, className = '', now }) => {

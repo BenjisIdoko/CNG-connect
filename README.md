@@ -8,7 +8,7 @@
 [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4-38B2AC.svg?logo=tailwind-css)](https://tailwindcss.com/)
 [![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL%2C%20Auth%20%26%20Storage-emerald.svg?logo=supabase)](https://supabase.com/)
 [![Vercel](https://img.shields.io/badge/Vercel-Serverless-black.svg?logo=vercel)](https://vercel.com/)
-[![Tests](https://img.shields.io/badge/Tests-269%2F269%20Passed-success.svg)](https://vitest.dev/)
+[![Tests](https://img.shields.io/badge/Tests-275%2F275%20Passed-success.svg)](https://vitest.dev/)
 
 **CNG-Connect** is a driver-facing PWA built for Nigerian commercial (Bolt, Uber, inDrive) and private drivers running on Compressed Natural Gas. Built in support of the Presidential CNG & EV Initiative (Pi-CNG), it provides a live, crowdsourced map of CNG refuelling stations, a directory of accredited conversion centres, a fuel-savings calculator, a driver community, and an internal toolset for keeping the underlying station data accurate.
 
@@ -23,14 +23,14 @@
 - Filter by pump pressure, distance radius, and live availability (*Available*, *Queuing*, *Out of Gas*).
 - One-tap turn-by-turn navigation via Google Maps, Apple Maps, or Waze.
 - Every station shows a plain-language report age (`"Updated 5 min ago"`, `"No recent report"`) so drivers know how fresh a status actually is.
-- A *Queuing* status only stays current while a car is actually at the station (a signed-in driver's phone within 250 m), or for 30 minutes after it is reported. Otherwise it reads `"Last: Queuing · 6 hr ago"` in grey. Only counts of cars per station are public; who is where stays private.
+- A *Queuing* status only stays current while a car is actually at the station (a signed-in driver's phone within 250 m), or for 30 minutes after it is reported, up to the 45 minutes a report lasts. Otherwise it reads `"Last: Queuing · 6 hr ago"` in grey. Only counts of cars per station are public; who is where stays private.
 
 ### 📍 Proximity Alerts
 - Background location watch detects when a driver is near a station they'd want to know about, and surfaces a push notification/in-app banner — the point being drivers find out about a nearby restock without needing to have the app open.
 
 ### ⏱️ Fast Driver Status Reporting
 - Pick a status (Available / Queuing / Out of gas), then take a live in-app photo as proof: the pump meter, the queue, or the empty pump. The phone must be within 150 m of the station (checked when the photo is taken and again on submit), and the photo's position is saved with the report. Wait time, price and a note are optional.
-- A station's reports count for 24 hours: after that nothing is shown for it ("No report yet"), though the records are kept.
+- A station shows one report: the newest, for 45 minutes. A newer report replaces it, and once it is over 45 minutes old nothing is shown ("No report yet"). Older records are kept but never listed.
 - Reports build a driver's reputation score and community points, with unlockable tiers as they contribute more.
 
 ### 🛠️ Conversion Centre Directory
@@ -74,7 +74,7 @@ Two hidden, authentication-gated routes exist for keeping station data accurate 
 | **AI Assistant** | Vercel Serverless Function (`api/chat.ts`) calling Gemini |
 | **PWA** | `vite-plugin-pwa` (Workbox) — offline caching, installability |
 | **State Management** | React Context (`AuthContext`) + component state; no global store |
-| **Test Runner** | Vitest (269 tests) |
+| **Test Runner** | Vitest (275 tests) |
 
 The app runs as a client-only SPA — there's no traditional application server. The React client talks to Supabase directly with a public anon key; every write that needs privilege beyond "any signed-in driver" (station edits, admin actions, point awards) goes through a Postgres RPC function that checks authorization server-side, rather than trusting the client.
 
@@ -161,7 +161,7 @@ Open [http://localhost:3002](http://localhost:3002).
 ## 🧪 Verification & Testing
 
 ```bash
-npm test           # Vitest — 269 tests across formatting, validation, proximity/push logic, etc.
+npm test           # Vitest — 275 tests across formatting, validation, proximity/push logic, etc.
 npx tsc --noEmit   # TypeScript compiler check
 npm run build      # Production build
 ```
