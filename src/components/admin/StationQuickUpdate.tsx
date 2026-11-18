@@ -127,7 +127,7 @@ export const StationQuickUpdate: React.FC<Props> = ({
             onClick={() => setPressure((p) => stepPressure(p, -1))}
             className="w-11 h-11 rounded-xl border border-slate-200 bg-white text-slate-800 flex items-center justify-center disabled:opacity-40"
           >
-            <Icon name="remove" size={20} />
+            <span aria-hidden="true" className="text-xl font-bold leading-none">−</span>
           </button>
           <p className="flex-1 text-center font-extrabold text-slate-900 text-lg tabular-nums" aria-live="polite">
             {pressure} <span className="text-sm font-bold text-slate-500">bar</span>

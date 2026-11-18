@@ -10,6 +10,7 @@ import { formatRelativeTime, isIsoTimestamp, minutesSince } from '../utils/timeU
 import { getFreshness, currentStatus, describeStatus, newestVisibleReport, STATUS_SHORT_LABEL, formatAgeShort } from '../utils/stationFreshness';
 import { latestReportedPrice } from '../utils/stationPrice';
 import { useNow } from '../hooks/useNow';
+import { StationSaysLine } from './common/StationSaysLine';
 import { openWhatsAppShare } from '../utils/shareMessageBuilder';
 import { describePresence } from '../utils/presenceLabel';
 
@@ -405,6 +406,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                     </div>
                   );
                 })()}
+                <StationSaysLine station={station} now={now} />
                 {!isLive && (
                   <div className="rounded-2xl bg-rd-available-container px-4 py-3 flex items-center gap-3">
                     <span aria-hidden="true" className="material-symbols-outlined text-rd-on-available-container text-[20px] shrink-0">bolt</span>

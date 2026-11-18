@@ -1,6 +1,7 @@
 import { GasStation } from '../types';
 import { track } from '../services/analytics';
 import { describeStatus, getFreshness } from './stationFreshness';
+import { describePressure } from './stationManagerSignals';
 
 // Share links point at whatever origin the app is actually served from
 // (cngconnect.com.ng in prod, a preview URL, or localhost in dev). The
@@ -37,8 +38,10 @@ export function buildStationShareMessage(station: GasStation): string {
     lines.push(`⏱️ Queue: *${station.busyEstimate}*`);
   }
 
-  if (station.pumpPressure && station.pumpPressure > 0) {
-    lines.push(`⚡ Pump Pressure: *${station.pumpPressure} bar*`);
+  // A manager's recent reading shows with its age; otherwise the admin's fixed value, as before.
+  const pressure = describePressure(station);
+  if (pressure) {
+    lines.push(`⚡ Pump Pressure: *${pressure}*`);
   }
 
   lines.push(`\n📲 Check live driver updates on CNG-Connect:\n${shareUrl}`);

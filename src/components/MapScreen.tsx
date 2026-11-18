@@ -11,6 +11,7 @@ import { GasStation, StationStatus, StationSuggestion } from '../types';
 import { Modal } from './common/Modal';
 import { ASSETS, SHOW_EV_STATIONS } from '../data/mockData';
 import { StationStatusChip } from './common/StationStatusChip';
+import { StationSaysLine } from './common/StationSaysLine';
 import {
   getFreshness, describeStatus, freshnessRank, currentStatus,
   rankByUsefulness, pickBestStation, pinEmphasis, usabilityCost,
@@ -960,6 +961,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
           <h3 className="font-geist font-semibold text-[0.9375rem] text-rd-fg truncate">{station.name}</h3>
           <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
             <StationStatusChip station={station} now={now} />
+            <StationSaysLine station={station} now={now} compact />
             {price && <span className="text-micro font-semibold text-rd-text-tertiary">{price.compact}</span>}
           </div>
         </div>
@@ -1510,8 +1512,9 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                             )}
                           </span>
                           <span className="text-micro text-rd-text-tertiary truncate mt-0.5">{station.area || station.address}</span>
-                          <span className="mt-2 flex">
+                          <span className="mt-2 flex flex-wrap items-center gap-1.5">
                             <StationStatusChip station={station} now={now} />
+                            <StationSaysLine station={station} now={now} compact />
                           </span>
                         </span>
                       </button>

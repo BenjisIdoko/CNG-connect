@@ -50,6 +50,17 @@ describe('shareMessageBuilder', () => {
     expect(message).toContain('https://cngconnect.com.ng?station=nipc-001');
   });
 
+  it('shows a live pressure reading with its age when it is recent, and the plain fixed value when it is not', () => {
+    const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60000).toISOString();
+    const live = buildStationShareMessage({ ...sampleStation, livePressureBar: 220, livePressureAt: twoHoursAgo });
+    expect(live).toContain('⚡ Pump Pressure: *220 bar · updated 2 hr ago*');
+
+    const thirteenHoursAgo = new Date(Date.now() - 13 * 60 * 60000).toISOString();
+    const old = buildStationShareMessage({ ...sampleStation, livePressureBar: 220, livePressureAt: thirteenHoursAgo });
+    expect(old).toContain('⚡ Pump Pressure: *215 bar*');
+    expect(old).not.toContain('updated');
+  });
+
   it('handles station missing wait time or pump pressure cleanly', () => {
     const minimalStation: GasStation = {
       ...sampleStation,

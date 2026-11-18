@@ -3,6 +3,7 @@ import { GasStation } from '../types';
 import { openExternalMaps, openGoogleMapsPin } from '../utils/navigationHelper';
 import { Modal } from './common/Modal';
 import { describeStatus } from '../utils/stationFreshness';
+import { describePressure } from '../utils/stationManagerSignals';
 
 interface LiveNavigationModalProps {
   station: GasStation;
@@ -54,7 +55,7 @@ export const LiveNavigationModal: React.FC<LiveNavigationModalProps> = ({
 
           <div className="flex flex-wrap items-center gap-2 pt-2">
             <span className="bg-primary-container text-on-primary-container text-[0.7812rem] font-semibold px-3 py-1 rounded-full">
-              {describeStatus(station)} {station.pumpPressure ? `• ${station.pumpPressure} bar` : ''}
+              {describeStatus(station)}{describePressure(station) ? ` • ${describePressure(station)}` : ''}
             </span>
             {station.cngPrice && (
               <span className="bg-surface-container-high text-slate-700 text-[0.7812rem] font-medium px-3 py-1 rounded-full">
