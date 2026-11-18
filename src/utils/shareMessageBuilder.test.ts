@@ -74,7 +74,8 @@ describe('shareMessageBuilder', () => {
       reports: [{ ...sampleStation.reports[0], timestamp: fortyDaysAgo, waitMinutes: 45 }],
     };
     const message = buildStationShareMessage(stale);
-    expect(message).toMatch(/📊 Status: \*Last: Available · \d+ wks? ago\*/);
+    // A report over 24 hours old is not shown at all, so a share says there is no report.
+    expect(message).toContain('📊 Status: *No report yet*');
     expect(message).not.toContain('Full stock');
     expect(message).not.toContain('Est. Wait');
   });

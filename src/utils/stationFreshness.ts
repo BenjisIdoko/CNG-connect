@@ -6,7 +6,8 @@ import { isIsoTimestamp } from './timeUtils';
  * real report (design tokens: solid <=1h, tint 1-24h, grey >24h).
  *   fresh  — reported within the last hour
  *   recent — within the last 24 hours
- *   stale  — older than 24 hours; the status is only a "last known" hint
+ *   stale  — a Queuing report past its short window (nobody there); only a "last known" hint
+ *            (anything older than 24 hours is 'none': not shown at all)
  *   none   — never reported (or only seeded data with no real timestamp)
  */
 export type FreshnessTier = 'fresh' | 'recent' | 'stale' | 'none';
@@ -69,6 +70,17 @@ export function normalizeStatus(raw: string | null | undefined): StationStatus {
   return 'unknown';
 }
 
+/** A report counts for 24 hours; after that it is gone from every screen (the row stays stored). */
+export function isReportVisible(report: { timestamp: string }, now = Date.now()): boolean {
+  const age = parseAgeMinutes(report.timestamp, now);
+  return age !== null && age <= RECENT_MINUTES;
+}
+
+/** The reports a station's list may show: the last 24 hours, in their original order. */
+export function visibleReports<T extends { timestamp: string }>(reports: T[], now = Date.now()): T[] {
+  return reports.filter((r) => isReportVisible(r, now));
+}
+
 export function getFreshness(station: GasStation, now = Date.now()): Freshness {
   let best: { age: number; status: StationStatus } | null = null;
 
@@ -85,7 +97,8 @@ export function getFreshness(station: GasStation, now = Date.now()): Freshness {
     if (age !== null) best = { age, status: normalizeStatus(station.status) };
   }
 
-  if (!best) return { tier: 'none', ageMinutes: null, lastKnownStatus: null, ageText: null };
+  // Nothing older than 24 hours is shown, not even as "last known".
+  if (!best || best.age > RECENT_MINUTES) return { tier: 'none', ageMinutes: null, lastKnownStatus: null, ageText: null };
 
   let tier: FreshnessTier;
   if (best.status === 'queue') {
@@ -93,7 +106,7 @@ export function getFreshness(station: GasStation, now = Date.now()): Freshness {
     const current = best.age <= QUEUE_GRACE_MINUTES || (carsHere > 0 && best.age <= QUEUE_MAX_MINUTES);
     tier = !current ? 'stale' : best.age <= FRESH_MINUTES ? 'fresh' : 'recent';
   } else {
-    tier = best.age <= FRESH_MINUTES ? 'fresh' : best.age <= RECENT_MINUTES ? 'recent' : 'stale';
+    tier = best.age <= FRESH_MINUTES ? 'fresh' : 'recent';
   }
   return { tier, ageMinutes: best.age, lastKnownStatus: best.status, ageText: formatAgeShort(best.age) };
 }

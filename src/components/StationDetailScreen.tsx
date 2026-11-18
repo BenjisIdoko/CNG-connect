@@ -7,7 +7,7 @@ import { ASSETS } from '../data/mockData';
 import { openExternalMaps } from '../utils/navigationHelper';
 import { StationGroupInfoSheet } from './StationGroupInfoSheet';
 import { formatRelativeTime, isIsoTimestamp, minutesSince } from '../utils/timeUtils';
-import { getFreshness, currentStatus, describeStatus, STATUS_SHORT_LABEL, formatAgeShort } from '../utils/stationFreshness';
+import { getFreshness, currentStatus, describeStatus, visibleReports, STATUS_SHORT_LABEL, formatAgeShort } from '../utils/stationFreshness';
 import { latestReportedPrice } from '../utils/stationPrice';
 import { useNow } from '../hooks/useNow';
 import { openWhatsAppShare } from '../utils/shareMessageBuilder';
@@ -181,6 +181,8 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
     const mm = String(d.getMinutes()).padStart(2, '0');
     return `${day} ${month} ${d.getFullYear()} · ${hh}:${mm} WAT`;
   };
+  // Only the last 24 hours of reports are listed; older ones are gone from every screen.
+  const listedReports = visibleReports(reports, now);
   const presenceCount = station.activePresenceCount || 0;
   const presenceLabel = describePresence(presenceCount, currentStatus(station, now));
 
@@ -442,7 +444,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
               value="reports"
               className="pb-2.5 -mb-px font-geist text-[0.9375rem] font-semibold text-rd-text-tertiary border-b-2 border-transparent transition-colors data-[state=active]:text-rd-fg data-[state=active]:font-bold focus:outline-none"
             >
-              Reports{reports.length > 0 ? ` · ${reports.length}` : ''}
+              Reports{listedReports.length > 0 ? ` · ${listedReports.length}` : ''}
             </TabsPrimitive.Trigger>
             <TabsPrimitive.Trigger
               value="feed"
@@ -456,7 +458,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
             >
               Photos{images.length > 0 ? ` · ${images.length}` : ''}
             </TabsPrimitive.Trigger>
-            <TabUnderline listRef={tabListRef} active={activeTab} deps={[comments.length, reports.length, images.length]} />
+            <TabUnderline listRef={tabListRef} active={activeTab} deps={[comments.length, listedReports.length, images.length]} />
           </TabsPrimitive.List>
 
           {/* TAB CONTENT 1: Station Group Chat Feed & Discussion — message bubbles per
@@ -518,13 +520,13 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
 
           {/* TAB CONTENT 2: Driver Status Reports */}
           <TabsPrimitive.Content value="reports" className="mt-4 outline-none">
-            {reports.length === 0 ? (
+            {listedReports.length === 0 ? (
               <p className="text-caption text-outline py-6 text-center">
-                No driver reports yet. Be the first to report stock &amp; queue.
+                No reports in the last 24 hours. Be the first to report stock &amp; queue.
               </p>
             ) : (
               <div className="flex flex-col gap-4">
-                {reports.map((report) => {
+                {listedReports.map((report) => {
                   const dot =
                     report.status === 'full'
                       ? 'bg-status-green'
