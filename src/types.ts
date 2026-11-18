@@ -54,7 +54,13 @@ export interface GasStation {
   statusLabel: string;
   cngPrice?: number;
   priceTrend?: 'stable' | 'up' | 'down';
-  pumpPressure?: number; // in bar
+  pumpPressure?: number; // in bar (the admin's fixed value)
+  /** The station's own staff: "selling now" (true) / "not selling" (false), and when they said it. */
+  managerSelling?: boolean;
+  managerSellingAt?: string;
+  /** Pump pressure in bar as last read by a station manager, and when. */
+  livePressureBar?: number;
+  livePressureAt?: string;
   busyEstimate?: string;
   lastUpdated: string;
   verifiedByCommunity: boolean;
