@@ -72,6 +72,28 @@
 }
 
 
+/* Admin dashboard ("Security Print"): banknote green, celadon paper, ink and foil gold.
+   Prefixed adm- so nothing here collides with the driver app's tokens; only used by
+   src/components/admin and src/components/ui. */
+@theme {
+  --color-adm-paper: #e7f0ea;
+  --color-adm-card: #f6faf7;
+  --color-adm-ink: #1a1f1c;
+  --color-adm-muted: #d6e5dc;
+  --color-adm-mute-text: #4a5a52;
+  --color-adm-line: #b9cfc2;
+  --color-adm-note: #0d3b2e;
+  --color-adm-note-2: #17503f;
+  --color-adm-note-text: #cfe3d8;
+  --color-adm-foil: #c9a227;
+  --color-adm-foil-hover: #b8921f;
+  --color-adm-new: #f3e7b8;
+  --color-adm-danger: #a4262c;
+  --color-adm-danger-soft: #f6dcdc;
+  --color-adm-warn: #7a5200;
+  --color-adm-warn-soft: #f6e6bf;
+}
+
 @theme {
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-headline: 'Urbanist', sans-serif;
