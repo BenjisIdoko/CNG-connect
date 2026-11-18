@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { useSupabaseClient } from '../../hooks/useSupabaseClient';
-import { Icon } from '../common/Icon';
+import { Button } from '../ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog';
+import { Input } from '../ui/input';
+import { Label } from '../ui/label';
 
 const CNG_KIT_PRESETS = [
   '',
@@ -30,14 +33,14 @@ interface Props {
   flash: (m: string) => void;
 }
 
-const inputCls = 'w-full border border-slate-300 rounded-lg px-2.5 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/30';
-const labelCls = 'text-xs font-semibold text-slate-500 mb-1 block';
+const selectCls =
+  'h-9 w-full rounded-md border border-adm-line bg-adm-card px-3 text-sm text-adm-ink outline-none transition-colors focus-visible:border-adm-note focus-visible:ring-2 focus-visible:ring-adm-note/40';
 
 /**
- * Full edit for one driver's profile — name/phone/state/vehicle/CNG kit. The admin flag is
- * shown read-only: nobody can change it from the app, only SQL can. Email isn't editable here: it's the Supabase Auth identity
- * itself, not just a profile field, so changing it needs Auth's own
- * email-change flow, not a plain profile patch.
+ * Full edit for one driver's profile: name, phone, state, vehicle and CNG kit. The admin flag is
+ * shown read-only: nobody can change it from the app, only SQL can. Email isn't editable here:
+ * it's the Supabase Auth identity itself, not just a profile field, so changing it needs Auth's
+ * own email-change flow, not a plain profile patch.
  */
 export const UserEditorModal: React.FC<Props> = ({ user, onClose, onSaved, flash }) => {
   const supabase = useSupabaseClient();
@@ -74,38 +77,33 @@ export const UserEditorModal: React.FC<Props> = ({ user, onClose, onSaved, flash
   };
 
   return (
-    <div className="fixed inset-0 z-[230] bg-black/40 grid place-items-center p-6">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl flex flex-col max-h-[85vh]">
-        <div className="p-4 border-b border-slate-200 flex items-center justify-between shrink-0">
-          <div className="min-w-0">
-            <h2 className="font-extrabold text-slate-900 text-sm truncate">Edit user</h2>
-            <p className="text-xs text-slate-500 truncate">{user.email}</p>
-          </div>
-          <button onClick={onClose} aria-label="Close" className="text-slate-400 hover:text-slate-600 shrink-0">
-            <Icon name="close" size={20} />
-          </button>
-        </div>
+    <Dialog open onOpenChange={(open) => !open && !saving && onClose()}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>Edit user</DialogTitle>
+          <DialogDescription className="truncate">{user.email}</DialogDescription>
+        </DialogHeader>
 
-        <div className="p-4 flex flex-col gap-3 overflow-y-auto">
-          <div>
-            <label className={labelCls}>Name</label>
-            <input value={name} onChange={(e) => setName(e.target.value)} className={inputCls} />
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="user-name">Name</Label>
+            <Input id="user-name" value={name} onChange={(e) => setName(e.target.value)} />
           </div>
-          <div>
-            <label className={labelCls}>Phone</label>
-            <input value={phone} onChange={(e) => setPhone(e.target.value)} className={inputCls} />
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="user-phone">Phone</Label>
+            <Input id="user-phone" value={phone} onChange={(e) => setPhone(e.target.value)} />
           </div>
-          <div>
-            <label className={labelCls}>State</label>
-            <input value={state} onChange={(e) => setState(e.target.value)} className={inputCls} />
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="user-state">State</Label>
+            <Input id="user-state" value={state} onChange={(e) => setState(e.target.value)} />
           </div>
-          <div>
-            <label className={labelCls}>Vehicle</label>
-            <input value={vehicle} onChange={(e) => setVehicle(e.target.value)} className={inputCls} />
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="user-vehicle">Vehicle</Label>
+            <Input id="user-vehicle" value={vehicle} onChange={(e) => setVehicle(e.target.value)} />
           </div>
-          <div>
-            <label className={labelCls}>CNG kit</label>
-            <select value={cngKit} onChange={(e) => setCngKit(e.target.value)} className={inputCls}>
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="user-kit">CNG kit</Label>
+            <select id="user-kit" value={cngKit} onChange={(e) => setCngKit(e.target.value)} className={selectCls}>
               {CNG_KIT_PRESETS.map((v) => (
                 <option key={v} value={v}>
                   {v || 'Not installed yet'}
@@ -115,25 +113,19 @@ export const UserEditorModal: React.FC<Props> = ({ user, onClose, onSaved, flash
             </select>
           </div>
           {user.is_admin && (
-            <p className="text-xs font-semibold text-slate-500">
-              App admin. The admin flag can only be changed in the database.
-            </p>
+            <p className="text-sm font-semibold text-adm-mute-text">App admin. The admin flag can only be changed in the database.</p>
           )}
         </div>
 
-        <div className="p-4 border-t border-slate-200 flex justify-end gap-2 shrink-0">
-          <button onClick={onClose} className="text-xs px-4 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200">
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose} disabled={saving}>
             Cancel
-          </button>
-          <button
-            onClick={save}
-            disabled={saving}
-            className="text-xs px-4 py-1.5 rounded-lg bg-emerald-600 text-white font-bold disabled:opacity-50"
-          >
+          </Button>
+          <Button onClick={() => void save()} disabled={saving}>
             {saving ? 'Saving…' : 'Save'}
-          </button>
-        </div>
-      </div>
-    </div>
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };

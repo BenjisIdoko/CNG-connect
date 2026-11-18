@@ -1,6 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSupabaseClient } from '../../hooks/useSupabaseClient';
 import { UserEditorModal, EditableUser } from './UserEditorModal';
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog';
+import { Input } from '../ui/input';
+import { Skeleton } from '../ui/skeleton';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 
 interface Row extends EditableUser {
   reports_count: number | null;
@@ -78,87 +84,89 @@ export const UsersPanel: React.FC<{ flash: (m: string) => void }> = ({ flash }) 
   };
 
   return (
-    <div className="h-full flex flex-col min-h-0">
-      <div className="h-11 shrink-0 border-b border-slate-200 flex items-center justify-between px-4 gap-3">
-        <span className="text-xs text-slate-500 font-semibold whitespace-nowrap">{rows.length} account{rows.length === 1 ? '' : 's'}</span>
-        <input
-          placeholder="Search name / email / phone / state"
+    <div className="flex h-full min-h-0 flex-col">
+      <div className="flex shrink-0 items-center justify-between gap-3 border-b border-adm-line bg-adm-card px-4 py-2 md:px-6">
+        <span className="whitespace-nowrap text-sm font-semibold text-adm-mute-text">
+          {rows.length} account{rows.length === 1 ? '' : 's'}
+        </span>
+        <Input
+          type="search"
+          aria-label="Search users"
+          placeholder="Search name, email, phone or state"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs w-72"
+          className="max-w-xs"
         />
       </div>
 
-      <div className="flex-1 overflow-auto p-4">
-        {loading && <p className="p-4 text-xs text-slate-400">Loading users…</p>}
-        {!loading && filtered.length > 0 && (
-          <div className="rounded-lg border border-slate-200">
-            <table className="min-w-full text-xs border-collapse">
-              <thead className="sticky top-0 z-10 bg-slate-50 text-slate-500 text-left [&_tr]:border-b [&_tr]:border-slate-200">
-                <tr>
-                  <th className="h-11 px-4 min-w-[160px] align-middle font-medium">Name</th>
-                  <th className="h-11 px-4 min-w-[200px] align-middle font-medium">Email</th>
-                  <th className="h-11 px-4 min-w-[130px] align-middle font-medium">Phone</th>
-                  <th className="h-11 px-4 min-w-[90px] align-middle font-medium">State</th>
-                  <th className="h-11 px-4 min-w-[160px] align-middle font-medium">Vehicle</th>
-                  <th className="h-11 px-4 min-w-[160px] align-middle font-medium">CNG kit</th>
-                  <th className="h-11 px-4 min-w-[70px] align-middle font-medium text-right">Reports</th>
-                  <th className="h-11 px-4 min-w-[80px] align-middle font-medium text-right">Reputation</th>
-                  <th className="h-11 px-4 min-w-[70px] align-middle font-medium text-right">Points</th>
-                  <th className="h-11 px-4 min-w-[70px] align-middle font-medium">Role</th>
-                  <th className="h-11 px-4 min-w-[140px] align-middle" />
-                </tr>
-              </thead>
-              <tbody className="[&_tr:last-child]:border-0">
-                {filtered.map((r) => (
-                  <tr key={r.id} className="border-b border-slate-100 hover:bg-slate-50/70">
-                    <td className="px-4 py-3 align-middle font-semibold text-slate-900 max-w-[160px] truncate" title={r.name || ''}>
-                      {r.name || <span className="text-slate-400 italic font-normal">(no name)</span>}
-                    </td>
-                    <td className="px-4 py-3 align-middle text-slate-600 max-w-[200px] truncate" title={r.email || ''}>
-                      {r.email || '—'}
-                    </td>
-                    <td className="px-4 py-3 align-middle text-slate-600 whitespace-nowrap">{r.phone || '—'}</td>
-                    <td className="px-4 py-3 align-middle text-slate-600">{r.state || '—'}</td>
-                    <td className="px-4 py-3 align-middle text-slate-600 max-w-[160px] truncate" title={r.vehicle || ''}>
-                      {r.vehicle || '—'}
-                    </td>
-                    <td className="px-4 py-3 align-middle text-slate-600 max-w-[160px] truncate" title={r.cng_kit || ''}>
-                      {r.cng_kit || '—'}
-                    </td>
-                    <td className="px-4 py-3 align-middle text-right text-slate-600">{r.reports_count ?? 0}</td>
-                    <td className="px-4 py-3 align-middle text-right text-slate-600">{(r.reputation_score ?? 0).toFixed(1)}</td>
-                    <td className="px-4 py-3 align-middle text-right text-slate-600">{r.community_points ?? 0}</td>
-                    <td className="px-4 py-3 align-middle">
-                      {r.is_admin && (
-                        <span className="rounded-md bg-emerald-100 text-emerald-700 px-1.5 py-0.5 font-semibold whitespace-nowrap">
-                          Admin
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3 align-middle whitespace-nowrap">
-                      <div className="flex gap-1.5">
-                        <button
-                          onClick={() => setEditId(r.id)}
-                          className="text-[0.6875rem] px-2.5 py-1 rounded-lg bg-slate-800 text-white font-semibold"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => setDeleteId(r.id)}
-                          className="text-[0.6875rem] px-2.5 py-1 rounded-lg bg-rose-50 text-rose-700 font-semibold hover:bg-rose-100"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+      <div className="flex-1 overflow-auto p-4 md:p-6">
+        {loading && (
+          <div className="flex flex-col gap-3" aria-label="Loading users">
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
           </div>
         )}
-        {!loading && filtered.length === 0 && <p className="p-4 text-xs text-slate-400">Nothing matches.</p>}
+        {!loading && filtered.length > 0 && (
+          <div className="overflow-hidden rounded-lg border border-adm-line bg-adm-card">
+            <Table>
+              <TableHeader>
+                <TableRow className="hover:bg-transparent">
+                  <TableHead className="min-w-[160px]">Name</TableHead>
+                  <TableHead className="min-w-[200px]">Email</TableHead>
+                  <TableHead className="min-w-[130px]">Phone</TableHead>
+                  <TableHead className="min-w-[90px]">State</TableHead>
+                  <TableHead className="min-w-[160px]">Vehicle</TableHead>
+                  <TableHead className="min-w-[160px]">CNG kit</TableHead>
+                  <TableHead className="min-w-[70px] text-right">Reports</TableHead>
+                  <TableHead className="min-w-[80px] text-right">Reputation</TableHead>
+                  <TableHead className="min-w-[70px] text-right">Points</TableHead>
+                  <TableHead className="min-w-[70px]">Role</TableHead>
+                  <TableHead className="min-w-[140px]">
+                    <span className="sr-only">Actions</span>
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filtered.map((r) => (
+                  <TableRow key={r.id}>
+                    <TableCell className="max-w-[160px] truncate font-semibold" title={r.name || ''}>
+                      {r.name || <span className="font-normal italic text-adm-mute-text">(no name)</span>}
+                    </TableCell>
+                    <TableCell className="max-w-[200px] truncate text-adm-mute-text" title={r.email || ''}>
+                      {r.email || '—'}
+                    </TableCell>
+                    <TableCell className="whitespace-nowrap text-adm-mute-text">{r.phone || '—'}</TableCell>
+                    <TableCell className="text-adm-mute-text">{r.state || '—'}</TableCell>
+                    <TableCell className="max-w-[160px] truncate text-adm-mute-text" title={r.vehicle || ''}>
+                      {r.vehicle || '—'}
+                    </TableCell>
+                    <TableCell className="max-w-[160px] truncate text-adm-mute-text" title={r.cng_kit || ''}>
+                      {r.cng_kit || '—'}
+                    </TableCell>
+                    <TableCell className="text-right text-adm-mute-text">{r.reports_count ?? 0}</TableCell>
+                    <TableCell className="text-right text-adm-mute-text">{(r.reputation_score ?? 0).toFixed(1)}</TableCell>
+                    <TableCell className="text-right text-adm-mute-text">{r.community_points ?? 0}</TableCell>
+                    <TableCell>{r.is_admin && <Badge>Admin</Badge>}</TableCell>
+                    <TableCell className="whitespace-nowrap">
+                      <div className="flex gap-1.5">
+                        <Button variant="outline" size="sm" onClick={() => setEditId(r.id)}>
+                          Edit
+                        </Button>
+                        <Button variant="ghost" size="sm" className="text-adm-danger hover:bg-adm-danger-soft" onClick={() => setDeleteId(r.id)}>
+                          Delete
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        )}
+        {!loading && filtered.length === 0 && (
+          <p className="p-4 text-sm text-adm-mute-text">{rows.length === 0 ? 'No accounts yet.' : 'Nothing matches that search.'}</p>
+        )}
       </div>
 
       {editRow && (
@@ -170,29 +178,25 @@ export const UsersPanel: React.FC<{ flash: (m: string) => void }> = ({ flash }) 
         />
       )}
 
-      {deleteRow && (
-        <div className="fixed inset-0 z-[225] bg-black/40 grid place-items-center p-6">
-          <div className="w-full max-w-sm bg-white rounded-2xl shadow-xl p-5 flex flex-col gap-3">
-            <h2 className="font-extrabold text-slate-900 text-sm">Delete this account?</h2>
-            <p className="text-xs text-slate-600">
-              <span className="font-semibold">{deleteRow.name || deleteRow.email}</span> will lose access immediately —
-              this permanently deletes their account, profile, reports, and posts. This can't be undone.
-            </p>
-            <div className="flex justify-end gap-2 mt-1">
-              <button onClick={() => setDeleteId(null)} className="text-xs px-4 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200">
-                Cancel
-              </button>
-              <button
-                onClick={() => void confirmDelete()}
-                disabled={deleting}
-                className="text-xs px-4 py-1.5 rounded-lg bg-rose-600 text-white font-bold disabled:opacity-50"
-              >
-                {deleting ? 'Deleting…' : 'Delete permanently'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <Dialog open={!!deleteRow} onOpenChange={(open) => !open && !deleting && setDeleteId(null)}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Delete this account?</DialogTitle>
+            <DialogDescription>
+              <span className="font-semibold text-adm-ink">{deleteRow?.name || deleteRow?.email}</span> will lose access immediately.
+              This permanently deletes their account, profile, reports, and posts. This can't be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteId(null)} disabled={deleting}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={() => void confirmDelete()} disabled={deleting}>
+              {deleting ? 'Deleting…' : 'Delete permanently'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

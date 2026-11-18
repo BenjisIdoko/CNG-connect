@@ -1,11 +1,19 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSupabaseClient } from '../../hooks/useSupabaseClient';
 import { ManagerLink, groupManagers } from '../../utils/stationManagerGroups';
+import { Button } from '../ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { Input } from '../ui/input';
+import { Label } from '../ui/label';
+import { Skeleton } from '../ui/skeleton';
 
 interface StationOption {
   id: string;
   name: string;
 }
+
+const selectCls =
+  'h-9 w-full rounded-md border border-adm-line bg-adm-card px-3 text-sm text-adm-ink outline-none transition-colors focus-visible:border-adm-note focus-visible:ring-2 focus-visible:ring-adm-note/40';
 
 /**
  * Super-admin view of every station manager: who manages which stations, with an "add by email"
@@ -107,76 +115,92 @@ export const StationManagersPanel: React.FC<{ flash: (m: string) => void }> = ({
     void load();
   };
 
-  const inputCls = 'rounded-lg border border-slate-300 px-3 py-2 text-sm bg-white';
-
   return (
     <div className="h-full overflow-y-auto">
-      <div className="max-w-2xl w-full mx-auto p-4 pb-16 flex flex-col gap-4">
-        <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs flex flex-col gap-3">
-          <h2 className="font-extrabold text-slate-900 text-sm">Add a station manager</h2>
-          <p className="text-xs text-slate-500">
-            The person must already have a CNG-Connect account. They sign in at <code>/station-manager</code> and see only
-            the stations you assign.
-          </p>
-          <input
-            type="email"
-            aria-label="Manager email"
-            placeholder="manager@example.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className={inputCls}
-          />
-          <select aria-label="Station" value={stationId} onChange={(e) => setStationId(e.target.value)} className={inputCls}>
-            <option value="">Choose a station…</option>
-            {stations.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.name}
-              </option>
-            ))}
-          </select>
-          <button
-            type="button"
-            onClick={() => void add()}
-            disabled={busy !== null || !email.trim() || !stationId}
-            className="min-h-[44px] rounded-xl bg-emerald-600 text-white text-sm font-bold disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {busy === 'add' ? 'Adding…' : 'Add manager'}
-          </button>
-          {formErr && (
-            <p role="alert" className="text-xs font-semibold text-rose-600">
-              {formErr}
-            </p>
-          )}
-        </div>
+      <div className="mx-auto flex w-full max-w-3xl flex-col gap-4 p-4 pb-16 md:p-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Add a station manager</CardTitle>
+            <CardDescription>
+              The person must already have a CNG-Connect account. They sign in at <code>/station-manager</code> and see only the
+              stations you assign.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-4">
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="manager-email">Manager email</Label>
+              <Input
+                id="manager-email"
+                type="email"
+                placeholder="manager@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="manager-station">Station</Label>
+              <select id="manager-station" value={stationId} onChange={(e) => setStationId(e.target.value)} className={selectCls}>
+                <option value="">Choose a station…</option>
+                {stations.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <Button onClick={() => void add()} disabled={busy !== null || !email.trim() || !stationId} className="self-start">
+              {busy === 'add' ? 'Adding…' : 'Add manager'}
+            </Button>
+            {formErr && (
+              <p role="alert" className="text-sm font-semibold text-adm-danger">
+                {formErr}
+              </p>
+            )}
+          </CardContent>
+        </Card>
 
-        {loading && <p className="text-sm text-slate-400">Loading station managers…</p>}
-        {loadErr && <p className="text-sm text-rose-600 font-semibold">{loadErr}</p>}
-        {!loading && !loadErr && groups.length === 0 && (
-          <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 text-center text-sm text-slate-500">
-            No station managers yet. Add one above.
+        {loading && (
+          <div className="flex flex-col gap-3" aria-label="Loading station managers">
+            <Skeleton className="h-20 w-full" />
           </div>
+        )}
+        {loadErr && (
+          <p role="alert" className="rounded-md border border-adm-danger/30 bg-adm-danger-soft px-4 py-3 text-sm font-semibold text-adm-danger">
+            {loadErr}
+          </p>
+        )}
+        {!loading && !loadErr && groups.length === 0 && (
+          <Card>
+            <CardContent className="py-8 text-center">
+              <p className="font-geist text-base font-bold">No station managers yet</p>
+              <p className="mt-1 text-sm text-adm-mute-text">Add one above and they can post for their station.</p>
+            </CardContent>
+          </Card>
         )}
 
         {groups.map((g) => (
-          <div key={g.userId} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs">
-            <p className="font-extrabold text-slate-900 text-sm">{g.name || g.email}</p>
-            {g.name && <p className="text-xs text-slate-500">{g.email}</p>}
-            <ul className="mt-2 flex flex-col gap-1.5">
+          <Card key={g.userId}>
+            <CardHeader>
+              <CardTitle>{g.name || g.email}</CardTitle>
+              {g.name && <CardDescription>{g.email}</CardDescription>}
+            </CardHeader>
+            <ul className="flex flex-col divide-y divide-adm-line">
               {g.stations.map((s) => (
-                <li key={s.id} className="flex items-center justify-between gap-3 text-sm text-slate-700">
+                <li key={s.id} className="flex items-center justify-between gap-3 px-5 py-2.5 text-sm">
                   <span className="truncate">{s.name}</span>
-                  <button
-                    type="button"
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-adm-danger hover:bg-adm-danger-soft"
                     onClick={() => void remove(g, s)}
                     disabled={busy !== null}
-                    className="shrink-0 text-xs font-semibold text-rose-600 hover:underline disabled:opacity-50"
                   >
                     {busy === `${g.email}|${s.id}` ? 'Removing…' : 'Remove'}
-                  </button>
+                  </Button>
                 </li>
               ))}
             </ul>
-          </div>
+          </Card>
         ))}
       </div>
     </div>
