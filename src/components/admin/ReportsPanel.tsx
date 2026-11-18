@@ -1,6 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useSupabaseClient } from '../../hooks/useSupabaseClient';
 import { formatRelativeTime } from '../../utils/timeUtils';
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { Skeleton } from '../ui/skeleton';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
+import { Tabs, TabsList, TabsTrigger } from '../ui/tabs';
 
 type QueueRow = {
   report_id: string;
@@ -29,10 +34,10 @@ const REASON_LABEL: Record<string, string> = {
 };
 
 const STATUS_DOT: Record<string, string> = {
-  full: 'bg-emerald-500',
-  queue: 'bg-amber-500',
-  low: 'bg-orange-500',
-  out: 'bg-rose-500',
+  full: 'bg-adm-note',
+  queue: 'bg-adm-foil',
+  low: 'bg-adm-warn',
+  out: 'bg-adm-danger',
 };
 
 /**
@@ -87,42 +92,37 @@ export const ReportsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash }
   };
 
   return (
-    <div className="h-full flex flex-col min-h-0">
-      {/* toolbar */}
-      <div className="h-11 shrink-0 border-b border-slate-200 flex items-center justify-between px-4 gap-3">
-        <div className="flex gap-2" role="tablist">
-          {(
-            [
-              ['review', 'Needs review'],
-              ['hidden', 'Removed (30 days)'],
-            ] as const
-          ).map(([key, label]) => (
-            <button
-              key={key}
-              role="tab"
-              aria-selected={view === key}
-              onClick={() => setView(key)}
-              className={`px-3 py-1.5 rounded-full text-xs font-bold transition-colors ${
-                view === key ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-        <button onClick={() => void load()} className="text-xs px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 font-semibold shrink-0">
+    <div className="flex h-full min-h-0 flex-col">
+      <div className="flex shrink-0 items-center justify-between gap-3 border-b border-adm-line bg-adm-card px-4 py-2 md:px-6">
+        <Tabs value={view} onValueChange={(v) => setView(v as 'review' | 'hidden')}>
+          <TabsList aria-label="Report view">
+            <TabsTrigger value="review">Needs review</TabsTrigger>
+            <TabsTrigger value="hidden">Removed (30 days)</TabsTrigger>
+          </TabsList>
+        </Tabs>
+        <Button variant="outline" size="sm" onClick={() => void load()}>
           Refresh
-        </button>
+        </Button>
       </div>
 
-      <div className="flex-1 overflow-auto p-4">
-        {loading && <p className="p-4 text-xs text-slate-400">Loading…</p>}
-        {err && <p className="p-4 text-xs font-semibold text-rose-600">{err}</p>}
+      <div className="flex-1 overflow-auto p-4 md:p-6">
+        {loading && (
+          <div className="flex flex-col gap-3" aria-label="Loading reports">
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+          </div>
+        )}
+        {err && (
+          <p role="alert" className="rounded-md border border-adm-danger/30 bg-adm-danger-soft px-4 py-3 text-sm font-semibold text-adm-danger">
+            {err}
+          </p>
+        )}
 
         {!loading && !err && rows.length === 0 && (
-          <div className="p-8 text-center">
-            <p className="font-bold text-sm text-slate-900">{view === 'review' ? 'Nothing to review' : 'Nothing removed recently'}</p>
-            <p className="text-xs text-slate-500 mt-1">
+          <div className="mx-auto max-w-md rounded-lg border border-adm-line bg-adm-card p-8 text-center">
+            <p className="font-geist text-base font-bold">{view === 'review' ? 'Nothing to review' : 'Nothing removed recently'}</p>
+            <p className="mt-1 text-sm text-adm-mute-text">
               {view === 'review'
                 ? 'Reports appear here when drivers flag them or they get 3+ dislikes.'
                 : 'Removed reports stay here for 30 days so you can restore them.'}
@@ -131,97 +131,89 @@ export const ReportsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash }
         )}
 
         {!loading && !err && rows.length > 0 && (
-          <div className="rounded-lg border border-slate-200">
-          <table className="min-w-full text-xs border-collapse">
-            <thead className="sticky top-0 z-10 bg-slate-50 text-slate-500 text-left [&_tr]:border-b [&_tr]:border-slate-200">
-              <tr>
-                <th className="h-11 px-4 min-w-[160px] align-middle font-medium">Station</th>
-                <th className="h-11 px-4 min-w-[100px] align-middle font-medium">Status</th>
-                <th className="h-11 px-4 min-w-[110px] align-middle font-medium">Reporter</th>
-                <th className="h-11 px-4 min-w-[90px] align-middle font-medium">Reported</th>
-                <th className="h-11 px-4 min-w-[100px] align-middle font-medium">Verification</th>
-                <th className="h-11 px-4 min-w-[220px] align-middle font-medium">Flags / comment</th>
-                <th className="h-11 px-4 w-20 align-middle font-medium">Photo</th>
-                <th className="h-11 px-4 w-44 align-middle" />
-              </tr>
-            </thead>
-            <tbody className="[&_tr:last-child]:border-0">
-              {rows.map((r) => (
-                <tr key={r.report_id} className={`border-b border-slate-100 ${r.open_flags > 0 ? 'bg-rose-50/40' : 'hover:bg-slate-50/70'}`}>
-                  <td className="px-4 py-3 font-semibold text-slate-900 max-w-[180px] truncate" title={r.station_name}>
-                    {r.station_name}
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className="inline-flex items-center gap-1.5 font-semibold text-slate-900">
-                      <span className={`w-2 h-2 rounded-full ${STATUS_DOT[r.status] || 'bg-slate-400'}`} />
-                      {r.status_label}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-slate-600 max-w-[110px] truncate">{r.author}</td>
-                  <td className="px-4 py-3 text-slate-500 whitespace-nowrap">{formatRelativeTime(r.created_at)}</td>
-                  <td className="px-4 py-3 text-slate-600 capitalize">{r.verification_level.replace(/_/g, ' ')}</td>
-                  <td className="px-4 py-3">
-                    <div className="flex flex-wrap gap-1 mb-1">
-                      {r.open_flags > 0 && (
-                        <span className="rounded-md bg-rose-100 text-rose-700 px-1.5 py-0.5 font-semibold">
-                          {r.open_flags} flag{r.open_flags > 1 ? 's' : ''}
-                        </span>
-                      )}
-                      {(r.reasons || []).map((x) => (
-                        <span key={x} className="rounded-md bg-slate-100 text-slate-600 px-1.5 py-0.5">
-                          {REASON_LABEL[x] || x}
-                        </span>
-                      ))}
-                      {r.dislikes > 0 && (
-                        <span className="rounded-md bg-slate-100 text-slate-600 px-1.5 py-0.5">
-                          {r.dislikes} dislike{r.dislikes > 1 ? 's' : ''}
-                        </span>
-                      )}
-                      {r.hidden && r.hidden_reason && (
-                        <span className="rounded-md bg-slate-100 text-slate-600 px-1.5 py-0.5">{r.hidden_reason}</span>
-                      )}
-                    </div>
-                    {r.comment && <p className="text-slate-600 max-w-[260px] truncate" title={r.comment}>&ldquo;{r.comment}&rdquo;</p>}
-                  </td>
-                  <td className="px-4 py-3">
-                    {r.photo && (
-                      <a href={r.photo} target="_blank" rel="noreferrer">
-                        <img src={r.photo} alt="Report" className="w-10 h-10 rounded-lg object-cover" loading="lazy" />
-                      </a>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 whitespace-nowrap">
-                    {view === 'review' ? (
-                      <div className="flex gap-1.5">
-                        <button
-                          disabled={busyId === r.report_id}
-                          onClick={() => void act(r, 'hide')}
-                          className="text-[0.6875rem] px-2.5 py-1 rounded-lg bg-rose-600 text-white font-bold disabled:opacity-50"
-                        >
-                          Remove
-                        </button>
-                        <button
-                          disabled={busyId === r.report_id}
-                          onClick={() => void act(r, 'keep')}
-                          className="text-[0.6875rem] px-2.5 py-1 rounded-lg bg-slate-100 text-slate-900 font-bold disabled:opacity-50"
-                        >
-                          Keep
-                        </button>
+          <div className="overflow-hidden rounded-lg border border-adm-line bg-adm-card">
+            <Table>
+              <TableHeader>
+                <TableRow className="hover:bg-transparent">
+                  <TableHead className="min-w-[160px]">Station</TableHead>
+                  <TableHead className="min-w-[100px]">Status</TableHead>
+                  <TableHead className="min-w-[110px]">Reporter</TableHead>
+                  <TableHead className="min-w-[90px]">Reported</TableHead>
+                  <TableHead className="min-w-[100px]">Verification</TableHead>
+                  <TableHead className="min-w-[220px]">Flags / comment</TableHead>
+                  <TableHead className="w-20">Photo</TableHead>
+                  <TableHead className="w-44">
+                    <span className="sr-only">Actions</span>
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {rows.map((r) => (
+                  <TableRow key={r.report_id}>
+                    <TableCell className="max-w-[180px] truncate font-semibold" title={r.station_name}>
+                      {r.station_name}
+                    </TableCell>
+                    <TableCell>
+                      <span className="inline-flex items-center gap-1.5 font-semibold">
+                        <span aria-hidden="true" className={`size-2 rounded-sm ${STATUS_DOT[r.status] || 'bg-adm-line'}`} />
+                        {r.status_label}
+                      </span>
+                    </TableCell>
+                    <TableCell className="max-w-[110px] truncate text-adm-mute-text">{r.author}</TableCell>
+                    <TableCell className="whitespace-nowrap text-adm-mute-text">{formatRelativeTime(r.created_at)}</TableCell>
+                    <TableCell className="capitalize text-adm-mute-text">{r.verification_level.replace(/_/g, ' ')}</TableCell>
+                    <TableCell>
+                      <div className="mb-1 flex flex-wrap gap-1">
+                        {r.open_flags > 0 && (
+                          <Badge variant="destructive">
+                            {r.open_flags} flag{r.open_flags > 1 ? 's' : ''}
+                          </Badge>
+                        )}
+                        {(r.reasons || []).map((x) => (
+                          <Badge key={x} variant="secondary">
+                            {REASON_LABEL[x] || x}
+                          </Badge>
+                        ))}
+                        {r.dislikes > 0 && (
+                          <Badge variant="secondary">
+                            {r.dislikes} dislike{r.dislikes > 1 ? 's' : ''}
+                          </Badge>
+                        )}
+                        {r.hidden && r.hidden_reason && <Badge variant="secondary">{r.hidden_reason}</Badge>}
                       </div>
-                    ) : (
-                      <button
-                        disabled={busyId === r.report_id}
-                        onClick={() => void act(r, 'restore')}
-                        className="text-[0.6875rem] px-2.5 py-1 rounded-lg bg-emerald-600 text-white font-bold disabled:opacity-50"
-                      >
-                        Restore
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                      {r.comment && (
+                        <p className="max-w-[260px] truncate text-adm-mute-text" title={r.comment}>
+                          &ldquo;{r.comment}&rdquo;
+                        </p>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {r.photo && (
+                        <a href={r.photo} target="_blank" rel="noreferrer" aria-label={`Open the photo for ${r.station_name}`}>
+                          <img src={r.photo} alt="" className="size-10 rounded-md border border-adm-line object-cover" loading="lazy" />
+                        </a>
+                      )}
+                    </TableCell>
+                    <TableCell className="whitespace-nowrap">
+                      {view === 'review' ? (
+                        <div className="flex gap-1.5">
+                          <Button variant="destructive" size="sm" disabled={busyId === r.report_id} onClick={() => void act(r, 'hide')}>
+                            Remove
+                          </Button>
+                          <Button variant="default" size="sm" disabled={busyId === r.report_id} onClick={() => void act(r, 'keep')}>
+                            Keep
+                          </Button>
+                        </div>
+                      ) : (
+                        <Button size="sm" disabled={busyId === r.report_id} onClick={() => void act(r, 'restore')}>
+                          Restore
+                        </Button>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </div>
         )}
       </div>
