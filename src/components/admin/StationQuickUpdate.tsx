@@ -76,12 +76,12 @@ export const StationQuickUpdate: React.FC<Props> = ({
   const client = supabase as unknown as RpcClient | null;
 
   const btnBase =
-    'flex-1 min-h-[44px] rounded-xl text-sm font-bold border transition-colors disabled:opacity-50 disabled:cursor-not-allowed';
+    'flex-1 min-h-[44px] rounded-md text-sm font-bold border transition-colors disabled:opacity-50 disabled:cursor-not-allowed';
 
   return (
-    <div className="mt-3 flex flex-col gap-3 border-t border-slate-100 pt-3">
+    <div className="mt-3 flex flex-col gap-3 border-t border-adm-line pt-3">
       <div>
-        <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">Station status</p>
+        <p className="text-xs font-bold text-adm-mute-text uppercase tracking-wide">Station status</p>
         <div className="mt-1.5 flex gap-2">
           <button
             type="button"
@@ -89,8 +89,8 @@ export const StationQuickUpdate: React.FC<Props> = ({
             onClick={() => client && void run('selling', () => postSelling(client, stationId, true), 'Posted: Selling now')}
             className={`${btnBase} ${
               statement?.selling
-                ? 'bg-emerald-600 border-emerald-600 text-white'
-                : 'bg-white border-slate-200 text-slate-800 hover:border-emerald-300'
+                ? 'bg-adm-foil border-adm-note text-adm-ink'
+                : 'bg-adm-card border-adm-line text-adm-ink hover:border-adm-note'
             }`}
           >
             {pending === 'selling' ? 'Posting…' : 'Selling now'}
@@ -103,14 +103,14 @@ export const StationQuickUpdate: React.FC<Props> = ({
             }
             className={`${btnBase} ${
               statement && !statement.selling
-                ? 'bg-slate-700 border-slate-700 text-white'
-                : 'bg-white border-slate-200 text-slate-800 hover:border-slate-400'
+                ? 'bg-adm-note border-adm-note text-white'
+                : 'bg-adm-card border-adm-line text-adm-ink hover:border-adm-note'
             }`}
           >
             {pending === 'not-selling' ? 'Posting…' : 'Not selling'}
           </button>
         </div>
-        <p className="text-xs text-slate-500 mt-1.5">
+        <p className="text-xs text-adm-mute-text mt-1.5">
           {statement
             ? `Posted ${formatAgeShort(statement.ageMinutes)} · drivers see it for ${SELLING_STATEMENT_MINUTES / 60} hours`
             : 'Nothing posted right now. Drivers see a post for 2 hours.'}
@@ -118,26 +118,26 @@ export const StationQuickUpdate: React.FC<Props> = ({
       </div>
 
       <div>
-        <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">Gas pressure</p>
+        <p className="text-xs font-bold text-adm-mute-text uppercase tracking-wide">Gas pressure</p>
         <div className="mt-1.5 flex items-center gap-2">
           <button
             type="button"
             aria-label="Lower pressure by 5 bar"
             disabled={pending !== null || pressure <= PRESSURE_MIN_BAR}
             onClick={() => setPressure((p) => stepPressure(p, -1))}
-            className="w-11 h-11 rounded-xl border border-slate-200 bg-white text-slate-800 flex items-center justify-center disabled:opacity-40"
+            className="w-11 h-11 rounded-md border border-adm-line bg-adm-card text-adm-ink flex items-center justify-center disabled:opacity-40"
           >
             <span aria-hidden="true" className="text-xl font-bold leading-none">−</span>
           </button>
-          <p className="flex-1 text-center font-extrabold text-slate-900 text-lg tabular-nums" aria-live="polite">
-            {pressure} <span className="text-sm font-bold text-slate-500">bar</span>
+          <p className="flex-1 text-center font-bold text-adm-ink text-lg tabular-nums" aria-live="polite">
+            {pressure} <span className="text-sm font-bold text-adm-mute-text">bar</span>
           </p>
           <button
             type="button"
             aria-label="Raise pressure by 5 bar"
             disabled={pending !== null || pressure >= PRESSURE_MAX_BAR}
             onClick={() => setPressure((p) => stepPressure(p, 1))}
-            className="w-11 h-11 rounded-xl border border-slate-200 bg-white text-slate-800 flex items-center justify-center disabled:opacity-40"
+            className="w-11 h-11 rounded-md border border-adm-line bg-adm-card text-adm-ink flex items-center justify-center disabled:opacity-40"
           >
             <Icon name="add" size={20} />
           </button>
@@ -148,11 +148,11 @@ export const StationQuickUpdate: React.FC<Props> = ({
           onClick={() =>
             client && void run('pressure', () => postPressure(client, stationId, pressure), `Posted: ${pressure} bar`)
           }
-          className="mt-2 w-full min-h-[44px] rounded-xl bg-emerald-600 text-white text-sm font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+          className="mt-2 w-full min-h-[44px] rounded-md bg-adm-foil text-adm-ink text-sm font-bold disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {pending === 'pressure' ? 'Posting…' : 'Update pressure'}
         </button>
-        <p className="text-xs text-slate-500 mt-1.5">
+        <p className="text-xs text-adm-mute-text mt-1.5">
           {pressureAge !== null && isValidPressure(livePressureBar)
             ? `Last reading ${livePressureBar} bar · updated ${formatAgeShort(pressureAge)}`
             : 'No reading posted yet.'}
@@ -160,7 +160,7 @@ export const StationQuickUpdate: React.FC<Props> = ({
       </div>
 
       {error && (
-        <p role="alert" className="text-xs font-semibold text-rose-600">
+        <p role="alert" className="text-xs font-semibold text-adm-danger">
           {error}
         </p>
       )}

@@ -60,10 +60,10 @@ export const MyStationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flas
   return (
     <div className="h-full overflow-y-auto">
       <div className="max-w-xl w-full mx-auto p-4 flex flex-col gap-3">
-        {loading && <p className="text-sm text-slate-400">Loading your stations…</p>}
-        {loadErr && <p className="text-sm text-rose-600 font-semibold">{loadErr}</p>}
+        {loading && <p className="text-sm text-adm-mute-text">Loading your stations…</p>}
+        {loadErr && <p className="text-sm text-adm-danger font-semibold">{loadErr}</p>}
         {!loading && !loadErr && stations.length === 0 && (
-          <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 text-center text-sm text-slate-500">
+          <div className="bg-adm-paper border border-adm-line rounded-lg p-6 text-center text-sm text-adm-mute-text">
             No stations are assigned to you yet. Ask the app admin to add your email ({driverProfile.email}) as the
             manager of your station.
             {driverProfile.isAdmin && (
@@ -75,9 +75,9 @@ export const MyStationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flas
           </div>
         )}
         {stations.map((s) => (
-          <div key={s.id} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs">
-            <p className="font-extrabold text-slate-900 text-sm">{s.name}</p>
-            <p className="text-xs text-slate-500 mt-0.5 truncate">{s.address}</p>
+          <div key={s.id} className="bg-adm-card border border-adm-line rounded-lg p-4">
+            <p className="font-bold text-adm-ink text-sm">{s.name}</p>
+            <p className="text-xs text-adm-mute-text mt-0.5 truncate">{s.address}</p>
             <StationQuickUpdate
               stationId={s.id}
               managerSelling={s.manager_selling}
@@ -91,7 +91,7 @@ export const MyStationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flas
             <button
               type="button"
               onClick={() => setEditingId(s.id)}
-              className="mt-3 text-xs text-emerald-700 font-semibold inline-flex items-center gap-1 hover:underline"
+              className="mt-3 text-xs text-adm-note font-semibold inline-flex items-center gap-1 hover:underline"
             >
               Edit details <Icon name="arrow_forward" size={12} />
             </button>
