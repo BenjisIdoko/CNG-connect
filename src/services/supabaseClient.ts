@@ -35,14 +35,8 @@ export function preloadSupabase(): void {
   void getSupabase();
 }
 
-/**
- * Lightweight read straight against the PostgREST endpoint (no supabase-js needed),
- * so the first station list can render without downloading the ~200 KB client.
- * Uses the signed-in user's stored token when it is still valid, else the anon key.
- * Returns null on any failure so callers can fall back to the full client.
- */
-export async function restSelect<T = any>(table: string, query: string): Promise<T[] | null> {
-  if (!isSupabaseConfigured) return null;
+/** Headers for a plain PostgREST call: the signed-in user's stored token when still valid, else the anon key. */
+function restHeaders(): Record<string, string> {
   let bearer = supabaseAnonKey;
   try {
     const ref = new URL(supabaseUrl).hostname.split('.')[0];
@@ -53,12 +47,37 @@ export async function restSelect<T = any>(table: string, query: string): Promise
   } catch {
     /* no stored session */
   }
+  return { apikey: supabaseAnonKey, Authorization: `Bearer ${bearer}`, Accept: 'application/json' };
+}
+
+/**
+ * Lightweight read straight against the PostgREST endpoint (no supabase-js needed),
+ * so the first station list can render without downloading the ~200 KB client.
+ * Uses the signed-in user's stored token when it is still valid, else the anon key.
+ * Returns null on any failure so callers can fall back to the full client.
+ */
+export async function restSelect<T = any>(table: string, query: string): Promise<T[] | null> {
+  if (!isSupabaseConfigured) return null;
   try {
-    const res = await fetch(`${supabaseUrl}/rest/v1/${table}?${query}`, {
-      headers: { apikey: supabaseAnonKey, Authorization: `Bearer ${bearer}`, Accept: 'application/json' },
-    });
+    const res = await fetch(`${supabaseUrl}/rest/v1/${table}?${query}`, { headers: restHeaders() });
     if (!res.ok) return null;
     return (await res.json()) as T[];
+  } catch {
+    return null;
+  }
+}
+
+/** Calls a database function over plain PostgREST (no supabase-js). Returns null on any failure. */
+export async function restRpc<T = unknown>(fn: string, args: Record<string, unknown> = {}): Promise<T | null> {
+  if (!isSupabaseConfigured) return null;
+  try {
+    const res = await fetch(`${supabaseUrl}/rest/v1/rpc/${fn}`, {
+      method: 'POST',
+      headers: { ...restHeaders(), 'Content-Type': 'application/json' },
+      body: JSON.stringify(args),
+    });
+    if (!res.ok) return null;
+    return (await res.json()) as T;
   } catch {
     return null;
   }

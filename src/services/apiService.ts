@@ -1,9 +1,10 @@
 import { GasStation, DriverReport, CommunityPost, StationStatus, VerificationLevel, StationMedia, StationSuggestion, CommentItem } from '../types';
 import { INITIAL_STATIONS, INITIAL_POSTS, deduplicateStations, SHOW_EV_STATIONS } from '../data/mockData';
-import { getSupabase, isSupabaseConfigured, restSelect } from './supabaseClient';
+import { getSupabase, isSupabaseConfigured, restSelect, restRpc } from './supabaseClient';
 import { checkNotificationPermission } from '../utils/permissionManager';
 import { formatRelativeTime } from '../utils/timeUtils';
 import { normalizeStatus } from '../utils/stationFreshness';
+import { carCountsToMap } from '../utils/carCounts';
 import { buildLeaderboard, LeaderboardDriver, LeaderboardProfileRow } from '../utils/reputationEngine';
 
 // Helper: Calculate verification level and weight according to schema rules
@@ -204,7 +205,7 @@ export const apiService = {
   async fetchStations(): Promise<GasStation[]> {
     if (isSupabaseConfigured) {
       try {
-        const tables = await loadStationTables();
+        const [tables, carCounts] = await Promise.all([loadStationTables(), apiService.fetchCarCounts()]);
         if (!tables) return getLocalStations();
         const { stationsData, reportsData, mediaData, commentsData } = tables;
 
@@ -285,7 +286,8 @@ export const apiService = {
             images: s.images || [],
             reports: stationReports,
             stationMedia: stationMedia,
-            activePresenceCount: s.active_presence_count ?? 0,
+            // Cars at the station's geofence right now, from the counts-only database function.
+            activePresenceCount: carCounts[s.id] ?? 0,
             stationComments,
             stationNotice: s.station_notice,
             locationPrecision: s.location_precision,
@@ -617,10 +619,28 @@ export const apiService = {
   },
 
   /**
-   * Register or refresh driver ephemeral proximity presence (expires_at > now()).
-   * Returns active_presence_count.
+   * How many cars are at each station's geofence right now (stations with none are absent).
+   * Never throws: with no database, or on any failure, it returns an empty map.
    */
-  async pingStationPresence(stationId: string, userKey: string, ttlMinutes = 20): Promise<number> {
+  async fetchCarCounts(): Promise<Record<string, number>> {
+    if (!isSupabaseConfigured) return {};
+    const viaRest = await restRpc<unknown>('station_car_counts');
+    if (viaRest !== null) return carCountsToMap(viaRest);
+    try {
+      const supabase = await getSupabase();
+      if (!supabase) return {};
+      const { data, error } = await supabase.rpc('station_car_counts');
+      return error ? {} : carCountsToMap(data);
+    } catch {
+      return {};
+    }
+  },
+
+  /**
+   * Register or refresh driver ephemeral proximity presence (expires_at > now()).
+   * Returns the number of cars now at that station.
+   */
+  async pingStationPresence(stationId: string, userKey: string, ttlMinutes = 6): Promise<number> {
     const now = new Date();
     const expiresAt = new Date(now.getTime() + ttlMinutes * 60 * 1000).toISOString();
     const nowIso = now.toISOString();
@@ -647,17 +667,9 @@ export const apiService = {
           console.error('Supabase station_presence upsert failed:', pingError.message);
         }
 
-        const { count, error: countError } = await supabase
-          .from('station_presence')
-          .select('*', { count: 'exact', head: true })
-          .eq('station_id', stationId)
-          .gt('expires_at', nowIso);
-
-        if (countError) {
-          console.error('Supabase station_presence count failed:', countError.message);
-          return 0;
-        }
-        return count || 0;
+        // The rows themselves are private; only the per-station count is public.
+        const counts = await apiService.fetchCarCounts();
+        return counts[stationId] ?? 0;
       } catch (err) {
         console.error('API Service pingStationPresence failed:', err);
       }

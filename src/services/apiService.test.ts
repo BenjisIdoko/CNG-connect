@@ -96,3 +96,11 @@ describe('Verification Weighting & Level Calculation', () => {
     expect(reloadedTarget?.reports.some((r) => r.id === testReport.id)).toBe(true);
   });
 });
+
+describe('car counts', () => {
+  it('fetchCarCounts quietly returns an empty map when no database is configured', async () => {
+    // Unit tests run without Supabase settings, so nothing is called and nothing throws.
+    const { apiService } = await import('./apiService');
+    await expect(apiService.fetchCarCounts()).resolves.toEqual({});
+  });
+});
