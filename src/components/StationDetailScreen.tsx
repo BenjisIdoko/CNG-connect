@@ -7,11 +7,11 @@ import { ASSETS } from '../data/mockData';
 import { openExternalMaps } from '../utils/navigationHelper';
 import { StationGroupInfoSheet } from './StationGroupInfoSheet';
 import { formatRelativeTime, isIsoTimestamp, minutesSince } from '../utils/timeUtils';
-import { getFreshness, describeStatus, STATUS_SHORT_LABEL, formatAgeShort } from '../utils/stationFreshness';
+import { getFreshness, currentStatus, describeStatus, STATUS_SHORT_LABEL, formatAgeShort } from '../utils/stationFreshness';
 import { latestReportedPrice } from '../utils/stationPrice';
 import { useNow } from '../hooks/useNow';
 import { openWhatsAppShare } from '../utils/shareMessageBuilder';
-import { describeLocationPrecision } from '../utils/locationPrecision';
+import { describePresence } from '../utils/presenceLabel';
 
 // Status-card icon/tile colors per the 2026-10 redesign's 3-status system.
 const STATUS_CARD_INFO: Record<string, { icon: string; tileBg: string; tileColor: string }> = {
@@ -182,6 +182,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
     return `${day} ${month} ${d.getFullYear()} · ${hh}:${mm} WAT`;
   };
   const presenceCount = station.activePresenceCount || 0;
+  const presenceLabel = describePresence(presenceCount, currentStatus(station, now));
 
   const handleVote = (reportId: string, type: 'up' | 'down') => {
     setReports((prev) =>
@@ -340,15 +341,10 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
               <span aria-hidden="true" className="material-symbols-outlined text-[15px]">info</span>
             </button>
           </p>
-          {describeLocationPrecision(station) && (
-            <p className="text-micro font-medium text-rd-on-low-container mt-1">
-              {describeLocationPrecision(station)}
-            </p>
-          )}
-          {presenceCount > 0 && (
+          {presenceLabel && (
             <span className="mt-2 flex items-center gap-1.5 text-micro font-semibold text-primary">
               <span className="w-1.5 h-1.5 rounded-full bg-live-pulse animate-pulse" />
-              {presenceCount} here now
+              {presenceLabel}
             </span>
           )}
         </div>
