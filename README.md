@@ -8,7 +8,7 @@
 [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4-38B2AC.svg?logo=tailwind-css)](https://tailwindcss.com/)
 [![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL%2C%20Auth%20%26%20Storage-emerald.svg?logo=supabase)](https://supabase.com/)
 [![Vercel](https://img.shields.io/badge/Vercel-Serverless-black.svg?logo=vercel)](https://vercel.com/)
-[![Tests](https://img.shields.io/badge/Tests-304%2F304%20Passed-success.svg)](https://vitest.dev/)
+[![Tests](https://img.shields.io/badge/Tests-317%2F317%20Passed-success.svg)](https://vitest.dev/)
 
 **CNG-Connect** is a driver-facing PWA built for Nigerian commercial (Bolt, Uber, inDrive) and private drivers running on Compressed Natural Gas. Built in support of the Presidential CNG & EV Initiative (Pi-CNG), it provides a live, crowdsourced map of CNG refuelling stations, a directory of accredited conversion centres, a fuel-savings calculator, a driver community, and an internal toolset for keeping the underlying station data accurate.
 
@@ -56,8 +56,8 @@
 
 Two hidden, authentication-gated routes exist for keeping station data accurate — neither is linked from the regular app UI:
 
-- **`/?admin=1` — Admin dashboard.** Gated on an `is_admin` flag. Lets an admin add a new station (name, address, a required map position and accuracy; a similar-station warning guards against duplicates), review driver "Suggest station" submissions (approve to create the station, or reject), drag a station's map pin to correct its location, edit every field on a station (name, address, hours, pricing, photos — uploaded straight to Supabase Storage), bulk-import corrections from a CSV spreadsheet, and bulk-delete stations.
-- **`/?manager=1` — Station manager.** A lighter role: an admin can assign a specific driver's email to one or more specific stations, and that driver can then sign in to edit only those station(s)' details (pricing, hours, photos, contact info) — without seeing or touching any other station. From the same "My stations" page a manager posts **Selling now / Not selling** and the pump pressure in bar. Drivers see it as a separate "Station says" line (a post shows for 2 hours, a pressure reading for 12) and it never changes the driver-reported status, pin colour or ranking. Needs `supabase/station-manager-signals.sql`.
+- **`/admin` — Super admin dashboard.** Only the app admin (the one profile with `is_admin`) can use it; anyone else who signs in there is pointed to their own page. The old `?admin=1` and `?moderation=1` links forward here. The **Station managers** tab lists every manager and their stations, and adds or removes a manager by email. Nobody can make an admin from inside the app: the flag changes only by SQL (`supabase/lock-admin-flag.sql`). It lets the admin add a new station (name, address, a required map position and accuracy; a similar-station warning guards against duplicates), review driver "Suggest station" submissions (approve to create the station, or reject), drag a station's map pin to correct its location, edit every field on a station (name, address, hours, pricing, photos — uploaded straight to Supabase Storage), bulk-import corrections from a CSV spreadsheet, and bulk-delete stations.
+- **`/station-manager` — Station manager.** Its own entrance (the old `?manager=1` link forwards here). A lighter role: the admin can assign a specific driver's email to one or more specific stations, and that driver can then sign in to edit only those station(s)' details (pricing, hours, photos, contact info) — without seeing or touching any other station. From the same "My stations" page a manager posts **Selling now / Not selling** and the pump pressure in bar. Drivers see it as a separate "Station says" line (a post shows for 2 hours, a pressure reading for 12) and it never changes the driver-reported status, pin colour or ranking. Needs `supabase/station-manager-signals.sql`.
 
 ---
 
@@ -74,7 +74,7 @@ Two hidden, authentication-gated routes exist for keeping station data accurate 
 | **AI Assistant** | Vercel Serverless Function (`api/chat.ts`) calling Gemini |
 | **PWA** | `vite-plugin-pwa` (Workbox) — offline caching, installability |
 | **State Management** | React Context (`AuthContext`) + component state; no global store |
-| **Test Runner** | Vitest (304 tests) |
+| **Test Runner** | Vitest (317 tests) |
 
 The app runs as a client-only SPA — there's no traditional application server. The React client talks to Supabase directly with a public anon key; every write that needs privilege beyond "any signed-in driver" (station edits, admin actions, point awards) goes through a Postgres RPC function that checks authorization server-side, rather than trusting the client.
 
@@ -161,7 +161,7 @@ Open [http://localhost:3002](http://localhost:3002).
 ## 🧪 Verification & Testing
 
 ```bash
-npm test           # Vitest — 304 tests across formatting, validation, proximity/push logic, etc.
+npm test           # Vitest — 317 tests across formatting, validation, proximity/push logic, etc.
 npx tsc --noEmit   # TypeScript compiler check
 npm run build      # Production build
 ```
