@@ -64,6 +64,7 @@ import { SuccessBurst } from './components/common/SuccessBurst';
 import { haptic } from './utils/haptics';
 import { track } from './services/analytics';
 import { takeDueFollowUp } from './utils/followUp';
+import { isAtStation, stationsToPing, PRESENCE_TTL_MINUTES } from './utils/geofencePresence';
 import { useBackLayer } from './utils/backLayer';
 import { Icon } from './components/common/Icon';
 
@@ -392,6 +393,18 @@ export const App: React.FC = () => {
 
 
   // Single Source of Truth: Geolocation Watch & Distance Updates
+  // A signed-in driver whose phone is within the station geofence counts as a car there: the GPS
+  // handler below refreshes that presence automatically (at most every 2 minutes per station), so
+  // the queue status can tell whether anyone is actually at the station. Read through a ref because
+  // the GPS watch is created once per profile and must see the latest stations and sign-in state.
+  const presenceCtxRef = useRef({ stations, isAuthenticated, userKey: '' });
+  presenceCtxRef.current = {
+    stations,
+    isAuthenticated,
+    userKey: userProfile.email || userProfile.phone || 'default_driver',
+  };
+  const lastPresencePingRef = useRef<Record<string, number>>({});
+
   useEffect(() => {
     if (!('geolocation' in navigator)) {
       setGpsStatus('unavailable');
@@ -407,6 +420,25 @@ export const App: React.FC = () => {
         localStorage.setItem('gasfinder_user_coords', JSON.stringify(coords));
       } catch {
         // storage error
+      }
+
+      // Presence: tell the database this driver is at a station (guests are never counted).
+      const presence = presenceCtxRef.current;
+      if (presence.isAuthenticated) {
+        const now = Date.now();
+        const fix = { lat: latitude, lng: longitude, accuracy: pos.coords.accuracy };
+        for (const stationId of stationsToPing(fix, presence.stations, lastPresencePingRef.current, now)) {
+          lastPresencePingRef.current[stationId] = now;
+          void apiService
+            .pingStationPresence(stationId, presence.userKey, PRESENCE_TTL_MINUTES)
+            .then((count) => {
+              // 0 means the count could not be read (the driver's own ping makes it at least 1).
+              if (count > 0) {
+                setStations((prev) => prev.map((st) => (st.id === stationId ? { ...st, activePresenceCount: count } : st)));
+              }
+            })
+            .catch(() => {});
+        }
       }
 
       // Dynamically compute exact distance & drive time for all stations relative to user's real GPS position
@@ -595,7 +627,12 @@ export const App: React.FC = () => {
   // Handlers
   const handleOpenStationDetail = async (station: GasStation) => {
     const userKey = userProfile.email || userProfile.phone || 'default_driver';
-    const activeCount = await apiService.pingStationPresence(station.id, userKey);
+    // Opening a station's page from afar must not make the viewer a "car there": only a driver whose
+    // phone is at the station is counted; everyone else just reads the current count.
+    const atStation = isAuthenticated && !!userCoords && isAtStation(userCoords, station);
+    const activeCount = atStation
+      ? await apiService.pingStationPresence(station.id, userKey, PRESENCE_TTL_MINUTES)
+      : (await apiService.fetchCarCounts())[station.id] ?? 0;
     const updatedStation = { ...station, activePresenceCount: activeCount };
     track('station_viewed', { station_id: station.id, status: station.status });
     setActiveDetailStation(updatedStation);
