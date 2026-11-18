@@ -16,6 +16,9 @@ const ADMIN_NAV: AdminNavItem[] = [
   { key: 'suggestions', label: 'Suggestions', icon: 'add_location_alt' },
   { key: 'reports', label: 'Report moderation', icon: 'flag' },
   { key: 'users', label: 'Users', icon: 'groups' },
+  // An admin who is also assigned to a station (they can assign themselves in the station editor)
+  // posts its selling status and pressure here, the same page a station manager gets.
+  { key: 'mystations', label: 'My stations', icon: 'local_gas_station' },
   ...(FEATURES.ENABLE_REFERRALS ? [{ key: 'payouts', label: 'Airtime payouts', icon: 'call' }] : []),
 ];
 const MANAGER_NAV: AdminNavItem[] = [{ key: 'mystations', label: 'My stations', icon: 'local_gas_station' }];
@@ -91,7 +94,7 @@ export const AdminScreen: React.FC<{ onExit: () => void }> = ({ onExit }) => {
             </div>
           </div>
         )}
-        {!isAdmin && activeKey === 'mystations' && <MyStationsPanel flash={flash} />}
+        {activeKey === 'mystations' && <MyStationsPanel flash={flash} />}
       </AdminSidebarLayout>
 
       {toast && (

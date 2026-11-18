@@ -279,6 +279,11 @@ export const apiService = {
             cngPrice: s.cng_price != null ? Number(s.cng_price) : undefined,
             priceTrend: s.price_trend || undefined,
             pumpPressure: s.pump_pressure != null ? Number(s.pump_pressure) : undefined,
+            // The station's own staff: "selling now" and a live pressure reading, with server times.
+            managerSelling: typeof s.manager_selling === 'boolean' ? s.manager_selling : undefined,
+            managerSellingAt: s.manager_selling_at || undefined,
+            livePressureBar: s.live_pressure_bar != null ? Number(s.live_pressure_bar) : undefined,
+            livePressureAt: s.live_pressure_at || undefined,
             busyEstimate: s.busy_estimate || undefined,
             // stations.last_updated is also the literal 'Just now' after any report; the
             // newest report's real time is the truth.
