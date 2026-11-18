@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Flag, Fuel, MapPinned, MapPinPlus, Phone, Users } from 'lucide-react';
+import { Flag, Fuel, LayoutDashboard, MapPinned, MapPinPlus, Phone, Users } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useSupabaseClient } from '../../hooks/useSupabaseClient';
 import { AdminAuthGate } from './AdminAuthGate';
 import { AdminSidebarLayout, AdminNavItem } from './AdminSidebarLayout';
+import { OverviewPanel } from './OverviewPanel';
 import { StationsPanel } from './StationsPanel';
 import { ReportsPanel } from './ReportsPanel';
 import { UsersPanel } from './UsersPanel';
@@ -17,6 +18,7 @@ import { AdminRoot } from './AdminRoot';
 import { FEATURES } from '../../config/features';
 
 const ADMIN_NAV: AdminNavItem[] = [
+  { key: 'overview', label: 'Overview', icon: LayoutDashboard },
   { key: 'stations', label: 'Stations', icon: MapPinned },
   { key: 'suggestions', label: 'Suggestions', icon: MapPinPlus },
   { key: 'reports', label: 'Report moderation', icon: Flag },
@@ -81,6 +83,7 @@ export const AdminScreen: React.FC<{ onExit: () => void }> = ({ onExit }) => {
         onSignOut={signOut}
         onExit={onExit}
       >
+        {isAdmin && activeKey === 'overview' && <OverviewPanel onNavigate={setActiveKey} />}
         {isAdmin && activeKey === 'stations' && <StationsPanel flash={flash} />}
         {isAdmin && activeKey === 'suggestions' && (
           <SuggestionsPanel flash={flash} onCountChange={setPendingSuggestions} />
