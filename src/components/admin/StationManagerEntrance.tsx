@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { Fuel } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { AdminAuthGate } from './AdminAuthGate';
 import { AdminSidebarLayout, AdminNavItem } from './AdminSidebarLayout';
 import { MyStationsPanel } from './MyStationsPanel';
+import { useAdminToast } from './useAdminToast';
 
-const NAV: AdminNavItem[] = [{ key: 'mystations', label: 'My stations', icon: 'local_gas_station' }];
+const NAV: AdminNavItem[] = [{ key: 'mystations', label: 'My stations', icon: Fuel }];
 
 /**
  * The station manager's own entrance (/station-manager): sign in, then see only the stations an
@@ -13,11 +15,7 @@ const NAV: AdminNavItem[] = [{ key: 'mystations', label: 'My stations', icon: 'l
  */
 export const StationManagerEntrance: React.FC<{ onExit: () => void }> = ({ onExit }) => {
   const { driverProfile, signOut } = useAuth();
-  const [toast, setToast] = useState<string | null>(null);
-  const flash = (m: string) => {
-    setToast(m);
-    setTimeout(() => setToast(null), 2600);
-  };
+  const { flash, toast } = useAdminToast();
 
   return (
     <AdminAuthGate title="Station manager" onExit={onExit}>
@@ -33,11 +31,7 @@ export const StationManagerEntrance: React.FC<{ onExit: () => void }> = ({ onExi
         <MyStationsPanel flash={flash} />
       </AdminSidebarLayout>
 
-      {toast && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[210] bg-slate-900 text-white text-xs font-semibold px-4 py-2 rounded-full shadow-lg">
-          {toast}
-        </div>
-      )}
+      {toast}
     </AdminAuthGate>
   );
 };
