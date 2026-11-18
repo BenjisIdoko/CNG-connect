@@ -146,7 +146,7 @@ export const OverviewView: React.FC<Props> = ({ data, loading, errors, lastVisit
           <Card className="overflow-hidden">
             <CardHeader>
               <CardTitle>Work queue</CardTitle>
-              <CardDescription>Oldest first, so nothing waits forever. New since your last visit is tinted gold.</CardDescription>
+              <CardDescription>Oldest first, so nothing waits forever. Flags and suggestions that arrived since you last opened the Overview are tinted gold.</CardDescription>
             </CardHeader>
             {loading && items.length === 0 ? (
               <CardContent className="flex flex-col gap-3">
@@ -164,7 +164,7 @@ export const OverviewView: React.FC<Props> = ({ data, loading, errors, lastVisit
               <Table>
                 <TableHeader>
                   <TableRow className="hover:bg-transparent">
-                    <TableHead>Type</TableHead>
+                    <TableHead className="hidden sm:table-cell">Type</TableHead>
                     <TableHead>Item</TableHead>
                     <TableHead className="hidden sm:table-cell">Waiting</TableHead>
                     <TableHead className="text-right">
@@ -177,12 +177,18 @@ export const OverviewView: React.FC<Props> = ({ data, loading, errors, lastVisit
                     const isNew = isNewSince(item.createdAt, lastVisitMs);
                     return (
                       <TableRow key={`${item.kind}-${item.id}`} data-state={isNew ? 'new' : undefined}>
-                        <TableCell>
+                        <TableCell className="hidden sm:table-cell">
                           <Badge variant={item.kind === 'flagged' ? 'destructive' : item.kind === 'pin' ? 'warning' : 'secondary'}>
                             {KIND_LABEL[item.kind]}
                           </Badge>
                         </TableCell>
-                        <TableCell className="max-w-[8rem] sm:max-w-[18rem]">
+                        <TableCell className="max-w-[13rem] sm:max-w-[18rem]">
+                          <Badge
+                            variant={item.kind === 'flagged' ? 'destructive' : item.kind === 'pin' ? 'warning' : 'secondary'}
+                            className="mb-1 sm:hidden"
+                          >
+                            {KIND_LABEL[item.kind]}
+                          </Badge>
                           <p className="truncate font-semibold">
                             {item.title}
                             {isNew && (

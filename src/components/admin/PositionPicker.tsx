@@ -1,8 +1,8 @@
 /// <reference types="google.maps" />
+import { ArrowUpRight } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
 import { loadGoogleMaps, hasGoogleMapsKey } from '../../utils/googleMaps';
 import { parseLatLng, PIN_TIERS, PIN_TIER_LABEL, type PinTier } from '../../utils/geoInput';
-import { Icon } from '../common/Icon';
 
 type LatLng = { lat: number; lng: number };
 
@@ -159,7 +159,7 @@ export const PositionPicker: React.FC<Props> = ({ value, onChange, tier, onTierC
             rel="noreferrer"
             className="font-semibold text-adm-note hover:underline"
           >
-            find on Google Maps <Icon name="north_east" size={12} className="inline" />
+            find on Google Maps <ArrowUpRight className="inline size-3" aria-hidden="true" />
           </a>
         )}
         {hasGoogleMapsKey && <span className="text-adm-mute-text">click or drag the pin on the map</span>}

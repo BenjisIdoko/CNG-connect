@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
+import { Minus, Plus } from 'lucide-react';
 import { useSupabaseClient } from '../../hooks/useSupabaseClient';
-import { Icon } from '../common/Icon';
 import { formatAgeShort, parseAgeMinutes } from '../../utils/stationFreshness';
 import {
   PRESSURE_DEFAULT_BAR,
@@ -127,7 +127,7 @@ export const StationQuickUpdate: React.FC<Props> = ({
             onClick={() => setPressure((p) => stepPressure(p, -1))}
             className="w-11 h-11 rounded-md border border-adm-line bg-adm-card text-adm-ink flex items-center justify-center disabled:opacity-40"
           >
-            <span aria-hidden="true" className="text-xl font-bold leading-none">−</span>
+            <Minus className="size-5" aria-hidden="true" />
           </button>
           <p className="flex-1 text-center font-bold text-adm-ink text-lg tabular-nums" aria-live="polite">
             {pressure} <span className="text-sm font-bold text-adm-mute-text">bar</span>
@@ -139,7 +139,7 @@ export const StationQuickUpdate: React.FC<Props> = ({
             onClick={() => setPressure((p) => stepPressure(p, 1))}
             className="w-11 h-11 rounded-md border border-adm-line bg-adm-card text-adm-ink flex items-center justify-center disabled:opacity-40"
           >
-            <Icon name="add" size={20} />
+            <Plus className="size-5" aria-hidden="true" />
           </button>
         </div>
         <button

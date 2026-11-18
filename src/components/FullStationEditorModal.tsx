@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { X } from 'lucide-react';
 import { useSupabaseClient } from '../hooks/useSupabaseClient';
-import { Icon } from './common/Icon';
+import { ModalFrame } from './admin/ModalFrame';
 
 export interface FullStationRow {
   id: string;
@@ -45,7 +46,7 @@ interface ManagerInfo {
 const toTimeInput = (v: string | null) => (v ? v.slice(0, 5) : '');
 
 const inputCls =
-  'w-full border border-adm-line rounded-lg px-2.5 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-adm-note/40';
+  'w-full border border-adm-line rounded-lg px-2.5 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-adm-note';
 const labelCls = 'text-xs font-semibold text-adm-mute-text mb-1 block';
 
 export const FullStationEditorModal: React.FC<Props> = ({ station, onClose, onSaved, isAdmin = false }) => {
@@ -266,8 +267,7 @@ export const FullStationEditorModal: React.FC<Props> = ({ station, onClose, onSa
   };
 
   return (
-    <div className="fixed inset-0 z-[230] bg-black/40 grid place-items-center p-4">
-      <div className="w-full max-w-2xl max-h-[88vh] bg-adm-card rounded-lg shadow-xl flex flex-col">
+    <ModalFrame onClose={onClose} title={`Full details for ${station.name}`} className="max-w-2xl">
         <div className="p-4 border-b border-adm-line flex items-center justify-between shrink-0">
           <h2 className="font-bold text-adm-ink text-sm truncate pr-2">Full details — {station.name}</h2>
           <button onClick={onClose} className="text-xs px-3 py-1.5 rounded-md bg-adm-muted hover:bg-adm-line shrink-0">
@@ -290,7 +290,7 @@ export const FullStationEditorModal: React.FC<Props> = ({ station, onClose, onSa
                     className="absolute top-1 right-1 w-6 h-6 rounded-md bg-black/60 text-white text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                     aria-label="Remove photo"
                   >
-                    <Icon name="close" size={12} />
+                    <X className="size-3" aria-hidden="true" />
                   </button>
                 </div>
               ))}
@@ -497,7 +497,6 @@ export const FullStationEditorModal: React.FC<Props> = ({ station, onClose, onSa
             {saving ? 'Saving…' : 'Save all'}
           </button>
         </div>
-      </div>
-    </div>
+    </ModalFrame>
   );
 };

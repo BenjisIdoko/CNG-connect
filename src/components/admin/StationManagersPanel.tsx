@@ -13,7 +13,7 @@ interface StationOption {
 }
 
 const selectCls =
-  'h-9 w-full rounded-md border border-adm-line bg-adm-card px-3 text-sm text-adm-ink outline-none transition-colors focus-visible:border-adm-note focus-visible:ring-2 focus-visible:ring-adm-note/40';
+  'h-9 w-full rounded-md border border-adm-line bg-adm-card px-3 text-sm text-adm-ink outline-none transition-colors focus-visible:border-adm-note focus-visible:ring-2 focus-visible:ring-adm-note';
 
 /**
  * Super-admin view of every station manager: who manages which stations, with an "add by email"

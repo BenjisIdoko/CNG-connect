@@ -35,8 +35,8 @@ const REASON_LABEL: Record<string, string> = {
 
 const STATUS_DOT: Record<string, string> = {
   full: 'bg-adm-note',
-  queue: 'bg-adm-foil',
-  low: 'bg-adm-warn',
+  queue: 'bg-adm-warn',
+  low: 'bg-adm-mute-text',
   out: 'bg-adm-danger',
 };
 

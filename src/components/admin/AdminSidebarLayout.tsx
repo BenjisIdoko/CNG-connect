@@ -70,7 +70,7 @@ export const AdminSidebarLayout: React.FC<AdminSidebarLayoutProps> = ({
             <Icon className="size-[18px] shrink-0" aria-hidden="true" />
             <span className="flex-1 truncate">{item.label}</span>
             {!!item.badge && (
-              <span className="shrink-0 rounded-md bg-adm-foil px-1.5 py-0.5 text-xs font-bold text-adm-ink tabular-nums">
+              <span className="shrink-0 rounded-md bg-adm-note-text px-1.5 py-0.5 text-xs font-bold text-adm-note tabular-nums">
                 {item.badge}
               </span>
             )}

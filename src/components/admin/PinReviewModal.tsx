@@ -1,8 +1,9 @@
 /// <reference types="google.maps" />
+import { ArrowUpRight, X } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
 import { useSupabaseClient } from '../../hooks/useSupabaseClient';
 import { loadGoogleMaps, hasGoogleMapsKey } from '../../utils/googleMaps';
-import { Icon } from '../common/Icon';
+import { ModalFrame } from './ModalFrame';
 
 // Tier list, labels, Nigeria bounds and coordinate parsing are shared with the Add station form.
 import { PIN_TIERS as TIERS, PIN_TIER_LABEL as TIER_LABEL, parseLatLng, type PinTier as Tier } from '../../utils/geoInput';
@@ -131,15 +132,14 @@ export const PinReviewModal: React.FC<Props> = ({ station, onClose, onSaved, fla
   };
 
   return (
-    <div className="fixed inset-0 z-[230] bg-black/40 grid place-items-center p-6">
-      <div className="w-full max-w-2xl max-h-[85vh] bg-adm-card rounded-lg shadow-xl flex flex-col">
+    <ModalFrame onClose={onClose} title={`Review pin for ${station.name}`} className="max-w-2xl">
         <div className="p-4 border-b border-adm-line flex items-center justify-between shrink-0">
           <div className="min-w-0">
             <h2 className="font-bold text-adm-ink text-sm truncate">Review pin · {station.name}</h2>
             <p className="text-xs text-adm-mute-text truncate">{station.address || '(no address)'}</p>
           </div>
           <button onClick={onClose} aria-label="Close" className="text-adm-mute-text hover:text-adm-ink shrink-0">
-            <Icon name="close" size={20} />
+            <X className="size-5" aria-hidden="true" />
           </button>
         </div>
 
@@ -190,7 +190,7 @@ export const PinReviewModal: React.FC<Props> = ({ station, onClose, onSaved, fla
               rel="noreferrer"
               className="font-semibold text-adm-note hover:underline"
             >
-              find on Google Maps <Icon name="north_east" size={12} className="inline" />
+              find on Google Maps <ArrowUpRight className="inline size-3" aria-hidden="true" />
             </a>
             {hasGoogleMapsKey && <span className="text-adm-mute-text">or drag the pin above</span>}
           </div>
@@ -220,7 +220,6 @@ export const PinReviewModal: React.FC<Props> = ({ station, onClose, onSaved, fla
             </button>
           </div>
         </div>
-      </div>
-    </div>
+    </ModalFrame>
   );
 };

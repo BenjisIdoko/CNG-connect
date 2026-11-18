@@ -1,10 +1,16 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { ArrowRight } from 'lucide-react';
 import { useSupabaseClient } from '../../hooks/useSupabaseClient';
 import { parseCsv, toCsv } from '../../utils/csv';
 import { FullStationEditorModal } from '../FullStationEditorModal';
 import { PinReviewModal } from './PinReviewModal';
 import { AddStationModal } from './AddStationModal';
-import { Icon } from '../common/Icon';
+import { ModalFrame } from './ModalFrame';
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import { Skeleton } from '../ui/skeleton';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 
 type Tier = 'source_exact' | 'rooftop' | 'street' | 'area' | 'city';
 const TIERS: Tier[] = ['rooftop', 'street', 'area', 'source_exact', 'city'];
@@ -172,7 +178,7 @@ const EditableCell: React.FC<{
             setEditing(false);
           }
         }}
-        className={`block w-full border border-adm-note rounded-md px-4 py-3 text-xs bg-adm-muted/50 outline-none ${
+        className={`block w-full border border-adm-note rounded-md px-3 py-2.5 text-sm bg-adm-card outline-none ring-2 ring-adm-note ${
           align === 'right' ? 'text-right' : ''
         }`}
       />
@@ -183,7 +189,7 @@ const EditableCell: React.FC<{
       type="button"
       onClick={() => setEditing(true)}
       title="Click to edit"
-      className={`block w-full truncate px-4 py-3 text-xs hover:bg-adm-muted ${
+      className={`block w-full truncate px-3 py-2.5 text-sm outline-none hover:bg-adm-muted focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-adm-note ${
         align === 'right' ? 'text-right' : 'text-left'
       } ${value ? 'text-adm-ink' : 'text-adm-mute-text italic'}`}
     >
@@ -209,6 +215,7 @@ export const StationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash 
 
   // bulk CSV import
   const [csvDiffs, setCsvDiffs] = useState<CsvDiffRow[] | null>(null);
+  const csvInputRef = useRef<HTMLInputElement>(null);
   const [applyingCsv, setApplyingCsv] = useState(false);
 
   // full station details editor
@@ -406,158 +413,174 @@ export const StationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash 
   const fullEditorRow = fullEditorId ? rows.find((r) => r.id === fullEditorId) || null : null;
 
   return (
-    <div className="h-full flex flex-col min-h-0">
-      {/* toolbar */}
-      <div className="h-auto min-h-11 shrink-0 border-b border-adm-line flex flex-wrap items-center justify-between gap-2 px-4 py-2">
-        <div className="flex items-center gap-3 min-w-0 flex-wrap">
-          <span className="text-xs text-adm-warn font-semibold whitespace-nowrap">{reviewCount} need review</span>
-          <input
-            placeholder="Search name / address / state / operator"
+    <div className="flex h-full min-h-0 flex-col">
+      <div className="flex min-h-14 shrink-0 flex-wrap items-center justify-between gap-3 border-b border-adm-line bg-adm-card px-4 py-2 md:px-6">
+        <div className="flex min-w-0 flex-wrap items-center gap-3">
+          <Badge variant={reviewCount > 0 ? 'warning' : 'secondary'}>{reviewCount} need review</Badge>
+          <Input
+            type="search"
+            aria-label="Search stations"
+            placeholder="Search name, address, state or operator"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="border border-adm-line rounded-lg px-2.5 py-1.5 text-xs w-64"
+            className="w-72"
           />
-          <label className="flex items-center gap-1.5 text-xs text-adm-ink whitespace-nowrap">
-            <input type="checkbox" checked={onlyReview} onChange={(e) => setOnlyReview(e.target.checked)} />
-            Only needs-review
+          <label className="flex items-center gap-2 text-sm whitespace-nowrap text-adm-ink">
+            <input
+              type="checkbox"
+              className="size-4 accent-adm-note"
+              checked={onlyReview}
+              onChange={(e) => setOnlyReview(e.target.checked)}
+            />
+            Only needs review
           </label>
         </div>
-        <div className="flex items-center gap-2 shrink-0">
-          <button
-            onClick={() => setAdding(true)}
-            className="text-xs px-3 py-1.5 rounded-md bg-adm-foil text-adm-ink font-bold hover:bg-adm-foil-hover"
-          >
-            Add station
-          </button>
-          <button onClick={exportCsv} className="text-xs px-3 py-1.5 rounded-md bg-adm-muted hover:bg-adm-line">
+        <div className="flex shrink-0 items-center gap-2">
+          <Button onClick={() => setAdding(true)}>Add station</Button>
+          <Button variant="outline" onClick={exportCsv}>
             Export CSV
-          </button>
-          <label className="text-xs px-3 py-1.5 rounded-md bg-adm-muted hover:bg-adm-line cursor-pointer">
+          </Button>
+          <Button variant="outline" onClick={() => csvInputRef.current?.click()}>
             Upload CSV
-            <input type="file" accept=".csv,text/csv" className="hidden" onChange={onCsvFileSelected} />
-          </label>
+          </Button>
+          <input
+            ref={csvInputRef}
+            type="file"
+            accept=".csv,text/csv"
+            className="hidden"
+            aria-label="Upload a CSV file of station changes"
+            onChange={onCsvFileSelected}
+          />
         </div>
       </div>
 
       {selectedForDelete.size > 0 && (
-        <div className="shrink-0 flex items-center justify-between gap-2 px-4 py-2 bg-adm-danger-soft border-b border-adm-danger/30">
-          <span className="text-xs font-semibold text-adm-danger">{selectedForDelete.size} selected</span>
-          <div className="flex items-center gap-1.5">
-            <button
-              onClick={() => setSelectedForDelete(new Set())}
-              className="text-xs px-2.5 py-1 rounded-md bg-adm-card text-adm-ink hover:bg-adm-muted"
-            >
+        <div className="flex shrink-0 items-center justify-between gap-2 border-b border-adm-danger/30 bg-adm-danger-soft px-4 py-2 md:px-6">
+          <span className="text-sm font-semibold text-adm-danger">{selectedForDelete.size} selected</span>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={() => setSelectedForDelete(new Set())}>
               Clear
-            </button>
-            <button
-              onClick={() => setConfirmingDelete(true)}
-              className="text-xs px-2.5 py-1 rounded-md bg-adm-danger text-white font-semibold hover:bg-adm-danger/90"
-            >
+            </Button>
+            <Button variant="destructive" size="sm" onClick={() => setConfirmingDelete(true)}>
               Delete
-            </button>
+            </Button>
           </div>
         </div>
       )}
 
-      {/* data table */}
-      <div className="flex-1 overflow-auto p-4">
-        {loading && <p className="p-4 text-xs text-adm-mute-text">Loading stations…</p>}
-        {!loading && filtered.length > 0 && (
-          <div className="rounded-lg border border-adm-line">
-          <table className="min-w-full text-xs border-collapse">
-            <thead className="sticky top-0 z-10 bg-adm-paper text-adm-mute-text text-left [&_tr]:border-b [&_tr]:border-adm-line">
-              <tr>
-                <th className="h-11 px-4 w-10 align-middle">
-                  <input type="checkbox" checked={allVisibleSelected} onChange={toggleSelectAllVisible} aria-label="Select all" />
-                </th>
-                <th className="h-11 pl-3 pr-2 min-w-[170px] align-middle font-medium">Name</th>
-                <th className="h-11 px-3 min-w-[150px] align-middle font-medium">Location</th>
-                <th className="h-11 px-4 min-w-[130px] align-middle font-medium">Operator</th>
-                <th className="h-11 px-4 min-w-[80px] align-middle font-medium text-right">Price (₦)</th>
-                <th className="h-11 px-4 min-w-[80px] align-middle font-medium text-right">Pressure</th>
-                <th className="h-11 px-4 min-w-[110px] align-middle font-medium">Pin</th>
-                <th className="h-11 px-4 min-w-[110px] align-middle" />
-              </tr>
-            </thead>
-            <tbody className="[&_tr:last-child]:border-0">
-              {filtered.map((r) => (
-                <tr key={r.id} className={`border-b border-adm-line ${r.needs_pin_review ? 'bg-adm-warn-soft/50' : 'hover:bg-adm-paper/70'}`}>
-                  <td className="px-4 py-3 align-middle">
-                    <input
-                      type="checkbox"
-                      checked={selectedForDelete.has(r.id)}
-                      onChange={() => toggleDeleteSelect(r.id)}
-                      aria-label={`Select ${r.name}`}
-                    />
-                  </td>
-                  <td className="p-0 align-middle">
-                    <div className="flex items-center gap-2 pl-3">
-                      <span
-                        className={`shrink-0 inline-block w-2 h-2 rounded-md ${r.needs_pin_review ? 'bg-adm-warn' : 'bg-adm-note'}`}
-                      />
-                      <div className="flex-1 min-w-0">
-                        <EditableCell value={r.name} onCommit={(v) => void saveField(r, { name: v })} />
-                      </div>
-                    </div>
-                  </td>
-                  <td className="p-0 align-middle">
-                    <div className="flex items-center gap-1 pl-2">
-                      <div className="flex-1 min-w-0">
-                        <EditableCell value={r.city || ''} placeholder="City" onCommit={(v) => void saveField(r, { city: v })} />
-                      </div>
-                      <span className="text-adm-line shrink-0">,</span>
-                      <div className="w-14 shrink-0">
-                        <EditableCell value={r.state || ''} placeholder="State" onCommit={(v) => void saveField(r, { state: v })} />
-                      </div>
-                    </div>
-                  </td>
-                  <td className="p-0 align-middle">
-                    <EditableCell value={r.operator || ''} onCommit={(v) => void saveField(r, { operator: v })} />
-                  </td>
-                  <td className="p-0 align-middle">
-                    <EditableCell
-                      align="right"
-                      value={r.cng_price != null ? String(r.cng_price) : ''}
-                      onCommit={(v) => void saveNumericField(r, 'cng_price', v)}
-                    />
-                  </td>
-                  <td className="p-0 align-middle">
-                    <EditableCell
-                      align="right"
-                      value={r.pump_pressure != null ? String(r.pump_pressure) : ''}
-                      onCommit={(v) => void saveNumericField(r, 'pump_pressure', v)}
-                    />
-                  </td>
-                  <td className="px-4 py-3 align-middle">
-                    <button
-                      onClick={() => setPinReviewId(r.id)}
-                      className={`text-[0.6875rem] px-2.5 py-1 rounded-full font-semibold whitespace-nowrap ${
-                        r.needs_pin_review ? 'bg-adm-warn-soft text-adm-warn' : 'bg-adm-muted text-adm-ink hover:bg-adm-line'
-                      }`}
-                    >
-                      {TIER_SHORT[(r.location_precision as Tier) || 'city']}
-                    </button>
-                  </td>
-                  <td className="px-4 py-3 align-middle whitespace-nowrap">
-                    <button
-                      onClick={() => setFullEditorId(r.id)}
-                      className="text-[0.6875rem] px-3 py-1.5 rounded-lg bg-adm-note text-white font-semibold"
-                    >
-                      Full details
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      <div className="flex-1 overflow-auto p-4 md:p-6">
+        {loading && (
+          <div className="flex flex-col gap-3" aria-label="Loading stations">
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
           </div>
         )}
-        {!loading && filtered.length === 0 && <p className="p-4 text-xs text-adm-mute-text">Nothing matches.</p>}
+        {!loading && filtered.length > 0 && (
+          <div className="overflow-hidden rounded-lg border border-adm-line bg-adm-card">
+            <Table>
+              <TableHeader>
+                <TableRow className="hover:bg-transparent">
+                  <TableHead className="w-10">
+                    <input
+                      type="checkbox"
+                      className="size-4 accent-adm-note"
+                      checked={allVisibleSelected}
+                      onChange={toggleSelectAllVisible}
+                      aria-label="Select all"
+                    />
+                  </TableHead>
+                  <TableHead className="min-w-[170px]">Name</TableHead>
+                  <TableHead className="min-w-[150px]">Location</TableHead>
+                  <TableHead className="min-w-[130px]">Operator</TableHead>
+                  <TableHead className="min-w-[80px] text-right">Price (₦)</TableHead>
+                  <TableHead className="min-w-[80px] text-right">Pressure</TableHead>
+                  <TableHead className="min-w-[110px]">Pin</TableHead>
+                  <TableHead className="min-w-[110px]">
+                    <span className="sr-only">Actions</span>
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filtered.map((r) => (
+                  <TableRow key={r.id} className={r.needs_pin_review ? 'bg-adm-warn-soft/50' : undefined}>
+                    <TableCell>
+                      <input
+                        type="checkbox"
+                        className="size-4 accent-adm-note"
+                        checked={selectedForDelete.has(r.id)}
+                        onChange={() => toggleDeleteSelect(r.id)}
+                        aria-label={`Select ${r.name}`}
+                      />
+                    </TableCell>
+                    <TableCell className="p-0">
+                      <div className="flex items-center gap-2 pl-3">
+                        <span
+                          aria-hidden="true"
+                          className={`inline-block size-2 shrink-0 rounded-sm ${r.needs_pin_review ? 'bg-adm-warn' : 'bg-adm-note'}`}
+                        />
+                        <div className="min-w-0 flex-1">
+                          <EditableCell value={r.name} onCommit={(v) => void saveField(r, { name: v })} />
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="p-0">
+                      <div className="flex items-center gap-1 pl-2">
+                        <div className="min-w-0 flex-1">
+                          <EditableCell value={r.city || ''} placeholder="City" onCommit={(v) => void saveField(r, { city: v })} />
+                        </div>
+                        <span aria-hidden="true" className="shrink-0 text-adm-mute-text">
+                          ,
+                        </span>
+                        <div className="w-16 shrink-0">
+                          <EditableCell value={r.state || ''} placeholder="State" onCommit={(v) => void saveField(r, { state: v })} />
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="p-0">
+                      <EditableCell value={r.operator || ''} onCommit={(v) => void saveField(r, { operator: v })} />
+                    </TableCell>
+                    <TableCell className="p-0">
+                      <EditableCell
+                        align="right"
+                        value={r.cng_price != null ? String(r.cng_price) : ''}
+                        onCommit={(v) => void saveNumericField(r, 'cng_price', v)}
+                      />
+                    </TableCell>
+                    <TableCell className="p-0">
+                      <EditableCell
+                        align="right"
+                        value={r.pump_pressure != null ? String(r.pump_pressure) : ''}
+                        onCommit={(v) => void saveNumericField(r, 'pump_pressure', v)}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Button
+                        variant={r.needs_pin_review ? 'outline' : 'ghost'}
+                        size="sm"
+                        className={r.needs_pin_review ? 'border-adm-warn/40 text-adm-warn' : undefined}
+                        onClick={() => setPinReviewId(r.id)}
+                      >
+                        {TIER_SHORT[(r.location_precision as Tier) || 'city']}
+                      </Button>
+                    </TableCell>
+                    <TableCell className="whitespace-nowrap">
+                      <Button variant="secondary" size="sm" onClick={() => setFullEditorId(r.id)}>
+                        Full details
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        )}
+        {!loading && filtered.length === 0 && <p className="p-4 text-sm text-adm-mute-text">Nothing matches that search.</p>}
       </div>
 
       {confirmingDelete && (
-        <div className="fixed inset-0 z-[225] bg-black/40 grid place-items-center p-6">
-          <div className="w-full max-w-sm bg-adm-card rounded-lg shadow-xl p-5 flex flex-col gap-3">
+        <ModalFrame onClose={() => setConfirmingDelete(false)} title="Delete stations" className="max-w-sm">
+          <div className="flex flex-col gap-3 p-5">
             <h2 className="font-bold text-adm-ink text-sm">
               Delete {selectedForDelete.size} station{selectedForDelete.size === 1 ? '' : 's'}?
             </h2>
@@ -586,12 +609,12 @@ export const StationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash 
               </button>
             </div>
           </div>
-        </div>
+        </ModalFrame>
       )}
 
       {csvDiffs && (
-        <div className="fixed inset-0 z-[220] bg-black/40 grid place-items-center p-6">
-          <div className="w-full max-w-2xl max-h-[80vh] bg-adm-card rounded-lg shadow-xl flex flex-col">
+        <ModalFrame onClose={() => setCsvDiffs(null)} title="Review bulk update" className="max-w-2xl">
+          <div className="flex min-h-0 flex-1 flex-col">
             <div className="p-4 border-b border-adm-line flex items-center justify-between shrink-0">
               <h2 className="font-bold text-adm-ink text-sm">
                 Review bulk update — {csvDiffs.filter((d) => d.current && !d.error).length} station(s) to change
@@ -610,7 +633,7 @@ export const StationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash 
                   {Object.entries(d.changes).map(([k, v]) => (
                     <p key={k} className="text-adm-ink mt-0.5">
                       <span className="font-mono text-[0.75rem] text-adm-mute-text">{k}</span>: {v.from || '(empty)'}{' '}
-                      <Icon name="arrow_forward" size={12} className="inline" /> <span className="font-semibold text-adm-note">{v.to}</span>
+                      <ArrowRight className="inline size-3" aria-hidden="true" /> <span className="font-semibold text-adm-note">{v.to}</span>
                     </p>
                   ))}
                 </div>
@@ -631,7 +654,7 @@ export const StationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash 
               </button>
             </div>
           </div>
-        </div>
+        </ModalFrame>
       )}
 
       {adding && (

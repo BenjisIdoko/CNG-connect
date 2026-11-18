@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { ArrowRight } from 'lucide-react';
 import { useSupabaseClient } from '../../hooks/useSupabaseClient';
 import { useAuth } from '../../context/AuthContext';
 import { FullStationEditorModal, FullStationRow } from '../FullStationEditorModal';
-import { Icon } from '../common/Icon';
 import { StationQuickUpdate } from './StationQuickUpdate';
 
 type ManagedStation = FullStationRow & {
@@ -93,7 +93,7 @@ export const MyStationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flas
               onClick={() => setEditingId(s.id)}
               className="mt-3 text-xs text-adm-note font-semibold inline-flex items-center gap-1 hover:underline"
             >
-              Edit details <Icon name="arrow_forward" size={12} />
+              Edit details <ArrowRight className="size-3" aria-hidden="true" />
             </button>
           </div>
         ))}

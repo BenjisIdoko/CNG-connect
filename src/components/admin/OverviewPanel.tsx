@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useSupabaseClient } from '../../hooks/useSupabaseClient';
 import { OverviewData, OverviewTarget, OverviewView } from './OverviewView';
 import type { QueueItem } from '../../utils/adminQueue';
+import type { ThreadCounts } from '../../utils/adminThread';
 
 const LAST_VISIT_KEY = 'cng-admin-last-visit';
 
@@ -22,7 +23,11 @@ const EMPTY: OverviewData = { counts: null, items: [], totals: { stations: null,
  * ranked oldest first, plus totals. It only reads, using the same queries the other tabs use. If
  * any of the three queues cannot be read it refuses to claim "all clear" and says so.
  */
-export const OverviewPanel: React.FC<{ onNavigate: (target: OverviewTarget) => void }> = ({ onNavigate }) => {
+export const OverviewPanel: React.FC<{
+  onNavigate: (target: OverviewTarget) => void;
+  /** Called whenever the three queue counts are known, so the sidebar can badge them. */
+  onCounts?: (counts: ThreadCounts) => void;
+}> = ({ onNavigate, onCounts }) => {
   const supabase = useSupabaseClient();
   const [data, setData] = useState<OverviewData>(EMPTY);
   const [loading, setLoading] = useState(true);
@@ -111,6 +116,7 @@ export const OverviewPanel: React.FC<{ onNavigate: (target: OverviewTarget) => v
             pin: items.filter((i) => i.kind === 'pin').length,
           };
 
+    if (counts && onCounts) onCounts(counts);
     setData({
       counts,
       items,
@@ -122,7 +128,7 @@ export const OverviewPanel: React.FC<{ onNavigate: (target: OverviewTarget) => v
     });
     setErrors(problems);
     setLoading(false);
-  }, [supabase]);
+  }, [supabase, onCounts]);
 
   useEffect(() => {
     void load();

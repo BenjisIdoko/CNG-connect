@@ -5,6 +5,7 @@ import { useSupabaseClient } from '../../hooks/useSupabaseClient';
 import { AdminAuthGate } from './AdminAuthGate';
 import { AdminSidebarLayout, AdminNavItem } from './AdminSidebarLayout';
 import { OverviewPanel } from './OverviewPanel';
+import type { ThreadCounts } from '../../utils/adminThread';
 import { StationsPanel } from './StationsPanel';
 import { ReportsPanel } from './ReportsPanel';
 import { UsersPanel } from './UsersPanel';
@@ -39,7 +40,17 @@ export const AdminScreen: React.FC<{ onExit: () => void }> = ({ onExit }) => {
   const isAdmin = Boolean(driverProfile.isAdmin);
   // How many driver suggestions are waiting; shown as a badge on the "Suggestions" tab.
   const [pendingSuggestions, setPendingSuggestions] = useState(0);
-  const navItems = ADMIN_NAV.map((n) => (n.key === 'suggestions' ? { ...n, badge: pendingSuggestions } : n));
+  // Counts the Overview found, so the sidebar can badge flagged reports and pin reviews too.
+  const [queueCounts, setQueueCounts] = useState<ThreadCounts | null>(null);
+  const navItems = ADMIN_NAV.map((n) =>
+    n.key === 'suggestions'
+      ? { ...n, badge: pendingSuggestions }
+      : n.key === 'reports'
+        ? { ...n, badge: queueCounts?.flagged ?? 0 }
+        : n.key === 'stations'
+          ? { ...n, badge: queueCounts?.pin ?? 0 }
+          : n,
+  );
 
   const [activeKey, setActiveKey] = useState(navItems[0].key);
 
@@ -83,7 +94,7 @@ export const AdminScreen: React.FC<{ onExit: () => void }> = ({ onExit }) => {
         onSignOut={signOut}
         onExit={onExit}
       >
-        {isAdmin && activeKey === 'overview' && <OverviewPanel onNavigate={setActiveKey} />}
+        {isAdmin && activeKey === 'overview' && <OverviewPanel onNavigate={setActiveKey} onCounts={setQueueCounts} />}
         {isAdmin && activeKey === 'stations' && <StationsPanel flash={flash} />}
         {isAdmin && activeKey === 'suggestions' && (
           <SuggestionsPanel flash={flash} onCountChange={setPendingSuggestions} />

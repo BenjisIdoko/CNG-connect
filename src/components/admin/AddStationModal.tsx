@@ -5,6 +5,7 @@ import { createStation, validateNewStation, type NewStationInput } from '../../s
 import { findSimilarStations, isExactNameDuplicate, type DuplicateHit, type StationRef } from '../../utils/stationDuplicates';
 import type { PinTier } from '../../utils/geoInput';
 import { PositionPicker } from './PositionPicker';
+import { ModalFrame } from './ModalFrame';
 
 interface Props {
   /** Existing stations, for the duplicate and nearby warnings. */
@@ -23,7 +24,7 @@ const REASON_LABEL: Record<DuplicateHit['reason'], string> = {
 };
 
 const inputCls =
-  'w-full border border-adm-line rounded-lg px-2.5 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-adm-note/40';
+  'w-full border border-adm-line rounded-lg px-2.5 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-adm-note';
 const labelCls = 'text-xs font-semibold text-adm-mute-text mb-1 block';
 
 /** Short form for adding one station: basics plus a required map position. */
@@ -79,8 +80,7 @@ export const AddStationModal: React.FC<Props> = ({ stations, prefill, onClose, o
   };
 
   return (
-    <div className="fixed inset-0 z-[230] bg-black/40 grid place-items-center p-6">
-      <div role="dialog" aria-label="Add station" className="w-full max-w-xl max-h-[90vh] bg-adm-card rounded-lg shadow-xl flex flex-col">
+    <ModalFrame onClose={onClose} title="Add station" className="max-w-xl">
         <div className="p-4 border-b border-adm-line shrink-0">
           <h2 className="font-bold text-adm-ink text-sm">Add station</h2>
           <p className="text-xs text-adm-mute-text">
@@ -177,7 +177,6 @@ export const AddStationModal: React.FC<Props> = ({ stations, prefill, onClose, o
             </button>
           </div>
         </div>
-      </div>
-    </div>
+    </ModalFrame>
   );
 };
