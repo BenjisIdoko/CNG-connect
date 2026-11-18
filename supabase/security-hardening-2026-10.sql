@@ -394,7 +394,7 @@ begin
       r.proname like 'admin\_%'
       or r.proname in (
         'award_report_points', 'claim_referral', 'cng_is_admin', 'cng_report_hidden',
-        'get_leaderboard', 'my_managed_stations', 'my_referral_code',
+        'get_leaderboard', 'manager_post_pressure', 'manager_post_selling', 'my_managed_stations', 'my_referral_code',
         'my_referral_summary', 'report_station_status', 'toggle_post_like'
       )
     ) then
