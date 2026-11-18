@@ -28,8 +28,6 @@ export type EventName =
   | 'arrival_prompt_shown'
   | 'followup_prompt_shown'
   | 'followup_dismissed'
-  | 'queue_left_prompt_shown'
-  | 'queue_left_answer'
   | 'install_prompt_accepted'
   | 'app_installed'
   | 'notification_permission'

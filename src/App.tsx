@@ -65,7 +65,7 @@ import { haptic } from './utils/haptics';
 import { track } from './services/analytics';
 import { takeDueFollowUp } from './utils/followUp';
 import { isAtStation, stationsToPing, PRESENCE_TTL_MINUTES, type PingPosition } from './utils/geofencePresence';
-import { clearQueueWatchFor, rememberQueueReport, takeDueLeftPrompt } from './utils/queueWatch';
+import { reportProofProblem } from './utils/reportProof';
 import { useBackLayer } from './utils/backLayer';
 import { Icon } from './components/common/Icon';
 
@@ -118,7 +118,7 @@ export const App: React.FC = () => {
   const [isRoiModalOpen, setIsRoiModalOpen] = useState(false);
   const [unlockedTierModal, setUnlockedTierModal] = useState<DriverTier | null>(null);
   const [proximityAlertStation, setProximityAlertStation] = useState<GasStation | null>(null);
-  const [proximityVariant, setProximityVariant] = useState<'arrival' | 'followup' | 'left'>('arrival');
+  const [proximityVariant, setProximityVariant] = useState<'arrival' | 'followup'>('arrival');
   const [globalToast, setGlobalToast] = useState<{ msg: string; tone?: ToastTone } | null>(null);
   const [gpsStatus, setGpsStatus] = useState<GpsStatus>('unavailable');
 
@@ -400,13 +400,11 @@ export const App: React.FC = () => {
   // handler below refreshes that presence automatically (at most every 2 minutes per station), so
   // the queue status can tell whether anyone is actually at the station. Read through a ref because
   // the GPS watch is created once per profile and must see the latest stations and sign-in state.
-  const presenceCtxRef = useRef({ stations, isAuthenticated, userKey: '', busy: false });
+  const presenceCtxRef = useRef({ stations, isAuthenticated, userKey: '' });
   presenceCtxRef.current = {
     stations,
     isAuthenticated,
     userKey: userProfile.email || userProfile.phone || 'default_driver',
-    // Another prompt or screen is already in front of the driver.
-    busy: !!proximityAlertStation || isReportModalOpen || authMode !== null || showSplash,
   };
   const lastPresencePingRef = useRef<Record<string, number>>({});
   const lastFixRef = useRef<PingPosition | null>(null);
@@ -458,24 +456,10 @@ export const App: React.FC = () => {
       }
 
       // Presence: tell the database this driver is at a station (guests are never counted).
-      const presence = presenceCtxRef.current;
       const now = Date.now();
       const fix: PingPosition = { lat: latitude, lng: longitude, accuracy: pos.coords.accuracy };
       lastFixRef.current = fix;
       pingPresenceFromFix(fix, now);
-      if (presence.isAuthenticated) {
-        // The driver who reported a queue has moved away from that station: ask once if it is still there.
-        if (!presence.busy) {
-          const due = takeDueLeftPrompt(fix, now);
-          const dueStation = due ? presence.stations.find((st) => st.id === due.stationId) : undefined;
-          if (dueStation) {
-            setProximityVariant('left');
-            track('queue_left_prompt_shown', { station_id: dueStation.id });
-            setProximityAlertStation(dueStation);
-          }
-        }
-      }
-
       // Dynamically compute exact distance & drive time for all stations relative to user's real GPS position
       setStations((prevStations) => {
         const updated = prevStations.map((st) => {
@@ -707,18 +691,16 @@ export const App: React.FC = () => {
     station: GasStation,
     newReport: DriverReport,
     newStatus: StationStatus,
-    source: 'form' | 'arrival' | 'followup' | 'left' = 'form'
   ) => {
-    track('report_submitted', { status: newStatus, has_photo: Boolean(newReport.photo), source, station_id: station.id });
+    // Whatever route a report takes, it never posts without a live photo taken at the station.
+    if (reportProofProblem(newReport, station)) {
+      showToast('A photo taken at the station is required.', 'warn');
+      return;
+    }
 
-    // Remember a fresh queue report so we can ask if it is still there once the driver leaves. An
-    // answer from that very question never starts a new watch (it would ask again at once).
-    if (newStatus === 'queue' && source !== 'left') rememberQueueReport(station);
-    else clearQueueWatchFor(station.id);
-    if (source === 'left') track('queue_left_answer', { station_id: station.id, answer: newStatus });
+    track('report_submitted', { status: newStatus, has_photo: true, source: 'form', station_id: station.id });
 
-    // The arrival/follow-up sheet shows its own confirmation.
-    if (source === 'form') setBurst({ status: newStatus, key: Date.now() });
+    setBurst({ status: newStatus, key: Date.now() });
     haptic(15);
     flashStations([station.id]);
 
@@ -741,12 +723,6 @@ export const App: React.FC = () => {
       newStatus,
       userProfile.state || 'Abuja FCT'
     );
-
-    // Answers to "is the queue still there?" are not worth points (so the question cannot be farmed).
-    if (source === 'left') {
-      showToast('Thanks, station updated.');
-      return;
-    }
 
     const oldPoints = userProfile.communityPoints || 0;
     const oldTier = getDriverTier(oldPoints).currentTier;
@@ -772,7 +748,7 @@ export const App: React.FC = () => {
 
   const handleSubmitReport = (newReport: DriverReport, newStatus: StationStatus) => {
     if (!reportingStation) return Promise.resolve();
-    return submitReportFor(reportingStation, newReport, newStatus, 'form');
+    return submitReportFor(reportingStation, newReport, newStatus);
   };
 
   const handleAddStationComment = async (stationId: string, commentText: string) => {
@@ -975,21 +951,10 @@ export const App: React.FC = () => {
         <ProximityAlertBanner
           station={proximityAlertStation}
           variant={proximityVariant}
-          onQuickSubmitReport={(st, report, status) => {
-            if (!requireAuth()) {
-              setProximityAlertStation(null);
-              return false;
-            }
-            void submitReportFor(
-              st,
-              { ...report, author: userProfile.name || 'Driver', authorAvatar: userProfile.avatar || '', comment: undefined },
-              status,
-              proximityVariant
-            );
-          }}
-          onShareStatus={(st) => {
+          onPickStatus={(st, status) => {
+            // Reports need a live photo taken at the station, so a tap opens the report sheet on that status.
             setProximityAlertStation(null);
-            handleOpenReportModal(st);
+            handleOpenReportModal(st, status);
           }}
           onDismiss={() => {
             if (proximityVariant === 'followup') track('followup_dismissed', { station_id: proximityAlertStation.id });
