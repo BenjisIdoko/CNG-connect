@@ -46,3 +46,29 @@ export function stationsToPing(
     .slice(0, MAX_STATIONS_PER_FIX)
     .map((s) => s.id);
 }
+
+/**
+ * A report must come from someone actually at the station: within this many metres when the photo
+ * is taken (and again when the report is submitted). Tighter than the 250 m "car here" geofence.
+ */
+export const REPORT_GEOFENCE_METERS = 150;
+
+export type ReportPositionCheck = { allowed: true } | { allowed: false; reason: string };
+
+/** Whether a GPS fix is good enough, and close enough, to let a driver report this station. */
+export function checkReportPosition(
+  position: PingPosition | null | undefined,
+  station: { lat: number; lng: number },
+): ReportPositionCheck {
+  if (!position || !hasCoordinates(position)) return { allowed: false, reason: 'Turn on location to report.' };
+  if (!isAccurateEnough(position)) {
+    return { allowed: false, reason: "Your location isn't precise enough yet. Step into the open and try again." };
+  }
+  if (!hasCoordinates(station) || haversineMeters(position, station) > REPORT_GEOFENCE_METERS) {
+    return {
+      allowed: false,
+      reason: 'Reports unlock within 150 m of the station so every status comes from someone actually there.',
+    };
+  }
+  return { allowed: true };
+}

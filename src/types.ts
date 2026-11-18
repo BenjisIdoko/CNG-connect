@@ -35,6 +35,11 @@ export interface DriverReport {
   dislikes?: number;
   userVoted?: 'up' | 'down' | null;
   photo?: string;
+  /** Where the phone was when the photo was taken (a report needs a photo within 150 m of the station). */
+  photoLat?: number;
+  photoLng?: number;
+  /** Radius in metres the browser reported for that fix. */
+  photoAccuracyM?: number;
 }
 
 export interface GasStation {

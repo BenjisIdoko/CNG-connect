@@ -4,6 +4,8 @@ import {
   PRESENCE_GEOFENCE_METERS,
   PRESENCE_PING_INTERVAL_MS,
   PRESENCE_TTL_MINUTES,
+  REPORT_GEOFENCE_METERS,
+  checkReportPosition,
   isAtStation,
   stationsToPing,
 } from './geofencePresence';
@@ -71,5 +73,39 @@ describe('stationsToPing', () => {
   it('ignores a station with missing coordinates', () => {
     const stations = [{ id: 'bad', lat: Number.NaN, lng: Number.NaN }, station('a', 50)];
     expect(stationsToPing(HERE, stations, {}, NOW)).toEqual(['a']);
+  });
+});
+
+describe('checkReportPosition (the 150 m rule for reporting)', () => {
+  const TOO_FAR = 'Reports unlock within 150 m of the station so every status comes from someone actually there.';
+
+  it('uses a 150 m radius', () => {
+    expect(REPORT_GEOFENCE_METERS).toBe(150);
+  });
+
+  it('allows a fix 149 m away and refuses one 151 m away with the 150 m reason', () => {
+    expect(checkReportPosition(HERE, station('a', 149))).toEqual({ allowed: true });
+    expect(checkReportPosition(HERE, station('a', 151))).toEqual({ allowed: false, reason: TOO_FAR });
+  });
+
+  it('refuses when there is no usable position', () => {
+    const noFix = { allowed: false, reason: 'Turn on location to report.' };
+    expect(checkReportPosition(null, station('a', 10))).toEqual(noFix);
+    expect(checkReportPosition(undefined, station('a', 10))).toEqual(noFix);
+    expect(checkReportPosition({ lat: Number.NaN, lng: 7.4 }, station('a', 10))).toEqual(noFix);
+    expect(checkReportPosition({ lat: 9.0, lng: Number.NaN }, station('a', 10))).toEqual(noFix);
+  });
+
+  it('refuses a fix less accurate than 100 m, allows exactly 100 m and a fix with no accuracy value', () => {
+    expect(checkReportPosition({ ...HERE, accuracy: 101 }, station('a', 10))).toEqual({
+      allowed: false,
+      reason: "Your location isn't precise enough yet. Step into the open and try again.",
+    });
+    expect(checkReportPosition({ ...HERE, accuracy: 100 }, station('a', 10))).toEqual({ allowed: true });
+    expect(checkReportPosition(HERE, station('a', 10))).toEqual({ allowed: true });
+  });
+
+  it('refuses a station with no map position instead of guessing', () => {
+    expect(checkReportPosition(HERE, { lat: Number.NaN, lng: Number.NaN })).toEqual({ allowed: false, reason: TOO_FAR });
   });
 });
