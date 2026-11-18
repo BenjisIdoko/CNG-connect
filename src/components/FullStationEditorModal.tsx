@@ -45,8 +45,8 @@ interface ManagerInfo {
 const toTimeInput = (v: string | null) => (v ? v.slice(0, 5) : '');
 
 const inputCls =
-  'w-full border border-slate-300 rounded-lg px-2.5 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/30';
-const labelCls = 'text-xs font-semibold text-slate-500 mb-1 block';
+  'w-full border border-adm-line rounded-lg px-2.5 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-adm-note/40';
+const labelCls = 'text-xs font-semibold text-adm-mute-text mb-1 block';
 
 export const FullStationEditorModal: React.FC<Props> = ({ station, onClose, onSaved, isAdmin = false }) => {
   const supabase = useSupabaseClient();
@@ -267,27 +267,27 @@ export const FullStationEditorModal: React.FC<Props> = ({ station, onClose, onSa
 
   return (
     <div className="fixed inset-0 z-[230] bg-black/40 grid place-items-center p-4">
-      <div className="w-full max-w-2xl max-h-[88vh] bg-white rounded-2xl shadow-xl flex flex-col">
-        <div className="p-4 border-b border-slate-200 flex items-center justify-between shrink-0">
-          <h2 className="font-extrabold text-slate-900 text-sm truncate pr-2">Full details — {station.name}</h2>
-          <button onClick={onClose} className="text-xs px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 shrink-0">
+      <div className="w-full max-w-2xl max-h-[88vh] bg-adm-card rounded-lg shadow-xl flex flex-col">
+        <div className="p-4 border-b border-adm-line flex items-center justify-between shrink-0">
+          <h2 className="font-bold text-adm-ink text-sm truncate pr-2">Full details — {station.name}</h2>
+          <button onClick={onClose} className="text-xs px-3 py-1.5 rounded-md bg-adm-muted hover:bg-adm-line shrink-0">
             Close
           </button>
         </div>
 
         <div className="flex-1 overflow-y-auto p-5 flex flex-col gap-6">
-          {err && <p className="text-xs font-semibold text-rose-600 bg-rose-50 border border-rose-200 rounded-lg px-3 py-2">{err}</p>}
+          {err && <p className="text-xs font-semibold text-adm-danger bg-adm-danger-soft border border-adm-danger/30 rounded-lg px-3 py-2">{err}</p>}
 
           {/* Photos */}
           <section className="flex flex-col gap-2">
-            <h3 className="text-xs font-extrabold text-slate-400 uppercase tracking-wide">Photos</h3>
+            <h3 className="text-xs font-bold text-adm-mute-text uppercase tracking-wide">Photos</h3>
             <div className="grid grid-cols-3 gap-2">
               {images.map((url) => (
-                <div key={url} className="relative aspect-video rounded-lg overflow-hidden border border-slate-200 bg-slate-100 group">
+                <div key={url} className="relative aspect-video rounded-lg overflow-hidden border border-adm-line bg-adm-muted group">
                   <img src={url} alt="" className="w-full h-full object-cover" />
                   <button
                     onClick={() => removeImage(url)}
-                    className="absolute top-1 right-1 w-6 h-6 rounded-full bg-black/60 text-white text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute top-1 right-1 w-6 h-6 rounded-md bg-black/60 text-white text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                     aria-label="Remove photo"
                   >
                     <Icon name="close" size={12} />
@@ -297,7 +297,7 @@ export const FullStationEditorModal: React.FC<Props> = ({ station, onClose, onSa
               <button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploading}
-                className="aspect-video rounded-lg border-2 border-dashed border-slate-300 text-slate-400 hover:border-emerald-400 hover:text-emerald-600 flex flex-col items-center justify-center gap-1 text-xs font-semibold disabled:opacity-50"
+                className="aspect-video rounded-lg border-2 border-dashed border-adm-line text-adm-mute-text hover:border-adm-note hover:text-adm-note flex flex-col items-center justify-center gap-1 text-xs font-semibold disabled:opacity-50"
               >
                 <span className="text-lg leading-none">{uploading ? '…' : '+'}</span>
                 {uploading ? 'Uploading' : 'Add photo'}
@@ -308,7 +308,7 @@ export const FullStationEditorModal: React.FC<Props> = ({ station, onClose, onSa
 
           {/* Core Info */}
           <section className="flex flex-col gap-3">
-            <h3 className="text-xs font-extrabold text-slate-400 uppercase tracking-wide">Core info</h3>
+            <h3 className="text-xs font-bold text-adm-mute-text uppercase tracking-wide">Core info</h3>
             <div>
               <label className={labelCls}>Name</label>
               <input className={inputCls} value={name} onChange={(e) => setName(e.target.value)} />
@@ -331,7 +331,7 @@ export const FullStationEditorModal: React.FC<Props> = ({ station, onClose, onSa
                   <option value="ev_charging">EV charging</option>
                 </select>
               </div>
-              <label className="flex items-center gap-2 text-sm font-medium text-slate-700 pb-1.5">
+              <label className="flex items-center gap-2 text-sm font-medium text-adm-ink pb-1.5">
                 <input type="checkbox" checked={isAccredited} onChange={(e) => setIsAccredited(e.target.checked)} />
                 Pi-CNG accredited
               </label>
@@ -358,7 +358,7 @@ export const FullStationEditorModal: React.FC<Props> = ({ station, onClose, onSa
 
           {/* Pricing & Specs */}
           <section className="flex flex-col gap-3">
-            <h3 className="text-xs font-extrabold text-slate-400 uppercase tracking-wide">Pricing & specs</h3>
+            <h3 className="text-xs font-bold text-adm-mute-text uppercase tracking-wide">Pricing & specs</h3>
             {isEv ? (
               <>
                 <div>
@@ -405,8 +405,8 @@ export const FullStationEditorModal: React.FC<Props> = ({ station, onClose, onSa
 
           {/* Hours */}
           <section className="flex flex-col gap-3">
-            <h3 className="text-xs font-extrabold text-slate-400 uppercase tracking-wide">Hours</h3>
-            <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
+            <h3 className="text-xs font-bold text-adm-mute-text uppercase tracking-wide">Hours</h3>
+            <label className="flex items-center gap-2 text-sm font-medium text-adm-ink">
               <input type="checkbox" checked={is24Hours} onChange={(e) => setIs24Hours(e.target.checked)} />
               Open 24 hours
             </label>
@@ -430,31 +430,31 @@ export const FullStationEditorModal: React.FC<Props> = ({ station, onClose, onSa
 
           {isAdmin && (
             <section className="flex flex-col gap-2">
-              <h3 className="text-xs font-extrabold text-slate-400 uppercase tracking-wide">
+              <h3 className="text-xs font-bold text-adm-mute-text uppercase tracking-wide">
                 Station managers
               </h3>
-              <p className="text-xs text-slate-500 -mt-1">
+              <p className="text-xs text-adm-mute-text -mt-1">
                 A manager can edit only this station's details (not pin location review, bulk tools, or other stations).
               </p>
               {loadingManagers ? (
-                <p className="text-xs text-slate-400">Loading…</p>
+                <p className="text-xs text-adm-mute-text">Loading…</p>
               ) : managers.length === 0 ? (
-                <p className="text-xs text-slate-400">No managers assigned yet.</p>
+                <p className="text-xs text-adm-mute-text">No managers assigned yet.</p>
               ) : (
                 <div className="flex flex-col gap-1.5">
                   {managers.map((m) => (
                     <div
                       key={m.userId}
-                      className="flex items-center justify-between gap-2 border border-slate-200 rounded-lg px-2.5 py-1.5"
+                      className="flex items-center justify-between gap-2 border border-adm-line rounded-lg px-2.5 py-1.5"
                     >
                       <div className="min-w-0">
-                        <p className="text-sm font-semibold text-slate-900 truncate">{m.name || 'Unnamed driver'}</p>
-                        <p className="text-xs text-slate-500 truncate">{m.email}</p>
+                        <p className="text-sm font-semibold text-adm-ink truncate">{m.name || 'Unnamed driver'}</p>
+                        <p className="text-xs text-adm-mute-text truncate">{m.email}</p>
                       </div>
                       <button
                         onClick={() => removeManager(m.email)}
                         disabled={managerBusy}
-                        className="text-xs px-2.5 py-1 rounded-full bg-rose-50 text-rose-600 hover:bg-rose-100 font-semibold shrink-0 disabled:opacity-50"
+                        className="text-xs px-2.5 py-1 rounded-md bg-adm-danger-soft text-adm-danger hover:bg-adm-danger-soft font-semibold shrink-0 disabled:opacity-50"
                       >
                         Remove
                       </button>
@@ -473,26 +473,26 @@ export const FullStationEditorModal: React.FC<Props> = ({ station, onClose, onSa
                 <button
                   onClick={addManager}
                   disabled={managerBusy || !newManagerEmail.trim()}
-                  className="text-xs px-3 py-1.5 rounded-lg bg-slate-800 text-white font-semibold whitespace-nowrap disabled:opacity-50"
+                  className="text-xs px-3 py-1.5 rounded-lg bg-adm-note text-white font-semibold whitespace-nowrap disabled:opacity-50"
                 >
                   Add
                 </button>
               </div>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-adm-mute-text">
                 The email must belong to a driver who has already signed up (any email-verified account works).
               </p>
             </section>
           )}
         </div>
 
-        <div className="p-4 border-t border-slate-200 flex justify-end gap-2 shrink-0">
-          <button onClick={onClose} className="text-xs px-4 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200">
+        <div className="p-4 border-t border-adm-line flex justify-end gap-2 shrink-0">
+          <button onClick={onClose} className="text-xs px-4 py-1.5 rounded-lg bg-adm-muted hover:bg-adm-line">
             Cancel
           </button>
           <button
             onClick={save}
             disabled={saving || !name.trim()}
-            className="text-xs px-4 py-1.5 rounded-lg bg-emerald-600 text-white font-bold disabled:opacity-50"
+            className="text-xs px-4 py-1.5 rounded-lg bg-adm-foil text-adm-ink font-bold disabled:opacity-50"
           >
             {saving ? 'Saving…' : 'Save all'}
           </button>

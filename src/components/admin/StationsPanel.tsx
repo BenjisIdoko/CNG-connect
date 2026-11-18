@@ -172,7 +172,7 @@ const EditableCell: React.FC<{
             setEditing(false);
           }
         }}
-        className={`block w-full border border-emerald-400 rounded-md px-4 py-3 text-xs bg-emerald-50/50 outline-none ${
+        className={`block w-full border border-adm-note rounded-md px-4 py-3 text-xs bg-adm-muted/50 outline-none ${
           align === 'right' ? 'text-right' : ''
         }`}
       />
@@ -183,9 +183,9 @@ const EditableCell: React.FC<{
       type="button"
       onClick={() => setEditing(true)}
       title="Click to edit"
-      className={`block w-full truncate px-4 py-3 text-xs hover:bg-slate-100 ${
+      className={`block w-full truncate px-4 py-3 text-xs hover:bg-adm-muted ${
         align === 'right' ? 'text-right' : 'text-left'
-      } ${value ? 'text-slate-800' : 'text-slate-400 italic'}`}
+      } ${value ? 'text-adm-ink' : 'text-adm-mute-text italic'}`}
     >
       {value || placeholder || '—'}
     </button>
@@ -408,16 +408,16 @@ export const StationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash 
   return (
     <div className="h-full flex flex-col min-h-0">
       {/* toolbar */}
-      <div className="h-auto min-h-11 shrink-0 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2 px-4 py-2">
+      <div className="h-auto min-h-11 shrink-0 border-b border-adm-line flex flex-wrap items-center justify-between gap-2 px-4 py-2">
         <div className="flex items-center gap-3 min-w-0 flex-wrap">
-          <span className="text-xs text-orange-600 font-semibold whitespace-nowrap">{reviewCount} need review</span>
+          <span className="text-xs text-adm-warn font-semibold whitespace-nowrap">{reviewCount} need review</span>
           <input
             placeholder="Search name / address / state / operator"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs w-64"
+            className="border border-adm-line rounded-lg px-2.5 py-1.5 text-xs w-64"
           />
-          <label className="flex items-center gap-1.5 text-xs text-slate-600 whitespace-nowrap">
+          <label className="flex items-center gap-1.5 text-xs text-adm-ink whitespace-nowrap">
             <input type="checkbox" checked={onlyReview} onChange={(e) => setOnlyReview(e.target.checked)} />
             Only needs-review
           </label>
@@ -425,14 +425,14 @@ export const StationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash 
         <div className="flex items-center gap-2 shrink-0">
           <button
             onClick={() => setAdding(true)}
-            className="text-xs px-3 py-1.5 rounded-full bg-emerald-600 text-white font-bold hover:bg-emerald-700"
+            className="text-xs px-3 py-1.5 rounded-md bg-adm-foil text-adm-ink font-bold hover:bg-adm-foil-hover"
           >
             Add station
           </button>
-          <button onClick={exportCsv} className="text-xs px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200">
+          <button onClick={exportCsv} className="text-xs px-3 py-1.5 rounded-md bg-adm-muted hover:bg-adm-line">
             Export CSV
           </button>
-          <label className="text-xs px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 cursor-pointer">
+          <label className="text-xs px-3 py-1.5 rounded-md bg-adm-muted hover:bg-adm-line cursor-pointer">
             Upload CSV
             <input type="file" accept=".csv,text/csv" className="hidden" onChange={onCsvFileSelected} />
           </label>
@@ -440,18 +440,18 @@ export const StationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash 
       </div>
 
       {selectedForDelete.size > 0 && (
-        <div className="shrink-0 flex items-center justify-between gap-2 px-4 py-2 bg-rose-50 border-b border-rose-200">
-          <span className="text-xs font-semibold text-rose-700">{selectedForDelete.size} selected</span>
+        <div className="shrink-0 flex items-center justify-between gap-2 px-4 py-2 bg-adm-danger-soft border-b border-adm-danger/30">
+          <span className="text-xs font-semibold text-adm-danger">{selectedForDelete.size} selected</span>
           <div className="flex items-center gap-1.5">
             <button
               onClick={() => setSelectedForDelete(new Set())}
-              className="text-xs px-2.5 py-1 rounded-full bg-white text-slate-600 hover:bg-slate-100"
+              className="text-xs px-2.5 py-1 rounded-md bg-adm-card text-adm-ink hover:bg-adm-muted"
             >
               Clear
             </button>
             <button
               onClick={() => setConfirmingDelete(true)}
-              className="text-xs px-2.5 py-1 rounded-full bg-rose-600 text-white font-semibold hover:bg-rose-700"
+              className="text-xs px-2.5 py-1 rounded-md bg-adm-danger text-white font-semibold hover:bg-adm-danger/90"
             >
               Delete
             </button>
@@ -461,11 +461,11 @@ export const StationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash 
 
       {/* data table */}
       <div className="flex-1 overflow-auto p-4">
-        {loading && <p className="p-4 text-xs text-slate-400">Loading stations…</p>}
+        {loading && <p className="p-4 text-xs text-adm-mute-text">Loading stations…</p>}
         {!loading && filtered.length > 0 && (
-          <div className="rounded-lg border border-slate-200">
+          <div className="rounded-lg border border-adm-line">
           <table className="min-w-full text-xs border-collapse">
-            <thead className="sticky top-0 z-10 bg-slate-50 text-slate-500 text-left [&_tr]:border-b [&_tr]:border-slate-200">
+            <thead className="sticky top-0 z-10 bg-adm-paper text-adm-mute-text text-left [&_tr]:border-b [&_tr]:border-adm-line">
               <tr>
                 <th className="h-11 px-4 w-10 align-middle">
                   <input type="checkbox" checked={allVisibleSelected} onChange={toggleSelectAllVisible} aria-label="Select all" />
@@ -481,7 +481,7 @@ export const StationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash 
             </thead>
             <tbody className="[&_tr:last-child]:border-0">
               {filtered.map((r) => (
-                <tr key={r.id} className={`border-b border-slate-100 ${r.needs_pin_review ? 'bg-orange-50/50' : 'hover:bg-slate-50/70'}`}>
+                <tr key={r.id} className={`border-b border-adm-line ${r.needs_pin_review ? 'bg-adm-warn-soft/50' : 'hover:bg-adm-paper/70'}`}>
                   <td className="px-4 py-3 align-middle">
                     <input
                       type="checkbox"
@@ -493,7 +493,7 @@ export const StationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash 
                   <td className="p-0 align-middle">
                     <div className="flex items-center gap-2 pl-3">
                       <span
-                        className={`shrink-0 inline-block w-2 h-2 rounded-full ${r.needs_pin_review ? 'bg-orange-500' : 'bg-emerald-500'}`}
+                        className={`shrink-0 inline-block w-2 h-2 rounded-md ${r.needs_pin_review ? 'bg-adm-warn' : 'bg-adm-note'}`}
                       />
                       <div className="flex-1 min-w-0">
                         <EditableCell value={r.name} onCommit={(v) => void saveField(r, { name: v })} />
@@ -505,7 +505,7 @@ export const StationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash 
                       <div className="flex-1 min-w-0">
                         <EditableCell value={r.city || ''} placeholder="City" onCommit={(v) => void saveField(r, { city: v })} />
                       </div>
-                      <span className="text-slate-300 shrink-0">,</span>
+                      <span className="text-adm-line shrink-0">,</span>
                       <div className="w-14 shrink-0">
                         <EditableCell value={r.state || ''} placeholder="State" onCommit={(v) => void saveField(r, { state: v })} />
                       </div>
@@ -532,7 +532,7 @@ export const StationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash 
                     <button
                       onClick={() => setPinReviewId(r.id)}
                       className={`text-[0.6875rem] px-2.5 py-1 rounded-full font-semibold whitespace-nowrap ${
-                        r.needs_pin_review ? 'bg-orange-100 text-orange-700' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                        r.needs_pin_review ? 'bg-adm-warn-soft text-adm-warn' : 'bg-adm-muted text-adm-ink hover:bg-adm-line'
                       }`}
                     >
                       {TIER_SHORT[(r.location_precision as Tier) || 'city']}
@@ -541,7 +541,7 @@ export const StationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash 
                   <td className="px-4 py-3 align-middle whitespace-nowrap">
                     <button
                       onClick={() => setFullEditorId(r.id)}
-                      className="text-[0.6875rem] px-3 py-1.5 rounded-lg bg-slate-800 text-white font-semibold"
+                      className="text-[0.6875rem] px-3 py-1.5 rounded-lg bg-adm-note text-white font-semibold"
                     >
                       Full details
                     </button>
@@ -552,16 +552,16 @@ export const StationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash 
           </table>
           </div>
         )}
-        {!loading && filtered.length === 0 && <p className="p-4 text-xs text-slate-400">Nothing matches.</p>}
+        {!loading && filtered.length === 0 && <p className="p-4 text-xs text-adm-mute-text">Nothing matches.</p>}
       </div>
 
       {confirmingDelete && (
         <div className="fixed inset-0 z-[225] bg-black/40 grid place-items-center p-6">
-          <div className="w-full max-w-sm bg-white rounded-2xl shadow-xl p-5 flex flex-col gap-3">
-            <h2 className="font-extrabold text-slate-900 text-sm">
+          <div className="w-full max-w-sm bg-adm-card rounded-lg shadow-xl p-5 flex flex-col gap-3">
+            <h2 className="font-bold text-adm-ink text-sm">
               Delete {selectedForDelete.size} station{selectedForDelete.size === 1 ? '' : 's'}?
             </h2>
-            <div className="max-h-40 overflow-y-auto text-xs text-slate-600 flex flex-col gap-1 border border-slate-200 rounded-lg p-2.5">
+            <div className="max-h-40 overflow-y-auto text-xs text-adm-ink flex flex-col gap-1 border border-adm-line rounded-lg p-2.5">
               {rows
                 .filter((r) => selectedForDelete.has(r.id))
                 .map((r) => (
@@ -570,17 +570,17 @@ export const StationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash 
                   </span>
                 ))}
             </div>
-            <p className="text-xs text-rose-600 font-semibold">
+            <p className="text-xs text-adm-danger font-semibold">
               This permanently deletes each station and its reports, photos, and comments. This can't be undone.
             </p>
             <div className="flex justify-end gap-2 mt-1">
-              <button onClick={() => setConfirmingDelete(false)} className="text-xs px-4 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200">
+              <button onClick={() => setConfirmingDelete(false)} className="text-xs px-4 py-1.5 rounded-lg bg-adm-muted hover:bg-adm-line">
                 Cancel
               </button>
               <button
                 onClick={deleteSelected}
                 disabled={deleting}
-                className="text-xs px-4 py-1.5 rounded-lg bg-rose-600 text-white font-bold disabled:opacity-50"
+                className="text-xs px-4 py-1.5 rounded-lg bg-adm-danger text-white font-bold disabled:opacity-50"
               >
                 {deleting ? 'Deleting…' : 'Delete permanently'}
               </button>
@@ -591,39 +591,39 @@ export const StationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash 
 
       {csvDiffs && (
         <div className="fixed inset-0 z-[220] bg-black/40 grid place-items-center p-6">
-          <div className="w-full max-w-2xl max-h-[80vh] bg-white rounded-2xl shadow-xl flex flex-col">
-            <div className="p-4 border-b border-slate-200 flex items-center justify-between shrink-0">
-              <h2 className="font-extrabold text-slate-900 text-sm">
+          <div className="w-full max-w-2xl max-h-[80vh] bg-adm-card rounded-lg shadow-xl flex flex-col">
+            <div className="p-4 border-b border-adm-line flex items-center justify-between shrink-0">
+              <h2 className="font-bold text-adm-ink text-sm">
                 Review bulk update — {csvDiffs.filter((d) => d.current && !d.error).length} station(s) to change
                 {csvDiffs.some((d) => d.error || !d.current) ? `, ${csvDiffs.filter((d) => d.error || !d.current).length} problem row(s)` : ''}
               </h2>
-              <button onClick={() => setCsvDiffs(null)} className="text-xs px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 shrink-0">
+              <button onClick={() => setCsvDiffs(null)} className="text-xs px-3 py-1.5 rounded-md bg-adm-muted hover:bg-adm-line shrink-0">
                 Cancel
               </button>
             </div>
             <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-2.5">
               {csvDiffs.map((d) => (
-                <div key={d.id} className={`border rounded-lg p-2.5 text-xs ${d.error || !d.current ? 'border-rose-300 bg-rose-50' : 'border-slate-200'}`}>
-                  <p className="font-semibold text-slate-900">{d.label}</p>
-                  {d.error && <p className="text-rose-600 mt-0.5">{d.error}</p>}
-                  {!d.current && <p className="text-rose-600 mt-0.5">Unknown station id "{d.id}" — will be skipped.</p>}
+                <div key={d.id} className={`border rounded-lg p-2.5 text-xs ${d.error || !d.current ? 'border-adm-danger/30 bg-adm-danger-soft' : 'border-adm-line'}`}>
+                  <p className="font-semibold text-adm-ink">{d.label}</p>
+                  {d.error && <p className="text-adm-danger mt-0.5">{d.error}</p>}
+                  {!d.current && <p className="text-adm-danger mt-0.5">Unknown station id "{d.id}" — will be skipped.</p>}
                   {Object.entries(d.changes).map(([k, v]) => (
-                    <p key={k} className="text-slate-600 mt-0.5">
-                      <span className="font-mono text-[0.75rem] text-slate-400">{k}</span>: {v.from || '(empty)'}{' '}
-                      <Icon name="arrow_forward" size={12} className="inline" /> <span className="font-semibold text-emerald-700">{v.to}</span>
+                    <p key={k} className="text-adm-ink mt-0.5">
+                      <span className="font-mono text-[0.75rem] text-adm-mute-text">{k}</span>: {v.from || '(empty)'}{' '}
+                      <Icon name="arrow_forward" size={12} className="inline" /> <span className="font-semibold text-adm-note">{v.to}</span>
                     </p>
                   ))}
                 </div>
               ))}
             </div>
-            <div className="p-4 border-t border-slate-200 flex justify-end gap-2 shrink-0">
-              <button onClick={() => setCsvDiffs(null)} className="text-xs px-4 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200">
+            <div className="p-4 border-t border-adm-line flex justify-end gap-2 shrink-0">
+              <button onClick={() => setCsvDiffs(null)} className="text-xs px-4 py-1.5 rounded-lg bg-adm-muted hover:bg-adm-line">
                 Cancel
               </button>
               <button
                 onClick={applyCsv}
                 disabled={applyingCsv || csvDiffs.every((d) => d.error || !d.current)}
-                className="text-xs px-4 py-1.5 rounded-lg bg-emerald-600 text-white font-bold disabled:opacity-50"
+                className="text-xs px-4 py-1.5 rounded-lg bg-adm-foil text-adm-ink font-bold disabled:opacity-50"
               >
                 {applyingCsv
                   ? 'Applying…'

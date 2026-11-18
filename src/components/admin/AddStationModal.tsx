@@ -23,8 +23,8 @@ const REASON_LABEL: Record<DuplicateHit['reason'], string> = {
 };
 
 const inputCls =
-  'w-full border border-slate-300 rounded-lg px-2.5 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/30';
-const labelCls = 'text-xs font-semibold text-slate-500 mb-1 block';
+  'w-full border border-adm-line rounded-lg px-2.5 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-adm-note/40';
+const labelCls = 'text-xs font-semibold text-adm-mute-text mb-1 block';
 
 /** Short form for adding one station: basics plus a required map position. */
 export const AddStationModal: React.FC<Props> = ({ stations, prefill, onClose, onCreated, flash }) => {
@@ -80,10 +80,10 @@ export const AddStationModal: React.FC<Props> = ({ stations, prefill, onClose, o
 
   return (
     <div className="fixed inset-0 z-[230] bg-black/40 grid place-items-center p-6">
-      <div role="dialog" aria-label="Add station" className="w-full max-w-xl max-h-[90vh] bg-white rounded-2xl shadow-xl flex flex-col">
-        <div className="p-4 border-b border-slate-200 shrink-0">
-          <h2 className="font-extrabold text-slate-900 text-sm">Add station</h2>
-          <p className="text-xs text-slate-500">
+      <div role="dialog" aria-label="Add station" className="w-full max-w-xl max-h-[90vh] bg-adm-card rounded-lg shadow-xl flex flex-col">
+        <div className="p-4 border-b border-adm-line shrink-0">
+          <h2 className="font-bold text-adm-ink text-sm">Add station</h2>
+          <p className="text-xs text-adm-mute-text">
             Basics and a map position. Price, hours and photos can be added right after in the full editor.
           </p>
         </div>
@@ -101,7 +101,7 @@ export const AddStationModal: React.FC<Props> = ({ stations, prefill, onClose, o
             </div>
             <div>
               <span className={labelCls}>Type</span>
-              <div className="px-2.5 py-1.5 text-sm text-slate-700 bg-slate-50 border border-slate-200 rounded-lg">CNG</div>
+              <div className="px-2.5 py-1.5 text-sm text-adm-ink bg-adm-paper border border-adm-line rounded-lg">CNG</div>
             </div>
           </div>
 
@@ -137,13 +137,13 @@ export const AddStationModal: React.FC<Props> = ({ stations, prefill, onClose, o
           </div>
 
           {exactDuplicate && (
-            <p role="alert" className="text-xs text-rose-700 bg-rose-50 border border-rose-200 rounded-lg px-3 py-2">
+            <p role="alert" className="text-xs text-adm-danger bg-adm-danger-soft border border-adm-danger/30 rounded-lg px-3 py-2">
               A station with this name already exists, so it can't be added. The app hides stations whose names match once case and punctuation are ignored. Use a more specific name.
             </p>
           )}
 
           {warnings.length > 0 && (
-            <div role="status" className="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+            <div role="status" className="text-xs text-adm-warn bg-adm-warn-soft border border-adm-warn/30 rounded-lg px-3 py-2">
               <p className="font-semibold">Check before adding. Similar stations:</p>
               <ul className="mt-1 list-disc pl-4">
                 {warnings.map((h) => (
@@ -157,21 +157,21 @@ export const AddStationModal: React.FC<Props> = ({ stations, prefill, onClose, o
           )}
 
           {error && (
-            <p role="alert" className="text-xs text-rose-700 font-semibold">{error}</p>
+            <p role="alert" className="text-xs text-adm-danger font-semibold">{error}</p>
           )}
         </div>
 
-        <div className="p-4 border-t border-slate-200 flex items-center justify-between gap-3 shrink-0">
-          <p className="text-xs text-slate-500 min-w-0">{blockedReason && !exactDuplicate ? blockedReason : ''}</p>
+        <div className="p-4 border-t border-adm-line flex items-center justify-between gap-3 shrink-0">
+          <p className="text-xs text-adm-mute-text min-w-0">{blockedReason && !exactDuplicate ? blockedReason : ''}</p>
           <div className="flex items-center gap-2 shrink-0">
-            <button type="button" onClick={onClose} className="text-xs px-4 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200">
+            <button type="button" onClick={onClose} className="text-xs px-4 py-1.5 rounded-lg bg-adm-muted hover:bg-adm-line">
               Cancel
             </button>
             <button
               type="button"
               onClick={submit}
               disabled={saving || !supabase || Boolean(blockedReason)}
-              className="text-xs px-4 py-1.5 rounded-lg bg-emerald-600 text-white font-bold disabled:opacity-50"
+              className="text-xs px-4 py-1.5 rounded-lg bg-adm-foil text-adm-ink font-bold disabled:opacity-50"
             >
               {saving ? 'Adding…' : warnings.length > 0 ? 'Add anyway' : 'Add station'}
             </button>

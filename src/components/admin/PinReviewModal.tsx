@@ -132,23 +132,23 @@ export const PinReviewModal: React.FC<Props> = ({ station, onClose, onSaved, fla
 
   return (
     <div className="fixed inset-0 z-[230] bg-black/40 grid place-items-center p-6">
-      <div className="w-full max-w-2xl max-h-[85vh] bg-white rounded-2xl shadow-xl flex flex-col">
-        <div className="p-4 border-b border-slate-200 flex items-center justify-between shrink-0">
+      <div className="w-full max-w-2xl max-h-[85vh] bg-adm-card rounded-lg shadow-xl flex flex-col">
+        <div className="p-4 border-b border-adm-line flex items-center justify-between shrink-0">
           <div className="min-w-0">
-            <h2 className="font-extrabold text-slate-900 text-sm truncate">Review pin · {station.name}</h2>
-            <p className="text-xs text-slate-500 truncate">{station.address || '(no address)'}</p>
+            <h2 className="font-bold text-adm-ink text-sm truncate">Review pin · {station.name}</h2>
+            <p className="text-xs text-adm-mute-text truncate">{station.address || '(no address)'}</p>
           </div>
-          <button onClick={onClose} aria-label="Close" className="text-slate-400 hover:text-slate-600 shrink-0">
+          <button onClick={onClose} aria-label="Close" className="text-adm-mute-text hover:text-adm-ink shrink-0">
             <Icon name="close" size={20} />
           </button>
         </div>
 
         {hasGoogleMapsKey ? (
-          <div ref={mapEl} className="h-72 shrink-0 bg-slate-100">
-            {mapErr && <p className="p-3 text-xs text-rose-600">{mapErr}</p>}
+          <div ref={mapEl} className="h-72 shrink-0 bg-adm-muted">
+            {mapErr && <p className="p-3 text-xs text-adm-danger">{mapErr}</p>}
           </div>
         ) : (
-          <div className="h-40 shrink-0 grid place-items-center p-4 text-center bg-slate-50 text-xs text-slate-600">
+          <div className="h-40 shrink-0 grid place-items-center p-4 text-center bg-adm-paper text-xs text-adm-ink">
             Map disabled — set <code className="mx-1">VITE_GOOGLE_MAPS_API_KEY</code> to see it here. You can still fix
             the pin below by pasting coordinates.
           </div>
@@ -156,7 +156,7 @@ export const PinReviewModal: React.FC<Props> = ({ station, onClose, onSaved, fla
 
         <div className="p-4 flex flex-col gap-2.5 overflow-y-auto">
           <div className="flex items-center gap-2">
-            <label className="text-xs font-semibold text-slate-500 w-14 shrink-0">Coords</label>
+            <label className="text-xs font-semibold text-adm-mute-text w-14 shrink-0">Coords</label>
             <input
               value={pasteVal}
               onChange={(e) => {
@@ -165,20 +165,20 @@ export const PinReviewModal: React.FC<Props> = ({ station, onClose, onSaved, fla
               }}
               onKeyDown={(e) => e.key === 'Enter' && applyPaste()}
               placeholder="Paste from Google Maps — e.g. 9.0765, 7.4853"
-              className="flex-1 border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs"
+              className="flex-1 border border-adm-line rounded-lg px-2.5 py-1.5 text-xs"
             />
-            <button onClick={applyPaste} className="text-xs px-3 py-1.5 rounded-lg bg-slate-800 text-white font-semibold">
+            <button onClick={applyPaste} className="text-xs px-3 py-1.5 rounded-lg bg-adm-note text-white font-semibold">
               Apply
             </button>
           </div>
-          {pasteErr && <p className="text-xs text-rose-600 pl-16">{pasteErr}</p>}
+          {pasteErr && <p className="text-xs text-adm-danger pl-16">{pasteErr}</p>}
 
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-600 pl-16">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-adm-ink pl-16">
             <span>
               now: {station.lat.toFixed(5)}, {station.lng.toFixed(5)}
             </span>
             {pending && (
-              <span className="text-emerald-700 font-semibold">
+              <span className="text-adm-note font-semibold">
                 new: {pending.lat.toFixed(5)}, {pending.lng.toFixed(5)} · moved {moved}m
               </span>
             )}
@@ -188,11 +188,11 @@ export const PinReviewModal: React.FC<Props> = ({ station, onClose, onSaved, fla
               )}`}
               target="_blank"
               rel="noreferrer"
-              className="font-semibold text-emerald-700 hover:underline"
+              className="font-semibold text-adm-note hover:underline"
             >
               find on Google Maps <Icon name="north_east" size={12} className="inline" />
             </a>
-            {hasGoogleMapsKey && <span className="text-slate-400">or drag the pin above</span>}
+            {hasGoogleMapsKey && <span className="text-adm-mute-text">or drag the pin above</span>}
           </div>
 
           <div className="flex items-center gap-2 mt-1">
@@ -200,7 +200,7 @@ export const PinReviewModal: React.FC<Props> = ({ station, onClose, onSaved, fla
               aria-label="Pin precision tier"
               value={tier}
               onChange={(e) => setTier(e.target.value as Tier)}
-              className="border border-slate-300 rounded-lg px-2 py-1.5 text-xs flex-1"
+              className="border border-adm-line rounded-lg px-2 py-1.5 text-xs flex-1"
             >
               {TIERS.map((t) => (
                 <option key={t} value={t}>
@@ -208,13 +208,13 @@ export const PinReviewModal: React.FC<Props> = ({ station, onClose, onSaved, fla
                 </option>
               ))}
             </select>
-            <button onClick={onClose} className="text-xs px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200">
+            <button onClick={onClose} className="text-xs px-3 py-1.5 rounded-lg bg-adm-muted hover:bg-adm-line">
               Cancel
             </button>
             <button
               onClick={save}
               disabled={saving}
-              className="text-xs px-4 py-1.5 rounded-lg bg-emerald-600 text-white font-bold disabled:opacity-50"
+              className="text-xs px-4 py-1.5 rounded-lg bg-adm-foil text-adm-ink font-bold disabled:opacity-50"
             >
               {saving ? 'Saving…' : 'Save'}
             </button>

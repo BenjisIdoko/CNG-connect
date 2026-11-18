@@ -108,11 +108,11 @@ export const PositionPicker: React.FC<Props> = ({ value, onChange, tier, onTierC
     <div className="flex flex-col gap-2">
       {hasGoogleMapsKey ? (
         <div>
-          <div ref={mapEl} className="w-full h-56 rounded-xl border border-slate-200 bg-slate-100" />
-          {mapErr && <p className="text-xs text-rose-600 mt-1">{mapErr}</p>}
+          <div ref={mapEl} className="w-full h-56 rounded-md border border-adm-line bg-adm-muted" />
+          {mapErr && <p className="text-xs text-adm-danger mt-1">{mapErr}</p>}
         </div>
       ) : (
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-adm-mute-text">
           No Google Maps key is set here, so paste the coordinates or a Google Maps link instead.
         </p>
       )}
@@ -132,44 +132,44 @@ export const PositionPicker: React.FC<Props> = ({ value, onChange, tier, onTierC
             }
           }}
           placeholder="Paste from Google Maps, e.g. 9.0765, 7.4853"
-          className="flex-1 border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs"
+          className="flex-1 border border-adm-line rounded-lg px-2.5 py-1.5 text-xs"
         />
         <button
           type="button"
           onClick={applyPaste}
-          className="text-xs px-3 py-1.5 rounded-lg bg-slate-800 text-white font-semibold"
+          className="text-xs px-3 py-1.5 rounded-lg bg-adm-note text-white font-semibold"
         >
           Apply
         </button>
       </div>
-      {pasteErr && <p className="text-xs text-rose-600">{pasteErr}</p>}
+      {pasteErr && <p className="text-xs text-adm-danger">{pasteErr}</p>}
 
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-600">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-adm-ink">
         {value ? (
-          <span className="text-emerald-700 font-semibold">
+          <span className="text-adm-note font-semibold">
             Position: {value.lat.toFixed(5)}, {value.lng.toFixed(5)}
           </span>
         ) : (
-          <span className="text-amber-700 font-semibold">No position yet</span>
+          <span className="text-adm-warn font-semibold">No position yet</span>
         )}
         {searchText && (
           <a
             href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(searchText)}`}
             target="_blank"
             rel="noreferrer"
-            className="font-semibold text-emerald-700 hover:underline"
+            className="font-semibold text-adm-note hover:underline"
           >
             find on Google Maps <Icon name="north_east" size={12} className="inline" />
           </a>
         )}
-        {hasGoogleMapsKey && <span className="text-slate-400">click or drag the pin on the map</span>}
+        {hasGoogleMapsKey && <span className="text-adm-mute-text">click or drag the pin on the map</span>}
       </div>
 
       <select
         aria-label="Position accuracy"
         value={tier}
         onChange={(e) => onTierChange(e.target.value as PinTier)}
-        className="border border-slate-300 rounded-lg px-2 py-1.5 text-xs"
+        className="border border-adm-line rounded-lg px-2 py-1.5 text-xs"
       >
         {PIN_TIERS.map((t) => (
           <option key={t} value={t}>
