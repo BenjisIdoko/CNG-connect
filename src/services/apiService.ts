@@ -198,6 +198,11 @@ async function loadStationTables(): Promise<{
   return { stationsData: stations, reportsData: reports || [], mediaData: media || [], commentsData: comments || [] };
 }
 
+// The car counts from the last refresh that worked. A failed refresh keeps showing them for a few
+// minutes (a presence record lives 6 minutes) instead of making every count vanish at once.
+const CAR_COUNTS_MAX_KEEP_MS = 10 * 60 * 1000;
+let lastGoodCarCounts: { counts: Record<string, number>; at: number } | null = null;
+
 export const apiService = {
   /**
    * Fetch all stations with driver reports, station media, and group information.
@@ -630,16 +635,29 @@ export const apiService = {
    */
   async fetchCarCounts(): Promise<Record<string, number>> {
     if (!isSupabaseConfigured) return {};
+    const remember = (counts: Record<string, number>) => {
+      lastGoodCarCounts = { counts, at: Date.now() };
+      return counts;
+    };
+
     const viaRest = await restRpc<unknown>('station_car_counts');
-    if (viaRest !== null) return carCountsToMap(viaRest);
+    if (viaRest !== null) return remember(carCountsToMap(viaRest));
     try {
       const supabase = await getSupabase();
-      if (!supabase) return {};
-      const { data, error } = await supabase.rpc('station_car_counts');
-      return error ? {} : carCountsToMap(data);
+      if (supabase) {
+        const { data, error } = await supabase.rpc('station_car_counts');
+        if (!error) return remember(carCountsToMap(data));
+      }
     } catch {
-      return {};
+      /* fall through to the last good answer */
     }
+
+    // Neither route worked. Keep showing the last good answer for a while rather than dropping every
+    // "N cars here" line to zero on a blip, then give up so a long outage cannot show old counts.
+    if (lastGoodCarCounts && Date.now() - lastGoodCarCounts.at <= CAR_COUNTS_MAX_KEEP_MS) {
+      return lastGoodCarCounts.counts;
+    }
+    return {};
   },
 
   /**
