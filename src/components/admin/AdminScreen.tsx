@@ -6,6 +6,7 @@ import { AdminSidebarLayout, AdminNavItem } from './AdminSidebarLayout';
 import { StationsPanel } from './StationsPanel';
 import { ReportsPanel } from './ReportsPanel';
 import { UsersPanel } from './UsersPanel';
+import { StationManagersPanel } from './StationManagersPanel';
 import { NotForYou } from './NotForYou';
 import { MANAGER_PATH } from '../../utils/adminRoutes';
 import { SuggestionsPanel } from './SuggestionsPanel';
@@ -17,6 +18,7 @@ const ADMIN_NAV: AdminNavItem[] = [
   { key: 'suggestions', label: 'Suggestions', icon: 'add_location_alt' },
   { key: 'reports', label: 'Report moderation', icon: 'flag' },
   { key: 'users', label: 'Users', icon: 'groups' },
+  { key: 'managers', label: 'Station managers', icon: 'local_gas_station' },
   ...(FEATURES.ENABLE_REFERRALS ? [{ key: 'payouts', label: 'Airtime payouts', icon: 'call' }] : []),
 ];
 
@@ -88,6 +90,7 @@ export const AdminScreen: React.FC<{ onExit: () => void }> = ({ onExit }) => {
         )}
         {isAdmin && activeKey === 'reports' && <ReportsPanel flash={flash} />}
         {isAdmin && activeKey === 'users' && <UsersPanel flash={flash} />}
+        {isAdmin && activeKey === 'managers' && <StationManagersPanel flash={flash} />}
         {FEATURES.ENABLE_REFERRALS && isAdmin && activeKey === 'payouts' && (
           <div className="h-full overflow-y-auto">
             <div className="max-w-2xl mx-auto p-4 pb-16">
