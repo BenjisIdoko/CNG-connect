@@ -2,11 +2,8 @@ import { describe, expect, it } from 'vitest';
 import {
   LIVE_PRESSURE_MAX_AGE_MINUTES,
   PRESSURE_DEFAULT_BAR,
-  SELLING_STATEMENT_MINUTES,
   describePressure,
-  describeSelling,
   getPressureReading,
-  getSellingStatement,
   isValidPressure,
   stepPressure,
 } from './stationManagerSignals';
@@ -37,40 +34,6 @@ describe('stepPressure', () => {
     expect(stepPressure(298, 1)).toBe(300);
     expect(stepPressure(10, -1)).toBe(10);
     expect(stepPressure(12, -1)).toBe(10);
-  });
-});
-
-describe('getSellingStatement', () => {
-  it('returns the post with its age within 120 minutes, including exactly 120', () => {
-    expect(SELLING_STATEMENT_MINUTES).toBe(120);
-    expect(getSellingStatement({ managerSelling: true, managerSellingAt: minsAgo(20) }, NOW)).toEqual({
-      selling: true,
-      ageMinutes: 20,
-    });
-    expect(getSellingStatement({ managerSelling: false, managerSellingAt: minsAgo(120) }, NOW)).toEqual({
-      selling: false,
-      ageMinutes: 120,
-    });
-  });
-
-  it('is null at 121 minutes, with no timestamp, with a null flag and with an unreadable timestamp', () => {
-    expect(getSellingStatement({ managerSelling: true, managerSellingAt: minsAgo(121) }, NOW)).toBeNull();
-    expect(getSellingStatement({ managerSelling: true }, NOW)).toBeNull();
-    expect(getSellingStatement({ managerSellingAt: minsAgo(5) }, NOW)).toBeNull();
-    expect(getSellingStatement({ managerSelling: true, managerSellingAt: 'garbage' }, NOW)).toBeNull();
-  });
-
-  it('a timestamp a few minutes in the future gives age 0', () => {
-    const future = new Date(NOW + 3 * 60000).toISOString();
-    expect(getSellingStatement({ managerSelling: true, managerSellingAt: future }, NOW)?.ageMinutes).toBe(0);
-  });
-});
-
-describe('describeSelling', () => {
-  it('reads "Selling now · updated 20 min ago" and "Not selling · updated 1 hr ago"', () => {
-    expect(describeSelling({ selling: true, ageMinutes: 20 })).toBe('Selling now · updated 20 min ago');
-    expect(describeSelling({ selling: false, ageMinutes: 60 })).toBe('Not selling · updated 1 hr ago');
-    expect(describeSelling({ selling: true, ageMinutes: 0 })).toBe('Selling now · updated just now');
   });
 });
 

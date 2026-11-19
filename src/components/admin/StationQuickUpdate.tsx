@@ -6,15 +6,18 @@ import {
   PRESSURE_DEFAULT_BAR,
   PRESSURE_MAX_BAR,
   PRESSURE_MIN_BAR,
-  SELLING_STATEMENT_MINUTES,
-  getSellingStatement,
   isValidPressure,
   stepPressure,
 } from '../../utils/stationManagerSignals';
-import { postPressure, postSelling, ManagerPostResult, RpcClient } from '../../services/stationManagerService';
+import { MANAGER_STATE_MINUTES, MANAGER_STATE_OPTIONS, ManagerState, getManagerStatement } from '../../utils/managerState';
+import { postPressure, ManagerPostResult, RpcClient } from '../../services/stationManagerService';
+import { postManagerState } from '../../services/managerAccessService';
 
 interface Props {
   stationId: string;
+  managerState: ManagerState | null;
+  managerStateAt: string | null;
+  /** The older two-state fields, still read so a post from a phone that has not updated shows up. */
   managerSelling: boolean | null;
   managerSellingAt: string | null;
   livePressureBar: number | null;
@@ -25,7 +28,7 @@ interface Props {
   onPosted: () => void;
 }
 
-type Pending = 'selling' | 'not-selling' | 'pressure' | null;
+type Pending = ManagerState | 'pressure' | null;
 
 const startingPressure = (live: number | null, pump: number | null): number => {
   if (isValidPressure(live)) return live;
@@ -33,13 +36,21 @@ const startingPressure = (live: number | null, pump: number | null): number => {
   return PRESSURE_DEFAULT_BAR;
 };
 
+const POSTED_TEXT: Record<ManagerState, string> = {
+  closed: 'Posted: Closed',
+  open: 'Posted: Open, waiting for gas',
+  selling: 'Posted: Open, gas available',
+};
+
 /**
- * The manager's quick card: "Selling now / Not selling" and the pump pressure, each posted in
- * a tap or two. These posts are shown to drivers as "Station says" and never change the
- * driver-reported status, so there is nothing here about queue or availability.
+ * The manager's quick card: the station's status (Closed, Open and waiting for gas, or Open with gas
+ * available) and the pump pressure, each posted in a tap or two. Drivers see these as "Station says";
+ * they never change the driver-reported status.
  */
 export const StationQuickUpdate: React.FC<Props> = ({
   stationId,
+  managerState,
+  managerStateAt,
   managerSelling,
   managerSellingAt,
   livePressureBar,
@@ -53,7 +64,9 @@ export const StationQuickUpdate: React.FC<Props> = ({
   const [error, setError] = useState<string | null>(null);
   const [pressure, setPressure] = useState(() => startingPressure(livePressureBar, pumpPressure));
 
-  const statement = getSellingStatement({
+  const statement = getManagerStatement({
+    managerState: managerState ?? undefined,
+    managerStateAt: managerStateAt ?? undefined,
     managerSelling: managerSelling ?? undefined,
     managerSellingAt: managerSellingAt ?? undefined,
   });
@@ -75,45 +88,33 @@ export const StationQuickUpdate: React.FC<Props> = ({
 
   const client = supabase as unknown as RpcClient | null;
 
-  const btnBase =
-    'flex-1 min-h-[44px] rounded-md text-sm font-bold border transition-colors disabled:opacity-50 disabled:cursor-not-allowed';
-
   return (
-    <div className="mt-3 flex flex-col gap-3 border-t border-adm-line pt-3">
+    <div className="mt-3 flex flex-col gap-4 border-t border-adm-line pt-3">
       <div>
         <p className="text-sm font-semibold text-adm-ink">Station status</p>
-        <div className="mt-1.5 flex gap-2">
-          <button
-            type="button"
-            disabled={pending !== null}
-            onClick={() => client && void run('selling', () => postSelling(client, stationId, true), 'Posted: Selling now')}
-            className={`${btnBase} ${
-              statement?.selling
-                ? 'bg-adm-foil border-adm-note text-adm-ink'
-                : 'bg-adm-card border-adm-line text-adm-ink hover:border-adm-note'
-            }`}
-          >
-            {pending === 'selling' ? 'Posting…' : 'Selling now'}
-          </button>
-          <button
-            type="button"
-            disabled={pending !== null}
-            onClick={() =>
-              client && void run('not-selling', () => postSelling(client, stationId, false), 'Posted: Not selling')
-            }
-            className={`${btnBase} ${
-              statement && !statement.selling
-                ? 'bg-adm-note border-adm-note text-white'
-                : 'bg-adm-card border-adm-line text-adm-ink hover:border-adm-note'
-            }`}
-          >
-            {pending === 'not-selling' ? 'Posting…' : 'Not selling'}
-          </button>
+        <div className="mt-1.5 grid gap-2 sm:grid-cols-3" role="group" aria-label="Station status">
+          {MANAGER_STATE_OPTIONS.map((option) => {
+            const current = statement?.state === option.state;
+            return (
+              <button
+                key={option.state}
+                type="button"
+                aria-pressed={current}
+                disabled={pending !== null}
+                onClick={() => client && void run(option.state, () => postManagerState(client, stationId, option.state), POSTED_TEXT[option.state])}
+                className={`min-h-[44px] rounded-md border px-2 text-sm font-bold transition-colors outline-none focus-visible:ring-2 focus-visible:ring-adm-note disabled:cursor-not-allowed disabled:opacity-50 ${
+                  current ? 'border-adm-note bg-adm-note text-white' : 'border-adm-line bg-adm-card text-adm-ink hover:border-adm-note'
+                }`}
+              >
+                {pending === option.state ? 'Posting…' : option.label}
+              </button>
+            );
+          })}
         </div>
-        <p className="text-xs text-adm-mute-text mt-1.5">
+        <p className="mt-1.5 text-xs text-adm-mute-text">
           {statement
-            ? `Posted ${formatAgeShort(statement.ageMinutes)} · drivers see it for ${SELLING_STATEMENT_MINUTES / 60} hours`
-            : 'Nothing posted right now. Drivers see a post for 2 hours.'}
+            ? `Posted ${formatAgeShort(statement.ageMinutes)} · drivers see it for ${MANAGER_STATE_MINUTES / 60} hours`
+            : `Nothing posted right now. Drivers see a post for ${MANAGER_STATE_MINUTES / 60} hours.`}
         </p>
       </div>
 
@@ -125,11 +126,11 @@ export const StationQuickUpdate: React.FC<Props> = ({
             aria-label="Lower pressure by 5 bar"
             disabled={pending !== null || pressure <= PRESSURE_MIN_BAR}
             onClick={() => setPressure((p) => stepPressure(p, -1))}
-            className="w-11 h-11 rounded-md border border-adm-line bg-adm-card text-adm-ink flex items-center justify-center disabled:opacity-40"
+            className="flex size-11 items-center justify-center rounded-md border border-adm-line bg-adm-card text-adm-ink disabled:opacity-40"
           >
             <Minus className="size-5" aria-hidden="true" />
           </button>
-          <p className="flex-1 text-center font-bold text-adm-ink text-lg tabular-nums" aria-live="polite">
+          <p className="flex-1 text-center text-lg font-bold text-adm-ink tabular-nums" aria-live="polite">
             {pressure} <span className="text-sm font-bold text-adm-mute-text">bar</span>
           </p>
           <button
@@ -137,7 +138,7 @@ export const StationQuickUpdate: React.FC<Props> = ({
             aria-label="Raise pressure by 5 bar"
             disabled={pending !== null || pressure >= PRESSURE_MAX_BAR}
             onClick={() => setPressure((p) => stepPressure(p, 1))}
-            className="w-11 h-11 rounded-md border border-adm-line bg-adm-card text-adm-ink flex items-center justify-center disabled:opacity-40"
+            className="flex size-11 items-center justify-center rounded-md border border-adm-line bg-adm-card text-adm-ink disabled:opacity-40"
           >
             <Plus className="size-5" aria-hidden="true" />
           </button>
@@ -145,14 +146,12 @@ export const StationQuickUpdate: React.FC<Props> = ({
         <button
           type="button"
           disabled={pending !== null}
-          onClick={() =>
-            client && void run('pressure', () => postPressure(client, stationId, pressure), `Posted: ${pressure} bar`)
-          }
-          className="mt-2 w-full min-h-[44px] rounded-md bg-adm-foil text-adm-ink text-sm font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+          onClick={() => client && void run('pressure', () => postPressure(client, stationId, pressure), `Posted: ${pressure} bar`)}
+          className="mt-2 min-h-[44px] w-full rounded-md bg-adm-foil text-sm font-bold text-adm-ink disabled:cursor-not-allowed disabled:opacity-50"
         >
           {pending === 'pressure' ? 'Posting…' : 'Update pressure'}
         </button>
-        <p className="text-xs text-adm-mute-text mt-1.5">
+        <p className="mt-1.5 text-xs text-adm-mute-text">
           {pressureAge !== null && isValidPressure(livePressureBar)
             ? `Last reading ${livePressureBar} bar · updated ${formatAgeShort(pressureAge)}`
             : 'No reading posted yet.'}

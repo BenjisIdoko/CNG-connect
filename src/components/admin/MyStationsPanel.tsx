@@ -11,6 +11,8 @@ type ManagedStation = FullStationRow & {
   needs_pin_review: boolean;
   location_precision: string | null;
   data_source: string | null;
+  manager_state: 'closed' | 'open' | 'selling' | null;
+  manager_state_at: string | null;
   manager_selling: boolean | null;
   manager_selling_at: string | null;
   live_pressure_bar: number | null;
@@ -80,6 +82,8 @@ export const MyStationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flas
             <p className="text-xs text-adm-mute-text mt-0.5 truncate">{s.address}</p>
             <StationQuickUpdate
               stationId={s.id}
+              managerState={s.manager_state ?? null}
+              managerStateAt={s.manager_state_at ?? null}
               managerSelling={s.manager_selling}
               managerSellingAt={s.manager_selling_at}
               livePressureBar={s.live_pressure_bar}

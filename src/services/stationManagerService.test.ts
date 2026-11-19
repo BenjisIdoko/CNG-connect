@@ -1,22 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
-import { friendlyManagerError, postPressure, postSelling } from './stationManagerService';
+import { friendlyManagerError, postPressure } from './stationManagerService';
 
 const clientReturning = (error: { message: string } | null) => ({
   rpc: vi.fn().mockResolvedValue({ error }),
-});
-
-describe('postSelling', () => {
-  it('calls manager_post_selling with p_station_id and p_selling', async () => {
-    const client = clientReturning(null);
-    await expect(postSelling(client, 'nipco-1', true)).resolves.toEqual({ ok: true });
-    expect(client.rpc).toHaveBeenCalledWith('manager_post_selling', { p_station_id: 'nipco-1', p_selling: true });
-  });
-
-  it('sends false for "Not selling"', async () => {
-    const client = clientReturning(null);
-    await postSelling(client, 'nipco-1', false);
-    expect(client.rpc).toHaveBeenCalledWith('manager_post_selling', { p_station_id: 'nipco-1', p_selling: false });
-  });
 });
 
 describe('postPressure', () => {
@@ -39,7 +25,7 @@ describe('postPressure', () => {
 describe('errors', () => {
   it('a "not authorized" error becomes the "no longer a manager of this station" message', async () => {
     const client = clientReturning({ message: 'not authorized' });
-    const result = await postSelling(client, 'nipco-1', true);
+    const result = await postPressure(client, 'nipco-1', 220);
     expect(result).toEqual({ ok: false, error: expect.stringContaining('no longer a manager of this station') });
   });
 
@@ -51,7 +37,7 @@ describe('errors', () => {
 
   it('a thrown network error is returned as a failed result, not thrown', async () => {
     const client = { rpc: vi.fn().mockRejectedValue(new Error('Failed to fetch')) };
-    await expect(postSelling(client, 'nipco-1', true)).resolves.toEqual({
+    await expect(postPressure(client, 'nipco-1', 220)).resolves.toEqual({
       ok: false,
       error: 'Could not post, try again',
     });

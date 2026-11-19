@@ -36,9 +36,6 @@ const call = async (client: RpcClient, fn: string, args: Record<string, unknown>
   }
 };
 
-export const postSelling = (client: RpcClient, stationId: string, selling: boolean): Promise<ManagerPostResult> =>
-  call(client, 'manager_post_selling', { p_station_id: stationId, p_selling: selling });
-
 export const postPressure = (client: RpcClient, stationId: string, bar: number): Promise<ManagerPostResult> => {
   if (!isValidPressure(bar)) {
     return Promise.resolve({ ok: false, error: friendlyManagerError('Invalid pressure') });

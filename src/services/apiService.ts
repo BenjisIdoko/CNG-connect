@@ -282,6 +282,9 @@ export const apiService = {
             // The station's own staff: "selling now" and a live pressure reading, with server times.
             managerSelling: typeof s.manager_selling === 'boolean' ? s.manager_selling : undefined,
             managerSellingAt: s.manager_selling_at || undefined,
+            managerState:
+              s.manager_state === 'closed' || s.manager_state === 'open' || s.manager_state === 'selling' ? s.manager_state : undefined,
+            managerStateAt: s.manager_state_at || undefined,
             livePressureBar: s.live_pressure_bar != null ? Number(s.live_pressure_bar) : undefined,
             livePressureAt: s.live_pressure_at || undefined,
             busyEstimate: s.busy_estimate || undefined,
