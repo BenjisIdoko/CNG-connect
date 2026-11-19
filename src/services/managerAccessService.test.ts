@@ -30,6 +30,34 @@ describe('postManagerState', () => {
     expect(client.rpc).toHaveBeenCalledWith('manager_post_state', { p_station_id: 'nipco-1', p_state: 'selling' });
   });
 
+  it('with no details the arguments are exactly the two the older app sends', async () => {
+    const client = clientReturning(null);
+    await postManagerState(client, 'nipco-1', 'closed');
+    await postManagerState(client, 'nipco-1', 'closed', {});
+    expect(client.rpc).toHaveBeenNthCalledWith(1, 'manager_post_state', { p_station_id: 'nipco-1', p_state: 'closed' });
+    expect(client.rpc).toHaveBeenNthCalledWith(2, 'manager_post_state', { p_station_id: 'nipco-1', p_state: 'closed' });
+  });
+
+  it('sends a reason and an expected time with a closed or open post', async () => {
+    const client = clientReturning(null);
+    const untilIso = '2026-11-19T13:00:00.000Z';
+    await postManagerState(client, 'nipco-1', 'closed', { reason: 'supply', untilIso });
+    await postManagerState(client, 'nipco-1', 'open', { reason: 'fault' });
+    expect(client.rpc).toHaveBeenNthCalledWith(1, 'manager_post_state', {
+      p_station_id: 'nipco-1',
+      p_state: 'closed',
+      p_reason: 'supply',
+      p_until: untilIso,
+    });
+    expect(client.rpc).toHaveBeenNthCalledWith(2, 'manager_post_state', { p_station_id: 'nipco-1', p_state: 'open', p_reason: 'fault' });
+  });
+
+  it('never sends details with a selling post', async () => {
+    const client = clientReturning(null);
+    await postManagerState(client, 'nipco-1', 'selling', { reason: 'supply', untilIso: '2026-11-19T13:00:00.000Z' });
+    expect(client.rpc).toHaveBeenCalledWith('manager_post_state', { p_station_id: 'nipco-1', p_state: 'selling' });
+  });
+
   it('rejects an unknown state without calling the database', async () => {
     const client = clientReturning(null);
     const result = await postManagerState(client, 'nipco-1', 'maybe' as never);

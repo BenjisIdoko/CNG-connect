@@ -1,5 +1,5 @@
 import { friendlyManagerError, ManagerPostResult, RpcClient } from './stationManagerService';
-import { MANAGER_STATE_OPTIONS, ManagerState } from '../utils/managerState';
+import { MANAGER_STATE_OPTIONS, ManagerState, ManagerStateReason } from '../utils/managerState';
 
 /**
  * Station manager access and the three-state status. The admin invites a manager by email (no driver
@@ -33,10 +33,30 @@ export function friendlyAccessError(message: string): string {
 
 const VALID_STATES = new Set<string>(MANAGER_STATE_OPTIONS.map((o) => o.state));
 
-export async function postManagerState(client: RpcClient, stationId: string, state: ManagerState): Promise<ManagerPostResult> {
+/** Optional extras on a Closed / waiting post: why, and when the manager expects it to change. */
+export interface ManagerPostDetails {
+  reason?: ManagerStateReason;
+  untilIso?: string;
+}
+
+/**
+ * Posts one of the three states. With no details the call is exactly the two-argument one the older app
+ * sends. Details go only with Closed or Open (waiting for gas); a gas-available post never carries them.
+ */
+export async function postManagerState(
+  client: RpcClient,
+  stationId: string,
+  state: ManagerState,
+  details: ManagerPostDetails = {},
+): Promise<ManagerPostResult> {
   if (!VALID_STATES.has(state)) return { ok: false, error: 'Choose Closed, Open or Open with gas' };
+  const args: Record<string, unknown> = { p_station_id: stationId, p_state: state };
+  if (state !== 'selling') {
+    if (details.reason) args.p_reason = details.reason;
+    if (details.untilIso) args.p_until = details.untilIso;
+  }
   try {
-    const { error } = await client.rpc('manager_post_state', { p_station_id: stationId, p_state: state });
+    const { error } = await client.rpc('manager_post_state', args);
     return error ? { ok: false, error: friendlyManagerError(error.message) } : { ok: true };
   } catch {
     return { ok: false, error: 'Could not post, try again' };
