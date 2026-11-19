@@ -68,6 +68,24 @@ export const MyStationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flas
 
   const editing = stations.find((s) => s.id === editingId) || null;
 
+  // The Closed / Open / Open with gas buttons and the pressure stepper. They sit on each station's
+  // card and again at the top of the details editor, so a manager who lands in the editor can post
+  // a status without closing it first.
+  const statusCard = (s: ManagedStation) => (
+    <StationQuickUpdate
+      stationId={s.id}
+      managerState={s.manager_state ?? null}
+      managerStateAt={s.manager_state_at ?? null}
+      managerSelling={s.manager_selling}
+      managerSellingAt={s.manager_selling_at}
+      livePressureBar={s.live_pressure_bar}
+      livePressureAt={s.live_pressure_at}
+      pumpPressure={s.pump_pressure}
+      flash={flash}
+      onPosted={() => void load(true)}
+    />
+  );
+
   return (
     <div className="h-full overflow-y-auto">
       <div className="max-w-xl w-full mx-auto p-4 flex flex-col gap-3">
@@ -89,18 +107,7 @@ export const MyStationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flas
           <div key={s.id} className="bg-adm-card border border-adm-line rounded-lg p-4">
             <p className="font-bold text-adm-ink text-sm">{s.name}</p>
             <p className="text-xs text-adm-mute-text mt-0.5 truncate">{s.address}</p>
-            <StationQuickUpdate
-              stationId={s.id}
-              managerState={s.manager_state ?? null}
-              managerStateAt={s.manager_state_at ?? null}
-              managerSelling={s.manager_selling}
-              managerSellingAt={s.manager_selling_at}
-              livePressureBar={s.live_pressure_bar}
-              livePressureAt={s.live_pressure_at}
-              pumpPressure={s.pump_pressure}
-              flash={flash}
-              onPosted={() => void load(true)}
-            />
+            {statusCard(s)}
             <button
               type="button"
               onClick={() => setEditingId(s.id)}
@@ -116,6 +123,7 @@ export const MyStationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flas
         <FullStationEditorModal
           station={editing}
           isAdmin={false}
+          statusCard={statusCard(editing)}
           onClose={() => setEditingId(null)}
           onSaved={(id, patch) => {
             setStations((prev) => prev.map((s) => (s.id === id ? { ...s, ...patch } : s)));
