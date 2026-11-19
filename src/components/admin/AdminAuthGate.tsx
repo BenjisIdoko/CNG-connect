@@ -6,6 +6,7 @@ import { Button } from '../ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
+import { CodeSignIn } from './CodeSignIn';
 
 /**
  * Shared sign-in screen for every admin/manager route. Password-based, not
@@ -16,12 +17,14 @@ import { Label } from '../ui/label';
  * station manager alike; each destination decides what a signed-in-but-
  * unprivileged visitor gets to see.
  */
-export const AdminAuthGate: React.FC<{ title: string; onExit: () => void; children: React.ReactNode }> = ({
-  title,
-  onExit,
-  children,
-}) => {
-  const { session, isAuthLoading, adminSignInWithPassword } = useAuth();
+export const AdminAuthGate: React.FC<{
+  title: string;
+  onExit: () => void;
+  children: React.ReactNode;
+  /** 'password' for the admin; 'code' for station managers (emailed code, no password). */
+  mode?: 'password' | 'code';
+}> = ({ title, onExit, children, mode = 'password' }) => {
+  const { session, isAuthLoading, adminSignInWithPassword, sendLoginCode, verifyLoginCode } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
@@ -34,6 +37,10 @@ export const AdminAuthGate: React.FC<{ title: string; onExit: () => void; childr
   }
 
   if (session) return <>{children}</>;
+
+  if (mode === 'code') {
+    return <CodeSignIn title={title} onExit={onExit} sendCode={sendLoginCode} verifyCode={verifyLoginCode} />;
+  }
 
   const handleSubmit = async () => {
     setBusy(true);

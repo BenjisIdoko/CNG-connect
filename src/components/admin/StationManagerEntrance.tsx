@@ -1,24 +1,57 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Fuel } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useSupabaseClient } from '../../hooks/useSupabaseClient';
 import { AdminAuthGate } from './AdminAuthGate';
 import { AdminSidebarLayout, AdminNavItem } from './AdminSidebarLayout';
 import { MyStationsPanel } from './MyStationsPanel';
 import { useAdminToast } from './useAdminToast';
+import { claimManagerInvites } from '../../services/managerAccessService';
+import type { RpcClient } from '../../services/stationManagerService';
 
 const NAV: AdminNavItem[] = [{ key: 'mystations', label: 'My stations', icon: Fuel }];
 
 /**
- * The station manager's own entrance (/station-manager): sign in, then see only the stations an
- * admin assigned to you. Who may change what is enforced by the database; this page just never
- * shows anything beyond "My stations".
+ * Shown once a manager is signed in: first it turns any invite for their verified email into station
+ * assignments, then it lists their stations. A failed check is announced but does not block the list.
+ */
+const ManagerBody: React.FC<{ flash: (m: string) => void }> = ({ flash }) => {
+  const supabase = useSupabaseClient();
+  const [checked, setChecked] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      if (supabase) {
+        const result = await claimManagerInvites(supabase as unknown as RpcClient);
+        if (cancelled) return;
+        if (!result.ok) flash(result.error);
+        else if (result.claimed > 0) flash(`You now manage ${result.claimed} station${result.claimed === 1 ? '' : 's'}`);
+      }
+      if (!cancelled) setChecked(true);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [supabase, flash]);
+
+  if (!checked) {
+    return <p className="p-6 text-sm text-adm-mute-text">Checking for your stations…</p>;
+  }
+  return <MyStationsPanel flash={flash} />;
+};
+
+/**
+ * The station manager's own entrance (/station-manager). Managers sign in with an emailed code (no
+ * password and no driver sign-up); the admin's invite for their email decides which stations they get.
+ * Who may change what is enforced by the database; this page never shows anything beyond "My stations".
  */
 export const StationManagerEntrance: React.FC<{ onExit: () => void }> = ({ onExit }) => {
   const { driverProfile, signOut } = useAuth();
   const { flash, toast } = useAdminToast();
 
   return (
-    <AdminAuthGate title="Station manager" onExit={onExit}>
+    <AdminAuthGate title="Station manager" onExit={onExit} mode="code">
       <AdminSidebarLayout
         brand="CNG-Connect"
         navItems={NAV}
@@ -28,7 +61,7 @@ export const StationManagerEntrance: React.FC<{ onExit: () => void }> = ({ onExi
         onSignOut={signOut}
         onExit={onExit}
       >
-        <MyStationsPanel flash={flash} />
+        <ManagerBody flash={flash} />
       </AdminSidebarLayout>
 
       {toast}

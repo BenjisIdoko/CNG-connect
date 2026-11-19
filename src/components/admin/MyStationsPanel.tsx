@@ -64,8 +64,8 @@ export const MyStationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flas
         {loadErr && <p className="text-sm text-adm-danger font-semibold">{loadErr}</p>}
         {!loading && !loadErr && stations.length === 0 && (
           <div className="bg-adm-paper border border-adm-line rounded-lg p-6 text-center text-sm text-adm-mute-text">
-            No stations are assigned to you yet. Ask the app admin to add your email ({driverProfile.email}) as the
-            manager of your station.
+            No stations are assigned to you yet. Ask the app admin to invite your email ({driverProfile.email}) as the
+            manager of your station, then sign in again.
             {driverProfile.isAdmin && (
               <>
                 {' '}
