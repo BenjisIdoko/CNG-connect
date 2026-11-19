@@ -285,6 +285,8 @@ export const apiService = {
             managerState:
               s.manager_state === 'closed' || s.manager_state === 'open' || s.manager_state === 'selling' ? s.manager_state : undefined,
             managerStateAt: s.manager_state_at || undefined,
+            managerStateReason: ['supply', 'fault', 'power', 'other'].includes(s.manager_state_reason) ? s.manager_state_reason : undefined,
+            managerStateUntil: s.manager_state_until || undefined,
             livePressureBar: s.live_pressure_bar != null ? Number(s.live_pressure_bar) : undefined,
             livePressureAt: s.live_pressure_at || undefined,
             busyEstimate: s.busy_estimate || undefined,
