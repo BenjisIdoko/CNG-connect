@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildInviteEmail } from './_inviteEmail';
+import { buildInviteEmail } from './invite-manager';
 
 describe('buildInviteEmail', () => {
   const email = buildInviteEmail({ stationName: 'NNPC filling station ushafa', signInUrl: 'https://cngconnect.com.ng/station-manager' });

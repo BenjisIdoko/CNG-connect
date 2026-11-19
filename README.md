@@ -74,7 +74,7 @@ Two hidden, authentication-gated routes exist for keeping station data accurate 
 | **AI Assistant** | Vercel Serverless Function (`api/chat.ts`) calling Gemini |
 | **PWA** | `vite-plugin-pwa` (Workbox) — offline caching, installability |
 | **State Management** | React Context (`AuthContext`) + component state; no global store |
-| **Test Runner** | Vitest (428 tests) |
+| **Test Runner** | Vitest (431 tests) |
 
 The app runs as a client-only SPA — there's no traditional application server. The React client talks to Supabase directly with a public anon key; every write that needs privilege beyond "any signed-in driver" (station edits, admin actions, point awards) goes through a Postgres RPC function that checks authorization server-side, rather than trusting the client.
 
@@ -161,7 +161,7 @@ Open [http://localhost:3002](http://localhost:3002).
 ## 🧪 Verification & Testing
 
 ```bash
-npm test           # Vitest — 428 tests across formatting, validation, proximity/push logic, etc.
+npm test           # Vitest — 431 tests across formatting, validation, proximity/push logic, etc.
 npx tsc --noEmit   # TypeScript compiler check
 npm run build      # Production build
 ```
