@@ -203,7 +203,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
             <div className="min-w-0 flex-1">
               <h2 className="font-geist font-bold text-[1.1875rem] leading-tight truncate">{user.name || 'Driver'}</h2>
               <PopoverPrimitive.Root>
-                <PopoverPrimitive.Trigger className="flex items-center gap-1 mt-0.5 text-micro text-[#B7CBB9] cursor-pointer text-left max-w-full">
+                <PopoverPrimitive.Trigger className="flex items-center gap-1 min-h-11 -my-2.5 text-micro text-[#B7CBB9] cursor-pointer text-left max-w-full">
                   <span className="truncate">
                     {[user.vehicle, user.cngKit].filter(Boolean).join(' · ') || 'Add your vehicle'}
                   </span>
@@ -239,7 +239,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
             <button
               onClick={openEdit}
               aria-label="Edit Profile"
-              className="w-10 h-10 rounded-full bg-white/10 text-white flex items-center justify-center active:scale-95 transition-transform shrink-0"
+              className="w-11 h-11 rounded-full bg-white/10 text-white flex items-center justify-center active:scale-95 transition-transform shrink-0"
             >
               <span aria-hidden="true" className="material-symbols-outlined text-[18px]">edit</span>
             </button>
@@ -354,7 +354,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                         setThemePref(pref);
                         setThemePrefState(pref);
                       }}
-                      className={`px-3 py-1.5 rounded-full text-[0.75rem] font-bold transition-colors ${
+                      className={`min-h-11 px-3.5 rounded-full text-[0.75rem] font-bold transition-colors ${
                         themePref === pref ? 'bg-rd-selected text-rd-on-selected' : 'text-outline'
                       }`}
                     >
@@ -381,7 +381,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                   if (onUpdateProfile) onUpdateProfile({ state: newState });
                   showToast(`Home state updated to ${newState}`);
                 }}
-                className="bg-transparent text-outline font-semibold text-caption focus:outline-none"
+                className="min-h-11 bg-transparent text-outline font-semibold text-caption rounded-md focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary"
               >
                 {['Abuja FCT', 'Lagos', 'Ogun', 'Rivers', 'Kano', 'Edo', 'Delta', 'Oyo', 'Kaduna'].map((st) => (
                   <option key={st} value={st}>
@@ -399,7 +399,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                 onClick={handleToggleNotifications}
                 aria-pressed={notificationsEnabled}
                 aria-label="Toggle proximity alerts"
-                className={`w-[34px] h-5 rounded-full transition-colors relative shrink-0 ${
+                className={`w-[34px] h-5 rounded-full transition-colors relative shrink-0 before:content-[''] before:absolute before:-inset-x-[5px] before:-inset-y-3 ${
                   notificationsEnabled ? 'bg-primary' : 'bg-surface-container-highest'
                 }`}
               >
@@ -425,7 +425,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                 }}
                 aria-pressed={analyticsOn}
                 aria-label="Toggle anonymous usage data"
-                className={`w-[34px] h-5 rounded-full transition-colors relative shrink-0 ${
+                className={`w-[34px] h-5 rounded-full transition-colors relative shrink-0 before:content-[''] before:absolute before:-inset-x-[5px] before:-inset-y-3 ${
                   analyticsOn ? 'bg-primary' : 'bg-surface-container-highest'
                 }`}
               >

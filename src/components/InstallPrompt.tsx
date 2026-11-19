@@ -20,7 +20,7 @@ export const InstallPrompt: React.FC = () => {
     // dark-mode values yet. The card itself stays ink-dark by design either way (same
     // "always-dark accent" treatment as the live camera screen), but rd-ink itself has no
     // dark-mode override, so this mainly keeps the hairline/divider legible.
-    <section aria-label="Install CNG-Connect" data-theme="light" className="fixed inset-x-0 bottom-24 z-40 px-4 pointer-events-none">
+    <section aria-label="Install CNG-Connect" data-theme="light" className="fixed inset-x-0 bottom-[7.5rem] z-40 px-4 pointer-events-none">
       <div className="max-w-md mx-auto pointer-events-auto bg-rd-ink text-white rounded-2xl shadow-[0_10px_30px_rgba(20,32,26,0.3)] p-3">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-primary text-white flex items-center justify-center shrink-0">
@@ -36,14 +36,14 @@ export const InstallPrompt: React.FC = () => {
           {canInstall ? (
             <button
               onClick={() => void promptInstall()}
-              className="shrink-0 px-3 py-2 rounded-full bg-primary text-white font-geist text-caption font-bold active:scale-95 transition-transform"
+              className="shrink-0 min-h-11 px-4 rounded-full bg-primary text-white font-geist text-caption font-bold active:scale-95 transition-transform"
             >
               Install
             </button>
           ) : (
             <button
               onClick={() => setIosStepsOpen((v) => !v)}
-              className="shrink-0 px-3 py-2 rounded-full bg-primary text-white font-geist text-caption font-bold active:scale-95 transition-transform flex items-center gap-1"
+              className="shrink-0 min-h-11 px-4 rounded-full bg-primary text-white font-geist text-caption font-bold active:scale-95 transition-transform flex items-center gap-1"
             >
               <span>How</span>
               <span aria-hidden="true" className="material-symbols-outlined text-[16px]">
@@ -55,7 +55,7 @@ export const InstallPrompt: React.FC = () => {
           <button
             onClick={dismiss}
             aria-label="Dismiss install banner"
-            className="shrink-0 w-7 h-7 rounded-full text-white/60 hover:bg-white/10 flex items-center justify-center"
+            className="shrink-0 w-11 h-11 -mr-1 rounded-full text-white/60 hover:bg-white/10 flex items-center justify-center"
           >
             <span aria-hidden="true" className="material-symbols-outlined text-[18px]">close</span>
           </button>

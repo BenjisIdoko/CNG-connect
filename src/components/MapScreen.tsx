@@ -1147,14 +1147,14 @@ export const MapScreen: React.FC<MapScreenProps> = ({
               }}
               style={{ touchAction: 'none' }}
               aria-label="Station list size — drag or tap to change"
-              className="w-full pt-3 pb-4 flex flex-col items-center"
+              className="w-full min-h-11 flex flex-col items-center justify-center"
             >
               <div className="w-10 h-1.5 bg-rd-handle rounded-full" />
             </button>
             {filteredStations.length > 0 && sheetMode !== 'collapsed' && (
               <button
                 onClick={toggleSheetMode}
-                className="absolute right-3 top-1 h-9 px-2 flex items-center gap-0.5 text-caption font-bold text-primary active:opacity-70"
+                className="absolute right-3 top-0 h-11 px-2 flex items-center gap-0.5 text-caption font-bold text-primary active:opacity-70"
               >
                 {sheetMode === 'expanded'
                   ? 'Show less'
@@ -1185,7 +1185,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                 <button
                   type="button"
                   onClick={() => setIsAreaPickerOpen(true)}
-                  className="mt-1.5 min-h-8 text-caption font-bold underline underline-offset-2 active:opacity-70"
+                  className="mt-0.5 -mb-2 min-h-11 text-caption font-bold underline underline-offset-2 active:opacity-70"
                 >
                   Choose a different area
                 </button>
@@ -1194,7 +1194,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                 type="button"
                 onClick={() => setAreaBannerDismissed(true)}
                 aria-label="Dismiss location notice"
-                className="shrink-0 w-10 h-10 -mt-1.5 -mr-1.5 flex items-center justify-center rounded-full hover:bg-black/5"
+                className="shrink-0 w-11 h-11 -mt-2 -mr-2 flex items-center justify-center rounded-full hover:bg-black/5"
               >
                 <span aria-hidden="true" className="material-symbols-outlined text-[18px]">close</span>
               </button>
@@ -1216,7 +1216,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                     setActiveFilter(chip.key);
                     track('filter_applied', { status: chip.key });
                   }}
-                  className={`shrink-0 rounded-full flex items-center gap-1.5 text-micro font-semibold font-geist min-h-10 px-3 transition-colors ${
+                  className={`shrink-0 rounded-full flex items-center gap-1.5 text-micro font-semibold font-geist min-h-11 px-3.5 transition-colors ${
                     active ? 'bg-rd-selected text-rd-on-selected' : 'bg-rd-chip-grey text-rd-fg'
                   }`}
                 >
@@ -1241,7 +1241,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
               </p>
               <button
                 onClick={resetAllFilters}
-                className="mt-1 px-6 py-3 bg-primary text-white text-caption font-bold rounded-full active:scale-95 transition-all"
+                className="mt-1 min-h-11 px-6 bg-primary text-white text-caption font-bold rounded-full active:scale-95 transition-all"
               >
                 Reset filters
               </button>

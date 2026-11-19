@@ -133,14 +133,14 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
               {filteredCenters.length} centre{filteredCenters.length === 1 ? '' : 's'}
               {selectedState !== 'all' ? ` near ${selectedState}` : ''}
             </span>
-            <label className="flex items-center gap-2 text-caption font-semibold text-rd-fg">
+            <label className="flex items-center gap-2 min-h-11 text-caption font-semibold text-rd-fg">
               Accredited only
               <button
                 type="button"
                 onClick={() => setOnlyAccredited(!onlyAccredited)}
                 aria-pressed={onlyAccredited}
                 aria-label="Toggle accredited only"
-                className={`w-10 h-6 rounded-full transition-colors relative ${onlyAccredited ? 'bg-primary' : 'bg-surface-container-highest'}`}
+                className={`w-10 h-6 rounded-full transition-colors relative before:content-[''] before:absolute before:-inset-x-1 before:-inset-y-2.5 ${onlyAccredited ? 'bg-primary' : 'bg-surface-container-highest'}`}
               >
                 <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-all ${onlyAccredited ? 'right-0.5' : 'left-0.5'}`} />
               </button>

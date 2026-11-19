@@ -91,7 +91,7 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
             </span>
             <button
               onClick={onStartLogin}
-              className="text-[0.875rem] font-semibold text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.5)] active:opacity-70"
+              className="min-h-11 pl-4 -mr-2 pr-2 flex items-center text-[0.875rem] font-semibold text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.5)] active:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white rounded-md"
             >
               Log in
             </button>
@@ -102,14 +102,14 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
       {/* Copy + controls */}
       <div className="flex-1 flex flex-col px-6 pt-6 pb-[max(env(safe-area-inset-bottom,0px),1.5rem)] max-w-xl mx-auto w-full">
         {/* Page dots — design_handoff_cng_connect_mobile 1g: 8px, active 26x8 ink pill */}
-        <div className="flex items-center -ml-1 mb-2">
+        <div className="flex items-center -ml-1 -mt-2.5 -mb-0.5">
           {slides.map((s, idx) => (
             <button
               key={s.id}
               onClick={() => setCurrentSlide(idx)}
               aria-label={`Go to slide ${idx + 1}`}
               aria-current={currentSlide === idx ? 'true' : undefined}
-              className={`h-6 flex items-center justify-center transition-all duration-300 ${currentSlide === idx ? 'w-[34px]' : 'w-6'}`}
+              className={`h-11 flex items-center justify-center transition-all duration-300 ${currentSlide === idx ? 'w-[34px]' : 'w-6'}`}
             >
               <span
                 aria-hidden="true"
@@ -143,14 +143,14 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
               Log in
             </button>
             {onExploreAsGuest && (
-              <button onClick={onExploreAsGuest} className="h-10 text-[0.9375rem] font-bold text-primary">
+              <button onClick={onExploreAsGuest} className="h-11 text-[0.9375rem] font-bold text-primary">
                 Explore as guest
               </button>
             )}
           </div>
         ) : (
           <div className="flex items-center justify-between">
-            <button onClick={handleSkip} className="text-[0.9375rem] font-semibold text-rd-text-tertiary py-2 pr-4">
+            <button onClick={handleSkip} className="min-h-11 pr-4 text-[0.9375rem] font-semibold text-rd-text-tertiary">
               Skip
             </button>
             <div className="flex items-center gap-3">

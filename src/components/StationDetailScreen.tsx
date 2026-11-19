@@ -446,19 +446,19 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
           <TabsPrimitive.List ref={tabListRef} className="relative flex gap-6 border-b border-surface-container-highest">
             <TabsPrimitive.Trigger
               value="reports"
-              className="pb-2.5 -mb-px font-geist text-[0.9375rem] font-semibold text-rd-text-tertiary border-b-2 border-transparent transition-colors data-[state=active]:text-rd-fg data-[state=active]:font-bold focus:outline-none"
+              className="min-h-11 flex items-end pb-2.5 -mb-px font-geist text-[0.9375rem] font-semibold text-rd-text-tertiary border-b-2 border-transparent transition-colors data-[state=active]:text-rd-fg data-[state=active]:font-bold focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary rounded-sm"
             >
               Reports{listedReports.length > 0 ? ` · ${listedReports.length}` : ''}
             </TabsPrimitive.Trigger>
             <TabsPrimitive.Trigger
               value="feed"
-              className="pb-2.5 -mb-px font-geist text-[0.9375rem] font-semibold text-rd-text-tertiary border-b-2 border-transparent transition-colors data-[state=active]:text-rd-fg data-[state=active]:font-bold focus:outline-none"
+              className="min-h-11 flex items-end pb-2.5 -mb-px font-geist text-[0.9375rem] font-semibold text-rd-text-tertiary border-b-2 border-transparent transition-colors data-[state=active]:text-rd-fg data-[state=active]:font-bold focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary rounded-sm"
             >
               Chat{comments.length > 0 ? ` · ${comments.length}` : ''}
             </TabsPrimitive.Trigger>
             <TabsPrimitive.Trigger
               value="photos"
-              className="pb-2.5 -mb-px font-geist text-[0.9375rem] font-semibold text-rd-text-tertiary border-b-2 border-transparent transition-colors data-[state=active]:text-rd-fg data-[state=active]:font-bold focus:outline-none"
+              className="min-h-11 flex items-end pb-2.5 -mb-px font-geist text-[0.9375rem] font-semibold text-rd-text-tertiary border-b-2 border-transparent transition-colors data-[state=active]:text-rd-fg data-[state=active]:font-bold focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary rounded-sm"
             >
               Photos{images.length > 0 ? ` · ${images.length}` : ''}
             </TabsPrimitive.Trigger>

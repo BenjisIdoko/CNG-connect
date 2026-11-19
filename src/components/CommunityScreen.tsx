@@ -227,7 +227,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
           />
           <button
             onClick={() => setActiveMainTab('station_groups')}
-            className={`relative z-10 flex-1 py-2.5 rounded-full text-caption font-bold transition-colors text-center ${
+            className={`relative z-10 flex-1 min-h-11 flex items-center justify-center rounded-full text-caption font-bold transition-colors text-center ${
               activeMainTab === 'station_groups'
                 ? 'text-rd-on-selected'
                 : 'text-on-surface-variant hover:text-on-surface'
@@ -238,7 +238,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
 
           <button
             onClick={() => setActiveMainTab('general')}
-            className={`relative z-10 flex-1 py-2.5 rounded-full text-caption font-bold transition-colors text-center ${
+            className={`relative z-10 flex-1 min-h-11 flex items-center justify-center rounded-full text-caption font-bold transition-colors text-center ${
               activeMainTab === 'general'
                 ? 'text-rd-on-selected'
                 : 'text-on-surface-variant hover:text-on-surface'
@@ -250,7 +250,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
           {SHOW_LEADERBOARD && (
             <button
               onClick={() => setActiveMainTab('leaderboard')}
-              className={`relative z-10 flex-1 py-2.5 rounded-full text-caption font-bold transition-colors text-center flex items-center justify-center gap-1 ${
+              className={`relative z-10 flex-1 min-h-11 flex items-center justify-center rounded-full text-caption font-bold transition-colors text-center flex items-center justify-center gap-1 ${
                 activeMainTab === 'leaderboard'
                   ? 'text-rd-on-selected'
                   : 'text-on-surface-variant hover:text-on-surface'
@@ -316,7 +316,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                 <button
                   onClick={() => setShowInfoSheet(true)}
                   aria-label="Station Group Policy Info"
-                  className="w-6 h-6 rounded-full bg-emerald-100 hover:bg-emerald-200 text-primary flex items-center justify-center transition-all active:scale-95 shrink-0"
+                  className="relative w-6 h-6 rounded-full bg-emerald-100 hover:bg-emerald-200 text-primary flex items-center justify-center transition-all active:scale-95 shrink-0 before:content-[''] before:absolute before:-inset-[10px]"
                   title="Policy Info"
                 >
                   <span aria-hidden="true" className="material-symbols-outlined text-[15px]">info</span>
@@ -327,7 +327,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                 <button
                   onClick={() => setShowStatusMenu((v) => !v)}
                   aria-label="Filter station groups by status"
-                  className={`flex items-center gap-1 text-micro font-semibold px-2 py-2 rounded-xl border transition-colors active:scale-95 ${
+                  className={`flex items-center justify-center gap-1 text-micro font-semibold min-h-11 min-w-11 px-2 rounded-xl border transition-colors active:scale-95 ${
                     statusFilter === 'all'
                       ? 'bg-surface-container-high text-slate-600 border-slate-200 hover:bg-surface-container'
                       : 'bg-primary text-white border-primary'
