@@ -154,7 +154,7 @@ export const UsersDirectory: React.FC<DirectoryProps> = ({ rows, loading, onEdit
         resetPage();
       }}
       className={cn(
-        'shrink-0 rounded-md px-3 py-1.5 text-sm font-medium whitespace-nowrap outline-none transition-colors focus-visible:ring-2 focus-visible:ring-adm-note focus-visible:ring-offset-2 focus-visible:ring-offset-adm-card',
+        'shrink-0 rounded-md px-3 py-1.5 max-md:min-h-11 text-sm font-medium whitespace-nowrap outline-none transition-colors focus-visible:ring-2 focus-visible:ring-adm-note focus-visible:ring-offset-2 focus-visible:ring-offset-adm-card',
         kit === value ? 'bg-adm-note text-white' : 'bg-adm-muted text-adm-ink hover:bg-adm-line',
       )}
     >
@@ -162,7 +162,7 @@ export const UsersDirectory: React.FC<DirectoryProps> = ({ rows, loading, onEdit
     </button>
   );
 
-  const iconBtn = 'size-9';
+  const iconBtn = 'size-9 max-md:size-11';
 
   return (
     <div className="h-full overflow-y-auto">

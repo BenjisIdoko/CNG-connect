@@ -48,7 +48,7 @@ interface ManagerInfo {
 const toTimeInput = (v: string | null) => (v ? v.slice(0, 5) : '');
 
 const inputCls =
-  'w-full border border-adm-line rounded-lg px-2.5 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-adm-note';
+  'w-full border border-adm-line rounded-lg px-2.5 py-1.5 text-sm max-md:min-h-11 max-md:text-base focus:outline-none focus:ring-2 focus:ring-adm-note';
 const labelCls = 'text-xs font-semibold text-adm-mute-text mb-1 block';
 
 export const FullStationEditorModal: React.FC<Props> = ({ station, onClose, onSaved, isAdmin = false, statusCard }) => {
@@ -272,7 +272,7 @@ export const FullStationEditorModal: React.FC<Props> = ({ station, onClose, onSa
     <ModalFrame onClose={onClose} title={`Full details for ${station.name}`} className="max-w-2xl">
         <div className="p-4 border-b border-adm-line flex items-center justify-between shrink-0">
           <h2 className="font-bold text-adm-ink text-sm truncate pr-2">Full details — {station.name}</h2>
-          <button onClick={onClose} className="text-xs px-3 py-1.5 rounded-md bg-adm-muted hover:bg-adm-line shrink-0">
+          <button onClick={onClose} className="text-xs px-3 py-1.5 max-md:px-4 max-md:min-h-11 rounded-md bg-adm-muted hover:bg-adm-line shrink-0">
             Close
           </button>
         </div>
@@ -295,7 +295,7 @@ export const FullStationEditorModal: React.FC<Props> = ({ station, onClose, onSa
                   <img src={url} alt="" className="w-full h-full object-cover" />
                   <button
                     onClick={() => removeImage(url)}
-                    className="absolute top-1 right-1 w-6 h-6 rounded-md bg-black/60 text-white text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute top-1 right-1 w-6 h-6 max-md:w-11 max-md:h-11 rounded-md bg-black/60 text-white text-xs flex items-center justify-center md:opacity-0 md:group-hover:opacity-100 focus-visible:opacity-100 transition-opacity"
                     aria-label="Remove photo"
                   >
                     <X className="size-3" aria-hidden="true" />
@@ -339,7 +339,7 @@ export const FullStationEditorModal: React.FC<Props> = ({ station, onClose, onSa
                   <option value="ev_charging">EV charging</option>
                 </select>
               </div>
-              <label className="flex items-center gap-2 text-sm font-medium text-adm-ink pb-1.5">
+              <label className="flex items-center gap-2 text-sm font-medium text-adm-ink pb-1.5 max-md:min-h-11">
                 <input type="checkbox" checked={isAccredited} onChange={(e) => setIsAccredited(e.target.checked)} />
                 Pi-CNG accredited
               </label>
@@ -414,7 +414,7 @@ export const FullStationEditorModal: React.FC<Props> = ({ station, onClose, onSa
           {/* Hours */}
           <section className="flex flex-col gap-3">
             <h3 className="text-sm font-semibold text-adm-ink">Hours</h3>
-            <label className="flex items-center gap-2 text-sm font-medium text-adm-ink">
+            <label className="flex items-center gap-2 text-sm font-medium text-adm-ink max-md:min-h-11">
               <input type="checkbox" checked={is24Hours} onChange={(e) => setIs24Hours(e.target.checked)} />
               Open 24 hours
             </label>
@@ -494,13 +494,13 @@ export const FullStationEditorModal: React.FC<Props> = ({ station, onClose, onSa
         </div>
 
         <div className="p-4 border-t border-adm-line flex justify-end gap-2 shrink-0">
-          <button onClick={onClose} className="text-xs px-4 py-1.5 rounded-lg bg-adm-muted hover:bg-adm-line">
+          <button onClick={onClose} className="text-xs px-4 py-1.5 max-md:min-h-11 rounded-lg bg-adm-muted hover:bg-adm-line">
             Cancel
           </button>
           <button
             onClick={save}
             disabled={saving || !name.trim()}
-            className="text-xs px-4 py-1.5 rounded-lg bg-adm-foil text-adm-ink font-bold disabled:opacity-50"
+            className="text-xs px-4 py-1.5 max-md:min-h-11 rounded-lg bg-adm-foil text-adm-ink font-bold disabled:opacity-50"
           >
             {saving ? 'Saving…' : 'Save all'}
           </button>

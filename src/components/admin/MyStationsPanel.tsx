@@ -111,7 +111,7 @@ export const MyStationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flas
             <button
               type="button"
               onClick={() => setEditingId(s.id)}
-              className="mt-3 text-xs text-adm-note font-semibold inline-flex items-center gap-1 hover:underline"
+              className="mt-1 min-h-11 text-xs text-adm-note font-semibold inline-flex items-center gap-1 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-adm-note rounded-sm"
             >
               Edit details <ArrowRight className="size-3" aria-hidden="true" />
             </button>

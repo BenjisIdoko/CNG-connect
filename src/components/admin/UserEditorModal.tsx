@@ -34,7 +34,7 @@ interface Props {
 }
 
 const selectCls =
-  'h-9 w-full rounded-md border border-adm-line bg-adm-card px-3 text-sm text-adm-ink outline-none transition-colors focus-visible:border-adm-note focus-visible:ring-2 focus-visible:ring-adm-note';
+  'h-9 max-md:h-11 w-full rounded-md border border-adm-line bg-adm-card px-3 text-sm max-md:text-base text-adm-ink outline-none transition-colors focus-visible:border-adm-note focus-visible:ring-2 focus-visible:ring-adm-note';
 
 /**
  * Full edit for one driver's profile: name, phone, state, vehicle and CNG kit. The admin flag is

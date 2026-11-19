@@ -24,7 +24,7 @@ const REASON_LABEL: Record<DuplicateHit['reason'], string> = {
 };
 
 const inputCls =
-  'w-full border border-adm-line rounded-lg px-2.5 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-adm-note';
+  'w-full border border-adm-line rounded-lg px-2.5 py-1.5 text-sm max-md:min-h-11 max-md:text-base focus:outline-none focus:ring-2 focus:ring-adm-note';
 const labelCls = 'text-xs font-semibold text-adm-mute-text mb-1 block';
 
 /** Short form for adding one station: basics plus a required map position. */
@@ -164,14 +164,14 @@ export const AddStationModal: React.FC<Props> = ({ stations, prefill, onClose, o
         <div className="p-4 border-t border-adm-line flex items-center justify-between gap-3 shrink-0">
           <p className="text-xs text-adm-mute-text min-w-0">{blockedReason && !exactDuplicate ? blockedReason : ''}</p>
           <div className="flex items-center gap-2 shrink-0">
-            <button type="button" onClick={onClose} className="text-xs px-4 py-1.5 rounded-lg bg-adm-muted hover:bg-adm-line">
+            <button type="button" onClick={onClose} className="text-xs px-4 py-1.5 max-md:min-h-11 rounded-lg bg-adm-muted hover:bg-adm-line">
               Cancel
             </button>
             <button
               type="button"
               onClick={submit}
               disabled={saving || !supabase || Boolean(blockedReason)}
-              className="text-xs px-4 py-1.5 rounded-lg bg-adm-foil text-adm-ink font-bold disabled:opacity-50"
+              className="text-xs px-4 py-1.5 max-md:min-h-11 rounded-lg bg-adm-foil text-adm-ink font-bold disabled:opacity-50"
             >
               {saving ? 'Adding…' : warnings.length > 0 ? 'Add anyway' : 'Add station'}
             </button>
