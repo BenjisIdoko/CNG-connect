@@ -2,6 +2,7 @@ import { GasStation } from '../types';
 import { track } from '../services/analytics';
 import { describeStatus, getFreshness } from './stationFreshness';
 import { describePressure } from './stationManagerSignals';
+import { describeManagerStatus, formatWatTime, ManagerStatement } from './managerState';
 
 // Share links point at whatever origin the app is actually served from
 // (cngconnect.com.ng in prod, a preview URL, or localhost in dev). The
@@ -53,6 +54,38 @@ export function openWhatsAppShare(station: GasStation): void {
   track('share_clicked', { station_id: station.id });
   const message = buildStationShareMessage(station);
   const waUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+  if (typeof window !== 'undefined') {
+    window.open(waUrl, '_blank');
+  }
+}
+
+export interface ManagerShareInput {
+  stationId: string;
+  name: string;
+  city: string;
+  statement: ManagerStatement;
+  now?: number;
+}
+
+/**
+ * The message a station manager sends to the drivers they already message on WhatsApp. It states what
+ * the station said and the clock time it was posted (never "20 min ago", which would be wrong in the
+ * chat an hour later), and links to the plain station page. Nothing here promotes the app.
+ */
+export function buildManagerShareMessage({ stationId, name, city, statement, now = Date.now() }: ManagerShareInput): string {
+  const postedAt = formatWatTime(now - statement.ageMinutes * 60000);
+  return [
+    '⛽ *Station update*',
+    `📍 *${name}*${city ? ` (${city})` : ''}`,
+    `📢 ${describeManagerStatus(statement)}`,
+    `🕒 Posted ${postedAt}`,
+    `\n📲 Check live on CNG-Connect:\n${buildStationShareUrl(stationId)}`,
+  ].join('\n');
+}
+
+export function openManagerWhatsAppShare(input: ManagerShareInput): void {
+  track('share_clicked', { station_id: input.stationId });
+  const waUrl = `https://wa.me/?text=${encodeURIComponent(buildManagerShareMessage(input))}`;
   if (typeof window !== 'undefined') {
     window.open(waUrl, '_blank');
   }

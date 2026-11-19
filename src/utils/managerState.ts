@@ -127,8 +127,8 @@ export function formatWatTime(ms: number): string {
   return formatClockMinutes(wat.getUTCHours() * 60 + wat.getUTCMinutes());
 }
 
-/** The sentence a driver reads on the station page, with how long ago the manager said it. */
-export function describeManagerState(statement: ManagerStatement): string {
+/** What the station says, without how long ago it said it (for places where an age would go stale). */
+export function describeManagerStatus(statement: ManagerStatement): string {
   const parts: string[] = [SENTENCE[statement.state]];
   if (statement.state !== 'selling') {
     // "Open · Waiting for gas supply" already says it, so a supply reason adds nothing there.
@@ -139,6 +139,10 @@ export function describeManagerState(statement: ManagerStatement): string {
       parts.push(statement.overdue ? `Was expected back ${time} · not confirmed` : `expected about ${time}`);
     }
   }
-  parts.push(`updated ${formatAgeShort(statement.ageMinutes)}`);
   return parts.join(' · ');
+}
+
+/** The sentence a driver reads on the station page, with how long ago the manager said it. */
+export function describeManagerState(statement: ManagerStatement): string {
+  return `${describeManagerStatus(statement)} · updated ${formatAgeShort(statement.ageMinutes)}`;
 }

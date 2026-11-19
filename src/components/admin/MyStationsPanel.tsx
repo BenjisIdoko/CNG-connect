@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { stationToOpenOnArrival } from '../../utils/managerLanding';
+import type { ManagerStateReason } from '../../utils/managerState';
 import { ArrowRight } from 'lucide-react';
 import { useSupabaseClient } from '../../hooks/useSupabaseClient';
 import { useAuth } from '../../context/AuthContext';
@@ -14,6 +15,8 @@ type ManagedStation = FullStationRow & {
   data_source: string | null;
   manager_state: 'closed' | 'open' | 'selling' | null;
   manager_state_at: string | null;
+  manager_state_reason: ManagerStateReason | null;
+  manager_state_until: string | null;
   manager_selling: boolean | null;
   manager_selling_at: string | null;
   live_pressure_bar: number | null;
@@ -74,8 +77,12 @@ export const MyStationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flas
   const statusCard = (s: ManagedStation) => (
     <StationQuickUpdate
       stationId={s.id}
+      stationName={s.name}
+      city={s.city ?? ''}
       managerState={s.manager_state ?? null}
       managerStateAt={s.manager_state_at ?? null}
+      managerStateReason={s.manager_state_reason ?? null}
+      managerStateUntil={s.manager_state_until ?? null}
       managerSelling={s.manager_selling}
       managerSellingAt={s.manager_selling_at}
       livePressureBar={s.live_pressure_bar}

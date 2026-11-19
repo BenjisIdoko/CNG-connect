@@ -9,14 +9,30 @@ import {
   isValidPressure,
   stepPressure,
 } from '../../utils/stationManagerSignals';
-import { MANAGER_STATE_MINUTES, MANAGER_STATE_OPTIONS, ManagerState, getManagerStatement } from '../../utils/managerState';
+import {
+  MANAGER_REASON_OPTIONS,
+  MANAGER_STATE_MINUTES,
+  MANAGER_STATE_OPTIONS,
+  ManagerState,
+  ManagerStateReason,
+  formatWatTime,
+  getManagerStatement,
+} from '../../utils/managerState';
+import { buildPostDetails } from '../../utils/managerPostForm';
+import { openManagerWhatsAppShare } from '../../utils/shareMessageBuilder';
 import { postPressure, ManagerPostResult, RpcClient } from '../../services/stationManagerService';
 import { postManagerState } from '../../services/managerAccessService';
 
 interface Props {
   stationId: string;
+  /** For the WhatsApp message. */
+  stationName: string;
+  city: string;
   managerState: ManagerState | null;
   managerStateAt: string | null;
+  /** Why a Closed / waiting post is that way, and when the manager expects it to change. */
+  managerStateReason: ManagerStateReason | null;
+  managerStateUntil: string | null;
   /** The older two-state fields, still read so a post from a phone that has not updated shows up. */
   managerSelling: boolean | null;
   managerSellingAt: string | null;
@@ -28,7 +44,7 @@ interface Props {
   onPosted: () => void;
 }
 
-type Pending = ManagerState | 'pressure' | null;
+type Pending = ManagerState | 'pressure' | 'details' | null;
 
 const startingPressure = (live: number | null, pump: number | null): number => {
   if (isValidPressure(live)) return live;
@@ -49,8 +65,12 @@ const POSTED_TEXT: Record<ManagerState, string> = {
  */
 export const StationQuickUpdate: React.FC<Props> = ({
   stationId,
+  stationName,
+  city,
   managerState,
   managerStateAt,
+  managerStateReason,
+  managerStateUntil,
   managerSelling,
   managerSellingAt,
   livePressureBar,
@@ -64,9 +84,15 @@ export const StationQuickUpdate: React.FC<Props> = ({
   const [error, setError] = useState<string | null>(null);
   const [pressure, setPressure] = useState(() => startingPressure(livePressureBar, pumpPressure));
 
+  const [reason, setReason] = useState<ManagerStateReason | null>(managerStateReason);
+  const [inHours, setInHours] = useState<1 | 2 | 4 | null>(null);
+  const [clock, setClock] = useState('');
+
   const statement = getManagerStatement({
     managerState: managerState ?? undefined,
     managerStateAt: managerStateAt ?? undefined,
+    managerStateReason: managerStateReason ?? undefined,
+    managerStateUntil: managerStateUntil ?? undefined,
     managerSelling: managerSelling ?? undefined,
     managerSellingAt: managerSellingAt ?? undefined,
   });
@@ -87,6 +113,33 @@ export const StationQuickUpdate: React.FC<Props> = ({
   };
 
   const client = supabase as unknown as RpcClient | null;
+
+  const saveDetails = () => {
+    if (!client || !statement || statement.state === 'selling') return;
+    const built = buildPostDetails({ reason, inHours, clock });
+    if (!built.ok) {
+      setError(built.error);
+      return;
+    }
+    void run('details', () => postManagerState(client, stationId, statement.state, built.details), 'Posted: details saved');
+  };
+
+  const pickHours = (hours: 1 | 2 | 4) => {
+    setInHours((current) => (current === hours ? null : hours));
+    setClock('');
+  };
+
+  const chip = (pressed: boolean) =>
+    `min-h-[44px] rounded-md border px-3 text-sm font-semibold transition-colors outline-none focus-visible:ring-2 focus-visible:ring-adm-note disabled:cursor-not-allowed disabled:opacity-50 ${
+      pressed ? 'border-adm-note bg-adm-note text-white' : 'border-adm-line bg-adm-card text-adm-ink hover:border-adm-note'
+    }`;
+
+  const expectedLine =
+    statement?.untilMs === undefined
+      ? null
+      : statement.overdue
+        ? `Was expected back ${formatWatTime(statement.untilMs)}, not confirmed.`
+        : `Expected back about ${formatWatTime(statement.untilMs)}.`;
 
   return (
     <div className="mt-3 flex flex-col gap-4 border-t border-adm-line pt-3">
@@ -116,6 +169,82 @@ export const StationQuickUpdate: React.FC<Props> = ({
             ? `Posted ${formatAgeShort(statement.ageMinutes)} · drivers see it for ${MANAGER_STATE_MINUTES / 60} hours`
             : `Nothing posted right now. Drivers see a post for ${MANAGER_STATE_MINUTES / 60} hours.`}
         </p>
+      </div>
+
+      {statement && statement.state !== 'selling' && (
+        <div className="flex flex-col gap-3 rounded-md border border-adm-line p-3">
+          <div>
+            <p className="text-sm font-semibold text-adm-ink">Why?</p>
+            <p className="text-xs text-adm-mute-text">Optional. Drivers read it on the station page.</p>
+            <div className="mt-1.5 flex flex-wrap gap-2" role="group" aria-label="Reason">
+              {MANAGER_REASON_OPTIONS.map((option) => (
+                <button
+                  key={option.reason}
+                  type="button"
+                  aria-pressed={reason === option.reason}
+                  disabled={pending !== null}
+                  onClick={() => setReason((current) => (current === option.reason ? null : option.reason))}
+                  className={chip(reason === option.reason)}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-adm-ink">Expected back</p>
+            <p className="text-xs text-adm-mute-text">Optional. Lagos time. {expectedLine}</p>
+            <div className="mt-1.5 flex flex-wrap items-center gap-2" role="group" aria-label="Expected back">
+              {([1, 2, 4] as const).map((hours) => (
+                <button
+                  key={hours}
+                  type="button"
+                  aria-pressed={inHours === hours}
+                  disabled={pending !== null}
+                  onClick={() => pickHours(hours)}
+                  className={chip(inHours === hours)}
+                >
+                  {hours === 1 ? 'In 1 hour' : `In ${hours} hours`}
+                </button>
+              ))}
+              <label className="flex items-center gap-2 text-sm text-adm-ink">
+                <span>Or at</span>
+                <input
+                  type="time"
+                  value={clock}
+                  onChange={(e) => {
+                    setClock(e.target.value);
+                    setInHours(null);
+                  }}
+                  disabled={pending !== null}
+                  className="min-h-[44px] rounded-md border border-adm-line bg-adm-card px-2 text-sm max-md:text-base text-adm-ink outline-none focus-visible:ring-2 focus-visible:ring-adm-note"
+                />
+              </label>
+            </div>
+          </div>
+          <button
+            type="button"
+            disabled={pending !== null}
+            onClick={saveDetails}
+            className="min-h-[44px] w-full rounded-md bg-adm-foil text-sm font-bold text-adm-ink disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {pending === 'details' ? 'Saving…' : 'Save details'}
+          </button>
+        </div>
+      )}
+
+      <div>
+        <button
+          type="button"
+          disabled={!statement}
+          onClick={() =>
+            statement && openManagerWhatsAppShare({ stationId, name: stationName, city, statement })
+          }
+          className="min-h-[44px] w-full rounded-md border border-adm-line bg-adm-card text-sm font-bold text-adm-ink outline-none transition-colors hover:border-adm-note focus-visible:ring-2 focus-visible:ring-adm-note disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          Share update on WhatsApp
+        </button>
+        <p className="mt-1.5 text-xs text-adm-mute-text">Sends this status to the drivers you message. Post it first.</p>
       </div>
 
       <div>

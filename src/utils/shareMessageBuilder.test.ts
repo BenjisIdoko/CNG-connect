@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { buildStationShareUrl, buildStationShareMessage } from './shareMessageBuilder';
+import { buildStationShareUrl, buildStationShareMessage, buildManagerShareMessage } from './shareMessageBuilder';
 import { GasStation } from '../types';
 
 describe('shareMessageBuilder', () => {
@@ -95,4 +95,34 @@ describe('shareMessageBuilder', () => {
     const never: GasStation = { ...sampleStation, status: 'unknown', statusLabel: 'No recent reports', reports: [] };
     expect(buildStationShareMessage(never)).toContain('📊 Status: *No report yet*');
   });
+
+  describe('buildManagerShareMessage', () => {
+    const NOW = Date.parse('2026-11-19T12:00:00Z'); // 1 pm in Lagos
+    const until = Date.parse('2026-11-19T13:00:00Z'); // 2 pm in Lagos
+    const base = { stationId: 'nipc-001', name: 'NIPCO CNG Station', city: 'Abuja FCT', now: NOW };
+
+    it('carries the station, the manager sentence, the reason, the expected time and the posted time', () => {
+      const message = buildManagerShareMessage({
+        ...base,
+        statement: { state: 'closed', ageMinutes: 20, reason: 'supply', untilMs: until, overdue: false },
+      });
+      expect(message).toContain('*NIPCO CNG Station*');
+      expect(message).toContain('Abuja FCT');
+      expect(message).toContain('Closed · Waiting for supply · expected about 2 pm');
+      expect(message).toContain('Posted 12:40 pm');
+      expect(message).toContain('https://cngconnect.com.ng?station=nipc-001');
+    });
+
+    it('does not print a relative age that would go stale in a chat', () => {
+      const message = buildManagerShareMessage({ ...base, statement: { state: 'selling', ageMinutes: 5 } });
+      expect(message).toContain('Open for business · Gas available');
+      expect(message).not.toMatch(/updated|min ago|hr ago/);
+    });
+
+    it('never mentions referrals, airtime or rewards', () => {
+      const message = buildManagerShareMessage({ ...base, statement: { state: 'open', ageMinutes: 5 } });
+      expect(message).not.toMatch(/referral|airtime|reward|bonus|invite/i);
+    });
+  });
 });
+
