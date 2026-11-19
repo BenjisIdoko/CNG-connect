@@ -58,6 +58,9 @@ export interface GasStation {
   /** The station's own staff: "selling now" (true) / "not selling" (false), and when they said it. */
   managerSelling?: boolean;
   managerSellingAt?: string;
+  /** The station's own status: 'closed', 'open' (waiting for gas) or 'selling' (gas available), and when. */
+  managerState?: 'closed' | 'open' | 'selling';
+  managerStateAt?: string;
   /** Pump pressure in bar as last read by a station manager, and when. */
   livePressureBar?: number;
   livePressureAt?: string;
