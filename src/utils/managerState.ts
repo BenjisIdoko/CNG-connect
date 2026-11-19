@@ -112,14 +112,19 @@ const REASON_TEXT: Record<ManagerStateReason, string | null> = {
   other: null,
 };
 
-/** A time of day on the Lagos clock (WAT, UTC+1, no daylight saving): "2 pm", "6:30 am". */
-export function formatWatTime(ms: number): string {
-  const wat = new Date(ms + 60 * 60000);
-  const hours = wat.getUTCHours();
-  const minutes = wat.getUTCMinutes();
+/** A clock time given as minutes after midnight: "2 pm", "6:30 am", "12 am". */
+export function formatClockMinutes(minutesIntoDay: number): string {
+  const hours = Math.floor(minutesIntoDay / 60) % 24;
+  const minutes = minutesIntoDay % 60;
   const hour12 = hours % 12 === 0 ? 12 : hours % 12;
   const clock = minutes === 0 ? `${hour12}` : `${hour12}:${String(minutes).padStart(2, '0')}`;
   return `${clock} ${hours < 12 ? 'am' : 'pm'}`;
+}
+
+/** A moment on the Lagos clock (WAT, UTC+1, no daylight saving): "2 pm", "6:30 am". */
+export function formatWatTime(ms: number): string {
+  const wat = new Date(ms + 60 * 60000);
+  return formatClockMinutes(wat.getUTCHours() * 60 + wat.getUTCMinutes());
 }
 
 /** The sentence a driver reads on the station page, with how long ago the manager said it. */

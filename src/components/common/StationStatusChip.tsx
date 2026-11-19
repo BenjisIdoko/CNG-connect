@@ -1,6 +1,8 @@
 import React from 'react';
 import { GasStation, StationStatus } from '../../types';
 import { getFreshness, STATUS_SHORT_LABEL } from '../../utils/stationFreshness';
+import { getManagerStatement } from '../../utils/managerState';
+import { describeClosedHours } from '../../utils/stationHours';
 
 type KnownStatus = Exclude<StationStatus, 'unknown'>;
 
@@ -17,13 +19,26 @@ const STALE_CHIP = 'bg-rd-stale-container text-rd-on-stale-container';
  *   fresh  (<=1h)  tinted chip with a live dot (pulses three times when it appears, then rests)
  *   recent (not produced any more: a report lasts 45 minutes)
  *   stale  (an expired Queuing report) grey chip — "Last: Queuing · 35 min ago" — never a confident colour
- *   none           grey "No report yet"
+ *   none           with a current manager post: nothing (the "Station says" badge beside it speaks);
+ *                  outside the listed opening hours: grey "Closed · opens 6 am";
+ *                  otherwise grey "No report yet"
  */
 export const StationStatusChip: React.FC<{ station: GasStation; className?: string; now?: number }> = ({ station, className = '', now }) => {
   const f = getFreshness(station, now);
   const base = `inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-micro font-semibold leading-none max-w-full ${className}`;
 
   if (f.tier === 'none' || !f.lastKnownStatus || f.lastKnownStatus === 'unknown') {
+    // The station's own staff have said something current: that is the answer, not "No report yet".
+    if (getManagerStatement(station, now)) return null;
+    const closedHours = describeClosedHours(station, now);
+    if (closedHours) {
+      return (
+        <span className={`${base} ${STALE_CHIP}`}>
+          <span aria-hidden="true" className="material-symbols-outlined text-[14px] shrink-0">schedule</span>
+          <span className="truncate">{closedHours}</span>
+        </span>
+      );
+    }
     return (
       <span className={`${base} ${STALE_CHIP}`}>
         <span aria-hidden="true" className="material-symbols-outlined text-[14px] shrink-0">help</span>

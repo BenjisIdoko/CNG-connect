@@ -78,4 +78,36 @@ describe('StationSaysLine', () => {
     expect(html(station({ managerState: 'closed', managerStateAt: minsAgo(10) }), true)).toContain('Station: closed');
     expect(html(station(base), true)).toBe('');
   });
+
+  describe('with a reason and an expected time', () => {
+    const until = new Date(Date.parse('2026-11-19T13:00:00Z')).toISOString(); // 2 pm in Lagos
+    const closed = (patch: Partial<GasStation> = {}) =>
+      station({ managerState: 'closed', managerStateAt: minsAgo(20), managerStateReason: 'supply', managerStateUntil: until, ...patch });
+
+    it('the station page says why and when', () => {
+      const out = html(closed());
+      expect(out).toContain('Closed · Waiting for supply · expected about 2 pm · updated 20 min ago');
+    });
+
+    it('after the time it says it was not confirmed', () => {
+      const out = renderToStaticMarkup(<StationSaysLine station={closed({ managerStateAt: minsAgo(200) })} now={Date.parse('2026-11-19T13:30:00Z')} />);
+      expect(out).toContain('Was expected back 2 pm · not confirmed');
+      expect(out).not.toContain('expected about');
+    });
+
+    it('the list badge says when it expects to be back', () => {
+      expect(html(closed(), true)).toContain('Station: closed · back ~2 pm');
+      expect(html(closed({ managerState: 'open' }), true)).toContain('Station: open, no gas yet · ~2 pm');
+    });
+
+    it('the list badge says the time was missed once it has passed', () => {
+      const out = renderToStaticMarkup(<StationSaysLine station={closed({ managerStateAt: minsAgo(200) })} now={Date.parse('2026-11-19T13:30:00Z')} compact />);
+      expect(out).toContain('Station: closed · was due 2 pm');
+    });
+
+    it('a selling post badge is unchanged', () => {
+      expect(html(station({ managerState: 'selling', managerStateAt: minsAgo(5) }), true)).toContain('Station: open, gas available');
+    });
+  });
 });
+
