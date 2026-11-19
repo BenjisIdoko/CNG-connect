@@ -8,8 +8,8 @@ const night = { opensAt: '22:00:00', closesAt: '06:00:00' };
 
 describe('describeClosedHours', () => {
   it('before opening, says when it opens today', () => {
-    expect(describeClosedHours(day, wat('05:00'))).toBe('Closed · opens 6 am');
-    expect(describeClosedHours(day, wat('00:00'))).toBe('Closed · opens 6 am');
+    expect(describeClosedHours(day, wat('05:00'))).toBe('Listed hours: closed, opens 6 am');
+    expect(describeClosedHours(day, wat('00:00'))).toBe('Listed hours: closed, opens 6 am');
   });
 
   it('while open, says nothing, including the minute it opens', () => {
@@ -19,20 +19,20 @@ describe('describeClosedHours', () => {
   });
 
   it('from closing time, says it opens tomorrow', () => {
-    expect(describeClosedHours(day, wat('22:00'))).toBe('Closed · opens tomorrow 6 am');
-    expect(describeClosedHours(day, wat('23:30'))).toBe('Closed · opens tomorrow 6 am');
+    expect(describeClosedHours(day, wat('22:00'))).toBe('Listed hours: closed, opens tomorrow 6 am');
+    expect(describeClosedHours(day, wat('23:30'))).toBe('Listed hours: closed, opens tomorrow 6 am');
   });
 
   it('shows minutes only when they are not zero', () => {
-    expect(describeClosedHours({ opensAt: '06:30:00', closesAt: '20:00:00' }, wat('05:00'))).toBe('Closed · opens 6:30 am');
+    expect(describeClosedHours({ opensAt: '06:30:00', closesAt: '20:00:00' }, wat('05:00'))).toBe('Listed hours: closed, opens 6:30 am');
   });
 
   it('handles hours that cross midnight', () => {
     expect(describeClosedHours(night, wat('23:00'))).toBeNull();
     expect(describeClosedHours(night, wat('03:00'))).toBeNull();
     expect(describeClosedHours(night, wat('22:00'))).toBeNull();
-    expect(describeClosedHours(night, wat('12:00'))).toBe('Closed · opens 10 pm');
-    expect(describeClosedHours(night, wat('06:00'))).toBe('Closed · opens 10 pm');
+    expect(describeClosedHours(night, wat('12:00'))).toBe('Listed hours: closed, opens 10 pm');
+    expect(describeClosedHours(night, wat('06:00'))).toBe('Listed hours: closed, opens 10 pm');
   });
 
   it('says nothing for 24-hour stations or unusable hours', () => {
@@ -47,6 +47,6 @@ describe('describeClosedHours', () => {
 
   it('reads the Lagos clock, not the UTC clock', () => {
     // 23:30 UTC is 00:30 in Lagos, before a 6 am opening.
-    expect(describeClosedHours(day, Date.parse('2026-11-19T23:30:00Z'))).toBe('Closed · opens 6 am');
+    expect(describeClosedHours(day, Date.parse('2026-11-19T23:30:00Z'))).toBe('Listed hours: closed, opens 6 am');
   });
 });

@@ -17,7 +17,8 @@ function toMinutes(raw: string | null | undefined): number | null {
 }
 
 /**
- * "Closed · opens 6 am" when the station's listed hours say it is shut right now, otherwise null.
+ * "Listed hours: closed, opens 6 am" when the station's listed hours say it is shut right now, otherwise
+ * null. The wording says where it comes from because listed hours can be out of date; it is not a report.
  * Hours are read on the Lagos clock (WAT) and handle a closing time after midnight. A 24-hour station,
  * missing or unreadable times, or identical opening and closing times say nothing: this is a hint from
  * listed hours, so it only speaks when the hours are clear.
@@ -33,9 +34,9 @@ export function describeClosedHours(station: HoursSource, now = Date.now()): str
 
   if (opens < closes) {
     if (t >= opens && t < closes) return null;
-    return t < opens ? `Closed · opens ${opensText}` : `Closed · opens tomorrow ${opensText}`;
+    return t < opens ? `Listed hours: closed, opens ${opensText}` : `Listed hours: closed, opens tomorrow ${opensText}`;
   }
   // Closes after midnight (for example 22:00 to 06:00): shut only between closing and opening.
   if (t >= opens || t < closes) return null;
-  return `Closed · opens ${opensText}`;
+  return `Listed hours: closed, opens ${opensText}`;
 }

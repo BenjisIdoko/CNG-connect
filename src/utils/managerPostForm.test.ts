@@ -33,4 +33,39 @@ describe('buildPostDetails', () => {
   it('a typed time that is not a clock time is an error, not silently dropped', () => {
     expect(buildPostDetails({ ...none, reason: 'fault', clock: '99:99' }, NOW)).toEqual({ ok: false, error: 'Enter the time like 14:00' });
   });
+
+  describe('keeping the time the post already has', () => {
+    const STORED = '2026-11-19T14:00:00.000Z'; // still ahead of NOW
+
+    it('changing only the reason resends the stored expected time instead of wiping it', () => {
+      expect(buildPostDetails({ ...none, reason: 'power' }, NOW, STORED)).toEqual({
+        ok: true,
+        details: { reason: 'power', untilIso: STORED },
+      });
+    });
+
+    it('a stored time that has already passed is not resent', () => {
+      expect(buildPostDetails({ ...none, reason: 'power' }, NOW, '2026-11-19T11:00:00.000Z')).toEqual({
+        ok: true,
+        details: { reason: 'power' },
+      });
+    });
+
+    it('a chip or a typed time the manager picks replaces the stored one', () => {
+      expect(buildPostDetails({ ...none, inHours: 1 }, NOW, STORED)).toEqual({ ok: true, details: { untilIso: '2026-11-19T13:00:00.000Z' } });
+      expect(buildPostDetails({ ...none, reason: 'fault', clock: '15:00' }, NOW, STORED)).toEqual({
+        ok: true,
+        details: { reason: 'fault', untilIso: '2026-11-19T14:00:00.000Z' },
+      });
+    });
+
+    it('with nothing newly chosen there is still nothing to save, even if a time is stored', () => {
+      expect(buildPostDetails(none, NOW, STORED)).toEqual({ ok: false, error: 'Choose a reason or an expected time first' });
+    });
+
+    it('an unreadable stored time is ignored', () => {
+      expect(buildPostDetails({ ...none, reason: 'power' }, NOW, 'soon')).toEqual({ ok: true, details: { reason: 'power' } });
+    });
+  });
 });
+

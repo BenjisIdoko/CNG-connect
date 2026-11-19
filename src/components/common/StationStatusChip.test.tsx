@@ -40,7 +40,7 @@ describe('StationStatusChip with no recent report', () => {
 
   it('outside opening hours it says the station is closed and when it opens, in grey', () => {
     const out = html(station(), FIVE_AM);
-    expect(out).toContain('Closed · opens 6 am');
+    expect(out).toContain('Listed hours: closed, opens 6 am');
     expect(out).not.toContain('No report yet');
   });
 
@@ -70,6 +70,6 @@ describe('StationStatusChip with a fresh driver report', () => {
     });
     const out = html(s, FIVE_AM);
     expect(out).toContain('Available');
-    expect(out).not.toContain('Closed · opens');
+    expect(out).not.toContain('Listed hours');
   });
 });

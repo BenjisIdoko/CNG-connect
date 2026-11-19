@@ -1,28 +1,13 @@
 import React from 'react';
 import { GasStation } from '../../types';
 import { describePressure, getPressureReading } from '../../utils/stationManagerSignals';
-import { describeManagerState, formatWatTime, getManagerStatement, ManagerState, ManagerStatement } from '../../utils/managerState';
+import { describeManagerBadge, describeManagerState, getManagerStatement, ManagerState } from '../../utils/managerState';
 
 interface Props {
   station: GasStation;
   now?: number;
   /** A small badge for list rows: only the opening status, no card and no pressure. */
   compact?: boolean;
-}
-
-const BADGE_TEXT: Record<ManagerState, string> = {
-  selling: 'Station: open, gas available',
-  open: 'Station: open, no gas yet',
-  closed: 'Station: closed',
-};
-
-/** The short badge for list rows, with the manager's expected time when they gave one. */
-function badgeText(statement: ManagerStatement): string {
-  const base = BADGE_TEXT[statement.state];
-  if (statement.state === 'selling' || statement.untilMs === undefined) return base;
-  const time = formatWatTime(statement.untilMs);
-  if (statement.overdue) return `${base} · was due ${time}`;
-  return statement.state === 'closed' ? `${base} · back ~${time}` : `${base} · ~${time}`;
 }
 
 const BADGE_CLASS: Record<ManagerState, string> = {
@@ -53,7 +38,7 @@ export const StationSaysLine: React.FC<Props> = ({ station, now, compact = false
     return (
       <span className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-micro font-semibold leading-none ${BADGE_CLASS[statement.state]}`}>
         <span aria-hidden="true" className="material-symbols-outlined text-[14px]">local_gas_station</span>
-        <span className="truncate">{badgeText(statement)}</span>
+        <span className="truncate">{describeManagerBadge(statement)}</span>
       </span>
     );
   }

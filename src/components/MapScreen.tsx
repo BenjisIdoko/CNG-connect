@@ -13,9 +13,10 @@ import { ASSETS, SHOW_EV_STATIONS } from '../data/mockData';
 import { StationStatusChip } from './common/StationStatusChip';
 import { StationSaysLine } from './common/StationSaysLine';
 import {
-  getFreshness, describeStatus, freshnessRank, currentStatus,
+  getFreshness, freshnessRank, currentStatus,
   rankByUsefulness, pickBestStation, pinEmphasis, usabilityCost,
 } from '../utils/stationFreshness';
+import { describeStatusOrStation } from '../utils/stationHeadline';
 import { DriveMode } from './DriveMode';
 import { useIsDarkTheme } from '../hooks/useIsDarkTheme';
 import { latestReportedPrice } from '../utils/stationPrice';
@@ -548,7 +549,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       // (ours) is a plain <div>, so without this it has no accessible name at all, and a
       // screen reader falls back to the icon glyph's raw text ("local_gas_station"). Its
       // `title` option, unlike `alt`, is applied to any icon type and doubles as the name.
-      const markerLabel = [st.name, st.area || st.city, describeStatus(st, now)]
+      const markerLabel = [st.name, st.area || st.city, describeStatusOrStation(st, now)]
         .filter(Boolean)
         .join(', ');
       const marker = L.marker([lat, lng], { icon: customIcon, title: markerLabel, zIndexOffset: isSelected ? 1000 : emphasis.zIndexOffset });
@@ -570,7 +571,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
         sub.className = 'pin-label-sub';
         // Age-aware ("Queuing · 3 min ago", "Last: Available · 5 wks ago"): the station row's own
         // status column never expires, so it must not be shown as if it were current.
-        sub.textContent = [describeStatus(st, now), st.city].filter(Boolean).join(' · ');
+        sub.textContent = [describeStatusOrStation(st, now), st.city].filter(Boolean).join(' · ');
         label.append(t, sub);
         marker.bindTooltip(label, { permanent: true, direction: 'top', offset: [0, -24], className: 'cng-pin-label', interactive: true });
         marker.on('tooltipopen', (ev: L.TooltipEvent) => {
@@ -827,7 +828,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
           <p className="text-caption text-outline truncate flex items-center gap-1.5 mt-0.5">
             <span aria-hidden="true" className={`w-2 h-2 rounded-full shrink-0 ${dotColor}`} />
             <span className="truncate">
-              {[describeStatus(station, now), latestReportedPrice(station, now)?.compact, userGps && station.distance ? station.distance : null, station.city]
+              {[describeStatusOrStation(station, now), latestReportedPrice(station, now)?.compact, userGps && station.distance ? station.distance : null, station.city]
                 .filter(Boolean)
                 .join(' · ')}
             </span>
@@ -906,7 +907,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                   <span aria-hidden="true" className={`material-symbols-outlined text-[13px] ${info.iconColor || ''}`}>
                     {freshness.tier === 'stale' ? 'history' : info.icon}
                   </span>
-                  {describeStatus(station, now)}
+                  {describeStatusOrStation(station, now)}
                 </span>
               )}
               {price && <span className="text-micro font-semibold text-white/85">{price.compact}</span>}
@@ -1311,7 +1312,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
             // Only a report under 24 h old counts as the status; older or missing ones show grey.
             const current = currentStatus(st, now);
             const info = getStatusIndicator(current);
-            return { dot: info.dotColor, label: current === 'unknown' ? describeStatus(st, now) : info.shortLabel };
+            return { dot: info.dotColor, label: current === 'unknown' ? describeStatusOrStation(st, now) : info.shortLabel };
           }}
           initialQuery={searchQuery}
           onPick={handlePickFromSearch}

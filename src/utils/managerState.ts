@@ -146,3 +146,18 @@ export function describeManagerStatus(statement: ManagerStatement): string {
 export function describeManagerState(statement: ManagerStatement): string {
   return `${describeManagerStatus(statement)} · updated ${formatAgeShort(statement.ageMinutes)}`;
 }
+
+const BADGE_TEXT: Record<ManagerState, string> = {
+  selling: 'Station: open, gas available',
+  open: 'Station: open, no gas yet',
+  closed: 'Station: closed',
+};
+
+/** The short line for list rows and cards: what the station says, with its expected time when it gave one. */
+export function describeManagerBadge(statement: ManagerStatement): string {
+  const base = BADGE_TEXT[statement.state];
+  if (statement.state === 'selling' || statement.untilMs === undefined) return base;
+  const time = formatWatTime(statement.untilMs);
+  if (statement.overdue) return `${base} · was due ${time}`;
+  return statement.state === 'closed' ? `${base} · back ~${time}` : `${base} · ~${time}`;
+}

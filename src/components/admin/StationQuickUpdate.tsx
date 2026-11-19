@@ -98,8 +98,8 @@ export const StationQuickUpdate: React.FC<Props> = ({
   });
   const pressureAge = parseAgeMinutes(livePressureAt);
 
-  const run = async (kind: Exclude<Pending, null>, action: () => Promise<ManagerPostResult>, done: string) => {
-    if (pending || !supabase) return;
+  const run = async (kind: Exclude<Pending, null>, action: () => Promise<ManagerPostResult>, done: string): Promise<boolean> => {
+    if (pending || !supabase) return false;
     setPending(kind);
     setError(null);
     const result = await action();
@@ -110,18 +110,25 @@ export const StationQuickUpdate: React.FC<Props> = ({
     } else {
       setError(result.error);
     }
+    return result.ok;
   };
 
   const client = supabase as unknown as RpcClient | null;
 
   const saveDetails = () => {
     if (!client || !statement || statement.state === 'selling') return;
-    const built = buildPostDetails({ reason, inHours, clock });
+    const built = buildPostDetails({ reason, inHours, clock }, Date.now(), managerStateUntil);
     if (!built.ok) {
       setError(built.error);
       return;
     }
-    void run('details', () => postManagerState(client, stationId, statement.state, built.details), 'Posted: details saved');
+    void run('details', () => postManagerState(client, stationId, statement.state, built.details), 'Posted: details saved').then((saved) => {
+      // The chip or time just sent now belongs to the post; leaving it pressed would resend a moved time next save.
+      if (saved) {
+        setInHours(null);
+        setClock('');
+      }
+    });
   };
 
   const pickHours = (hours: 1 | 2 | 4) => {

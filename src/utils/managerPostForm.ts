@@ -11,8 +11,13 @@ export interface PostDetailsChoice {
 
 export type PostDetailsResult = { ok: true; details: ManagerPostDetails } | { ok: false; error: string };
 
-/** Turns the picks into what the database call needs, or a plain-language reason it cannot. */
-export function buildPostDetails(choice: PostDetailsChoice, now = Date.now()): PostDetailsResult {
+/**
+ * Turns the picks into what the database call needs, or a plain-language reason it cannot. Posting
+ * details replaces the post's details, so when the manager changes only the reason the time the post
+ * already has (`storedUntilIso`) is sent again, as long as it is still ahead; otherwise saving a new
+ * reason would silently wipe the expected time drivers can see.
+ */
+export function buildPostDetails(choice: PostDetailsChoice, now = Date.now(), storedUntilIso?: string | null): PostDetailsResult {
   const details: ManagerPostDetails = {};
   if (choice.reason) details.reason = choice.reason;
 
@@ -26,6 +31,12 @@ export function buildPostDetails(choice: PostDetailsChoice, now = Date.now()): P
     if (untilIso) details.untilIso = untilIso;
   }
 
-  if (!details.reason && !details.untilIso) return { ok: false, error: 'Choose a reason or an expected time first' };
+  const nothingNewChosen = !details.reason && !details.untilIso;
+  if (!details.untilIso && storedUntilIso) {
+    const storedMs = Date.parse(storedUntilIso);
+    if (Number.isFinite(storedMs) && storedMs > now) details.untilIso = storedUntilIso;
+  }
+
+  if (nothingNewChosen) return { ok: false, error: 'Choose a reason or an expected time first' };
   return { ok: true, details };
 }
