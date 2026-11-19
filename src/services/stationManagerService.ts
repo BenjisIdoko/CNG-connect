@@ -10,7 +10,7 @@ export type ManagerPostResult = { ok: true } | { ok: false; error: string };
 
 /** The one method of the Supabase client these functions use, so tests can pass a fake. */
 export interface RpcClient {
-  rpc(fn: string, args: Record<string, unknown>): PromiseLike<{ error: { message: string } | null }>;
+  rpc(fn: string, args: Record<string, unknown>): PromiseLike<{ data?: unknown; error: { message: string } | null }>;
 }
 
 const GENERIC_ERROR = 'Could not post, try again';
