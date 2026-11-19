@@ -57,7 +57,7 @@
 Two hidden, authentication-gated routes exist for keeping station data accurate — neither is linked from the regular app UI:
 
 - **`/admin` — Super admin dashboard.** Redesigned in the "Security Print" look (deep note green, celadon paper, foil gold for pressable things), built on shadcn/ui components scoped to the admin (`src/components/ui`, `adm-` tokens; see `DESIGN.md`). The **Users** tab is a directory: search, role, state and CNG-kit filters, sortable columns, paging and a CSV export of the current view. The dashboard opens on an **Overview**: a "security thread" with one notch per flagged report, driver suggestion and station pin waiting, a ranked work queue and totals. Only the app admin (the one profile with `is_admin`) can use it; anyone else who signs in there is pointed to their own page. The old `?admin=1` and `?moderation=1` links forward here. The **Station managers** tab lists every manager and their stations, invites a manager by email (no account needed; pending invites are shown until they first sign in) and removes managers. Accounts that manage a station are labelled in the Users tab. Nobody can make an admin from inside the app: the flag changes only by SQL (`supabase/lock-admin-flag.sql`). It lets the admin add a new station (name, address, a required map position and accuracy; a similar-station warning guards against duplicates), review driver "Suggest station" submissions (approve to create the station, or reject), drag a station's map pin to correct its location, edit every field on a station (name, address, hours, pricing, photos — uploaded straight to Supabase Storage), bulk-import corrections from a CSV spreadsheet, and bulk-delete stations.
-- **`/station-manager` — Station manager.** Its own entrance (the old `?manager=1` link forwards here). A lighter role: the admin invites an email to one or more specific stations. The manager needs **no CNG-Connect account**: they open `/station-manager`, enter that email, get a code by email and sign in, then see and edit only their stations (pricing, hours, photos, contact info). From the same "My stations" page a manager posts the station's status — **Closed**, **Open, waiting for gas** or **Open, gas available** — and the pump pressure in bar. Drivers see it as a separate "Station says" line on the station page (a status shows for 6 hours, a pressure reading for 12) and it never changes the driver-reported status, pin colour or ranking. There are no push notifications. Needs `supabase/station-manager-signals.sql` and `supabase/manager-access-and-states.sql`.
+- **`/station-manager` — Station manager.** Its own entrance (the old `?manager=1` link forwards here). A lighter role: the admin invites an email to one or more specific stations. The manager needs **no CNG-Connect account**: the invite also emails them a link (sent by `api/invite-manager.ts` through Resend; needs `RESEND_API_KEY` and `INVITE_FROM_EMAIL` in Vercel, otherwise the invite is saved and the admin screen says the email did not go out). They open `/station-manager`, enter that email, get a code by email and sign in. A manager with one station lands straight on its editor; with several they pick from a list. They see and edit only their stations (pricing, hours, photos, contact info). From the same "My stations" page a manager posts the station's status — **Closed**, **Open, waiting for gas** or **Open, gas available** — and the pump pressure in bar. Drivers see it as a separate "Station says" line on the station page (a status shows for 6 hours, a pressure reading for 12) and it never changes the driver-reported status, pin colour or ranking. There are no push notifications. Needs `supabase/station-manager-signals.sql` and `supabase/manager-access-and-states.sql`.
 
 ---
 
@@ -74,7 +74,7 @@ Two hidden, authentication-gated routes exist for keeping station data accurate 
 | **AI Assistant** | Vercel Serverless Function (`api/chat.ts`) calling Gemini |
 | **PWA** | `vite-plugin-pwa` (Workbox) — offline caching, installability |
 | **State Management** | React Context (`AuthContext`) + component state; no global store |
-| **Test Runner** | Vitest (405 tests) |
+| **Test Runner** | Vitest (428 tests) |
 
 The app runs as a client-only SPA — there's no traditional application server. The React client talks to Supabase directly with a public anon key; every write that needs privilege beyond "any signed-in driver" (station edits, admin actions, point awards) goes through a Postgres RPC function that checks authorization server-side, rather than trusting the client.
 
@@ -161,7 +161,7 @@ Open [http://localhost:3002](http://localhost:3002).
 ## 🧪 Verification & Testing
 
 ```bash
-npm test           # Vitest — 405 tests across formatting, validation, proximity/push logic, etc.
+npm test           # Vitest — 428 tests across formatting, validation, proximity/push logic, etc.
 npx tsc --noEmit   # TypeScript compiler check
 npm run build      # Production build
 ```

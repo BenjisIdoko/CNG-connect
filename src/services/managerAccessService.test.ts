@@ -2,10 +2,12 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   cancelStationManagerInvite,
   claimManagerInvites,
+  describeInviteOutcome,
   friendlyAccessError,
   inviteStationManager,
   isPlausibleEmail,
   postManagerState,
+  sendManagerInvite,
 } from './managerAccessService';
 
 const clientReturning = (data: unknown, error: { message: string } | null = null) => ({
@@ -112,5 +114,56 @@ describe('friendlyAccessError', () => {
     expect(friendlyAccessError('not authorized')).toBe('Only the app admin can invite managers');
     expect(friendlyAccessError('no station x')).toBe('That station no longer exists');
     expect(friendlyAccessError('anything else')).toBe('Could not invite, try again');
+  });
+});
+
+describe('describeInviteOutcome', () => {
+  it('says plainly whether the email went out', () => {
+    expect(describeInviteOutcome({ result: 'invited', emailed: true })).toBe('Invite saved and emailed. They can sign in now');
+    expect(describeInviteOutcome({ result: 'invited', emailed: false })).toBe(
+      'Invite saved, but the email did not go out. Ask them to open /station-manager',
+    );
+    expect(describeInviteOutcome({ result: 'assigned', emailed: true })).toBe('Added and emailed: that email already had an account');
+    expect(describeInviteOutcome({ result: 'assigned', emailed: false })).toBe(
+      'Added: that email already had an account. The email did not go out',
+    );
+  });
+});
+
+describe('sendManagerInvite', () => {
+  const reply = (body: unknown, status = 200) => ({ ok: status < 400, status, json: async () => body });
+
+  it('posts the station and email with the admin token and returns the result and whether it was emailed', async () => {
+    const fetchFn = vi.fn().mockResolvedValue(reply({ result: 'invited', emailed: true }));
+    const result = await sendManagerInvite({ accessToken: 'tok', stationId: 'pci-station-65', email: ' A@B.co ', fetchFn, client: clientReturning(null) });
+    expect(result).toEqual({ ok: true, result: 'invited', emailed: true });
+    const [url, init] = fetchFn.mock.calls[0];
+    expect(url).toBe('/api/invite-manager');
+    expect(init.headers.Authorization).toBe('Bearer tok');
+    expect(JSON.parse(init.body)).toEqual({ stationId: 'pci-station-65', email: 'a@b.co' });
+  });
+
+  it('passes the server message through when it refuses (for example not the admin)', async () => {
+    const fetchFn = vi.fn().mockResolvedValue(reply({ error: 'Only the app admin can invite managers.' }, 403));
+    const result = await sendManagerInvite({ accessToken: 'tok', stationId: 's', email: 'a@b.co', fetchFn, client: clientReturning(null) });
+    expect(result).toEqual({ ok: false, error: 'Only the app admin can invite managers.' });
+  });
+
+  it('refuses a bad email without any request', async () => {
+    const fetchFn = vi.fn();
+    const client = clientReturning(null);
+    const result = await sendManagerInvite({ accessToken: 'tok', stationId: 's', email: 'nope', fetchFn, client });
+    expect(result.ok).toBe(false);
+    expect(fetchFn).not.toHaveBeenCalled();
+    expect(client.rpc).not.toHaveBeenCalled();
+  });
+
+  it('falls back to saving the invite directly (emailed:false) when the endpoint is missing or unreachable', async () => {
+    for (const fetchFn of [vi.fn().mockResolvedValue(reply({}, 404)), vi.fn().mockRejectedValue(new Error('offline'))]) {
+      const client = clientReturning('invited');
+      const result = await sendManagerInvite({ accessToken: 'tok', stationId: 's', email: 'a@b.co', fetchFn, client });
+      expect(result).toEqual({ ok: true, result: 'invited', emailed: false });
+      expect(client.rpc).toHaveBeenCalledWith('admin_invite_station_manager', { p_station_id: 's', p_email: 'a@b.co' });
+    }
   });
 });

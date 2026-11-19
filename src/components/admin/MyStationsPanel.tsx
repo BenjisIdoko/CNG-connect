@@ -1,4 +1,5 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { stationToOpenOnArrival } from '../../utils/managerLanding';
 import { ArrowRight } from 'lucide-react';
 import { useSupabaseClient } from '../../hooks/useSupabaseClient';
 import { useAuth } from '../../context/AuthContext';
@@ -34,6 +35,8 @@ export const MyStationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flas
   const [loading, setLoading] = useState(false);
   const [loadErr, setLoadErr] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
+  // A manager with one station lands on it once; closing the editor must not reopen it on reload.
+  const autoOpened = useRef(false);
 
   // `quiet` reloads after a post without the "Loading…" line, so the card the manager is on
   // does not jump; the stations are replaced with what the database now holds (server times).
@@ -48,7 +51,13 @@ export const MyStationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flas
         setLoadErr(error.message);
         return;
       }
-      setStations((data || []) as ManagedStation[]);
+      const loaded = (data || []) as ManagedStation[];
+      setStations(loaded);
+      const toOpen = stationToOpenOnArrival(loaded, autoOpened.current);
+      if (toOpen) {
+        autoOpened.current = true;
+        setEditingId(toOpen);
+      }
     },
     [supabase],
   );

@@ -61,6 +61,75 @@ export async function inviteStationManager(client: RpcClient, stationId: string,
   }
 }
 
+export type SendInviteResult =
+  | { ok: true; result: 'assigned' | 'invited'; emailed: boolean }
+  | { ok: false; error: string };
+
+type InviteFetch = (
+  url: string,
+  init: { method: string; headers: Record<string, string>; body: string },
+) => Promise<{ ok: boolean; status: number; json: () => Promise<any> }>;
+
+/**
+ * Invites an email and has the server email them. The server runs the same database function with the
+ * admin's own token, so the permission check is unchanged. If the endpoint is not there (local dev) or
+ * cannot be reached, the invite is saved directly instead and reported as not emailed.
+ */
+export async function sendManagerInvite(args: {
+  accessToken: string;
+  stationId: string;
+  email: string;
+  client: RpcClient;
+  fetchFn?: InviteFetch;
+}): Promise<SendInviteResult> {
+  const { accessToken, stationId, client } = args;
+  const email = args.email.trim().toLowerCase();
+  if (!isPlausibleEmail(email)) return { ok: false, error: "That doesn't look like an email address" };
+  if (!stationId) return { ok: false, error: 'Choose a station first' };
+
+  const fallback = async (): Promise<SendInviteResult> => {
+    const saved = await inviteStationManager(client, stationId, email);
+    return saved.ok ? { ok: true, result: saved.result, emailed: false } : saved;
+  };
+
+  const fetchFn = args.fetchFn ?? ((url, init) => fetch(url, init));
+  let response: Awaited<ReturnType<InviteFetch>>;
+  try {
+    response = await fetchFn('/api/invite-manager', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+      body: JSON.stringify({ stationId, email }),
+    });
+  } catch {
+    return fallback();
+  }
+
+  if (response.status === 404 || response.status === 405 || response.status === 503) return fallback();
+
+  let body: any = null;
+  try {
+    body = await response.json();
+  } catch {
+    body = null;
+  }
+  if (!response.ok) {
+    return { ok: false, error: typeof body?.error === 'string' && body.error ? body.error : INVITE_ERROR };
+  }
+  return { ok: true, result: body?.result === 'assigned' ? 'assigned' : 'invited', emailed: body?.emailed === true };
+}
+
+/** The toast the admin sees after inviting: always says whether the email actually went out. */
+export function describeInviteOutcome(result: { result: 'assigned' | 'invited'; emailed: boolean }): string {
+  if (result.result === 'assigned') {
+    return result.emailed
+      ? 'Added and emailed: that email already had an account'
+      : 'Added: that email already had an account. The email did not go out';
+  }
+  return result.emailed
+    ? 'Invite saved and emailed. They can sign in now'
+    : 'Invite saved, but the email did not go out. Ask them to open /station-manager';
+}
+
 export async function cancelStationManagerInvite(client: RpcClient, stationId: string, email: string): Promise<ManagerPostResult> {
   try {
     const { error } = await client.rpc('admin_cancel_station_manager_invite', {

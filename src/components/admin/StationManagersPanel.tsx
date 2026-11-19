@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSupabaseClient } from '../../hooks/useSupabaseClient';
 import { ManagerLink, groupManagers } from '../../utils/stationManagerGroups';
-import { cancelStationManagerInvite, inviteStationManager } from '../../services/managerAccessService';
+import { cancelStationManagerInvite, describeInviteOutcome, sendManagerInvite } from '../../services/managerAccessService';
 import type { RpcClient } from '../../services/stationManagerService';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
@@ -99,14 +99,26 @@ export const StationManagersPanel: React.FC<{ flash: (m: string) => void }> = ({
     if (!supabase || busy || !email.trim() || !stationId) return;
     setBusy('invite');
     setFormErr(null);
-    const result = await inviteStationManager(supabase as unknown as RpcClient, stationId, email);
+    const { data: sessionData } = await supabase.auth.getSession();
+    const accessToken = sessionData.session?.access_token;
+    if (!accessToken) {
+      setBusy(null);
+      setFormErr('Sign in again to invite managers');
+      return;
+    }
+    const result = await sendManagerInvite({
+      accessToken,
+      stationId,
+      email,
+      client: supabase as unknown as RpcClient,
+    });
     setBusy(null);
     if (!result.ok) {
       setFormErr(result.error);
       return;
     }
     setEmail('');
-    flash(result.result === 'assigned' ? 'Added: that email already had an account' : 'Invite saved. They can sign in now');
+    flash(describeInviteOutcome(result));
     void load();
   };
 
@@ -148,8 +160,8 @@ export const StationManagersPanel: React.FC<{ flash: (m: string) => void }> = ({
           <CardHeader>
             <CardTitle>Invite a station manager</CardTitle>
             <CardDescription>
-              They don't need a CNG-Connect account. They open <code>/station-manager</code>, enter this email, and sign in with a code
-              sent to it. They then see only the stations you invite them to.
+              They don't need a CNG-Connect account. We email them a link to <code>/station-manager</code>; they enter this same
+              email, sign in with the code that follows, and see only the stations you invite them to.
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
