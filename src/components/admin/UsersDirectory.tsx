@@ -75,13 +75,15 @@ interface DirectoryProps {
   onDelete: (id: string) => void;
   /** Called after an export so the screen can announce it. */
   flash: (m: string) => void;
+  /** Ids of accounts that manage at least one station; they get a "Station manager" label. */
+  managerIds?: Set<string>;
 }
 
 /**
  * The user directory table: search, filter, sort and page through every driver account. It only
  * draws and reorganises the rows it is given; loading, editing and deleting live in UsersPanel.
  */
-export const UsersDirectory: React.FC<DirectoryProps> = ({ rows, loading, onEdit, onDelete, flash }) => {
+export const UsersDirectory: React.FC<DirectoryProps> = ({ rows, loading, onEdit, onDelete, flash, managerIds }) => {
   const [search, setSearch] = useState('');
   const [role, setRole] = useState<RoleFilter>('all');
   const [stateFilter, setStateFilter] = useState('');
@@ -309,7 +311,15 @@ export const UsersDirectory: React.FC<DirectoryProps> = ({ rows, loading, onEdit
                         <span className="text-adm-mute-text">Not installed yet</span>
                       )}
                     </TableCell>
-                    <TableCell>{r.is_admin ? <Badge>Admin</Badge> : <span className="text-adm-mute-text">Driver</span>}</TableCell>
+                    <TableCell>
+                      {r.is_admin ? (
+                        <Badge>Admin</Badge>
+                      ) : managerIds?.has(r.id) ? (
+                        <Badge variant="outline">Station manager</Badge>
+                      ) : (
+                        <span className="text-adm-mute-text">Driver</span>
+                      )}
+                    </TableCell>
                     <TableCell>
                       <p className="font-semibold">{r.reports_count ?? 0} reports</p>
                       <p className="text-xs text-adm-mute-text">

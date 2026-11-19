@@ -15,6 +15,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 export const UsersPanel: React.FC<{ flash: (m: string) => void }> = ({ flash }) => {
   const supabase = useSupabaseClient();
   const [rows, setRows] = useState<DirectoryRow[]>([]);
+  const [managerIds, setManagerIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -37,6 +38,9 @@ export const UsersPanel: React.FC<{ flash: (m: string) => void }> = ({ flash }) 
       return;
     }
     setRows((data || []) as DirectoryRow[]);
+    // Who manages a station, so those accounts can be labelled (the admin may read every assignment).
+    const { data: managers } = await supabase.from('station_managers').select('user_id');
+    setManagerIds(new Set((managers || []).map((m) => m.user_id as string)));
   }, [supabase, flash]);
 
   useEffect(() => {
@@ -66,7 +70,7 @@ export const UsersPanel: React.FC<{ flash: (m: string) => void }> = ({ flash }) 
 
   return (
     <>
-      <UsersDirectory rows={rows} loading={loading} onEdit={setEditId} onDelete={setDeleteId} flash={flash} />
+      <UsersDirectory rows={rows} loading={loading} onEdit={setEditId} onDelete={setDeleteId} flash={flash} managerIds={managerIds} />
 
       {editRow && (
         <UserEditorModal

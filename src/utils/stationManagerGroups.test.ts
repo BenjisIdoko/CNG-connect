@@ -37,3 +37,37 @@ describe('groupManagers', () => {
     expect(groups.map((g) => g.email)).toEqual(['amy@x.com', 'Bob@x.com']);
   });
 });
+
+describe('groupManagers with pending invites', () => {
+  const pending = (email: string, stationId: string, stationName: string): ManagerLink => ({
+    userId: `invite:${email}`,
+    email,
+    name: '',
+    stationId,
+    stationName,
+    pending: true,
+  });
+
+  it('keeps a pending invite as its own group marked pending, and real managers are not marked', () => {
+    const groups = groupManagers([link('u1', 'amy@x.com', 's1', 'Alpha'), pending('new@x.com', 's2', 'Beta')]);
+    expect(groups).toHaveLength(2);
+    expect(groups.find((g) => g.email === 'amy@x.com')?.pending).toBe(false);
+    expect(groups.find((g) => g.email === 'new@x.com')?.pending).toBe(true);
+  });
+
+  it('lists real managers first and pending invites after them, each sorted by email', () => {
+    const groups = groupManagers([
+      pending('aaa@x.com', 's1', 'A'),
+      link('u2', 'zed@x.com', 's2', 'B'),
+      link('u1', 'amy@x.com', 's3', 'C'),
+      pending('bob@x.com', 's4', 'D'),
+    ]);
+    expect(groups.map((g) => g.email)).toEqual(['amy@x.com', 'zed@x.com', 'aaa@x.com', 'bob@x.com']);
+  });
+
+  it('groups one pending email across several stations', () => {
+    const groups = groupManagers([pending('new@x.com', 's2', 'Beta'), pending('new@x.com', 's1', 'Alpha')]);
+    expect(groups).toHaveLength(1);
+    expect(groups[0].stations.map((s) => s.name)).toEqual(['Alpha', 'Beta']);
+  });
+});

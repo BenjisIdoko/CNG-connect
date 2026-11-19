@@ -90,4 +90,12 @@ describe('UsersDirectory', () => {
     expect(html).toContain('aria-label="Loading users"');
     expect(html).not.toContain('<table');
   });
+
+  it('labels accounts that manage a station with a Station manager badge, and no one else', () => {
+    const html = renderToStaticMarkup(
+      <UsersDirectory rows={rows} loading={false} onEdit={noop} onDelete={noop} flash={noop} managerIds={new Set(['3'])} />,
+    );
+    expect(html.match(/>Station manager</g)).toHaveLength(1);
+    expect(render(rows)).not.toContain('Station manager');
+  });
 });

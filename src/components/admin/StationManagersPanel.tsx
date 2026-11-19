@@ -1,6 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSupabaseClient } from '../../hooks/useSupabaseClient';
 import { ManagerLink, groupManagers } from '../../utils/stationManagerGroups';
+import { cancelStationManagerInvite, inviteStationManager } from '../../services/managerAccessService';
+import type { RpcClient } from '../../services/stationManagerService';
+import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Input } from '../ui/input';
@@ -16,9 +19,10 @@ const selectCls =
   'h-9 w-full rounded-md border border-adm-line bg-adm-card px-3 text-sm text-adm-ink outline-none transition-colors focus-visible:border-adm-note focus-visible:ring-2 focus-visible:ring-adm-note';
 
 /**
- * Super-admin view of every station manager: who manages which stations, with an "add by email"
- * form and a remove button per station. The database checks the caller is the admin on every
- * change (admin_assign_station_manager / admin_remove_station_manager).
+ * Super-admin view of every station manager: who manages which stations, with an "invite by email"
+ * form and a remove button per station. A manager does not need a CNG-Connect account first: an invite
+ * waits (shown as pending) until that email signs in at /station-manager with an emailed code. The
+ * database checks the caller is the admin on every change.
  */
 export const StationManagersPanel: React.FC<{ flash: (m: string) => void }> = ({ flash }) => {
   const supabase = useSupabaseClient();
@@ -35,9 +39,11 @@ export const StationManagersPanel: React.FC<{ flash: (m: string) => void }> = ({
     if (!supabase) return;
     setLoading(true);
     setLoadErr(null);
-    const [{ data: rows, error: rowsErr }, { data: stationRows, error: stationsErr }] = await Promise.all([
+    const [{ data: rows, error: rowsErr }, { data: stationRows, error: stationsErr }, { data: inviteRows }] = await Promise.all([
       supabase.from('station_managers').select('station_id,user_id'),
       supabase.from('stations').select('id,name').order('name', { ascending: true }),
+      // Before the invites migration is applied this simply returns nothing.
+      supabase.from('station_manager_invites').select('station_id,email'),
     ]);
     if (rowsErr || stationsErr) {
       setLoading(false);
@@ -58,18 +64,28 @@ export const StationManagersPanel: React.FC<{ flash: (m: string) => void }> = ({
     }
     const nameOf = new Map(options.map((o) => [o.id, o.name]));
     const profileOf = new Map(profiles.map((p) => [p.id, p]));
-    setLinks(
-      (rows || []).map((r) => {
-        const profile = profileOf.get(r.user_id as string);
-        return {
-          stationId: r.station_id as string,
-          stationName: nameOf.get(r.station_id as string) || (r.station_id as string),
-          userId: r.user_id as string,
-          email: profile?.email || '(unknown email)',
-          name: profile?.name || '',
-        };
-      }),
-    );
+    const real: ManagerLink[] = (rows || []).map((r) => {
+      const profile = profileOf.get(r.user_id as string);
+      return {
+        stationId: r.station_id as string,
+        stationName: nameOf.get(r.station_id as string) || (r.station_id as string),
+        userId: r.user_id as string,
+        email: profile?.email || '(unknown email)',
+        name: profile?.name || '',
+      };
+    });
+    const pending: ManagerLink[] = (inviteRows || []).map((i) => {
+      const invitedEmail = (i.email as string) || '';
+      return {
+        stationId: i.station_id as string,
+        stationName: nameOf.get(i.station_id as string) || (i.station_id as string),
+        userId: `invite:${invitedEmail}`,
+        email: invitedEmail,
+        name: '',
+        pending: true,
+      };
+    });
+    setLinks([...real, ...pending]);
     setLoading(false);
   }, [supabase]);
 
@@ -79,39 +95,49 @@ export const StationManagersPanel: React.FC<{ flash: (m: string) => void }> = ({
 
   const groups = useMemo(() => groupManagers(links), [links]);
 
-  const add = async () => {
+  const invite = async () => {
     if (!supabase || busy || !email.trim() || !stationId) return;
-    setBusy('add');
+    setBusy('invite');
     setFormErr(null);
-    const { error } = await supabase.rpc('admin_assign_station_manager', {
-      p_station_id: stationId,
-      p_manager_email: email.trim(),
-    });
+    const result = await inviteStationManager(supabase as unknown as RpcClient, stationId, email);
     setBusy(null);
-    if (error) {
-      setFormErr(`Could not add: ${error.message}`);
+    if (!result.ok) {
+      setFormErr(result.error);
       return;
     }
     setEmail('');
-    flash('Manager added');
+    flash(result.result === 'assigned' ? 'Added: that email already had an account' : 'Invite saved. They can sign in now');
     void load();
   };
 
-  const remove = async (g: { email: string }, station: { id: string; name: string }) => {
+  const remove = async (g: { email: string; pending: boolean }, station: { id: string; name: string }) => {
     if (!supabase || busy) return;
-    if (!window.confirm(`Remove ${g.email} as manager of ${station.name}?`)) return;
+    const question = g.pending
+      ? `Cancel the invite for ${g.email} to manage ${station.name}?`
+      : `Remove ${g.email} as manager of ${station.name}?`;
+    if (!window.confirm(question)) return;
     setBusy(`${g.email}|${station.id}`);
     setFormErr(null);
-    const { error } = await supabase.rpc('admin_remove_station_manager', {
-      p_station_id: station.id,
-      p_manager_email: g.email,
-    });
-    setBusy(null);
-    if (error) {
-      setFormErr(`Could not remove: ${error.message}`);
-      return;
+    if (g.pending) {
+      const result = await cancelStationManagerInvite(supabase as unknown as RpcClient, station.id, g.email);
+      setBusy(null);
+      if (!result.ok) {
+        setFormErr(result.error);
+        return;
+      }
+      flash('Invite cancelled');
+    } else {
+      const { error } = await supabase.rpc('admin_remove_station_manager', {
+        p_station_id: station.id,
+        p_manager_email: g.email,
+      });
+      setBusy(null);
+      if (error) {
+        setFormErr(`Could not remove: ${error.message}`);
+        return;
+      }
+      flash('Manager removed');
     }
-    flash('Manager removed');
     void load();
   };
 
@@ -120,10 +146,10 @@ export const StationManagersPanel: React.FC<{ flash: (m: string) => void }> = ({
       <div className="mx-auto flex w-full max-w-3xl flex-col gap-4 p-4 pb-16 md:p-6">
         <Card>
           <CardHeader>
-            <CardTitle>Add a station manager</CardTitle>
+            <CardTitle>Invite a station manager</CardTitle>
             <CardDescription>
-              The person must already have a CNG-Connect account. They sign in at <code>/station-manager</code> and see only the
-              stations you assign.
+              They don't need a CNG-Connect account. They open <code>/station-manager</code>, enter this email, and sign in with a code
+              sent to it. They then see only the stations you invite them to.
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
@@ -148,8 +174,8 @@ export const StationManagersPanel: React.FC<{ flash: (m: string) => void }> = ({
                 ))}
               </select>
             </div>
-            <Button onClick={() => void add()} disabled={busy !== null || !email.trim() || !stationId} className="self-start">
-              {busy === 'add' ? 'Adding…' : 'Add manager'}
+            <Button onClick={() => void invite()} disabled={busy !== null || !email.trim() || !stationId} className="self-start">
+              {busy === 'invite' ? 'Inviting…' : 'Invite manager'}
             </Button>
             {formErr && (
               <p role="alert" className="text-sm font-semibold text-adm-danger">
@@ -173,7 +199,7 @@ export const StationManagersPanel: React.FC<{ flash: (m: string) => void }> = ({
           <Card>
             <CardContent className="py-8 text-center">
               <p className="font-geist text-base font-bold">No station managers yet</p>
-              <p className="mt-1 text-sm text-adm-mute-text">Add one above and they can post for their station.</p>
+              <p className="mt-1 text-sm text-adm-mute-text">Invite one above and they can post for their station.</p>
             </CardContent>
           </Card>
         )}
@@ -181,7 +207,10 @@ export const StationManagersPanel: React.FC<{ flash: (m: string) => void }> = ({
         {groups.map((g) => (
           <Card key={g.userId}>
             <CardHeader>
-              <CardTitle>{g.name || g.email}</CardTitle>
+              <div className="flex flex-wrap items-center gap-2">
+                <CardTitle>{g.name || g.email}</CardTitle>
+                {g.pending && <Badge variant="warning">Invited, has not signed in yet</Badge>}
+              </div>
               {g.name && <CardDescription>{g.email}</CardDescription>}
             </CardHeader>
             <ul className="flex flex-col divide-y divide-adm-line">
@@ -195,7 +224,7 @@ export const StationManagersPanel: React.FC<{ flash: (m: string) => void }> = ({
                     onClick={() => void remove(g, s)}
                     disabled={busy !== null}
                   >
-                    {busy === `${g.email}|${s.id}` ? 'Removing…' : 'Remove'}
+                    {busy === `${g.email}|${s.id}` ? 'Working…' : g.pending ? 'Cancel invite' : 'Remove'}
                   </Button>
                 </li>
               ))}
