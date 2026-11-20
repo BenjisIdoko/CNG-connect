@@ -160,8 +160,9 @@ export const StationManagersPanel: React.FC<{ flash: (m: string) => void }> = ({
           <CardHeader>
             <CardTitle>Invite a station manager</CardTitle>
             <CardDescription>
-              They don't need a CNG-Connect account. We email them a link to <code>/station-manager</code>; they enter this same
-              email, sign in with the code that follows, and see only the stations you invite them to.
+              They don't need a CNG-Connect account. We email them a link to <code>/station-manager</code>; the first time they enter
+              this same email and sign in with the code that follows, then set a password so they don't need a code again. They
+              see only the stations you invite them to.
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">

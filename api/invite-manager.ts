@@ -28,7 +28,8 @@ export function buildInviteEmail({ stationName, signInUrl }: { stationName: stri
     '',
     `1. Open ${signInUrl}`,
     '2. Enter this same email address. You do not need a CNG-Connect account first.',
-    '3. We email you a code. Type it in and your station is there.',
+    '3. The first time, we email you a code. Type it in and your station is there.',
+    "4. Then set a password so you don't need a code again.",
     '',
     'If you were not expecting this, you can ignore this email.',
   ].join('\n');
@@ -43,7 +44,8 @@ export function buildInviteEmail({ stationName, signInUrl }: { stationName: stri
 <ol style="font-size:14px;line-height:1.6;padding-left:20px;margin:0 0 16px;">
 <li>Open the manager page below.</li>
 <li>Enter this same email address. You do not need a CNG-Connect account first.</li>
-<li>We email you a code. Type it in and your station is there.</li>
+<li>The first time, we email you a code. Type it in and your station is there.</li>
+<li>Then set a password so you don't need a code again.</li>
 </ol>
 <p style="margin:0 0 16px;"><a href="${safeUrl}" style="display:inline-block;background:#0f3b2c;color:#ffffff;text-decoration:none;font-weight:bold;font-size:14px;padding:12px 18px;border-radius:8px;">Open the manager page</a></p>
 <p style="font-size:12px;color:#5b6b63;margin:0;">If you were not expecting this, you can ignore this email.</p>

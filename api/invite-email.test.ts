@@ -17,6 +17,13 @@ describe('buildInviteEmail', () => {
     expect(email.text.toLowerCase()).toContain('same email');
   });
 
+  it('says the first sign-in uses a code and that a password can then be set', () => {
+    expect(email.text).toContain('The first time, we email you a code');
+    expect(email.text).toContain("set a password so you don't need a code again");
+    expect(email.html).toContain('The first time, we email you a code');
+    expect(email.html).toContain("set a password so you don't need a code again");
+  });
+
   it('never includes a sign-in code or password', () => {
     expect(email.text).not.toMatch(/\b\d{6,10}\b/);
   });
