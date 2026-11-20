@@ -33,6 +33,12 @@
 - A station shows one report: the newest, for 45 minutes. A newer report replaces it, and once it is over 45 minutes old nothing is shown ("No report yet"). Older records are kept but never listed.
 - Reports build a driver's reputation score and community points, with unlockable tiers as they contribute more.
 
+### 📢 Community Managers
+- The admin can mark any account as a **community manager** (the Users page has a switch). They use the same driver app as everyone else; there is no separate dashboard.
+- On the page of a station they are standing at (within 150 m, checked on the phone and again by the database), a community manager sees a **Post the gas status** card with two choices: **Gas available** and **Gas not available**. Everyone then sees it on that station's page and in lists as **"Community manager says"**. The poster's name is not shown.
+- "Gas available" shows for 6 hours. "Gas not available" shows for 6 hours, then greyed as "Last said" until 24 hours after the post. A post never changes pin colours, ranking, points or flags, and the 45-minute rule for driver reports is unchanged.
+- Needs `supabase/community-managers.sql`. This is stage 1 of replacing the station manager role; push notifications for these posts are not built yet.
+
 ### 🛠️ Conversion Centre Directory
 - Searchable directory of 451+ Pi-CNG accredited conversion workshops, filterable by state/LGA, with in-app booking.
 

@@ -98,4 +98,13 @@ describe('UsersDirectory', () => {
     expect(html.match(/>Station manager</g)).toHaveLength(1);
     expect(render(rows)).not.toContain('Station manager');
   });
+
+  it('labels community managers with a Community manager badge, and no one else', () => {
+    const html = renderToStaticMarkup(
+      <UsersDirectory rows={rows} loading={false} onEdit={noop} onDelete={noop} flash={noop} communityManagerIds={new Set(['3'])} />,
+    );
+    expect(html.match(/>Community manager</g)).toHaveLength(1);
+    expect(render(rows)).not.toContain('Community manager');
+  });
 });
+

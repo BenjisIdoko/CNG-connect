@@ -77,13 +77,15 @@ interface DirectoryProps {
   flash: (m: string) => void;
   /** Ids of accounts that manage at least one station; they get a "Station manager" label. */
   managerIds?: Set<string>;
+  /** Ids of accounts with the community manager role; they get a "Community manager" label. */
+  communityManagerIds?: Set<string>;
 }
 
 /**
  * The user directory table: search, filter, sort and page through every driver account. It only
  * draws and reorganises the rows it is given; loading, editing and deleting live in UsersPanel.
  */
-export const UsersDirectory: React.FC<DirectoryProps> = ({ rows, loading, onEdit, onDelete, flash, managerIds }) => {
+export const UsersDirectory: React.FC<DirectoryProps> = ({ rows, loading, onEdit, onDelete, flash, managerIds, communityManagerIds }) => {
   const [search, setSearch] = useState('');
   const [role, setRole] = useState<RoleFilter>('all');
   const [stateFilter, setStateFilter] = useState('');
@@ -130,7 +132,7 @@ export const UsersDirectory: React.FC<DirectoryProps> = ({ rows, loading, onEdit
       r.reports_count ?? 0,
       (r.reputation_score ?? 0).toFixed(1),
       r.community_points ?? 0,
-      r.is_admin ? 'admin' : 'driver',
+      r.is_admin ? 'admin' : communityManagerIds?.has(r.id) ? 'community manager' : 'driver',
     ]);
     const blob = new Blob([toCsv(headers, data)], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
@@ -314,6 +316,8 @@ export const UsersDirectory: React.FC<DirectoryProps> = ({ rows, loading, onEdit
                     <TableCell>
                       {r.is_admin ? (
                         <Badge>Admin</Badge>
+                      ) : communityManagerIds?.has(r.id) ? (
+                        <Badge variant="outline">Community manager</Badge>
                       ) : managerIds?.has(r.id) ? (
                         <Badge variant="outline">Station manager</Badge>
                       ) : (
