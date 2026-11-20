@@ -32,6 +32,7 @@ export const ManagerSignIn: React.FC<Props> = ({ title, onExit, signInWithPasswo
         title={title}
         onExit={onExit}
         intro={CODE_INTRO}
+        codeStepNote="After you sign in, you will be asked to choose a password."
         sendCode={sendCode}
         // A code sign-in is when a manager is asked to set a password (first time, or a forgotten one).
         verifyCode={(email, code) => verifyWithSetPasswordPrompt(() => verifyCode(email, code))}

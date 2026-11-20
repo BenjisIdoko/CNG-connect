@@ -14,4 +14,10 @@ describe('stationToOpenOnArrival', () => {
   it('opens nothing again once it has already opened, so closing the editor sticks', () => {
     expect(stationToOpenOnArrival([{ id: 'pci-station-65' }], true)).toBeNull();
   });
+
+  it('waits while something else needs the manager first, such as the set-password card, then opens', () => {
+    expect(stationToOpenOnArrival([{ id: 'pci-station-65' }], false, true)).toBeNull();
+    expect(stationToOpenOnArrival([{ id: 'pci-station-65' }], false, false)).toBe('pci-station-65');
+  });
 });
+

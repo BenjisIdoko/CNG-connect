@@ -54,13 +54,7 @@ export const MyStationsPanel: React.FC<{ flash: (m: string) => void; topSlot?: R
         setLoadErr(error.message);
         return;
       }
-      const loaded = (data || []) as ManagedStation[];
-      setStations(loaded);
-      const toOpen = stationToOpenOnArrival(loaded, autoOpened.current);
-      if (toOpen) {
-        autoOpened.current = true;
-        setEditingId(toOpen);
-      }
+      setStations((data || []) as ManagedStation[]);
     },
     [supabase],
   );
@@ -68,6 +62,17 @@ export const MyStationsPanel: React.FC<{ flash: (m: string) => void; topSlot?: R
   useEffect(() => {
     void load();
   }, [load]);
+
+  // A manager with one station lands on its editor, but not while the set-password card is waiting:
+  // the editor is full-screen and would hide it. Once the card is answered the editor opens.
+  const holdAutoOpen = Boolean(topSlot);
+  useEffect(() => {
+    const toOpen = stationToOpenOnArrival(stations, autoOpened.current, holdAutoOpen);
+    if (toOpen) {
+      autoOpened.current = true;
+      setEditingId(toOpen);
+    }
+  }, [stations, holdAutoOpen]);
 
   const editing = stations.find((s) => s.id === editingId) || null;
 

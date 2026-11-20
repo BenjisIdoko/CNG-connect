@@ -19,13 +19,15 @@ interface Props {
   onUsePassword?: () => void;
   /** Replaces the sentence on the email step. */
   intro?: string;
+  /** Added after "We sent a code to …" on the code step. */
+  codeStepNote?: string;
 }
 
 /**
  * Sign-in for station managers: enter your email, get a code by email, enter it. No password and no
  * driver sign-up. Which stations you manage comes from the admin's invite for that email.
  */
-export const CodeSignIn: React.FC<Props> = ({ title, onExit, sendCode, verifyCode, onUsePassword, intro }) => {
+export const CodeSignIn: React.FC<Props> = ({ title, onExit, sendCode, verifyCode, onUsePassword, intro, codeStepNote }) => {
   const [state, dispatch] = useReducer((s: SignInState, e: SignInEvent) => nextSignIn(s, e, Date.now()), undefined, initialSignIn);
   const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
@@ -87,7 +89,7 @@ export const CodeSignIn: React.FC<Props> = ({ title, onExit, sendCode, verifyCod
             <CardDescription>
               {state.step === 'email'
                 ? (intro ?? 'Enter your email and we will send you a code. No password and no CNG-Connect sign-up needed.')
-                : `We sent a code to ${state.email}. Enter it below.`}
+                : `We sent a code to ${state.email}. Enter it below.${codeStepNote ? ` ${codeStepNote}` : ''}`}
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
