@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import webpush from 'web-push';
+import * as webpush from 'web-push';
 
 /**
  * Sends a push notification when a community manager has just posted "Gas available" or "Gas not

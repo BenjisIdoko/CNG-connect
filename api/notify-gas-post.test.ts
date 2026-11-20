@@ -37,7 +37,12 @@ vi.mock('@supabase/supabase-js', () => ({
     return { auth: { getUser }, from: (table: string) => query(table), rpc: (...a: unknown[]) => rpc(...a) };
   },
 }));
-vi.mock('web-push', () => ({ default: { setVapidDetails: (...a: unknown[]) => setVapidDetails(...a), sendNotification: (...a: unknown[]) => sendNotification(...a) } }));
+// web-push 4 is an ES module with NAMED exports and no default export (a default import crashed on Vercel),
+// so the fake has the same shape.
+vi.mock('web-push', () => ({
+  setVapidDetails: (...a: unknown[]) => setVapidDetails(...a),
+  sendNotification: (...a: unknown[]) => sendNotification(...a),
+}));
 
 import handler, { buildNotification, normalizeState, pickAudience, sameState, shouldNotify } from './notify-gas-post';
 
