@@ -757,6 +757,22 @@ export const App: React.FC = () => {
     return submitReportFor(reportingStation, newReport, newStatus);
   };
 
+  // A community manager's post shows at once; the next refresh from the database confirms it.
+  const handleCommunityGasPosted = (stationId: string, available: boolean) => {
+    const postedAt = new Date().toISOString();
+    const patch = (st: GasStation): GasStation => ({
+      ...st,
+      managerState: available ? 'selling' : 'out',
+      managerStateAt: postedAt,
+      managerStateReason: undefined,
+      managerStateUntil: undefined,
+      managerSelling: available,
+      managerSellingAt: postedAt,
+    });
+    setStations((prev) => prev.map((st) => (st.id === stationId ? patch(st) : st)));
+    setActiveDetailStation((prev) => (prev && prev.id === stationId ? patch(prev) : prev));
+  };
+
   const handleAddStationComment = async (stationId: string, commentText: string) => {
     if (!requireAuth()) return;
     // Optimistic local update so the comment appears instantly.
@@ -1041,6 +1057,8 @@ export const App: React.FC = () => {
               onOpenReportModal={handleOpenReportModal}
               onNavigate={handleNavigate}
               onAddStationComment={handleAddStationComment}
+              getFreshPosition={getFreshPosition}
+              onCommunityPosted={handleCommunityGasPosted}
             />
           ) : activeTab === 'map' ? (
             <MapScreen

@@ -11,6 +11,8 @@ import { getFreshness, currentStatus, describeStatus, newestVisibleReport, STATU
 import { latestReportedPrice } from '../utils/stationPrice';
 import { useNow } from '../hooks/useNow';
 import { StationSaysLine } from './common/StationSaysLine';
+import { CommunityGasPostCard } from './CommunityGasPostCard';
+import type { PingPosition } from '../utils/geofencePresence';
 import { openWhatsAppShare } from '../utils/shareMessageBuilder';
 import { describePresence } from '../utils/presenceLabel';
 
@@ -35,6 +37,9 @@ interface StationDetailScreenProps {
   isPresenceActive?: boolean;
   isFavorite?: boolean;
   onToggleFavorite?: (stationId: string) => void;
+  /** For community managers: a fresh GPS fix, and what to do once they have posted. */
+  getFreshPosition?: () => Promise<PingPosition | null>;
+  onCommunityPosted?: (stationId: string, available: boolean) => void;
 }
 
 export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
@@ -49,6 +54,8 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
   isPresenceActive = true,
   isFavorite = false,
   onToggleFavorite,
+  getFreshPosition,
+  onCommunityPosted,
 }) => {
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
   const now = useNow();
@@ -407,6 +414,13 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                   );
                 })()}
                 <StationSaysLine station={station} now={now} />
+                {user?.isCommunityManager && getFreshPosition && (
+                  <CommunityGasPostCard
+                    station={station}
+                    getFreshPosition={getFreshPosition}
+                    onPosted={(available) => onCommunityPosted?.(station.id, available)}
+                  />
+                )}
                 {!isLive && (
                   <div className="rounded-2xl bg-rd-available-container px-4 py-3 flex items-center gap-3">
                     <span aria-hidden="true" className="material-symbols-outlined text-rd-on-available-container text-[20px] shrink-0">bolt</span>

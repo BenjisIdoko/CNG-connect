@@ -107,7 +107,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIsProfileLoaded(true);
       return true;
     }
-    setDriverProfile(mapProfileRow(data, fallbackEmail));
+    // The community manager role lives in its own table, readable only for the person's own row.
+    let isCommunityManager = false;
+    try {
+      const { data: roleRow } = await supabase.from('community_managers').select('user_id').eq('user_id', userId).maybeSingle();
+      isCommunityManager = Boolean(roleRow);
+    } catch {
+      /* no role table yet, or offline: the person is simply not shown the post card */
+    }
+    setDriverProfile({ ...mapProfileRow(data, fallbackEmail), isCommunityManager });
     setIsProfileLoaded(true);
     const isNew = !data.name;
     setIsNewDriver(isNew);

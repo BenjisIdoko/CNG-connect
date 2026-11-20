@@ -177,6 +177,8 @@ export interface UserProfile {
   communityPoints?: number;
   state?: string; // Registered or detected state (e.g., 'Abuja FCT', 'Lagos', etc.)
   isAdmin?: boolean; // Set manually in the DB; unlocks the ?admin=1 pin editor.
+  /** An ambassador the admin has marked: can post Gas available / Gas not available at a station they are at. */
+  isCommunityManager?: boolean;
 }
 
 export interface ConversionCenter {
