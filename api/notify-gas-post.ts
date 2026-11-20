@@ -7,8 +7,8 @@ import * as webpush from 'web-push';
  * function does not trust that: it checks the caller's sign-in, that they hold the community manager role,
  * and that they really posted for this station in the last few minutes, and it takes the status from that
  * post, not from the request. Who is told: drivers registered in the station's state, plus anyone who
- * favourited the station, never the poster. Rules against noise: at most one notification per station every
- * 15 minutes, and the same status is not repeated within 6 hours.
+ * favourited the station, never the poster. Rules against noise: the same status is not repeated within 6 hours,
+ * a changed status goes out after a 2 minute pause, and a station gets at most 4 notifications an hour.
  *
  * Self-contained on purpose: a helper file under api/ is not bundled into the serverless function (the first
  * invite deploy failed with ERR_MODULE_NOT_FOUND). Needs these settings in Vercel: SUPABASE_SERVICE_ROLE_KEY,
@@ -86,10 +86,17 @@ export function sameState(a?: string | null, b?: string | null): boolean {
 }
 
 const MINUTE = 60_000;
-const MIN_GAP_MS = 15 * MINUTE;
+/** A changed status (a correction, or gas arriving after "not available") goes out after this short pause. */
+const CHANGE_PAUSE_MS = 2 * MINUTE;
+/** The same status is not announced again within this long. */
 const SAME_STATUS_MS = 6 * 60 * MINUTE;
 
-/** Whether this post should notify anyone, given the last notification sent for the station. */
+/**
+ * Whether this post should notify anyone, given the last notification sent for the station. The same status
+ * is not repeated within 6 hours; a CHANGED status goes out after a 2 minute pause, so a correction reaches
+ * drivers. (The database also caps a station at 4 notifications an hour, which stops a flapping status from
+ * flooding phones; that cap is applied in claim_push_slot, where the claim is atomic.)
+ */
 export function shouldNotify({
   last,
   state,
@@ -100,9 +107,8 @@ export function shouldNotify({
   now: number;
 }): { send: true } | { send: false; reason: 'recent' | 'unchanged' } {
   if (!last) return { send: true };
-  if (now - last.sentAt < MIN_GAP_MS) return { send: false, reason: 'recent' };
-  if (last.state === state && now - last.sentAt < SAME_STATUS_MS) return { send: false, reason: 'unchanged' };
-  return { send: true };
+  if (last.state === state) return now - last.sentAt < SAME_STATUS_MS ? { send: false, reason: 'unchanged' } : { send: true };
+  return now - last.sentAt < CHANGE_PAUSE_MS ? { send: false, reason: 'recent' } : { send: true };
 }
 
 /** The registered phones to tell: same state or favourited, never the poster, each phone once. */

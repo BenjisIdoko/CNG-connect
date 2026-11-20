@@ -116,9 +116,10 @@ grant execute on function remove_push_subscription(text) to authenticated;
 -- ---- the sender claims the right to notify a station, atomically ----
 -- Called only by the server function (service role). Under a lock per station it checks the last
 -- notification and, if the station may be notified now, records the new one and returns its id; otherwise
--- it returns null. Rules: at most one notification per station every 15 minutes, and the same status is not
--- repeated within 6 hours. Doing the check and the insert together stops two simultaneous requests from
--- both sending.
+-- it returns null. Rules: the same status is not repeated within 6 hours; a CHANGED status goes out after a
+-- 2 minute pause (so a correction reaches drivers); and a station gets at most 4 notifications an hour (so
+-- a flapping status cannot flood phones). Doing the check and the insert together stops two simultaneous
+-- requests from both sending.
 create or replace function claim_push_slot(p_station_id text, p_state text)
 returns uuid
 language plpgsql
@@ -127,6 +128,7 @@ set search_path = public
 as $$
 declare
   v_last record;
+  v_recent integer;
   v_id uuid;
 begin
   if coalesce(p_station_id, '') = '' or p_state is null or p_state not in ('selling', 'out') then
@@ -142,12 +144,20 @@ begin
   limit 1;
 
   if found then
-    if v_last.sent_at > now() - interval '15 minutes' then
+    if v_last.state = p_state then
+      if v_last.sent_at > now() - interval '6 hours' then
+        return null;
+      end if;
+    elsif v_last.sent_at > now() - interval '2 minutes' then
       return null;
     end if;
-    if v_last.state = p_state and v_last.sent_at > now() - interval '6 hours' then
-      return null;
-    end if;
+  end if;
+
+  select count(*) into v_recent
+  from push_notification_log
+  where station_id = p_station_id and sent_at > now() - interval '1 hour';
+  if v_recent >= 4 then
+    return null;
   end if;
 
   insert into push_notification_log (station_id, state, recipients)

@@ -92,14 +92,18 @@ describe('shouldNotify', () => {
     expect(shouldNotify({ last: null, state: 'selling', now: NOW })).toEqual({ send: true });
   });
 
-  it('waits 15 minutes between notifications for one station', () => {
-    expect(shouldNotify({ last: { state: 'out', sentAt: NOW - 10 * MIN }, state: 'selling', now: NOW })).toEqual({ send: false, reason: 'recent' });
-    expect(shouldNotify({ last: { state: 'out', sentAt: NOW - 16 * MIN }, state: 'selling', now: NOW })).toEqual({ send: true });
+  it('never repeats the same status within 6 hours, however soon or late within that', () => {
+    for (const minutes of [1, 10, 20, 180, 359]) {
+      expect(shouldNotify({ last: { state: 'selling', sentAt: NOW - minutes * MIN }, state: 'selling', now: NOW })).toEqual({ send: false, reason: 'unchanged' });
+    }
+    expect(shouldNotify({ last: { state: 'selling', sentAt: NOW - 7 * 60 * MIN }, state: 'selling', now: NOW })).toEqual({ send: true });
   });
 
-  it('does not repeat the same status within 6 hours, but does after', () => {
-    expect(shouldNotify({ last: { state: 'selling', sentAt: NOW - 3 * 60 * MIN }, state: 'selling', now: NOW })).toEqual({ send: false, reason: 'unchanged' });
-    expect(shouldNotify({ last: { state: 'selling', sentAt: NOW - 7 * 60 * MIN }, state: 'selling', now: NOW })).toEqual({ send: true });
+  it('lets a CHANGED status through after a 2 minute pause (a correction must reach drivers)', () => {
+    expect(shouldNotify({ last: { state: 'out', sentAt: NOW - 1 * MIN }, state: 'selling', now: NOW })).toEqual({ send: false, reason: 'recent' });
+    expect(shouldNotify({ last: { state: 'out', sentAt: NOW - 119 * 1000 }, state: 'selling', now: NOW })).toEqual({ send: false, reason: 'recent' });
+    expect(shouldNotify({ last: { state: 'out', sentAt: NOW - 2 * MIN }, state: 'selling', now: NOW })).toEqual({ send: true });
+    expect(shouldNotify({ last: { state: 'out', sentAt: NOW - 5 * MIN }, state: 'selling', now: NOW })).toEqual({ send: true });
   });
 });
 
@@ -236,13 +240,26 @@ describe('notify-gas-post handler', () => {
     expect(sendNotification).not.toHaveBeenCalled();
   });
 
-  it('skips when the station was notified a few minutes ago', async () => {
-    results.push_notification_log.select = { data: { state: 'out', sent_at: new Date(Date.now() - 5 * MIN).toISOString() }, error: null };
+  it('skips a repeat of the same status', async () => {
+    results.push_notification_log.select = { data: { state: 'selling', sent_at: new Date(Date.now() - 20 * MIN).toISOString() }, error: null };
     const res = makeRes();
     await handler(post({ stationId: 's1' }), res);
     expect(res.statusCode).toBe(200);
+    expect(res.body).toMatchObject({ sent: 0, skipped: 'unchanged' });
+    expect(sendNotification).not.toHaveBeenCalled();
+  });
+
+  it('skips a change that comes within 2 minutes of the last alert, but sends one a few minutes later', async () => {
+    results.push_notification_log.select = { data: { state: 'out', sent_at: new Date(Date.now() - 1 * MIN).toISOString() }, error: null };
+    const res = makeRes();
+    await handler(post({ stationId: 's1' }), res);
     expect(res.body).toMatchObject({ sent: 0, skipped: 'recent' });
     expect(sendNotification).not.toHaveBeenCalled();
+
+    results.push_notification_log.select = { data: { state: 'out', sent_at: new Date(Date.now() - 5 * MIN).toISOString() }, error: null };
+    const res2 = makeRes();
+    await handler(post({ stationId: 's1' }), res2);
+    expect(res2.body).toMatchObject({ sent: 2 });
   });
 
   it('sends to the same state and to favourites, with the station tag and one hour to live', async () => {

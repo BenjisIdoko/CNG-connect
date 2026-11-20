@@ -9,7 +9,7 @@
 - The user adds five Vercel settings: `VAPID_PUBLIC_KEY`, `VITE_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`, `SUPABASE_SERVICE_ROLE_KEY`. Until they exist the sender answers 503 and nothing is sent; the app ignores that quietly.
 
 **My calls (defaults from the proposal):**
-- Only when the status **changes**, and at most **once per station per 15 minutes**. A repeat of the same status within 6 hours is skipped.
+- (Updated 2026-11-20) The same status is not repeated within 6 hours; a **changed** status goes out after a 2 minute pause; a station gets at most 4 alerts an hour. (Originally: at most once per station per 15 minutes.)
 - A newer notification for the same station **replaces** the older one (same `tag`); tapping opens `/?station=<id>`.
 - No names or locations of any driver in a notification. Text: "Gas available at <station>" / "Gas not available at <station>", body "A community manager says · <city>".
 - Signed-in drivers only (a subscription stores the driver's state and favourites).

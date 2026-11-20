@@ -123,9 +123,10 @@ grant execute on function remove_push_subscription(text) to authenticated;
 -- ---- the sender claims the right to notify a station, atomically ----
 -- Called only by the server function (service role). Under a lock per station it checks the last
 -- notification and, if the station may be notified now, records the new one and returns its id; otherwise
--- it returns null. Rules: at most one notification per station every 15 minutes, and the same status is not
--- repeated within 6 hours. Doing the check and the insert together stops two simultaneous requests from
--- both sending.
+-- it returns null. Rules: the same status is not repeated within 6 hours; a CHANGED status goes out after a
+-- 2 minute pause (so a correction reaches drivers); and a station gets at most 4 notifications an hour (so
+-- a flapping status cannot flood phones). Doing the check and the insert together stops two simultaneous
+-- requests from both sending.
 create or replace function claim_push_slot(p_station_id text, p_state text)
 returns uuid
 language plpgsql
@@ -134,6 +135,7 @@ set search_path = public
 as $$
 declare
   v_last record;
+  v_recent integer;
   v_id uuid;
 begin
   if coalesce(p_station_id, '') = '' or p_state is null or p_state not in ('selling', 'out') then
@@ -149,12 +151,20 @@ begin
   limit 1;
 
   if found then
-    if v_last.sent_at > now() - interval '15 minutes' then
+    if v_last.state = p_state then
+      if v_last.sent_at > now() - interval '6 hours' then
+        return null;
+      end if;
+    elsif v_last.sent_at > now() - interval '2 minutes' then
       return null;
     end if;
-    if v_last.state = p_state and v_last.sent_at > now() - interval '6 hours' then
-      return null;
-    end if;
+  end if;
+
+  select count(*) into v_recent
+  from push_notification_log
+  where station_id = p_station_id and sent_at > now() - interval '1 hour';
+  if v_recent >= 4 then
+    return null;
   end if;
 
   insert into push_notification_log (station_id, state, recipients)
@@ -252,27 +262,39 @@ begin
   insert into verify_results values ('j: the first claim for a station succeeds', v_id is not null, coalesce(v_id::text, 'null'));
 
   v_id := claim_push_slot('verify-station', 'selling');
-  insert into verify_results values ('j2: an immediate second claim gets nothing', v_id is null, coalesce(v_id::text, 'null'));
+  insert into verify_results values ('j2: the same status again right away gets nothing', v_id is null, coalesce(v_id::text, 'null'));
   v_id := claim_push_slot('verify-station', 'out');
-  insert into verify_results values ('j3: a different status within 15 minutes also gets nothing', v_id is null, coalesce(v_id::text, 'null'));
+  insert into verify_results values ('j3: a different status within 2 minutes gets nothing', v_id is null, coalesce(v_id::text, 'null'));
   select count(*) into v_n from push_notification_log where station_id = 'verify-station';
   insert into verify_results values ('j4: only one log row exists', v_n = 1, v_n::text);
 
-  update push_notification_log set sent_at = now() - interval '16 minutes' where station_id = 'verify-station';
+  update push_notification_log set sent_at = now() - interval '3 minutes' where station_id = 'verify-station';
   v_id := claim_push_slot('verify-station', 'selling');
-  insert into verify_results values ('k: the same status 16 minutes later is still skipped (6 hour rule)', v_id is null, coalesce(v_id::text, 'null'));
+  insert into verify_results values ('k: the same status 3 minutes later is still skipped', v_id is null, coalesce(v_id::text, 'null'));
   v_id := claim_push_slot('verify-station', 'out');
-  insert into verify_results values ('k2: a different status 16 minutes later is allowed', v_id is not null, coalesce(v_id::text, 'null'));
+  insert into verify_results values ('k2: a CHANGED status 3 minutes later goes out', v_id is not null, coalesce(v_id::text, 'null'));
 
   update push_notification_log set sent_at = now() - interval '7 hours' where station_id = 'verify-station';
   v_id := claim_push_slot('verify-station', 'out');
-  insert into verify_results values ('l: the same status after 7 hours is allowed again', v_id is not null, coalesce(v_id::text, 'null'));
+  insert into verify_results values ('l: the same status after 7 hours goes out again', v_id is not null, coalesce(v_id::text, 'null'));
+
+  delete from push_notification_log where station_id = 'verify-station';
+  insert into push_notification_log (station_id, state, recipients, sent_at) values
+    ('verify-station', 'selling', 0, now() - interval '50 minutes'),
+    ('verify-station', 'out', 0, now() - interval '40 minutes'),
+    ('verify-station', 'selling', 0, now() - interval '30 minutes'),
+    ('verify-station', 'out', 0, now() - interval '20 minutes');
+  v_id := claim_push_slot('verify-station', 'selling');
+  insert into verify_results values ('m: a fifth notification within an hour is refused (cap of 4)', v_id is null, coalesce(v_id::text, 'null'));
+  update push_notification_log set sent_at = now() - interval '70 minutes' where station_id = 'verify-station' and state = 'selling' and sent_at < now() - interval '45 minutes';
+  v_id := claim_push_slot('verify-station', 'selling');
+  insert into verify_results values ('m2: once one is more than an hour old, there is room again', v_id is not null, coalesce(v_id::text, 'null'));
 
   begin
     perform claim_push_slot('verify-station', 'closed');
-    insert into verify_results values ('m: an unknown status is refused', false, 'expected an error');
+    insert into verify_results values ('o: an unknown status is refused', false, 'expected an error');
   exception when others then
-    insert into verify_results values ('m: an unknown status is refused', sqlerrm like '%Invalid request%', sqlerrm);
+    insert into verify_results values ('o: an unknown status is refused', sqlerrm like '%Invalid request%', sqlerrm);
   end;
 end
 $$;
