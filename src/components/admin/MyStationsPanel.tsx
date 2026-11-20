@@ -13,7 +13,7 @@ type ManagedStation = FullStationRow & {
   needs_pin_review: boolean;
   location_precision: string | null;
   data_source: string | null;
-  manager_state: 'closed' | 'open' | 'selling' | null;
+  manager_state: 'closed' | 'open' | 'selling' | 'out' | null;
   manager_state_at: string | null;
   manager_state_reason: ManagerStateReason | null;
   manager_state_until: string | null;

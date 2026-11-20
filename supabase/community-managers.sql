@@ -6,8 +6,10 @@
 -- * community_post_gas(station, available, lat, lng) records the post. The caller must have the role and
 --   must be within 150 m of the station (the same distance drivers' reports use); the app checks too, but
 --   this is the real check. Gas available is stored as manager_state 'selling', not available as 'out'
---   (a new allowed value); the older manager_selling columns are kept in step for phones that have not
---   updated. The same person cannot post the same state for the same station twice within 2 minutes.
+--   (a new allowed value). For gas available the older manager_selling flag is set to true for phones that
+--   have not updated; for not available it is left EMPTY (null), because an old phone would read "false"
+--   as "Closed", which is not what the post says. The same person cannot post the same state for the same
+--   station twice within 2 minutes.
 -- * Nothing here touches stations.status, station_reports, points or flags.
 
 create table if not exists community_managers (
@@ -103,7 +105,9 @@ begin
     power(sin(radians(v_lat - p_lat) / 2), 2)
     + cos(radians(p_lat)) * cos(radians(v_lat)) * power(sin(radians(v_lng - p_lng) / 2), 2)
   )));
-  if v_distance > 150 then
+  -- The phone rounds the distance to whole metres, so allow up to 150.5 m here: a post the phone allows
+  -- is never refused here on a fraction of a metre.
+  if v_distance > 150.5 then
     raise exception 'too far from the station';
   end if;
 
@@ -122,8 +126,8 @@ begin
       manager_state_at = now(),
       manager_state_reason = null,
       manager_state_until = null,
-      manager_selling = p_available,
-      manager_selling_at = now()
+      manager_selling = case when p_available then true else null end,
+      manager_selling_at = case when p_available then now() else null end
   where id = p_station_id;
 
   insert into station_manager_posts (station_id, user_id, kind, state, selling)

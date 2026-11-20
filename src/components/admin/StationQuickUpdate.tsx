@@ -130,7 +130,7 @@ export const StationQuickUpdate: React.FC<Props> = ({
   const client = supabase as unknown as RpcClient | null;
 
   const saveDetails = () => {
-    if (!client || !statement || statement.state === 'selling') return;
+    if (!client || !statement || (statement.state !== 'closed' && statement.state !== 'open')) return;
     const built = buildPostDetails({ reason, inHours, clock }, Date.now(), managerStateUntil);
     if (!built.ok) {
       setError(built.error);
@@ -190,7 +190,7 @@ export const StationQuickUpdate: React.FC<Props> = ({
         </p>
       </div>
 
-      {statement && statement.state !== 'selling' && (
+      {statement && (statement.state === 'closed' || statement.state === 'open') && (
         <div className="flex flex-col gap-3 rounded-md border border-adm-line p-3">
           <div>
             <p className="text-sm font-semibold text-adm-ink">Why?</p>

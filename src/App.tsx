@@ -766,8 +766,9 @@ export const App: React.FC = () => {
       managerStateAt: postedAt,
       managerStateReason: undefined,
       managerStateUntil: undefined,
-      managerSelling: available,
-      managerSellingAt: postedAt,
+      // Like the database: only "gas available" sets the older flag (a "not available" post leaves it empty).
+      managerSelling: available ? true : undefined,
+      managerSellingAt: available ? postedAt : undefined,
     });
     setStations((prev) => prev.map((st) => (st.id === stationId ? patch(st) : st)));
     setActiveDetailStation((prev) => (prev && prev.id === stationId ? patch(prev) : prev));

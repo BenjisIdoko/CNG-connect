@@ -96,7 +96,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const loadProfile = useCallback(async (userId: string, fallbackEmail: string): Promise<boolean> => {
     const supabase = await getSupabase();
     if (!supabase) return false;
-    const { data, error } = await supabase.from('profiles').select('*').eq('id', userId).single();
+    // The profile and the community manager role are read together, so the role adds no extra wait.
+    const [{ data, error }, roleResult] = await Promise.all([
+      supabase.from('profiles').select('*').eq('id', userId).single(),
+      // The role lives in its own table, readable only for the person's own row. A failure (no table yet,
+      // offline) simply means the person is not shown the post card.
+      Promise.resolve(supabase.from('community_managers').select('user_id').eq('user_id', userId).maybeSingle()).catch(() => null),
+    ]);
     if (error || !data) {
       // The DB trigger (handle_new_auth_user) creates this row on sign-up;
       // if it hasn't landed yet (rare race on the very first verify), treat
@@ -107,14 +113,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIsProfileLoaded(true);
       return true;
     }
-    // The community manager role lives in its own table, readable only for the person's own row.
-    let isCommunityManager = false;
-    try {
-      const { data: roleRow } = await supabase.from('community_managers').select('user_id').eq('user_id', userId).maybeSingle();
-      isCommunityManager = Boolean(roleRow);
-    } catch {
-      /* no role table yet, or offline: the person is simply not shown the post card */
-    }
+    const isCommunityManager = Boolean(roleResult?.data);
     setDriverProfile({ ...mapProfileRow(data, fallbackEmail), isCommunityManager });
     setIsProfileLoaded(true);
     const isNew = !data.name;

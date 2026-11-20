@@ -13,8 +13,10 @@ begin;
 -- * community_post_gas(station, available, lat, lng) records the post. The caller must have the role and
 --   must be within 150 m of the station (the same distance drivers' reports use); the app checks too, but
 --   this is the real check. Gas available is stored as manager_state 'selling', not available as 'out'
---   (a new allowed value); the older manager_selling columns are kept in step for phones that have not
---   updated. The same person cannot post the same state for the same station twice within 2 minutes.
+--   (a new allowed value). For gas available the older manager_selling flag is set to true for phones that
+--   have not updated; for not available it is left EMPTY (null), because an old phone would read "false"
+--   as "Closed", which is not what the post says. The same person cannot post the same state for the same
+--   station twice within 2 minutes.
 -- * Nothing here touches stations.status, station_reports, points or flags.
 
 create table if not exists community_managers (
@@ -110,7 +112,9 @@ begin
     power(sin(radians(v_lat - p_lat) / 2), 2)
     + cos(radians(p_lat)) * cos(radians(v_lat)) * power(sin(radians(v_lng - p_lng) / 2), 2)
   )));
-  if v_distance > 150 then
+  -- The phone rounds the distance to whole metres, so allow up to 150.5 m here: a post the phone allows
+  -- is never refused here on a fraction of a metre.
+  if v_distance > 150.5 then
     raise exception 'too far from the station';
   end if;
 
@@ -129,8 +133,8 @@ begin
       manager_state_at = now(),
       manager_state_reason = null,
       manager_state_until = null,
-      manager_selling = p_available,
-      manager_selling_at = now()
+      manager_selling = case when p_available then true else null end,
+      manager_selling_at = case when p_available then now() else null end
   where id = p_station_id;
 
   insert into station_manager_posts (station_id, user_id, kind, state, selling)
@@ -169,6 +173,9 @@ declare
   v_cm uuid;
   v_plain uuid;
   s1 text;
+  s2 text;
+  v_lat2 double precision;
+  v_lng2 double precision;
   v_lat double precision;
   v_lng double precision;
   r record;
@@ -178,6 +185,7 @@ begin
   select id into v_cm from profiles where not coalesce(is_admin, false) order by id limit 1;
   select id into v_plain from profiles where not coalesce(is_admin, false) and id <> v_cm order by id limit 1;
   select id, lat, lng into s1, v_lat, v_lng from stations order by id limit 1;
+  select id, lat, lng into s2, v_lat2, v_lng2 from stations order by id offset 1 limit 1;
   if v_admin is null or v_cm is null or v_plain is null or s1 is null then
     raise exception 'need an admin, two other profiles and a station to test with';
   end if;
@@ -203,10 +211,15 @@ begin
   -- (c) about 100 m away is fine, about 1 km away is refused
   perform community_post_gas(s1, false, v_lat + 0.0009, v_lng);
   select manager_state, manager_selling into r from stations where id = s1;
-  insert into verify_results values ('c: about 100 m away can post, and not available is stored as out',
-    r.manager_state = 'out' and r.manager_selling is false, coalesce(r.manager_state, 'null'));
+  insert into verify_results values ('c: about 100 m away can post, and not available is stored as out, with the old flag left empty',
+    r.manager_state = 'out' and r.manager_selling is null, coalesce(r.manager_state, 'null'));
   perform pg_temp.expect_error('c2: about 1 km away is refused',
     format($q$select community_post_gas(%L, true, %s, %s)$q$, s1, v_lat + 0.01, v_lng), 'too far');
+
+  -- (c3) the phone rounds to whole metres: about 150.1 m is allowed, about 152 m is refused
+  perform community_post_gas(s2, true, v_lat2 + 0.00135, v_lng2);
+  perform pg_temp.expect_error('c4: about 152 m is refused',
+    format($q$select community_post_gas(%L, false, %s, %s)$q$, s2, v_lat2 + 0.00137, v_lng2), 'too far');
 
   -- (d) the same state twice within 2 minutes is refused
   perform pg_temp.expect_error('d: the same post twice within 2 minutes is refused',

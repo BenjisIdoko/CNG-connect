@@ -98,3 +98,11 @@ describe('StationQuickUpdate with an old post', () => {
   });
 });
 
+describe('StationQuickUpdate with a community post of gas not available', () => {
+  it('does not offer a reason and time for it: that post has none and the card cannot resend it', () => {
+    const out = render({ state: 'out' });
+    expect(out).not.toContain('Why?');
+    expect(out).not.toContain('Save details');
+  });
+});
+
