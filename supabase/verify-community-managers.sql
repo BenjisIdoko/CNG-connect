@@ -10,9 +10,10 @@ begin;
 --
 -- * community_managers lists the accounts with the role. Rows are written only by the admin function
 --   below, so nobody can give the role to themselves; a person can read their own row, the admin reads all.
--- * community_post_gas(station, available, lat, lng) records the post. The caller must have the role and
---   must be within 150 m of the station (the same distance drivers' reports use); the app checks too, but
---   this is the real check. Gas available is stored as manager_state 'selling', not available as 'out'
+-- * community_post_gas(station, available) records the post. The caller must have the role; there is NO
+--   distance rule (community managers are trusted ambassadors and may post for any station from anywhere).
+--   The old lat/lng arguments are still accepted and ignored, so an app that still sends them keeps working.
+--   Gas available is stored as manager_state 'selling', not available as 'out'
 --   (a new allowed value). For gas available the older manager_selling flag is set to true for phones that
 --   have not updated; for not available it is left EMPTY (null), because an old phone would read "false"
 --   as "Closed", which is not what the post says. The same person cannot post the same state for the same
@@ -78,8 +79,8 @@ $$;
 create or replace function community_post_gas(
   p_station_id text,
   p_available boolean,
-  p_lat double precision,
-  p_lng double precision
+  p_lat double precision default null,
+  p_lng double precision default null
 )
 returns void
 language plpgsql
@@ -87,10 +88,7 @@ security definer
 set search_path = public
 as $$
 declare
-  v_lat double precision;
-  v_lng double precision;
   v_state text;
-  v_distance double precision;
 begin
   if auth.uid() is null or not exists (select 1 from community_managers where user_id = auth.uid()) then
     raise exception 'not authorized';
@@ -98,24 +96,8 @@ begin
   if p_available is null then
     raise exception 'Invalid choice';
   end if;
-  if p_lat is null or p_lng is null or p_lat not between -90 and 90 or p_lng not between -180 and 180 then
-    raise exception 'location required';
-  end if;
-
-  select lat, lng into v_lat, v_lng from stations where id = p_station_id;
-  if not found then
+  if not exists (select 1 from stations where id = p_station_id) then
     raise exception 'no station';
-  end if;
-
-  -- great-circle distance in metres (haversine)
-  v_distance := 6371000 * 2 * asin(least(1, sqrt(
-    power(sin(radians(v_lat - p_lat) / 2), 2)
-    + cos(radians(p_lat)) * cos(radians(v_lat)) * power(sin(radians(v_lng - p_lng) / 2), 2)
-  )));
-  -- The phone rounds the distance to whole metres, so allow up to 150.5 m here: a post the phone allows
-  -- is never refused here on a fraction of a metre.
-  if v_distance > 150.5 then
-    raise exception 'too far from the station';
   end if;
 
   v_state := case when p_available then 'selling' else 'out' end;
@@ -174,18 +156,14 @@ declare
   v_plain uuid;
   s1 text;
   s2 text;
-  v_lat2 double precision;
-  v_lng2 double precision;
-  v_lat double precision;
-  v_lng double precision;
   r record;
   v_n integer;
 begin
   select id into v_admin from profiles where is_admin limit 1;
   select id into v_cm from profiles where not coalesce(is_admin, false) order by id limit 1;
   select id into v_plain from profiles where not coalesce(is_admin, false) and id <> v_cm order by id limit 1;
-  select id, lat, lng into s1, v_lat, v_lng from stations order by id limit 1;
-  select id, lat, lng into s2, v_lat2, v_lng2 from stations order by id offset 1 limit 1;
+  select id into s1 from stations order by id limit 1;
+  select id into s2 from stations order by id offset 1 limit 1;
   if v_admin is null or v_cm is null or v_plain is null or s1 is null then
     raise exception 'need an admin, two other profiles and a station to test with';
   end if;
@@ -196,42 +174,34 @@ begin
   -- (a) a person without the role is refused
   perform set_config('request.jwt.claims', json_build_object('sub', v_plain, 'role', 'authenticated')::text, true);
   perform pg_temp.expect_error('a: a person without the role cannot post',
-    format($q$select community_post_gas(%L, true, %s, %s)$q$, s1, v_lat, v_lng), 'not authorized');
+    format($q$select community_post_gas(%L, true)$q$, s1), 'not authorized');
 
-  -- (b) a community manager at the station posts gas available
-  perform set_config('request.jwt.claims', json_build_object('sub', v_cm, 'role', 'authenticated')::text, true);
-  perform community_post_gas(s1, true, v_lat, v_lng);
+  -- (b) a community manager posts gas available: from anywhere, with no location
+  perform community_post_gas(s1, true, 6.5244, 3.3792);
   select manager_state, manager_selling, manager_state_at, manager_state_reason, manager_state_until into r from stations where id = s1;
-  insert into verify_results values ('b: gas available is stored as selling, with the old flag and no details',
+  insert into verify_results values ('b: gas available from far away is stored as selling, with the old flag and no details',
     r.manager_state = 'selling' and r.manager_selling is true and r.manager_state_at > now() - interval '1 minute'
     and r.manager_state_reason is null and r.manager_state_until is null, coalesce(r.manager_state, 'null'));
   select count(*) into v_n from station_manager_posts where station_id = s1 and user_id = v_cm and kind = 'state' and state = 'selling';
-  insert into verify_results values ('b2: the post is logged', v_n = 1, v_n::text);
+  insert into verify_results values ('b2: the post is logged with who made it', v_n = 1, v_n::text);
 
-  -- (c) about 100 m away is fine, about 1 km away is refused
-  perform community_post_gas(s1, false, v_lat + 0.0009, v_lng);
+  -- (c) not available with no location at all; the older lat/lng arguments are still accepted
+  perform community_post_gas(s1, false);
   select manager_state, manager_selling into r from stations where id = s1;
-  insert into verify_results values ('c: about 100 m away can post, and not available is stored as out, with the old flag left empty',
+  insert into verify_results values ('c: not available with no location is stored as out, with the old flag left empty',
     r.manager_state = 'out' and r.manager_selling is null, coalesce(r.manager_state, 'null'));
-  perform pg_temp.expect_error('c2: about 1 km away is refused',
-    format($q$select community_post_gas(%L, true, %s, %s)$q$, s1, v_lat + 0.01, v_lng), 'too far');
-
-  -- (c3) the phone rounds to whole metres: about 150.1 m is allowed, about 152 m is refused
-  perform community_post_gas(s2, true, v_lat2 + 0.00135, v_lng2);
-  perform pg_temp.expect_error('c4: about 152 m is refused',
-    format($q$select community_post_gas(%L, false, %s, %s)$q$, s2, v_lat2 + 0.00137, v_lng2), 'too far');
+  perform community_post_gas(s2, false, 9.0, 7.0);
+  insert into verify_results values ('c2: an older app that still sends a location works', true, '');
 
   -- (d) the same state twice within 2 minutes is refused
   perform pg_temp.expect_error('d: the same post twice within 2 minutes is refused',
-    format($q$select community_post_gas(%L, false, %s, %s)$q$, s1, v_lat, v_lng), 'already posted');
+    format($q$select community_post_gas(%L, false)$q$, s1), 'already posted');
 
   -- (e) bad input
-  perform pg_temp.expect_error('e: no location is refused',
-    format($q$select community_post_gas(%L, true, null, null)$q$, s1), 'location required');
   perform pg_temp.expect_error('e2: an unknown station is refused',
-    format($q$select community_post_gas('no-such-station', true, %s, %s)$q$, v_lat, v_lng), 'no station');
+    $q$select community_post_gas('no-such-station', true)$q$, 'no station');
   perform pg_temp.expect_error('e3: no choice is refused',
-    format($q$select community_post_gas(%L, null, %s, %s)$q$, s1, v_lat, v_lng), 'Invalid choice');
+    format($q$select community_post_gas(%L, null)$q$, s1), 'Invalid choice');
 
   -- (f) only the admin changes the role
   perform pg_temp.expect_error('f: a non-admin cannot give the role',

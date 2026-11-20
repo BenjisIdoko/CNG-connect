@@ -6,7 +6,7 @@ import type { GasStation } from '../types';
 
 const station = { id: 's1', name: 'NIPCO Kubwa', lat: 9.07, lng: 7.39 } as GasStation;
 
-const html = renderToStaticMarkup(<CommunityGasPostCard station={station} getFreshPosition={async () => null} onPosted={() => undefined} />);
+const html = renderToStaticMarkup(<CommunityGasPostCard station={station} onPosted={() => undefined} />);
 
 describe('CommunityGasPostCard', () => {
   it('offers exactly two choices: gas available and gas not available', () => {
@@ -15,9 +15,10 @@ describe('CommunityGasPostCard', () => {
     expect((html.match(/<button/g) || []).length).toBe(2);
   });
 
-  it('says who it is for and what it needs', () => {
+  it('says who it is for, and asks for nothing about where they are', () => {
     expect(html).toContain('Community manager');
-    expect(html).toContain('within 150 m');
+    expect(html).toContain('Everyone sees it');
+    expect(html).not.toMatch(/150 ?m|within|location|nearby|distance/i);
   });
 
   it('has big tap targets', () => {

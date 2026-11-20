@@ -1192,7 +1192,6 @@ export const App: React.FC = () => {
               onOpenReportModal={handleOpenReportModal}
               onNavigate={handleNavigate}
               onAddStationComment={handleAddStationComment}
-              getFreshPosition={getFreshPosition}
               onCommunityPosted={handleCommunityGasPosted}
             />
           ) : activeTab === 'map' ? (

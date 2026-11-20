@@ -12,7 +12,6 @@ import { latestReportedPrice } from '../utils/stationPrice';
 import { useNow } from '../hooks/useNow';
 import { StationSaysLine } from './common/StationSaysLine';
 import { CommunityGasPostCard } from './CommunityGasPostCard';
-import type { PingPosition } from '../utils/geofencePresence';
 import { openWhatsAppShare } from '../utils/shareMessageBuilder';
 import { describePresence } from '../utils/presenceLabel';
 
@@ -37,8 +36,7 @@ interface StationDetailScreenProps {
   isPresenceActive?: boolean;
   isFavorite?: boolean;
   onToggleFavorite?: (stationId: string) => void;
-  /** For community managers: a fresh GPS fix, and what to do once they have posted. */
-  getFreshPosition?: () => Promise<PingPosition | null>;
+  /** For community managers: what to do once they have posted. */
   onCommunityPosted?: (stationId: string, available: boolean) => void;
 }
 
@@ -54,7 +52,6 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
   isPresenceActive = true,
   isFavorite = false,
   onToggleFavorite,
-  getFreshPosition,
   onCommunityPosted,
 }) => {
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
@@ -414,10 +411,9 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                   );
                 })()}
                 <StationSaysLine station={station} now={now} />
-                {user?.isCommunityManager && getFreshPosition && (
+                {user?.isCommunityManager && (
                   <CommunityGasPostCard
                     station={station}
-                    getFreshPosition={getFreshPosition}
                     onPosted={(available) => onCommunityPosted?.(station.id, available)}
                   />
                 )}

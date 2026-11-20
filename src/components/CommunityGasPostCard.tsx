@@ -1,14 +1,11 @@
 import React, { useState } from 'react';
 import { GasStation } from '../types';
 import { useSupabaseClient } from '../hooks/useSupabaseClient';
-import type { PingPosition } from '../utils/geofencePresence';
 import type { RpcClient } from '../services/rpcClient';
-import { communityPostPositionProblem, notifyGasPost, postCommunityGas } from '../services/communityPostService';
+import { notifyGasPost, postCommunityGas } from '../services/communityPostService';
 
 interface Props {
   station: GasStation;
-  /** A fresh GPS fix, asked for when the manager taps. Null when none could be had. */
-  getFreshPosition: () => Promise<PingPosition | null>;
   /** Called after a successful post so the app can show it at once. */
   onPosted: (available: boolean) => void;
 }
@@ -16,10 +13,10 @@ interface Props {
 type Message = { kind: 'ok' | 'error'; text: string };
 
 /**
- * The card a community manager sees on a station's page: two choices, Gas available and Gas not available.
- * They must be within 150 m of the station; the phone says so plainly and the database checks it too.
+ * The card a community manager sees on any station's page: two choices, Gas available and Gas not available.
+ * Community managers are trusted ambassadors chosen by the admin, so there is no distance rule.
  */
-export const CommunityGasPostCard: React.FC<Props> = ({ station, getFreshPosition, onPosted }) => {
+export const CommunityGasPostCard: React.FC<Props> = ({ station, onPosted }) => {
   const supabase = useSupabaseClient();
   const [busy, setBusy] = useState<'available' | 'out' | null>(null);
   const [message, setMessage] = useState<Message | null>(null);
@@ -28,14 +25,7 @@ export const CommunityGasPostCard: React.FC<Props> = ({ station, getFreshPositio
     if (busy || !supabase) return;
     setBusy(available ? 'available' : 'out');
     setMessage(null);
-    const position = await getFreshPosition();
-    const problem = communityPostPositionProblem(position, station);
-    if (problem) {
-      setBusy(null);
-      setMessage({ kind: 'error', text: problem });
-      return;
-    }
-    const result = await postCommunityGas(supabase as unknown as RpcClient, { stationId: station.id, available, position });
+    const result = await postCommunityGas(supabase as unknown as RpcClient, { stationId: station.id, available });
     setBusy(null);
     if (result.ok) {
       setMessage({ kind: 'ok', text: available ? 'Posted: gas is available.' : 'Posted: gas is not available.' });
@@ -53,7 +43,7 @@ export const CommunityGasPostCard: React.FC<Props> = ({ station, getFreshPositio
     <div className="rounded-2xl bg-rd-surface ring-1 ring-rd-divider px-4 py-3">
       <p className="text-caption text-rd-text-tertiary">Community manager</p>
       <p className="font-geist font-bold text-body-lg leading-snug text-rd-fg">Post the gas status</p>
-      <p className="text-caption text-rd-text-tertiary mt-0.5">Everyone sees it. You need to be within 150 m of the station.</p>
+      <p className="text-caption text-rd-text-tertiary mt-0.5">Everyone sees it.</p>
       <div className="mt-3 flex gap-2">
         <button
           type="button"

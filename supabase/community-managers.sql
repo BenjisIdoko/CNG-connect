@@ -3,9 +3,10 @@
 --
 -- * community_managers lists the accounts with the role. Rows are written only by the admin function
 --   below, so nobody can give the role to themselves; a person can read their own row, the admin reads all.
--- * community_post_gas(station, available, lat, lng) records the post. The caller must have the role and
---   must be within 150 m of the station (the same distance drivers' reports use); the app checks too, but
---   this is the real check. Gas available is stored as manager_state 'selling', not available as 'out'
+-- * community_post_gas(station, available) records the post. The caller must have the role; there is NO
+--   distance rule (community managers are trusted ambassadors and may post for any station from anywhere).
+--   The old lat/lng arguments are still accepted and ignored, so an app that still sends them keeps working.
+--   Gas available is stored as manager_state 'selling', not available as 'out'
 --   (a new allowed value). For gas available the older manager_selling flag is set to true for phones that
 --   have not updated; for not available it is left EMPTY (null), because an old phone would read "false"
 --   as "Closed", which is not what the post says. The same person cannot post the same state for the same
@@ -71,8 +72,8 @@ $$;
 create or replace function community_post_gas(
   p_station_id text,
   p_available boolean,
-  p_lat double precision,
-  p_lng double precision
+  p_lat double precision default null,
+  p_lng double precision default null
 )
 returns void
 language plpgsql
@@ -80,10 +81,7 @@ security definer
 set search_path = public
 as $$
 declare
-  v_lat double precision;
-  v_lng double precision;
   v_state text;
-  v_distance double precision;
 begin
   if auth.uid() is null or not exists (select 1 from community_managers where user_id = auth.uid()) then
     raise exception 'not authorized';
@@ -91,24 +89,8 @@ begin
   if p_available is null then
     raise exception 'Invalid choice';
   end if;
-  if p_lat is null or p_lng is null or p_lat not between -90 and 90 or p_lng not between -180 and 180 then
-    raise exception 'location required';
-  end if;
-
-  select lat, lng into v_lat, v_lng from stations where id = p_station_id;
-  if not found then
+  if not exists (select 1 from stations where id = p_station_id) then
     raise exception 'no station';
-  end if;
-
-  -- great-circle distance in metres (haversine)
-  v_distance := 6371000 * 2 * asin(least(1, sqrt(
-    power(sin(radians(v_lat - p_lat) / 2), 2)
-    + cos(radians(p_lat)) * cos(radians(v_lat)) * power(sin(radians(v_lng - p_lng) / 2), 2)
-  )));
-  -- The phone rounds the distance to whole metres, so allow up to 150.5 m here: a post the phone allows
-  -- is never refused here on a fraction of a metre.
-  if v_distance > 150.5 then
-    raise exception 'too far from the station';
   end if;
 
   v_state := case when p_available then 'selling' else 'out' end;
