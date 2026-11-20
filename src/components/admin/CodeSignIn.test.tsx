@@ -76,3 +76,20 @@ describe('CodeSignIn', () => {
     expect(html).toContain('Back to app');
   });
 });
+
+describe('CodeSignIn with a password option', () => {
+  const render = (extra: { onUsePassword?: () => void; intro?: string } = {}) =>
+    renderToStaticMarkup(
+      <CodeSignIn title="Station manager" onExit={() => undefined} sendCode={async () => ({ success: true })} verifyCode={async () => ({ success: true })} {...extra} />,
+    );
+
+  it('offers "Use my password instead" only when asked to', () => {
+    expect(render()).not.toContain('Use my password instead');
+    expect(render({ onUsePassword: () => undefined })).toContain('Use my password instead');
+  });
+
+  it('can replace the sentence on the email step', () => {
+    expect(render({ intro: 'After you sign in you can set a password.' })).toContain('After you sign in you can set a password.');
+    expect(render()).toContain('No password and no CNG-Connect sign-up needed.');
+  });
+});

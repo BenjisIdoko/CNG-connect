@@ -42,8 +42,9 @@ const ManagerBody: React.FC<{ flash: (m: string) => void }> = ({ flash }) => {
 };
 
 /**
- * The station manager's own entrance (/station-manager). Managers sign in with an emailed code (no
- * password and no driver sign-up); the admin's invite for their email decides which stations they get.
+ * The station manager's own entrance (/station-manager). Managers sign in with an email and a password
+ * (an emailed code the first time, or if they forget it; no driver sign-up); the admin's invite for their
+ * email decides which stations they get.
  * Who may change what is enforced by the database; this page never shows anything beyond "My stations".
  */
 export const StationManagerEntrance: React.FC<{ onExit: () => void }> = ({ onExit }) => {
@@ -51,7 +52,7 @@ export const StationManagerEntrance: React.FC<{ onExit: () => void }> = ({ onExi
   const { flash, toast } = useAdminToast();
 
   return (
-    <AdminAuthGate title="Station manager" onExit={onExit} mode="code">
+    <AdminAuthGate title="Station manager" onExit={onExit} mode="manager">
       <AdminSidebarLayout
         brand="CNG-Connect"
         navItems={NAV}

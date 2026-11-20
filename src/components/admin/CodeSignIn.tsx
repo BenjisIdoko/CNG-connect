@@ -15,13 +15,17 @@ interface Props {
   onExit: () => void;
   sendCode: (email: string) => Promise<Outcome>;
   verifyCode: (email: string, code: string) => Promise<Outcome>;
+  /** When given, a "Use my password instead" link is shown (managers who already have a password). */
+  onUsePassword?: () => void;
+  /** Replaces the sentence on the email step. */
+  intro?: string;
 }
 
 /**
  * Sign-in for station managers: enter your email, get a code by email, enter it. No password and no
  * driver sign-up. Which stations you manage comes from the admin's invite for that email.
  */
-export const CodeSignIn: React.FC<Props> = ({ title, onExit, sendCode, verifyCode }) => {
+export const CodeSignIn: React.FC<Props> = ({ title, onExit, sendCode, verifyCode, onUsePassword, intro }) => {
   const [state, dispatch] = useReducer((s: SignInState, e: SignInEvent) => nextSignIn(s, e, Date.now()), undefined, initialSignIn);
   const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
@@ -82,7 +86,7 @@ export const CodeSignIn: React.FC<Props> = ({ title, onExit, sendCode, verifyCod
             <CardTitle className="text-xl">{title}</CardTitle>
             <CardDescription>
               {state.step === 'email'
-                ? 'Enter your email and we will send you a code. No password and no CNG-Connect sign-up needed.'
+                ? (intro ?? 'Enter your email and we will send you a code. No password and no CNG-Connect sign-up needed.')
                 : `We sent a code to ${state.email}. Enter it below.`}
             </CardDescription>
           </CardHeader>
@@ -142,6 +146,12 @@ export const CodeSignIn: React.FC<Props> = ({ title, onExit, sendCode, verifyCod
                   Use a different email
                 </Button>
               </div>
+            )}
+
+            {onUsePassword && (
+              <Button type="button" variant="link" onClick={onUsePassword} className="self-start px-0">
+                Use my password instead
+              </Button>
             )}
 
             <Button type="button" variant="link" onClick={onExit} className="self-start px-0 text-adm-mute-text">
