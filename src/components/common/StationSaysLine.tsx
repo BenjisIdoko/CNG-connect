@@ -14,6 +14,7 @@ const BADGE_CLASS: Record<ManagerState, string> = {
   selling: 'bg-rd-available-container text-rd-on-available-container',
   open: 'bg-rd-queuing-container text-rd-on-queuing-container',
   closed: 'bg-rd-surface ring-1 ring-rd-divider text-rd-text-tertiary',
+  out: 'bg-rd-out-container text-rd-on-out-container',
 };
 
 const LAST_SAID_BADGE_CLASS = 'bg-rd-surface ring-1 ring-rd-divider text-rd-text-tertiary';
@@ -23,6 +24,7 @@ const LINE_CLASS: Record<ManagerState, string> = {
   selling: 'text-rd-on-available-container',
   open: 'text-rd-on-queuing-container',
   closed: 'text-rd-fg',
+  out: 'text-rd-on-out-container',
 };
 
 /**
@@ -52,7 +54,7 @@ export const StationSaysLine: React.FC<Props> = ({ station, now, compact = false
     <div className="rounded-2xl bg-rd-surface ring-1 ring-rd-divider px-4 py-3 flex items-start gap-3">
       <span aria-hidden="true" className="material-symbols-outlined text-rd-text-tertiary text-[20px] shrink-0 mt-0.5">local_gas_station</span>
       <div className="flex-1 min-w-0">
-        <p className="text-caption text-rd-text-tertiary">Station says</p>
+        <p className="text-caption text-rd-text-tertiary">Community manager says</p>
         {statement && (
           <p className={`font-geist font-bold text-body-lg leading-snug ${statement.lastSaid ? LAST_SAID_LINE_CLASS : LINE_CLASS[statement.state]}`}>{describeManagerState(statement)}</p>
         )}

@@ -62,7 +62,7 @@ export interface GasStation {
   managerSelling?: boolean;
   managerSellingAt?: string;
   /** The station's own status: 'closed', 'open' (waiting for gas) or 'selling' (gas available), and when. */
-  managerState?: 'closed' | 'open' | 'selling';
+  managerState?: 'closed' | 'open' | 'selling' | 'out';
   managerStateAt?: string;
   /** Why a closed / waiting post is that way, and when the manager expects it to change (ISO time). */
   managerStateReason?: ManagerStateReason;

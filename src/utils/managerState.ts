@@ -10,8 +10,9 @@ export type { ManagerStateReason } from '../types';
  *   closed   the station is not open
  *   open     open for business but waiting for gas supply
  *   selling  open for business and gas is available
+ *   out      gas is not available (a community manager's post)
  */
-export type ManagerState = 'closed' | 'open' | 'selling';
+export type ManagerState = 'closed' | 'open' | 'selling' | 'out';
 
 /** A manager's status shows for this long, then disappears (it always shows its age meanwhile). */
 export const MANAGER_STATE_MINUTES = 360;
@@ -29,7 +30,7 @@ const OVERDUE_GRACE_MINUTES = 60;
 /** Whatever the expected time, a post is gone 24 hours after it was made. */
 const MAX_POST_MINUTES = 24 * 60;
 
-/** The three buttons on the manager's card, in the order they appear. */
+/** The three buttons on the (older) station manager's card, in the order they appear. */
 export const MANAGER_STATE_OPTIONS: { state: ManagerState; label: string }[] = [
   { state: 'closed', label: 'Closed' },
   { state: 'open', label: 'Open, waiting for gas' },
@@ -112,6 +113,7 @@ const SENTENCE: Record<ManagerState, string> = {
   selling: 'Open for business · Gas available',
   open: 'Open · Waiting for gas supply',
   closed: 'Closed',
+  out: 'Gas not available',
 };
 
 const REASON_TEXT: Record<ManagerStateReason, string | null> = {
@@ -164,12 +166,14 @@ const BADGE_TEXT: Record<ManagerState, string> = {
   selling: 'Station: open, gas available',
   open: 'Station: open, no gas yet',
   closed: 'Station: closed',
+  out: 'Station: gas not available',
 };
 
 const LAST_SAID_BADGE: Record<ManagerState, string> = {
   selling: 'Station last said: open, gas available',
   open: 'Station last said: open, waiting for gas',
   closed: 'Station last said: closed',
+  out: 'Station last said: gas not available',
 };
 
 /** The short line for list rows and cards: what the station says, with its expected time when it gave one. */

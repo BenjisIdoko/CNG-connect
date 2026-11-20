@@ -69,6 +69,7 @@ const POSTED_TEXT: Record<ManagerState, string> = {
   closed: 'Posted: Closed',
   open: 'Posted: Open, waiting for gas',
   selling: 'Posted: Open, gas available',
+  out: 'Posted: Gas not available',
 };
 
 /**

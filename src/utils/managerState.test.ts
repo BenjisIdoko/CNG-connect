@@ -233,3 +233,24 @@ describe('a Closed or Open-waiting post after its normal window is "last said", 
     expect(describeManagerBadge({ state: 'closed', ageMinutes: 500, untilMs: 1, overdue: true, lastSaid: true })).toBe('Station last said: closed · 8 hr ago');
   });
 });
+
+describe('the "out" state: gas not available', () => {
+  it('is current for 6 hours, then "last said" until 24 hours, then gone', () => {
+    expect(getManagerStatement({ managerState: 'out', managerStateAt: minsAgo(10) }, NOW)).toEqual({ state: 'out', ageMinutes: 10 });
+    expect(getManagerStatement({ managerState: 'out', managerStateAt: minsAgo(360) }, NOW)).toEqual({ state: 'out', ageMinutes: 360 });
+    expect(getManagerStatement({ managerState: 'out', managerStateAt: minsAgo(361) }, NOW)).toEqual({ state: 'out', ageMinutes: 361, lastSaid: true });
+    expect(getManagerStatement({ managerState: 'out', managerStateAt: minsAgo(1441) }, NOW)).toBeNull();
+  });
+
+  it('reads as "Gas not available" on the station page and in lists', () => {
+    expect(describeManagerState({ state: 'out', ageMinutes: 5 })).toBe('Gas not available · updated 5 min ago');
+    expect(describeManagerState({ state: 'out', ageMinutes: 500, lastSaid: true })).toBe('Last said: Gas not available · 8 hr ago');
+    expect(describeManagerBadge({ state: 'out', ageMinutes: 5 })).toBe('Station: gas not available');
+    expect(describeManagerBadge({ state: 'out', ageMinutes: 500, lastSaid: true })).toBe('Station last said: gas not available · 8 hr ago');
+  });
+
+  it('is not one of the three buttons on the old manager card', () => {
+    expect(MANAGER_STATE_OPTIONS.map((o) => o.state)).toEqual(['closed', 'open', 'selling']);
+  });
+});
+

@@ -38,7 +38,7 @@ describe('StationSaysLine', () => {
 
   it('says "Open for business · Gas available" with the age when the manager is selling', () => {
     const out = html(station({ managerState: 'selling', managerStateAt: minsAgo(20) }));
-    expect(out).toContain('Station says');
+    expect(out).toContain('Community manager says');
     expect(out).toContain('Open for business · Gas available · updated 20 min ago');
   });
 
@@ -125,6 +125,22 @@ describe('StationSaysLine', () => {
 
     it('a selling post badge is unchanged', () => {
       expect(html(station({ managerState: 'selling', managerStateAt: minsAgo(5) }), true)).toContain('Station: open, gas available');
+    });
+  });
+
+  describe('gas not available', () => {
+    it('the station page says it, with the age', () => {
+      expect(html(station({ managerState: 'out', managerStateAt: minsAgo(15) }))).toContain('Gas not available · updated 15 min ago');
+    });
+
+    it('the list badge says it', () => {
+      expect(html(station({ managerState: 'out', managerStateAt: minsAgo(15) }), true)).toContain('Station: gas not available');
+    });
+
+    it('an old one is greyed as "last said"', () => {
+      const out = html(station({ managerState: 'out', managerStateAt: minsAgo(400) }));
+      expect(out).toContain('Last said: Gas not available · 6 hr ago');
+      expect(out).toContain('text-rd-text-tertiary');
     });
   });
 });

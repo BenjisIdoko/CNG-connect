@@ -283,7 +283,9 @@ export const apiService = {
             managerSelling: typeof s.manager_selling === 'boolean' ? s.manager_selling : undefined,
             managerSellingAt: s.manager_selling_at || undefined,
             managerState:
-              s.manager_state === 'closed' || s.manager_state === 'open' || s.manager_state === 'selling' ? s.manager_state : undefined,
+              s.manager_state === 'closed' || s.manager_state === 'open' || s.manager_state === 'selling' || s.manager_state === 'out'
+                ? s.manager_state
+                : undefined,
             managerStateAt: s.manager_state_at || undefined,
             managerStateReason: ['supply', 'fault', 'power', 'other'].includes(s.manager_state_reason) ? s.manager_state_reason : undefined,
             managerStateUntil: s.manager_state_until || undefined,
