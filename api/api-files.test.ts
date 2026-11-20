@@ -9,7 +9,7 @@ describe('serverless functions under api/', () => {
   const functions = readdirSync(dir).filter((f) => f.endsWith('.ts') && !f.endsWith('.test.ts'));
 
   it('has at least the functions we ship', () => {
-    expect(functions).toEqual(expect.arrayContaining(['chat.ts', 'invite-manager.ts', 'notify-gas-post.ts']));
+    expect(functions).toEqual(expect.arrayContaining(['chat.ts', 'notify-gas-post.ts']));
   });
 
   it.each(functions)('%s imports no sibling files', (file) => {

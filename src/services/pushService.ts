@@ -1,5 +1,5 @@
 /// <reference types="vite/client" />
-import type { RpcClient } from './stationManagerService';
+import type { RpcClient } from './rpcClient';
 import { requestNotificationPermission } from '../utils/pushNotificationEngine';
 
 /**

@@ -5,7 +5,7 @@ import { OverviewData, OverviewView } from './OverviewView';
 import type { QueueItem } from '../../utils/adminQueue';
 
 const noop = () => undefined;
-const TOTALS = { stations: 100, users: 161, managers: 2 };
+const TOTALS = { stations: 100, users: 161, communityManagers: 2 };
 
 const render = (data: OverviewData, extra: Partial<React.ComponentProps<typeof OverviewView>> = {}) =>
   renderToStaticMarkup(
@@ -60,7 +60,7 @@ describe('OverviewView', () => {
 
   it('shows a dash for totals that could not be loaded and a Retry with the problem', () => {
     const html = render(
-      { counts: null, items: [], totals: { stations: null, users: null, managers: null } },
+      { counts: null, items: [], totals: { stations: null, users: null, communityManagers: null } },
       { errors: ['Flagged reports could not be loaded.'] },
     );
     expect(html).toContain('role="alert"');
@@ -82,6 +82,6 @@ describe('OverviewView', () => {
     const html = render({ counts: { flagged: 0, suggestion: 0, pin: 0 }, items: [], totals: TOTALS });
     expect(html).toContain('Stations');
     expect(html).toContain('>161<');
-    expect(html).toContain('Station managers');
+    expect(html).toContain('Community managers');
   });
 });

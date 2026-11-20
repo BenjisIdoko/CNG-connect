@@ -65,7 +65,7 @@ import { SuccessBurst } from './components/common/SuccessBurst';
 import { haptic } from './utils/haptics';
 import { track } from './services/analytics';
 import { getSupabase } from './services/supabaseClient';
-import type { RpcClient } from './services/stationManagerService';
+import type { RpcClient } from './services/rpcClient';
 import {
   PUSH_NOT_SET_UP_REASON,
   detectPushSupport,
@@ -98,15 +98,10 @@ const TOAST_COLORS: Record<ToastTone, string> = {
 };
 
 const AdminScreen = safeLazy(() => import('./components/admin/AdminScreen'), (m) => m.AdminScreen);
-const StationManagerEntrance = safeLazy(
-  () => import('./components/admin/StationManagerEntrance'),
-  (m) => m.StationManagerEntrance,
-);
 
 export const App: React.FC = () => {
-  // Two hidden entrances: /admin (the super admin's dashboard) and /station-manager (a manager's
-  // own stations). The old ?admin=1 / ?moderation=1 / ?manager=1 links still land on the right one
-  // and the address bar is swapped to the new path. Who may use each is enforced by the database.
+  // One hidden entrance: /admin (the super admin's dashboard). The old ?admin=1 / ?moderation=1 links still
+  // land on it and the address bar is swapped to the new path. Who may use it is enforced by the database.
   const [entrance] = useState<Entrance | null>(() => {
     try {
       const resolved = resolveEntrance(window.location.pathname, window.location.search);
@@ -1040,7 +1035,7 @@ export const App: React.FC = () => {
     };
     return (
       <Suspense fallback={<div className="fixed inset-0 grid place-items-center text-slate-500">Loading…</div>}>
-        {entrance === 'admin' ? <AdminScreen onExit={exitToApp} /> : <StationManagerEntrance onExit={exitToApp} />}
+        <AdminScreen onExit={exitToApp} />
       </Suspense>
     );
   }

@@ -75,8 +75,6 @@ interface DirectoryProps {
   onDelete: (id: string) => void;
   /** Called after an export so the screen can announce it. */
   flash: (m: string) => void;
-  /** Ids of accounts that manage at least one station; they get a "Station manager" label. */
-  managerIds?: Set<string>;
   /** Ids of accounts with the community manager role; they get a "Community manager" label. */
   communityManagerIds?: Set<string>;
 }
@@ -85,7 +83,7 @@ interface DirectoryProps {
  * The user directory table: search, filter, sort and page through every driver account. It only
  * draws and reorganises the rows it is given; loading, editing and deleting live in UsersPanel.
  */
-export const UsersDirectory: React.FC<DirectoryProps> = ({ rows, loading, onEdit, onDelete, flash, managerIds, communityManagerIds }) => {
+export const UsersDirectory: React.FC<DirectoryProps> = ({ rows, loading, onEdit, onDelete, flash, communityManagerIds }) => {
   const [search, setSearch] = useState('');
   const [role, setRole] = useState<RoleFilter>('all');
   const [stateFilter, setStateFilter] = useState('');
@@ -318,8 +316,6 @@ export const UsersDirectory: React.FC<DirectoryProps> = ({ rows, loading, onEdit
                         <Badge>Admin</Badge>
                       ) : communityManagerIds?.has(r.id) ? (
                         <Badge variant="outline">Community manager</Badge>
-                      ) : managerIds?.has(r.id) ? (
-                        <Badge variant="outline">Station manager</Badge>
                       ) : (
                         <span className="text-adm-mute-text">Driver</span>
                       )}

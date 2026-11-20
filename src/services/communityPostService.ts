@@ -1,5 +1,5 @@
 import { checkReportPosition, type PingPosition } from '../utils/geofencePresence';
-import type { RpcClient } from './stationManagerService';
+import type { RpcClient } from './rpcClient';
 
 /**
  * A community manager's post: "Gas available" or "Gas not available" for the station they are at. The

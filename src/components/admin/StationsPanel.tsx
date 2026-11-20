@@ -677,7 +677,6 @@ export const StationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash 
       {fullEditorRow && (
         <FullStationEditorModal
           station={fullEditorRow}
-          isAdmin
           onClose={() => setFullEditorId(null)}
           onSaved={(id, patch) => {
             setRows((rs) => rs.map((r) => (r.id === id ? { ...r, ...patch } : r)));

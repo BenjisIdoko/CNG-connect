@@ -14,7 +14,7 @@ export interface OverviewData {
   /** null until loaded, or when loading failed. */
   counts: ThreadCounts | null;
   items: QueueItem[];
-  totals: { stations: number | null; users: number | null; managers: number | null };
+  totals: { stations: number | null; users: number | null; communityManagers: number | null };
 }
 
 interface Props {
@@ -231,7 +231,7 @@ export const OverviewView: React.FC<Props> = ({ data, loading, errors, lastVisit
                   [
                     ['Stations', totals.stations],
                     ['Users', totals.users],
-                    ['Station managers', totals.managers],
+                    ['Community managers', totals.communityManagers],
                   ] as [string, number | null][]
                 ).map(([label, value]) => (
                   <div key={label} className="flex items-baseline justify-between gap-3 py-2 first:pt-0 last:pb-0">

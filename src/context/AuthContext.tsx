@@ -34,8 +34,6 @@ interface AuthContextType {
   /** True once a password-recovery link has been opened — the app must show the "set a new password" screen before anything else, session or not. */
   isPasswordRecovery: boolean;
   updatePassword: (newPassword: string) => Promise<AuthResult>;
-  /** Saves the signed-in person's own name and phone, and tells the caller if it failed. */
-  saveContactDetails: (name: string, phone: string) => Promise<AuthResult>;
   updateProfile: (updater: Partial<UserProfile> | ((prev: UserProfile) => UserProfile)) => Promise<void>;
   /** Resize + upload an image to the `avatars` bucket and save its URL on the profile. */
   uploadAvatar: (file: File) => Promise<{ url?: string; error?: string }>;
@@ -228,20 +226,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return { success: true };
   }, [loadProfile]);
 
-  const saveContactDetails = useCallback(
-    async (name: string, phone: string): Promise<AuthResult> => {
-      if (!session) return { success: false, error: 'not authenticated' };
-      const supabase = await getSupabase();
-      if (!supabase) return { success: false, error: 'Backend not configured.' };
-      // Only these two columns are sent: an upsert updates just the columns it is given.
-      const { error } = await supabase.from('profiles').upsert({ id: session.user.id, name, phone });
-      if (error) return { success: false, error: error.message };
-      setDriverProfile((prev) => ({ ...prev, name, phone }));
-      return { success: true };
-    },
-    [session]
-  );
-
   const updatePassword = useCallback(async (newPassword: string): Promise<AuthResult> => {
     const supabase = await getSupabase();
     if (!supabase) return { success: false, error: 'Backend not configured.' };
@@ -340,7 +324,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         adminSignInWithPassword,
         isPasswordRecovery,
         updatePassword,
-        saveContactDetails,
         updateProfile,
         uploadAvatar,
         signOut,

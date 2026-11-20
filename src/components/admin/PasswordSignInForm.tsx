@@ -17,7 +17,7 @@ interface Props {
 }
 
 /**
- * Email and password sign-in shared by the admin dashboard and the station manager page. The fields
+ * Email and password sign-in for the admin dashboard. The fields
  * carry the attributes a browser or phone password manager needs to fill and save them.
  */
 export const PasswordSignInForm: React.FC<Props> = ({ title, description, onSubmit, onExit, footer }) => {

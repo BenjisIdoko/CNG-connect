@@ -12,9 +12,8 @@ interface Props {
 }
 
 /**
- * Shown to someone who is signed in at the wrong back-office entrance (for example a station
- * manager at /admin). The database refuses them anyway; this just says so plainly and points
- * them at the entrance that is theirs.
+ * Shown to someone who is signed in at the admin dashboard but is not the admin. The database refuses
+ * them anyway; this just says so plainly and points them back to the app.
  */
 export const NotForYou: React.FC<Props> = ({ title, message, linkLabel, linkHref, onSignOut }) => (
   <AdminRoot className="fixed inset-0 z-[200] grid place-items-center overflow-y-auto p-6">

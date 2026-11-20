@@ -42,7 +42,7 @@ export interface DriverReport {
   photoAccuracyM?: number;
 }
 
-/** The reasons a station manager can give for a Closed or waiting-for-gas post. */
+/** The reasons the (retired) station manager flow could give for a Closed or waiting-for-gas post; old posts may still carry one. */
 export type ManagerStateReason = 'supply' | 'fault' | 'power' | 'other';
 
 export interface GasStation {
@@ -67,7 +67,7 @@ export interface GasStation {
   /** Why a closed / waiting post is that way, and when the manager expects it to change (ISO time). */
   managerStateReason?: ManagerStateReason;
   managerStateUntil?: string;
-  /** Pump pressure in bar as last read by a station manager, and when. */
+  /** Pump pressure in bar as last read by the (retired) station manager flow, and when; old readings may still show. */
   livePressureBar?: number;
   livePressureAt?: string;
   busyEstimate?: string;

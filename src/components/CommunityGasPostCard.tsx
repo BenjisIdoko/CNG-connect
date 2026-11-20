@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { GasStation } from '../types';
 import { useSupabaseClient } from '../hooks/useSupabaseClient';
 import type { PingPosition } from '../utils/geofencePresence';
-import type { RpcClient } from '../services/stationManagerService';
+import type { RpcClient } from '../services/rpcClient';
 import { communityPostPositionProblem, notifyGasPost, postCommunityGas } from '../services/communityPostService';
 
 interface Props {

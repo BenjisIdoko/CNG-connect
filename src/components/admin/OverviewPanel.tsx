@@ -15,7 +15,7 @@ const readLastVisit = (): number | null => {
   }
 };
 
-const EMPTY: OverviewData = { counts: null, items: [], totals: { stations: null, users: null, managers: null } };
+const EMPTY: OverviewData = { counts: null, items: [], totals: { stations: null, users: null, communityManagers: null } };
 
 /**
  * The admin's home: what is waiting (flagged reports, driver suggestions, station pins to review),
@@ -45,7 +45,7 @@ export const OverviewPanel: React.FC<{ onNavigate: (target: OverviewTarget) => v
   const load = useCallback(async () => {
     if (!supabase) return;
     setLoading(true);
-    const [sugg, flagged, pins, stations, users, managers] = await Promise.all([
+    const [sugg, flagged, pins, stations, users, communityManagers] = await Promise.all([
       supabase
         .from('station_suggestions')
         .select('id,name,city,state,created_at')
@@ -56,7 +56,7 @@ export const OverviewPanel: React.FC<{ onNavigate: (target: OverviewTarget) => v
       supabase.from('stations').select('id,name,city').eq('needs_pin_review', true).order('name').limit(500),
       supabase.from('stations').select('id', { count: 'exact', head: true }),
       supabase.from('profiles').select('id', { count: 'exact', head: true }),
-      supabase.from('station_managers').select('user_id'),
+      supabase.from('community_managers').select('user_id'),
     ]);
 
     const problems: string[] = [];
@@ -117,7 +117,7 @@ export const OverviewPanel: React.FC<{ onNavigate: (target: OverviewTarget) => v
       totals: {
         stations: stations.error ? null : stations.count ?? 0,
         users: users.error ? null : users.count ?? 0,
-        managers: managers.error ? null : new Set((managers.data || []).map((m) => m.user_id as string)).size,
+        communityManagers: communityManagers.error ? null : new Set((communityManagers.data || []).map((m) => m.user_id as string)).size,
       },
     });
     setErrors(problems);

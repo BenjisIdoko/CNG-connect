@@ -30,7 +30,7 @@ const sidebarButton =
   'rounded-md border border-white/20 px-3 py-1.5 max-md:min-h-11 text-xs font-semibold text-white transition-colors hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-adm-foil outline-none';
 
 /**
- * The one shell shared by the admin dashboard and the station manager page: a deep-green sidebar
+ * The one shell shared by the admin dashboard: a deep-green sidebar
  * on laptops (a drawer on phones) and a celadon work area. Which nav items appear is decided by the
  * caller; this component only draws them.
  */

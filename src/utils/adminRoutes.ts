@@ -1,17 +1,17 @@
 /**
- * The two hidden entrances to the app's back office:
- *   /admin            the super admin's dashboard
- *   /station-manager  a station manager's page (only their assigned stations)
- * The older links (?admin=1, ?moderation=1, ?manager=1) still work and are forwarded to these paths.
- * Which role may actually use each one is enforced by the database, not by this file.
+ * The one hidden entrance to the app's back office:
+ *   /admin  the super admin's dashboard
+ * The older links (?admin=1, ?moderation=1) still work and are forwarded to this path. (/station-manager and
+ * ?manager=1 used to open a station manager's page; that role was retired, so they are ordinary addresses now
+ * and /station-manager is redirected to the home page by vercel.json.) Who may actually use the dashboard is
+ * enforced by the database, not by this file.
  */
 
-export type Entrance = 'admin' | 'manager';
+export type Entrance = 'admin';
 
 export const ADMIN_PATH = '/admin';
-export const MANAGER_PATH = '/station-manager';
 
-export const entrancePath = (entrance: Entrance): string => (entrance === 'admin' ? ADMIN_PATH : MANAGER_PATH);
+export const entrancePath = (_entrance: Entrance): string => ADMIN_PATH;
 
 /** True when `pathname` is exactly `base` or a sub-path of it ("/admin", "/admin/", "/admin/x", not "/admins"). */
 const isPathUnder = (pathname: string, base: string): boolean => {
@@ -27,7 +27,6 @@ export interface ResolvedEntrance {
 
 export function resolveEntrance(pathname: string, search: string): ResolvedEntrance {
   if (isPathUnder(pathname || '', ADMIN_PATH)) return { entrance: 'admin', canonicalPath: null };
-  if (isPathUnder(pathname || '', MANAGER_PATH)) return { entrance: 'manager', canonicalPath: null };
 
   let params: URLSearchParams;
   try {
@@ -36,6 +35,5 @@ export function resolveEntrance(pathname: string, search: string): ResolvedEntra
     return { entrance: null, canonicalPath: null };
   }
   if (params.has('admin') || params.has('moderation')) return { entrance: 'admin', canonicalPath: ADMIN_PATH };
-  if (params.has('manager')) return { entrance: 'manager', canonicalPath: MANAGER_PATH };
   return { entrance: null, canonicalPath: null };
 }

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Flag, Fuel, LayoutDashboard, MapPinned, MapPinPlus, Phone, Users } from 'lucide-react';
+import { Flag, LayoutDashboard, MapPinned, MapPinPlus, Phone, Users } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useSupabaseClient } from '../../hooks/useSupabaseClient';
 import { AdminAuthGate } from './AdminAuthGate';
@@ -8,9 +8,7 @@ import { OverviewPanel } from './OverviewPanel';
 import { StationsPanel } from './StationsPanel';
 import { ReportsPanel } from './ReportsPanel';
 import { UsersPanel } from './UsersPanel';
-import { StationManagersPanel } from './StationManagersPanel';
 import { NotForYou } from './NotForYou';
-import { MANAGER_PATH } from '../../utils/adminRoutes';
 import { SuggestionsPanel } from './SuggestionsPanel';
 import { AirtimePayouts } from '../AirtimePayouts';
 import { useAdminToast } from './useAdminToast';
@@ -23,15 +21,13 @@ const ADMIN_NAV: AdminNavItem[] = [
   { key: 'suggestions', label: 'Suggestions', icon: MapPinPlus },
   { key: 'reports', label: 'Report moderation', icon: Flag },
   { key: 'users', label: 'Users', icon: Users },
-  { key: 'managers', label: 'Station managers', icon: Fuel },
   ...(FEATURES.ENABLE_REFERRALS ? [{ key: 'payouts', label: 'Airtime payouts', icon: Phone }] : []),
 ];
 
 /**
- * The super admin's dashboard (/admin): Stations, Suggestions, Report moderation, Users and the
- * Station managers list. Only a profile with `is_admin` may use it; anyone else who signs in here
- * (a station manager, say) is told it is not for them and pointed at /station-manager. The database
- * enforces every action as well, so this screen is the front door, not the lock.
+ * The super admin's dashboard (/admin): Stations, Suggestions, Report moderation and Users (where the admin
+ * marks community managers). Only a profile with `is_admin` may use it; anyone else who signs in here is told
+ * it is not for them. The database enforces every action as well, so this screen is the front door, not the lock.
  */
 export const AdminScreen: React.FC<{ onExit: () => void }> = ({ onExit }) => {
   const { driverProfile, isProfileLoaded, signOut } = useAuth();
@@ -105,9 +101,9 @@ export const AdminScreen: React.FC<{ onExit: () => void }> = ({ onExit }) => {
       ) : !isAdmin ? (
         <NotForYou
           title="This page is for the app admin"
-          message="You're signed in, but this dashboard is only for the app admin. If you manage a station, your page is the station manager page."
-          linkLabel="Go to the station manager page"
-          linkHref={MANAGER_PATH}
+          message="You're signed in, but this dashboard is only for the app admin."
+          linkLabel="Back to CNG-Connect"
+          linkHref="/"
           onSignOut={signOut}
         />
       ) : (
@@ -127,7 +123,6 @@ export const AdminScreen: React.FC<{ onExit: () => void }> = ({ onExit }) => {
         )}
         {isAdmin && activeKey === 'reports' && <ReportsPanel flash={flash} />}
         {isAdmin && activeKey === 'users' && <UsersPanel flash={flash} />}
-        {isAdmin && activeKey === 'managers' && <StationManagersPanel flash={flash} />}
         {FEATURES.ENABLE_REFERRALS && isAdmin && activeKey === 'payouts' && (
           <div className="h-full overflow-y-auto">
             <div className="max-w-2xl mx-auto p-4 pb-16">

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ADMIN_PATH, MANAGER_PATH, entrancePath, resolveEntrance } from './adminRoutes';
+import { ADMIN_PATH, entrancePath, resolveEntrance } from './adminRoutes';
 
 describe('resolveEntrance', () => {
   it('matches /admin, /admin/ and /admin/anything as the admin entrance', () => {
@@ -8,32 +8,30 @@ describe('resolveEntrance', () => {
     }
   });
 
-  it('matches /station-manager and /station-manager/ as the manager entrance', () => {
-    for (const p of ['/station-manager', '/station-manager/']) {
-      expect(resolveEntrance(p, '')).toEqual({ entrance: 'manager', canonicalPath: null });
-    }
-  });
-
   it('is case-insensitive for the path', () => {
     expect(resolveEntrance('/Admin', '').entrance).toBe('admin');
-    expect(resolveEntrance('/STATION-MANAGER', '').entrance).toBe('manager');
   });
 
-  it('does not match /administrator, /admins, /station-managers or /adminx', () => {
-    for (const p of ['/administrator', '/admins', '/station-managers', '/adminx', '/xadmin']) {
+  it('does not match /administrator, /admins or /adminx', () => {
+    for (const p of ['/administrator', '/admins', '/adminx', '/xadmin']) {
       expect(resolveEntrance(p, '').entrance).toBeNull();
     }
   });
 
-  it('maps ?admin=1 and ?moderation=1 to admin and ?manager=1 to manager with the new canonicalPath', () => {
+  it('the retired station manager page is no longer an entrance (path or ?manager=1)', () => {
+    for (const p of ['/station-manager', '/station-manager/', '/STATION-MANAGER']) {
+      expect(resolveEntrance(p, '').entrance).toBeNull();
+    }
+    expect(resolveEntrance('/', '?manager=1')).toEqual({ entrance: null, canonicalPath: null });
+  });
+
+  it('maps ?admin=1 and ?moderation=1 to admin with the new canonicalPath', () => {
     expect(resolveEntrance('/', '?admin=1')).toEqual({ entrance: 'admin', canonicalPath: ADMIN_PATH });
     expect(resolveEntrance('/', '?moderation=1')).toEqual({ entrance: 'admin', canonicalPath: ADMIN_PATH });
-    expect(resolveEntrance('/', '?manager=1')).toEqual({ entrance: 'manager', canonicalPath: MANAGER_PATH });
   });
 
   it('an explicit path wins over a legacy query and gives no canonicalPath', () => {
-    expect(resolveEntrance('/admin', '?manager=1')).toEqual({ entrance: 'admin', canonicalPath: null });
-    expect(resolveEntrance('/station-manager', '?admin=1')).toEqual({ entrance: 'manager', canonicalPath: null });
+    expect(resolveEntrance('/admin', '?moderation=1')).toEqual({ entrance: 'admin', canonicalPath: null });
   });
 
   it('returns no entrance for /, /?station=abc and empty strings', () => {
@@ -42,8 +40,7 @@ describe('resolveEntrance', () => {
     expect(resolveEntrance('', '')).toEqual({ entrance: null, canonicalPath: null });
   });
 
-  it('entrancePath gives the two paths', () => {
+  it('entrancePath gives the admin path', () => {
     expect(entrancePath('admin')).toBe('/admin');
-    expect(entrancePath('manager')).toBe('/station-manager');
   });
 });

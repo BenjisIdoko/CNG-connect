@@ -30,7 +30,7 @@ const OVERDUE_GRACE_MINUTES = 60;
 /** Whatever the expected time, a post is gone 24 hours after it was made. */
 const MAX_POST_MINUTES = 24 * 60;
 
-/** The three buttons on the (older) station manager's card, in the order they appear. */
+/** The statuses the retired station manager card offered (kept for old posts and tests). */
 export const MANAGER_STATE_OPTIONS: { state: ManagerState; label: string }[] = [
   { state: 'closed', label: 'Closed' },
   { state: 'open', label: 'Open, waiting for gas' },

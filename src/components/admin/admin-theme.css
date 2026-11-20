@@ -1,4 +1,4 @@
-/* Base styling for everything inside .admin-ui (the admin and station-manager dashboards).
+/* Base styling for everything inside .admin-ui (the admin dashboard).
    The colours themselves are the adm-* tokens in src/index.css; this file themes the parts the
    browser would otherwise ship with its own defaults: selection, caret, scrollbars, focus. */
 .admin-ui {
