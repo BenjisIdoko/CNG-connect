@@ -73,6 +73,7 @@ import {
   isPushKeyConfigured,
   markPushPromptSeen,
   pushSwitchState,
+  sendTestAlert,
   shouldAskForAlerts,
   subscribeThisDevice,
   syncThisDevice,
@@ -327,6 +328,19 @@ export const App: React.FC = () => {
       showToast('Push notification permission blocked in browser settings.', 'warn');
     }
   }, [isPushSubscribed, enablePushAlerts]);
+
+  // "Send a test alert": asks the server to push one to this phone, and says what happened.
+  const [isSendingTestAlert, setIsSendingTestAlert] = useState(false);
+  const handleSendTestAlert = useCallback(async () => {
+    if (isSendingTestAlert) return;
+    setIsSendingTestAlert(true);
+    const supabase = await getSupabase();
+    const { data } = supabase ? await supabase.auth.getSession() : { data: { session: null } };
+    const subscription = await getThisDeviceSubscription();
+    const result = await sendTestAlert({ accessToken: data.session?.access_token ?? '', endpoint: subscription?.endpoint });
+    setIsSendingTestAlert(false);
+    showToast(result.message, result.ok ? 'bell' : 'warn');
+  }, [isSendingTestAlert]);
 
   // Is this phone already registered (from an earlier visit)?
   useEffect(() => {
@@ -1238,6 +1252,8 @@ export const App: React.FC = () => {
               onUploadAvatar={isAuthenticated ? uploadAvatar : undefined}
               onOpenRoiCalculator={() => setIsRoiModalOpen(true)}
               onTogglePushNotifications={handleTogglePushNotifications}
+              onSendTestAlert={() => void handleSendTestAlert()}
+              isSendingTestAlert={isSendingTestAlert}
               isPushGranted={pushSwitchState({ keyConfigured: isPushKeyConfigured(), subscribed: isPushSubscribed, permissionGranted: isPushGranted })}
               onTriggerProximityAlert={() => {
                 handleSimulateProximityNudge();

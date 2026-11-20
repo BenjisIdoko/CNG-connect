@@ -1,6 +1,7 @@
 import { InviteCard } from './InviteCard';
 import { FEATURES } from '../config/features';
 import { validatePhoneNumber } from '../utils/phoneValidator';
+import { SendTestAlertRow } from './SendTestAlertRow';
 import { BUILD_ID, checkForAppUpdate } from '../utils/appUpdate';
 import React, { useState } from 'react';
 import * as PopoverPrimitive from '@radix-ui/react-popover';
@@ -27,6 +28,9 @@ interface ProfileScreenProps {
   onOpenRoiCalculator?: () => void;
   onTogglePushNotifications?: () => void;
   isPushGranted?: boolean;
+  /** Sends a test alert to this phone; the row is shown only while alerts are on. */
+  onSendTestAlert?: () => void;
+  isSendingTestAlert?: boolean;
 }
 
 export const ProfileScreen: React.FC<ProfileScreenProps> = ({
@@ -40,6 +44,8 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   onOpenRoiCalculator,
   onTogglePushNotifications,
   isPushGranted,
+  onSendTestAlert,
+  isSendingTestAlert = false,
 }) => {
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const avatarInputRef = React.useRef<HTMLInputElement>(null);
@@ -411,6 +417,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
               </button>
             }
           />
+          {notificationsEnabled && onSendTestAlert && <SendTestAlertRow busy={isSendingTestAlert} onSend={onSendTestAlert} />}
           <Row
             icon="tune"
             label="Anonymous usage data"

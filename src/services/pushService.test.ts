@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
   describePushSupport,
+  describeTestAlertOutcome,
   markPushPromptSeen,
   pushSwitchState,
   shouldAskForAlerts,
@@ -8,6 +9,7 @@ import {
   friendlyPushError,
   removePushSubscription,
   savePushSubscription,
+  sendTestAlert,
   subscriptionToRows,
   urlBase64ToUint8Array,
 } from './pushService';
@@ -177,6 +179,77 @@ describe('pushSwitchState', () => {
   it('before alerts are set up on the server, it keeps the older meaning: the browser permission', () => {
     expect(pushSwitchState({ keyConfigured: false, subscribed: false, permissionGranted: true })).toBe(true);
     expect(pushSwitchState({ keyConfigured: false, subscribed: false, permissionGranted: false })).toBe(false);
+  });
+});
+
+describe('describeTestAlertOutcome', () => {
+  it('says the alert was sent when at least one phone took it', () => {
+    expect(describeTestAlertOutcome(200, { sent: 1, devices: 1, removed: 0 })).toEqual({
+      ok: true,
+      message: 'Test alert sent. It should arrive in a few seconds.',
+    });
+    expect(describeTestAlertOutcome(200, { sent: 1, devices: 2, removed: 1 }).ok).toBe(true);
+  });
+
+  it('tells the person to switch alerts on when this phone is not registered', () => {
+    expect(describeTestAlertOutcome(200, { sent: 0, devices: 0, removed: 0 })).toEqual({
+      ok: false,
+      message: 'This phone is not registered for alerts. Switch alerts on first.',
+    });
+  });
+
+  it('tells the person to switch alerts off and on again when the phone is known but nothing was delivered', () => {
+    expect(describeTestAlertOutcome(200, { sent: 0, devices: 1, removed: 1 })).toEqual({
+      ok: false,
+      message: 'The test alert could not be delivered. Switch alerts off and on again, then try once more.',
+    });
+  });
+
+  it('turns every failure status into plain text and never echoes the server', () => {
+    expect(describeTestAlertOutcome(503, { error: 'Alerts are not set up yet.' })).toEqual({ ok: false, message: 'Alerts are not set up yet.' });
+    expect(describeTestAlertOutcome(401, { error: 'secret' })).toEqual({ ok: false, message: 'Sign in again, then try once more.' });
+    expect(describeTestAlertOutcome(429, {})).toEqual({ ok: false, message: 'Wait a minute, then try again.' });
+    expect(describeTestAlertOutcome(500, { error: 'boom secret' })).toEqual({ ok: false, message: 'Could not send the test alert. Try again.' });
+    expect(describeTestAlertOutcome(200, null)).toEqual({ ok: false, message: 'Could not send the test alert. Try again.' });
+  });
+});
+
+describe('sendTestAlert', () => {
+  const reply = (status: number, body: unknown) => vi.fn().mockResolvedValue({ ok: status >= 200 && status < 300, status, json: async () => body });
+
+  it('asks the server for a test alert to this phone, with the sign-in token', async () => {
+    const fetchFn = reply(200, { sent: 1, devices: 1, removed: 0 });
+    const result = await sendTestAlert({ accessToken: 'tok', endpoint: 'https://push.example/abc', fetchFn });
+    expect(result).toEqual({ ok: true, message: 'Test alert sent. It should arrive in a few seconds.' });
+    expect(fetchFn).toHaveBeenCalledWith('/api/notify-test', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer tok' },
+      body: JSON.stringify({ endpoint: 'https://push.example/abc' }),
+    });
+  });
+
+  it('does not name a phone when it does not know which one this is', async () => {
+    const fetchFn = reply(200, { sent: 1, devices: 1, removed: 0 });
+    await sendTestAlert({ accessToken: 'tok', endpoint: undefined, fetchFn });
+    expect(fetchFn.mock.calls[0][1].body).toBe('{}');
+  });
+
+  it('needs a sign-in and does not call the server without one', async () => {
+    const fetchFn = vi.fn();
+    expect(await sendTestAlert({ accessToken: '', endpoint: undefined, fetchFn })).toEqual({ ok: false, message: 'Sign in to send a test alert.' });
+    expect(fetchFn).not.toHaveBeenCalled();
+  });
+
+  it('survives a network failure and an unreadable reply', async () => {
+    expect(await sendTestAlert({ accessToken: 't', endpoint: undefined, fetchFn: vi.fn().mockRejectedValue(new Error('offline')) })).toEqual({
+      ok: false,
+      message: 'Could not reach the server. Check your internet and try again.',
+    });
+    const bad = vi.fn().mockResolvedValue({ ok: true, status: 200, json: async () => { throw new Error('not json'); } });
+    expect(await sendTestAlert({ accessToken: 't', endpoint: undefined, fetchFn: bad })).toEqual({
+      ok: false,
+      message: 'Could not send the test alert. Try again.',
+    });
   });
 });
 

@@ -222,3 +222,54 @@ export function markPushPromptSeen(storage: KeyValueStorage | null = defaultStor
 export function pushSwitchState(facts: { keyConfigured: boolean; subscribed: boolean; permissionGranted: boolean }): boolean {
   return facts.keyConfigured ? facts.subscribed : facts.permissionGranted;
 }
+
+export type TestAlertResult = { ok: boolean; message: string };
+
+const TEST_GENERIC = 'Could not send the test alert. Try again.';
+
+/** Turns the test-alert server's answer into one plain sentence for the person. Never echoes the server's text. */
+export function describeTestAlertOutcome(status: number, body: unknown): TestAlertResult {
+  if (status === 503) return { ok: false, message: 'Alerts are not set up yet.' };
+  if (status === 401) return { ok: false, message: 'Sign in again, then try once more.' };
+  if (status === 429) return { ok: false, message: 'Wait a minute, then try again.' };
+  if (status < 200 || status >= 300 || !body || typeof body !== 'object') return { ok: false, message: TEST_GENERIC };
+
+  const { sent, devices } = body as { sent?: number; devices?: number };
+  if (typeof sent !== 'number' || typeof devices !== 'number') return { ok: false, message: TEST_GENERIC };
+  if (sent > 0) return { ok: true, message: 'Test alert sent. It should arrive in a few seconds.' };
+  if (devices === 0) return { ok: false, message: 'This phone is not registered for alerts. Switch alerts on first.' };
+  return { ok: false, message: 'The test alert could not be delivered. Switch alerts off and on again, then try once more.' };
+}
+
+/**
+ * Asks the server to send a test alert to this phone (or, when `endpoint` is not known, to the person's
+ * registered phones), so they can see alerts working without waiting for a station post.
+ */
+export async function sendTestAlert({
+  accessToken,
+  endpoint,
+  fetchFn = fetch,
+}: {
+  accessToken: string;
+  endpoint: string | undefined;
+  fetchFn?: typeof fetch;
+}): Promise<TestAlertResult> {
+  if (!accessToken) return { ok: false, message: 'Sign in to send a test alert.' };
+  let response: Response;
+  try {
+    response = await fetchFn('/api/notify-test', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+      body: JSON.stringify(endpoint ? { endpoint } : {}),
+    });
+  } catch {
+    return { ok: false, message: 'Could not reach the server. Check your internet and try again.' };
+  }
+  let body: unknown = null;
+  try {
+    body = await response.json();
+  } catch {
+    body = null;
+  }
+  return describeTestAlertOutcome(response.status, body);
+}
