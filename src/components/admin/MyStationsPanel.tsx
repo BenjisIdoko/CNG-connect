@@ -30,7 +30,7 @@ type ManagedStation = FullStationRow & {
  * FullStationEditorModal the admin tool uses for details, just without pin review,
  * bulk CSV, bulk delete, or visibility into any other station.
  */
-export const MyStationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash }) => {
+export const MyStationsPanel: React.FC<{ flash: (m: string) => void; topSlot?: React.ReactNode }> = ({ flash, topSlot }) => {
   const supabase = useSupabaseClient();
   const { driverProfile } = useAuth();
 
@@ -96,6 +96,7 @@ export const MyStationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flas
   return (
     <div className="h-full overflow-y-auto">
       <div className="max-w-xl w-full mx-auto p-4 flex flex-col gap-3">
+        {topSlot}
         {loading && <p className="text-sm text-adm-mute-text">Loading your stations…</p>}
         {loadErr && <p className="text-sm text-adm-danger font-semibold">{loadErr}</p>}
         {!loading && !loadErr && stations.length === 0 && (

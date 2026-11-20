@@ -5,13 +5,13 @@
  */
 
 const MIN_LENGTH = 8;
-/** bcrypt, which Supabase uses, ignores everything after 72 characters. */
-const MAX_LENGTH = 72;
+/** bcrypt, which Supabase uses, takes at most 72 BYTES (a Cyrillic or accented letter is 2 or more). */
+const MAX_BYTES = 72;
 
 /** An error sentence, or null when the new password and its repeat are acceptable. Spaces count. */
 export function validateNewPassword(password: string, confirm: string): string | null {
   if (password.length < MIN_LENGTH) return `Use at least ${MIN_LENGTH} characters`;
-  if (password.length > MAX_LENGTH) return `Use ${MAX_LENGTH} characters or fewer`;
+  if (new TextEncoder().encode(password).length > MAX_BYTES) return 'That password is too long. Use a shorter one';
   if (password !== confirm) return "The two passwords don't match";
   return null;
 }

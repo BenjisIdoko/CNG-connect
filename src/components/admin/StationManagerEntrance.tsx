@@ -43,10 +43,13 @@ const ManagerBody: React.FC<{ flash: (m: string) => void }> = ({ flash }) => {
   if (!checked) {
     return <p className="p-6 text-sm text-adm-mute-text">Checking for your stations…</p>;
   }
+  // The card sits inside the panel's own scrolling area, so on a short (landscape) phone it scrolls away
+  // instead of filling the screen and hiding "Not now" and the stations.
   return (
-    <div className="flex h-full flex-col">
-      {askPassword && (
-        <div className="shrink-0 p-4 pb-0">
+    <MyStationsPanel
+      flash={flash}
+      topSlot={
+        askPassword ? (
           <SetPasswordCard
             onSave={async (password) => {
               const result = await updatePassword(password);
@@ -58,12 +61,9 @@ const ManagerBody: React.FC<{ flash: (m: string) => void }> = ({ flash }) => {
               setAskPassword(false);
             }}
           />
-        </div>
-      )}
-      <div className="min-h-0 flex-1">
-        <MyStationsPanel flash={flash} />
-      </div>
-    </div>
+        ) : null
+      }
+    />
   );
 };
 

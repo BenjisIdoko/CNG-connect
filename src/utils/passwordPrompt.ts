@@ -38,3 +38,24 @@ export function clearSetPasswordPrompt(storage: KeyValueStorage | null = default
     /* storage blocked */
   }
 }
+
+/**
+ * Runs an emailed-code check with the "set a password" prompt already switched on. The flag has to be
+ * set before the check finishes: the sign-in is announced to the app while the check is still running, the
+ * manager page appears at once, and it reads the flag when it appears. If the code is wrong (or the check
+ * throws) the flag is switched off again.
+ */
+export async function verifyWithSetPasswordPrompt<T extends { success: boolean }>(
+  verify: () => Promise<T>,
+  storage: KeyValueStorage | null = defaultStorage(),
+): Promise<T> {
+  markSetPasswordPrompt(storage);
+  try {
+    const result = await verify();
+    if (!result.success) clearSetPasswordPrompt(storage);
+    return result;
+  } catch (error) {
+    clearSetPasswordPrompt(storage);
+    throw error;
+  }
+}

@@ -10,7 +10,12 @@ describe('validateNewPassword', () => {
 
   it('allows up to 72 characters and no more', () => {
     expect(validateNewPassword('a'.repeat(72), 'a'.repeat(72))).toBeNull();
-    expect(validateNewPassword('a'.repeat(73), 'a'.repeat(73))).toBe('Use 72 characters or fewer');
+    expect(validateNewPassword('a'.repeat(73), 'a'.repeat(73))).toBe('That password is too long. Use a shorter one');
+  });
+
+  it('counts bytes, not letters: the limit is 72 bytes, so 40 Cyrillic letters are too long', () => {
+    expect(validateNewPassword('ж'.repeat(36), 'ж'.repeat(36))).toBeNull(); // 72 bytes
+    expect(validateNewPassword('ж'.repeat(40), 'ж'.repeat(40))).toBe('That password is too long. Use a shorter one');
   });
 
   it('needs both entries to match', () => {

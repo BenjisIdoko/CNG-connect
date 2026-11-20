@@ -1,14 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { AdminRoot } from './AdminRoot';
-import { Button } from '../ui/button';
 import { CodeSignIn } from './CodeSignIn';
 import { PasswordSignInForm } from './PasswordSignInForm';
-import { friendlySignInError } from '../../utils/passwordRules';
-import { clearSetPasswordPrompt, markSetPasswordPrompt } from '../../utils/passwordPrompt';
-
-const MANAGER_CODE_INTRO =
-  "Enter your email and we will send you a code. After you sign in you can set a password, so you won't need a code next time.";
+import { ManagerSignIn } from './ManagerSignIn';
 
 /**
  * Shared sign-in screen for every admin/manager route. Password-based, not
@@ -28,7 +23,6 @@ export const AdminAuthGate: React.FC<{
   mode?: 'password' | 'code' | 'manager';
 }> = ({ title, onExit, children, mode = 'password' }) => {
   const { session, isAuthLoading, adminSignInWithPassword, sendLoginCode, verifyLoginCode } = useAuth();
-  const [useCode, setUseCode] = useState(false);
 
   if (isAuthLoading) {
     return (
@@ -43,39 +37,13 @@ export const AdminAuthGate: React.FC<{
   }
 
   if (mode === 'manager') {
-    if (useCode) {
-      return (
-        <CodeSignIn
-          title={title}
-          onExit={onExit}
-          intro={MANAGER_CODE_INTRO}
-          sendCode={sendLoginCode}
-          // A code sign-in is when a manager is asked to set a password (first time, or forgotten one).
-          verifyCode={async (email, code) => {
-            const result = await verifyLoginCode(email, code);
-            if (result.success) markSetPasswordPrompt();
-            return result;
-          }}
-          onUsePassword={() => setUseCode(false)}
-        />
-      );
-    }
     return (
-      <PasswordSignInForm
+      <ManagerSignIn
         title={title}
-        description="Sign in with your email and password."
         onExit={onExit}
-        onSubmit={async (email, password) => {
-          const result = await adminSignInWithPassword(email, password);
-          if (!result.success) return { success: false, error: friendlySignInError(result.error || '') };
-          clearSetPasswordPrompt();
-          return result;
-        }}
-        footer={
-          <Button type="button" variant="link" className="self-start px-0" onClick={() => setUseCode(true)}>
-            First time, or forgot your password? Email me a code
-          </Button>
-        }
+        signInWithPassword={adminSignInWithPassword}
+        sendCode={sendLoginCode}
+        verifyCode={verifyLoginCode}
       />
     );
   }
