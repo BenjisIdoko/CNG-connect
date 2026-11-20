@@ -7,6 +7,8 @@ import { AdminSidebarLayout, AdminNavItem } from './AdminSidebarLayout';
 import { MyStationsPanel } from './MyStationsPanel';
 import { useAdminToast } from './useAdminToast';
 import { claimManagerInvites } from '../../services/managerAccessService';
+import { SetPasswordCard } from './SetPasswordCard';
+import { clearSetPasswordPrompt, shouldPromptSetPassword } from '../../utils/passwordPrompt';
 import type { RpcClient } from '../../services/stationManagerService';
 
 const NAV: AdminNavItem[] = [{ key: 'mystations', label: 'My stations', icon: Fuel }];
@@ -17,7 +19,10 @@ const NAV: AdminNavItem[] = [{ key: 'mystations', label: 'My stations', icon: Fu
  */
 const ManagerBody: React.FC<{ flash: (m: string) => void }> = ({ flash }) => {
   const supabase = useSupabaseClient();
+  const { updatePassword } = useAuth();
   const [checked, setChecked] = useState(false);
+  // Right after an emailed-code sign-in the manager is asked to choose a password (the code flow set the flag).
+  const [askPassword, setAskPassword] = useState(() => shouldPromptSetPassword());
 
   useEffect(() => {
     let cancelled = false;
@@ -38,7 +43,28 @@ const ManagerBody: React.FC<{ flash: (m: string) => void }> = ({ flash }) => {
   if (!checked) {
     return <p className="p-6 text-sm text-adm-mute-text">Checking for your stations…</p>;
   }
-  return <MyStationsPanel flash={flash} />;
+  return (
+    <div className="flex h-full flex-col">
+      {askPassword && (
+        <div className="shrink-0 p-4 pb-0">
+          <SetPasswordCard
+            onSave={async (password) => {
+              const result = await updatePassword(password);
+              if (result.success) flash('Password saved. Next time, sign in with it');
+              return result;
+            }}
+            onDone={() => {
+              clearSetPasswordPrompt();
+              setAskPassword(false);
+            }}
+          />
+        </div>
+      )}
+      <div className="min-h-0 flex-1">
+        <MyStationsPanel flash={flash} />
+      </div>
+    </div>
+  );
 };
 
 /**
