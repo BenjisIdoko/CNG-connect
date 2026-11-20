@@ -1,6 +1,6 @@
 ---
 name: CNG-Connect Admin (Security Print)
-description: Banknote-green operator desk for the CNG-Connect admin and station-manager dashboards; celadon paper, ink, and foil gold reserved for what can be pressed.
+description: Banknote-green operator desk for the CNG-Connect admin dashboard; celadon paper, ink, and foil gold reserved for what can be pressed.
 colors:
   note-green: "#0d3b2e"
   note-green-2: "#17503f"
@@ -117,7 +117,7 @@ components:
 
 # Design System: CNG-Connect Admin (Security Print)
 
-Scope: the admin dashboard (/admin) and the station manager page (/station-manager) only: `src/components/admin/*`, the kit in `src/components/ui/*`, tokens prefixed `--color-adm-*` in `src/index.css`, scoped base styles in `src/components/admin/admin-theme.css`. The driver app is a different, untouched design and is not described here.
+Scope: the admin dashboard (/admin) only: `src/components/admin/*`, the kit in `src/components/ui/*`, tokens prefixed `--color-adm-*` in `src/index.css`, scoped base styles in `src/components/admin/admin-theme.css`. The driver app is a different, untouched design and is not described here.
 
 ## Overview
 

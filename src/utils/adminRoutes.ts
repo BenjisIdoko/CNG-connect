@@ -37,3 +37,12 @@ export function resolveEntrance(pathname: string, search: string): ResolvedEntra
   if (params.has('admin') || params.has('moderation')) return { entrance: 'admin', canonicalPath: ADMIN_PATH };
   return { entrance: null, canonicalPath: null };
 }
+
+/**
+ * The address to show instead of the retired /station-manager page, or null for any other address. vercel.json
+ * redirects it for first-time visitors, but an installed app serves the app shell from its cache and never
+ * reaches that redirect, so the app tidies the address bar itself.
+ */
+export function retiredEntranceRedirect(pathname: string, search: string): string | null {
+  return isPathUnder(pathname || '', '/station-manager') ? `/${search || ''}` : null;
+}

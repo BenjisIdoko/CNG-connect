@@ -30,6 +30,20 @@ from unnest(array[
   'admin_remove_station_manager(text, text)'
 ]) f;
 
+insert into verify_results
+select 'a2: signed-out visitors (anon) cannot run ' || f, not has_function_privilege('anon', f, 'execute'), ''
+from unnest(array[
+  'manager_post_state(text, text, text, timestamptz)',
+  'manager_post_pressure(text, integer)',
+  'manager_post_selling(text, boolean)',
+  'my_managed_stations()',
+  'claim_station_manager_invites()',
+  'admin_invite_station_manager(text, text)',
+  'admin_cancel_station_manager_invite(text, text)',
+  'admin_assign_station_manager(text, text)',
+  'admin_remove_station_manager(text, text)'
+]) f;
+
 -- what must keep working
 insert into verify_results values (
   'b: the community manager functions still work for signed-in users',

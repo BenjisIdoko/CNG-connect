@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ADMIN_PATH, entrancePath, resolveEntrance } from './adminRoutes';
+import { ADMIN_PATH, entrancePath, resolveEntrance, retiredEntranceRedirect } from './adminRoutes';
 
 describe('resolveEntrance', () => {
   it('matches /admin, /admin/ and /admin/anything as the admin entrance', () => {
@@ -44,3 +44,18 @@ describe('resolveEntrance', () => {
     expect(entrancePath('admin')).toBe('/admin');
   });
 });
+
+describe('retiredEntranceRedirect', () => {
+  it('sends the retired station manager page to the home page, keeping a query like ?station=', () => {
+    expect(retiredEntranceRedirect('/station-manager', '')).toBe('/');
+    expect(retiredEntranceRedirect('/station-manager/', '')).toBe('/');
+    expect(retiredEntranceRedirect('/Station-Manager/anything', '?station=pci-station-65')).toBe('/?station=pci-station-65');
+  });
+
+  it('leaves every other address alone', () => {
+    for (const p of ['/', '/admin', '/station-managers', '/stations', '']) {
+      expect(retiredEntranceRedirect(p, '')).toBeNull();
+    }
+  });
+});
+

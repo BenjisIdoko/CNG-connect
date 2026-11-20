@@ -8,6 +8,10 @@
 --   station_managers and station_manager_invites keep their rows, and station_manager_posts is still the log
 --   that community posts are written to.
 -- * To bring any of these back:  grant execute on function <name>(<args>) to authenticated;
+-- * RUN THIS AGAIN after re-running any older script that grants these functions: supabase/security-hardening-2026-10.sql
+--   (its loop re-grants every admin_* function and names the manager ones), admin-bulk-delete-and-managers.sql,
+--   manager-access-and-states.sql, station-manager-signals.sql and station-post-details.sql. Re-running them
+--   silently switches the retired functions back on.
 -- * Not touched: admin_update_station still accepts an assigned station manager for that one station's
 --   details. Removing the assignment rows (delete from station_managers) closes that; it is left for the
 --   admin to decide because it deletes data.

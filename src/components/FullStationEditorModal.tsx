@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { X } from 'lucide-react';
 import { useSupabaseClient } from '../hooks/useSupabaseClient';
 import { ModalFrame } from './admin/ModalFrame';

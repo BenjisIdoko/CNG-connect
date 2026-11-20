@@ -3,7 +3,7 @@ import { captureReferralFromUrl, clearPendingReferral, getPendingReferral } from
 import { shareApp, shareAppToast } from './utils/shareApp';
 import { FEATURES } from './config/features';
 import React, { useState, useEffect, useMemo, useCallback, useRef, Suspense } from 'react';
-import { Entrance, resolveEntrance } from './utils/adminRoutes';
+import { Entrance, resolveEntrance, retiredEntranceRedirect } from './utils/adminRoutes';
 import { safeLazy } from './utils/safeLazy';
 import {
   GasStation,
@@ -104,6 +104,9 @@ export const App: React.FC = () => {
   // land on it and the address bar is swapped to the new path. Who may use it is enforced by the database.
   const [entrance] = useState<Entrance | null>(() => {
     try {
+      // The retired station manager page: show the plain app address instead (a cached app never hits the redirect).
+      const retired = retiredEntranceRedirect(window.location.pathname, window.location.search);
+      if (retired) window.history.replaceState({}, '', retired);
       const resolved = resolveEntrance(window.location.pathname, window.location.search);
       if (resolved.canonicalPath) window.history.replaceState({}, '', resolved.canonicalPath);
       return resolved.entrance;
