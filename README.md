@@ -8,7 +8,7 @@
 [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4-38B2AC.svg?logo=tailwind-css)](https://tailwindcss.com/)
 [![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL%2C%20Auth%20%26%20Storage-emerald.svg?logo=supabase)](https://supabase.com/)
 [![Vercel](https://img.shields.io/badge/Vercel-Serverless-black.svg?logo=vercel)](https://vercel.com/)
-[![Tests](https://img.shields.io/badge/Tests-578%2F578%20Passed-success.svg)](https://vitest.dev/)
+[![Tests](https://img.shields.io/badge/Tests-625%2F625%20Passed-success.svg)](https://vitest.dev/)
 
 **CNG-Connect** is a driver-facing PWA built for Nigerian commercial (Bolt, Uber, inDrive) and private drivers running on Compressed Natural Gas. Built in support of the Presidential CNG & EV Initiative (Pi-CNG), it provides a live, crowdsourced map of CNG refuelling stations, a directory of accredited conversion centres, a fuel-savings calculator, a driver community, and an internal toolset for keeping the underlying station data accurate.
 
@@ -37,7 +37,8 @@
 - The admin can mark any account as a **community manager** (the Users page has a switch). They use the same driver app as everyone else; there is no separate dashboard.
 - On the page of a station they are standing at (within 150 m, checked on the phone and again by the database), a community manager sees a **Post the gas status** card with two choices: **Gas available** and **Gas not available**. Everyone then sees it on that station's page and in lists as **"Community manager says"**. The poster's name is not shown.
 - "Gas available" shows for 6 hours. "Gas not available" shows for 6 hours, then greyed as "Last said" until 24 hours after the post. A post never changes pin colours, ranking, points or flags, and the 45-minute rule for driver reports is unchanged.
-- Needs `supabase/community-managers.sql`. This is stage 1 of replacing the station manager role; push notifications for these posts are not built yet.
+- **Push alerts:** drivers who switch alerts on (Profile, or the one-time question after favouriting a station) get a push notification when a community manager posts, even with the app closed: drivers in the same state as the station, plus anyone who favourited it, never the poster. At most one alert per station every 15 minutes, the same status is not repeated within 6 hours, and a newer alert for a station replaces the older one. Notifications name the station and the city, never a person. On iPhone the app must be installed to the Home Screen first. Needs `supabase/push-subscriptions.sql` and the Vercel settings listed in `.env.example` (`VAPID_PUBLIC_KEY`, `VITE_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`, `SUPABASE_SERVICE_ROLE_KEY`); until they exist nothing is sent.
+- Needs `supabase/community-managers.sql`. This is part of replacing the station manager role.
 
 ### 🛠️ Conversion Centre Directory
 - Searchable directory of 451+ Pi-CNG accredited conversion workshops, filterable by state/LGA, with in-app booking.
@@ -80,7 +81,7 @@ Two hidden, authentication-gated routes exist for keeping station data accurate 
 | **AI Assistant** | Vercel Serverless Function (`api/chat.ts`) calling Gemini |
 | **PWA** | `vite-plugin-pwa` (Workbox) — offline caching, installability |
 | **State Management** | React Context (`AuthContext`) + component state; no global store |
-| **Test Runner** | Vitest (578 tests) |
+| **Test Runner** | Vitest (625 tests) |
 
 The app runs as a client-only SPA — there's no traditional application server. The React client talks to Supabase directly with a public anon key; every write that needs privilege beyond "any signed-in driver" (station edits, admin actions, point awards) goes through a Postgres RPC function that checks authorization server-side, rather than trusting the client.
 
@@ -91,7 +92,9 @@ The app runs as a client-only SPA — there's no traditional application server.
 ```
 CNG-connect/
 ├── api/
-│   └── chat.ts                      # Serverless AI Guide endpoint (Gemini)
+│   ├── chat.ts                      # Serverless AI Guide endpoint (Gemini)
+│   ├── invite-manager.ts            # Emails a station manager invite (Resend)
+│   └── notify-gas-post.ts           # Sends push alerts for community manager posts (web-push)
 ├── scripts/                         # One-off data enrichment/geocoding scripts
 ├── supabase/
 │   ├── schema.sql                   # Full DB schema: tables, RLS policies, triggers
@@ -167,7 +170,7 @@ Open [http://localhost:3002](http://localhost:3002).
 ## 🧪 Verification & Testing
 
 ```bash
-npm test           # Vitest — 578 tests across formatting, validation, proximity/push logic, etc.
+npm test           # Vitest — 625 tests across formatting, validation, proximity/push logic, etc.
 npx tsc --noEmit   # TypeScript compiler check
 npm run build      # Production build
 ```

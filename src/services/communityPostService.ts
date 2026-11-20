@@ -53,3 +53,30 @@ export async function postCommunityGas(
     return { ok: false, error: GENERIC };
   }
 }
+
+/**
+ * Right after a successful post, asks the server to alert the drivers who opted in. The server checks
+ * the caller's sign-in and that they really just posted, and takes the status from that post, so only the
+ * station id is sent. Best effort: a failure never affects the post, which has already been saved.
+ */
+export async function notifyGasPost({
+  accessToken,
+  stationId,
+  fetchFn = fetch,
+}: {
+  accessToken: string;
+  stationId: string;
+  fetchFn?: typeof fetch;
+}): Promise<boolean> {
+  if (!accessToken) return false;
+  try {
+    const response = await fetchFn('/api/notify-gas-post', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+      body: JSON.stringify({ stationId }),
+    });
+    return Boolean(response.ok);
+  } catch {
+    return false;
+  }
+}

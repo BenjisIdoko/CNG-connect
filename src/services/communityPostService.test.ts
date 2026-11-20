@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { communityPostPositionProblem, friendlyCommunityPostError, postCommunityGas } from './communityPostService';
+import { communityPostPositionProblem, friendlyCommunityPostError, notifyGasPost, postCommunityGas } from './communityPostService';
 
 const station = { lat: 9.0765, lng: 7.3986 };
 const clientReturning = (error: { message: string } | null = null) => ({ rpc: vi.fn().mockResolvedValue({ data: null, error }) });
@@ -58,3 +58,27 @@ describe('friendlyCommunityPostError', () => {
     expect(friendlyCommunityPostError('boom 500 secret')).toBe('Could not post. Try again');
   });
 });
+
+describe('notifyGasPost', () => {
+  it('tells the server which station, with the caller\'s sign-in, and never sends the status itself', async () => {
+    const fetchFn = vi.fn().mockResolvedValue({ ok: true });
+    await expect(notifyGasPost({ accessToken: 'tok', stationId: 's1', fetchFn })).resolves.toBe(true);
+    expect(fetchFn).toHaveBeenCalledWith('/api/notify-gas-post', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer tok' },
+      body: JSON.stringify({ stationId: 's1' }),
+    });
+  });
+
+  it('is false, and silent, when the server says no or the network fails', async () => {
+    expect(await notifyGasPost({ accessToken: 't', stationId: 's1', fetchFn: vi.fn().mockResolvedValue({ ok: false, status: 503 }) })).toBe(false);
+    expect(await notifyGasPost({ accessToken: 't', stationId: 's1', fetchFn: vi.fn().mockRejectedValue(new Error('offline')) })).toBe(false);
+  });
+
+  it('does nothing without a sign-in token', async () => {
+    const fetchFn = vi.fn();
+    expect(await notifyGasPost({ accessToken: '', stationId: 's1', fetchFn })).toBe(false);
+    expect(fetchFn).not.toHaveBeenCalled();
+  });
+});
+

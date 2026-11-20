@@ -3,7 +3,7 @@ import { GasStation } from '../types';
 import { useSupabaseClient } from '../hooks/useSupabaseClient';
 import type { PingPosition } from '../utils/geofencePresence';
 import type { RpcClient } from '../services/stationManagerService';
-import { communityPostPositionProblem, postCommunityGas } from '../services/communityPostService';
+import { communityPostPositionProblem, notifyGasPost, postCommunityGas } from '../services/communityPostService';
 
 interface Props {
   station: GasStation;
@@ -40,6 +40,10 @@ export const CommunityGasPostCard: React.FC<Props> = ({ station, getFreshPositio
     if (result.ok) {
       setMessage({ kind: 'ok', text: available ? 'Posted: gas is available.' : 'Posted: gas is not available.' });
       onPosted(available);
+      // Alert the drivers who opted in. Fire and forget: the post is already saved whatever happens here.
+      void supabase.auth.getSession().then(({ data }) => {
+        void notifyGasPost({ accessToken: data.session?.access_token ?? '', stationId: station.id });
+      });
     } else {
       setMessage({ kind: 'error', text: result.error });
     }
