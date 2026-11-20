@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { stationToOpenOnArrival } from './managerLanding';
+import { holdsAutoOpen, stationToOpenOnArrival } from './managerLanding';
 
 describe('stationToOpenOnArrival', () => {
   it('opens the one station a manager has', () => {
@@ -21,3 +21,16 @@ describe('stationToOpenOnArrival', () => {
   });
 });
 
+describe('holdsAutoOpen', () => {
+  it('holds while the set-password card is pending', () => {
+    expect(holdsAutoOpen({ promptPending: true, pageActive: true })).toBe(true);
+  });
+
+  it('holds while the manager is on another page, so the editor cannot open over "My profile"', () => {
+    expect(holdsAutoOpen({ promptPending: false, pageActive: false })).toBe(true);
+  });
+
+  it('lets the editor open only on My stations with nothing pending', () => {
+    expect(holdsAutoOpen({ promptPending: false, pageActive: true })).toBe(false);
+  });
+});

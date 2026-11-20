@@ -9,3 +9,12 @@ export function stationToOpenOnArrival(stations: Array<{ id: string }>, alreadyO
   if (held || alreadyOpened || stations.length !== 1) return null;
   return stations[0].id;
 }
+
+/**
+ * Whether the automatic opening of a one-station manager's editor must wait. It waits while the
+ * set-password card is pending, and while another page (My profile) is showing: the editor is a full-screen
+ * layer outside the page, so hiding the page does not hide it and it would open over the wrong page.
+ */
+export function holdsAutoOpen({ promptPending, pageActive }: { promptPending: boolean; pageActive: boolean }): boolean {
+  return promptPending || !pageActive;
+}

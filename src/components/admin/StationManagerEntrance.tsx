@@ -21,7 +21,7 @@ const NAV: AdminNavItem[] = [
  * Shown once a manager is signed in: first it turns any invite for their verified email into station
  * assignments, then it lists their stations. A failed check is announced but does not block the list.
  */
-const ManagerBody: React.FC<{ flash: (m: string) => void }> = ({ flash }) => {
+const ManagerBody: React.FC<{ flash: (m: string) => void; active: boolean }> = ({ flash, active }) => {
   const supabase = useSupabaseClient();
   const { updatePassword } = useAuth();
   const [checked, setChecked] = useState(false);
@@ -52,6 +52,7 @@ const ManagerBody: React.FC<{ flash: (m: string) => void }> = ({ flash }) => {
   return (
     <MyStationsPanel
       flash={flash}
+      active={active}
       topSlot={
         askPassword ? (
           <SetPasswordCard
@@ -78,7 +79,7 @@ const ManagerBody: React.FC<{ flash: (m: string) => void }> = ({ flash }) => {
  * Who may change what is enforced by the database; this page never shows anything beyond "My stations".
  */
 export const StationManagerEntrance: React.FC<{ onExit: () => void }> = ({ onExit }) => {
-  const { driverProfile, isProfileLoaded, signOut, saveContactDetails, updatePassword } = useAuth();
+  const { session, driverProfile, isProfileLoaded, signOut, saveContactDetails, updatePassword } = useAuth();
   const { flash, toast } = useAdminToast();
   const [activeKey, setActiveKey] = useState('mystations');
 
@@ -96,12 +97,13 @@ export const StationManagerEntrance: React.FC<{ onExit: () => void }> = ({ onExi
         {/* Both pages stay mounted and one is hidden, so going to "My profile" and back does not reload the
             stations or reopen the station editor. */}
         <div className={activeKey === 'mystations' ? 'h-full' : 'hidden'}>
-          <ManagerBody flash={flash} />
+          <ManagerBody flash={flash} active={activeKey === 'mystations'} />
         </div>
         <div className={activeKey === 'profile' ? 'h-full' : 'hidden'}>
           <ManagerProfilePanel
-            // The form copies the profile when it first appears; start it again once the profile has loaded.
-            key={isProfileLoaded ? 'loaded' : 'loading'}
+            // The form copies the profile when it first appears; start it again once the profile has loaded, or if
+            // another tab signs in as a different person.
+            key={`${session?.user.id ?? 'none'}:${isProfileLoaded ? 'loaded' : 'loading'}`}
             name={driverProfile.name}
             phone={driverProfile.phone}
             email={driverProfile.email}

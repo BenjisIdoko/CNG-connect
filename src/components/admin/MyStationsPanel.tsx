@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { stationToOpenOnArrival } from '../../utils/managerLanding';
+import { holdsAutoOpen, stationToOpenOnArrival } from '../../utils/managerLanding';
 import type { ManagerStateReason } from '../../utils/managerState';
 import { ArrowRight } from 'lucide-react';
 import { useSupabaseClient } from '../../hooks/useSupabaseClient';
@@ -30,7 +30,12 @@ type ManagedStation = FullStationRow & {
  * FullStationEditorModal the admin tool uses for details, just without pin review,
  * bulk CSV, bulk delete, or visibility into any other station.
  */
-export const MyStationsPanel: React.FC<{ flash: (m: string) => void; topSlot?: React.ReactNode }> = ({ flash, topSlot }) => {
+export const MyStationsPanel: React.FC<{
+  flash: (m: string) => void;
+  topSlot?: React.ReactNode;
+  /** False while another page is showing; the editor then does not open by itself. */
+  active?: boolean;
+}> = ({ flash, topSlot, active = true }) => {
   const supabase = useSupabaseClient();
   const { driverProfile } = useAuth();
 
@@ -65,7 +70,7 @@ export const MyStationsPanel: React.FC<{ flash: (m: string) => void; topSlot?: R
 
   // A manager with one station lands on its editor, but not while the set-password card is waiting:
   // the editor is full-screen and would hide it. Once the card is answered the editor opens.
-  const holdAutoOpen = Boolean(topSlot);
+  const holdAutoOpen = holdsAutoOpen({ promptPending: Boolean(topSlot), pageActive: active });
   useEffect(() => {
     const toOpen = stationToOpenOnArrival(stations, autoOpened.current, holdAutoOpen);
     if (toOpen) {
