@@ -242,8 +242,8 @@ export function describeTestAlertOutcome(status: number, body: unknown): TestAle
 }
 
 /**
- * Asks the server to send a test alert to this phone (or, when `endpoint` is not known, to the person's
- * registered phones), so they can see alerts working without waiting for a station post.
+ * Asks the server to send a test alert to THIS phone, so they can see alerts working without waiting for a
+ * station post. `endpoint` is this phone's own push registration; without one nothing is sent.
  */
 export async function sendTestAlert({
   accessToken,
@@ -255,12 +255,15 @@ export async function sendTestAlert({
   fetchFn?: typeof fetch;
 }): Promise<TestAlertResult> {
   if (!accessToken) return { ok: false, message: 'Sign in to send a test alert.' };
+  // Without this phone's own registration the test would reach the person's OTHER phones and still say
+  // "sent", which is exactly what a test must not do. Say plainly that this phone is not registered.
+  if (!endpoint) return { ok: false, message: 'This phone is not registered for alerts. Switch alerts on first.' };
   let response: Response;
   try {
     response = await fetchFn('/api/notify-test', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
-      body: JSON.stringify(endpoint ? { endpoint } : {}),
+      body: JSON.stringify({ endpoint }),
     });
   } catch {
     return { ok: false, message: 'Could not reach the server. Check your internet and try again.' };

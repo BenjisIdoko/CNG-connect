@@ -5,12 +5,16 @@ const sendNotification = vi.fn();
 const setVapidDetails = vi.fn();
 const createClient = vi.fn();
 const calls: Array<[string, string, unknown[]]> = [];
+// The same calls grouped per query (one entry per `from(...)` chain), so a filter can be checked on the right query.
+const chains: Array<{ table: string; calls: Array<[string, unknown[]]> }> = [];
 const results: Record<string, any> = {};
 
 // A chainable fake of the Supabase query builder (awaiting it gives the configured result for the table and
 // the first verb used).
 function query(table: string) {
   let verb = '';
+  const chain = { table, calls: [] as Array<[string, unknown[]]> };
+  chains.push(chain);
   const q: any = new Proxy(
     {},
     {
@@ -21,6 +25,7 @@ function query(table: string) {
         return (...args: unknown[]) => {
           if (!verb && ['select', 'insert', 'update', 'delete'].includes(prop)) verb = prop;
           calls.push([table, prop, args]);
+          chain.calls.push([prop, args]);
           return q;
         };
       },
@@ -73,6 +78,7 @@ beforeEach(() => {
   sendNotification.mockReset().mockResolvedValue({ statusCode: 201 });
   setVapidDetails.mockReset();
   calls.length = 0;
+  chains.length = 0;
   for (const k of Object.keys(results)) delete results[k];
   results.push_subscriptions = {
     select: {
@@ -208,4 +214,41 @@ describe('notify-test handler', () => {
     expect(codes.slice(0, 5)).toEqual([200, 200, 200, 200, 200]);
     expect(codes[5]).toBe(429);
   });
+
+  it('filters the read to the caller AND the named phone on the same query', async () => {
+    getUser.mockResolvedValue({ data: { user: { id: 'caller-9' } }, error: null });
+    await handler(post({ endpoint: 'https://push.example/phone' }), makeRes());
+    const read = chains.find((c) => c.table === 'push_subscriptions' && c.calls[0][0] === 'select');
+    expect(read?.calls).toEqual([
+      ['select', ['endpoint, p256dh, auth']],
+      ['eq', ['user_id', 'caller-9']],
+      ['eq', ['endpoint', 'https://push.example/phone']],
+    ]);
+  });
+
+  it('without a named phone, filters the read to the caller only', async () => {
+    getUser.mockResolvedValue({ data: { user: { id: 'caller-9' } }, error: null });
+    await handler(post({}), makeRes());
+    const read = chains.find((c) => c.table === 'push_subscriptions' && c.calls[0][0] === 'select');
+    expect(read?.calls).toEqual([
+      ['select', ['endpoint, p256dh, auth']],
+      ['eq', ['user_id', 'caller-9']],
+    ]);
+  });
+
+  it('removes ONLY the phones the push service said are gone, and only the caller\'s', async () => {
+    getUser.mockResolvedValue({ data: { user: { id: 'caller-9' } }, error: null });
+    sendNotification.mockImplementation(async (sub: { endpoint: string }) => {
+      if (sub.endpoint.endsWith('/tablet')) throw Object.assign(new Error('gone'), { statusCode: 410 });
+      return { statusCode: 201 };
+    });
+    await handler(post({}), makeRes());
+    const del = chains.find((c) => c.table === 'push_subscriptions' && c.calls[0][0] === 'delete');
+    expect(del?.calls).toEqual([
+      ['delete', []],
+      ['eq', ['user_id', 'caller-9']],
+      ['in', ['endpoint', ['https://push.example/tablet']]],
+    ]);
+  });
 });
+

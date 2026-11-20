@@ -228,25 +228,28 @@ describe('sendTestAlert', () => {
     });
   });
 
-  it('does not name a phone when it does not know which one this is', async () => {
+  it('does not call the server, and says so, when it does not know which phone this is (this phone is not registered)', async () => {
     const fetchFn = reply(200, { sent: 1, devices: 1, removed: 0 });
-    await sendTestAlert({ accessToken: 'tok', endpoint: undefined, fetchFn });
-    expect(fetchFn.mock.calls[0][1].body).toBe('{}');
+    expect(await sendTestAlert({ accessToken: 'tok', endpoint: undefined, fetchFn })).toEqual({
+      ok: false,
+      message: 'This phone is not registered for alerts. Switch alerts on first.',
+    });
+    expect(fetchFn).not.toHaveBeenCalled();
   });
 
   it('needs a sign-in and does not call the server without one', async () => {
     const fetchFn = vi.fn();
-    expect(await sendTestAlert({ accessToken: '', endpoint: undefined, fetchFn })).toEqual({ ok: false, message: 'Sign in to send a test alert.' });
+    expect(await sendTestAlert({ accessToken: '', endpoint: 'https://push.example/abc', fetchFn })).toEqual({ ok: false, message: 'Sign in to send a test alert.' });
     expect(fetchFn).not.toHaveBeenCalled();
   });
 
   it('survives a network failure and an unreadable reply', async () => {
-    expect(await sendTestAlert({ accessToken: 't', endpoint: undefined, fetchFn: vi.fn().mockRejectedValue(new Error('offline')) })).toEqual({
+    expect(await sendTestAlert({ accessToken: 't', endpoint: 'https://push.example/abc', fetchFn: vi.fn().mockRejectedValue(new Error('offline')) })).toEqual({
       ok: false,
       message: 'Could not reach the server. Check your internet and try again.',
     });
     const bad = vi.fn().mockResolvedValue({ ok: true, status: 200, json: async () => { throw new Error('not json'); } });
-    expect(await sendTestAlert({ accessToken: 't', endpoint: undefined, fetchFn: bad })).toEqual({
+    expect(await sendTestAlert({ accessToken: 't', endpoint: 'https://push.example/abc', fetchFn: bad })).toEqual({
       ok: false,
       message: 'Could not send the test alert. Try again.',
     });

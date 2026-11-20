@@ -334,12 +334,18 @@ export const App: React.FC = () => {
   const handleSendTestAlert = useCallback(async () => {
     if (isSendingTestAlert) return;
     setIsSendingTestAlert(true);
-    const supabase = await getSupabase();
-    const { data } = supabase ? await supabase.auth.getSession() : { data: { session: null } };
-    const subscription = await getThisDeviceSubscription();
-    const result = await sendTestAlert({ accessToken: data.session?.access_token ?? '', endpoint: subscription?.endpoint });
-    setIsSendingTestAlert(false);
-    showToast(result.message, result.ok ? 'bell' : 'warn');
+    try {
+      const supabase = await getSupabase();
+      const { data } = supabase ? await supabase.auth.getSession() : { data: { session: null } };
+      const subscription = await getThisDeviceSubscription();
+      const result = await sendTestAlert({ accessToken: data.session?.access_token ?? '', endpoint: subscription?.endpoint });
+      showToast(result.message, result.ok ? 'bell' : 'warn');
+    } catch {
+      showToast('Could not send the test alert. Try again.', 'warn');
+    } finally {
+      // Always give the button back, even if loading the sign-in or the phone's registration failed.
+      setIsSendingTestAlert(false);
+    }
   }, [isSendingTestAlert]);
 
   // Is this phone already registered (from an earlier visit)?
