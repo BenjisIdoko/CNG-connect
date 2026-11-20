@@ -70,7 +70,9 @@ import {
   PUSH_NOT_SET_UP_REASON,
   detectPushSupport,
   getThisDeviceSubscription,
+  isPushKeyConfigured,
   markPushPromptSeen,
+  pushSwitchState,
   shouldAskForAlerts,
   subscribeThisDevice,
   syncThisDevice,
@@ -1015,6 +1017,14 @@ export const App: React.FC = () => {
   };
 
   const handleSignOut = async () => {
+    // Unlink this phone from the account first (removing it needs the sign-in): a phone that is handed on
+    // or signed in as someone else must not keep getting the previous person's alerts.
+    if (isPushSubscribed) {
+      const supabase = await getSupabase();
+      if (supabase) await unsubscribeThisDevice(supabase as unknown as RpcClient);
+      setIsPushSubscribed(false);
+      setIsPushGranted(false);
+    }
     await signOut();
     setAuthMode('onboarding');
     showToast('Signed out successfully.');
@@ -1230,7 +1240,7 @@ export const App: React.FC = () => {
               onUploadAvatar={isAuthenticated ? uploadAvatar : undefined}
               onOpenRoiCalculator={() => setIsRoiModalOpen(true)}
               onTogglePushNotifications={handleTogglePushNotifications}
-              isPushGranted={isPushGranted}
+              isPushGranted={pushSwitchState({ keyConfigured: isPushKeyConfigured(), subscribed: isPushSubscribed, permissionGranted: isPushGranted })}
               onTriggerProximityAlert={() => {
                 handleSimulateProximityNudge();
                 setActiveTab('map');

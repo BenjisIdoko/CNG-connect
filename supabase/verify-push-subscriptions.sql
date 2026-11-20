@@ -120,6 +120,53 @@ revoke all on function remove_push_subscription(text) from public, anon;
 grant execute on function save_push_subscription(text, text, text, text, text[]) to authenticated;
 grant execute on function remove_push_subscription(text) to authenticated;
 
+-- ---- the sender claims the right to notify a station, atomically ----
+-- Called only by the server function (service role). Under a lock per station it checks the last
+-- notification and, if the station may be notified now, records the new one and returns its id; otherwise
+-- it returns null. Rules: at most one notification per station every 15 minutes, and the same status is not
+-- repeated within 6 hours. Doing the check and the insert together stops two simultaneous requests from
+-- both sending.
+create or replace function claim_push_slot(p_station_id text, p_state text)
+returns uuid
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_last record;
+  v_id uuid;
+begin
+  if coalesce(p_station_id, '') = '' or p_state is null or p_state not in ('selling', 'out') then
+    raise exception 'Invalid request';
+  end if;
+
+  perform pg_advisory_xact_lock(hashtext('push:' || p_station_id));
+
+  select state, sent_at into v_last
+  from push_notification_log
+  where station_id = p_station_id
+  order by sent_at desc
+  limit 1;
+
+  if found then
+    if v_last.sent_at > now() - interval '15 minutes' then
+      return null;
+    end if;
+    if v_last.state = p_state and v_last.sent_at > now() - interval '6 hours' then
+      return null;
+    end if;
+  end if;
+
+  insert into push_notification_log (station_id, state, recipients)
+  values (p_station_id, p_state, 0)
+  returning id into v_id;
+  return v_id;
+end;
+$$;
+
+revoke all on function claim_push_slot(text, text) from public, anon, authenticated;
+grant execute on function claim_push_slot(text, text) to service_role;
+
 -- ---- the checks ----
 create temp table verify_results (step text, ok boolean, detail text);
 
@@ -193,6 +240,49 @@ begin
   perform set_config('request.jwt.claims', '', true);
 end
 $$;
+
+-- ---- claim_push_slot ----
+do $$
+declare
+  v_id uuid;
+  v_n integer;
+begin
+  delete from push_notification_log where station_id = 'verify-station';
+  v_id := claim_push_slot('verify-station', 'selling');
+  insert into verify_results values ('j: the first claim for a station succeeds', v_id is not null, coalesce(v_id::text, 'null'));
+
+  v_id := claim_push_slot('verify-station', 'selling');
+  insert into verify_results values ('j2: an immediate second claim gets nothing', v_id is null, coalesce(v_id::text, 'null'));
+  v_id := claim_push_slot('verify-station', 'out');
+  insert into verify_results values ('j3: a different status within 15 minutes also gets nothing', v_id is null, coalesce(v_id::text, 'null'));
+  select count(*) into v_n from push_notification_log where station_id = 'verify-station';
+  insert into verify_results values ('j4: only one log row exists', v_n = 1, v_n::text);
+
+  update push_notification_log set sent_at = now() - interval '16 minutes' where station_id = 'verify-station';
+  v_id := claim_push_slot('verify-station', 'selling');
+  insert into verify_results values ('k: the same status 16 minutes later is still skipped (6 hour rule)', v_id is null, coalesce(v_id::text, 'null'));
+  v_id := claim_push_slot('verify-station', 'out');
+  insert into verify_results values ('k2: a different status 16 minutes later is allowed', v_id is not null, coalesce(v_id::text, 'null'));
+
+  update push_notification_log set sent_at = now() - interval '7 hours' where station_id = 'verify-station';
+  v_id := claim_push_slot('verify-station', 'out');
+  insert into verify_results values ('l: the same status after 7 hours is allowed again', v_id is not null, coalesce(v_id::text, 'null'));
+
+  begin
+    perform claim_push_slot('verify-station', 'closed');
+    insert into verify_results values ('m: an unknown status is refused', false, 'expected an error');
+  exception when others then
+    insert into verify_results values ('m: an unknown status is refused', sqlerrm like '%Invalid request%', sqlerrm);
+  end;
+end
+$$;
+
+insert into verify_results values (
+  'n: only the service role can run claim_push_slot',
+  not has_function_privilege('anon', 'claim_push_slot(text, text)', 'execute')
+  and not has_function_privilege('authenticated', 'claim_push_slot(text, text)', 'execute')
+  and has_function_privilege('service_role', 'claim_push_slot(text, text)', 'execute'),
+  '');
 
 insert into verify_results values (
   'g: anon cannot run either function, signed-in users can',

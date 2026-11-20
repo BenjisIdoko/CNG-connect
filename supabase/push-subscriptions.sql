@@ -112,3 +112,50 @@ revoke all on function save_push_subscription(text, text, text, text, text[]) fr
 revoke all on function remove_push_subscription(text) from public, anon;
 grant execute on function save_push_subscription(text, text, text, text, text[]) to authenticated;
 grant execute on function remove_push_subscription(text) to authenticated;
+
+-- ---- the sender claims the right to notify a station, atomically ----
+-- Called only by the server function (service role). Under a lock per station it checks the last
+-- notification and, if the station may be notified now, records the new one and returns its id; otherwise
+-- it returns null. Rules: at most one notification per station every 15 minutes, and the same status is not
+-- repeated within 6 hours. Doing the check and the insert together stops two simultaneous requests from
+-- both sending.
+create or replace function claim_push_slot(p_station_id text, p_state text)
+returns uuid
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_last record;
+  v_id uuid;
+begin
+  if coalesce(p_station_id, '') = '' or p_state is null or p_state not in ('selling', 'out') then
+    raise exception 'Invalid request';
+  end if;
+
+  perform pg_advisory_xact_lock(hashtext('push:' || p_station_id));
+
+  select state, sent_at into v_last
+  from push_notification_log
+  where station_id = p_station_id
+  order by sent_at desc
+  limit 1;
+
+  if found then
+    if v_last.sent_at > now() - interval '15 minutes' then
+      return null;
+    end if;
+    if v_last.state = p_state and v_last.sent_at > now() - interval '6 hours' then
+      return null;
+    end if;
+  end if;
+
+  insert into push_notification_log (station_id, state, recipients)
+  values (p_station_id, p_state, 0)
+  returning id into v_id;
+  return v_id;
+end;
+$$;
+
+revoke all on function claim_push_slot(text, text) from public, anon, authenticated;
+grant execute on function claim_push_slot(text, text) to service_role;

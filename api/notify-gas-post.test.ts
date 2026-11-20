@@ -5,6 +5,7 @@ const getUser = vi.fn();
 const sendNotification = vi.fn();
 const setVapidDetails = vi.fn();
 const createClient = vi.fn();
+const rpc = vi.fn();
 const calls: Array<[string, string, unknown[]]> = [];
 const results: Record<string, any> = {};
 
@@ -33,7 +34,7 @@ function query(table: string) {
 vi.mock('@supabase/supabase-js', () => ({
   createClient: (...args: unknown[]) => {
     createClient(...args);
-    return { auth: { getUser }, from: (table: string) => query(table) };
+    return { auth: { getUser }, from: (table: string) => query(table), rpc: (...a: unknown[]) => rpc(...a) };
   },
 }));
 vi.mock('web-push', () => ({ default: { setVapidDetails: (...a: unknown[]) => setVapidDetails(...a), sendNotification: (...a: unknown[]) => sendNotification(...a) } }));
@@ -155,13 +156,14 @@ beforeEach(() => {
   createClient.mockReset();
   getUser.mockReset().mockResolvedValue({ data: { user: { id: 'poster-' + Math.random() } }, error: null });
   sendNotification.mockReset().mockResolvedValue({ statusCode: 201 });
+  rpc.mockReset().mockResolvedValue({ data: 'log1', error: null });
   setVapidDetails.mockReset();
   calls.length = 0;
   for (const k of Object.keys(results)) delete results[k];
   results.community_managers = { select: { data: { user_id: 'x' }, error: null } };
   results.station_manager_posts = { select: { data: { state: 'selling', created_at: new Date().toISOString() }, error: null } };
   results.stations = { select: { data: { id: 's1', name: 'NNPC Kubwa', city: 'Abuja', state: 'Abuja FCT' }, error: null } };
-  results.push_notification_log = { select: { data: null, error: null }, insert: { data: { id: 'log1' }, error: null }, update: { data: null, error: null } };
+  results.push_notification_log = { select: { data: null, error: null }, update: { data: null, error: null }, delete: { data: null, error: null } };
   results.push_subscriptions = {
     select: {
       data: [
@@ -302,4 +304,61 @@ describe('notify-gas-post handler', () => {
     }
     expect(last).toBe(429);
   });
+
+  it('claims the station atomically before sending, naming the station and the status', async () => {
+    const res = makeRes();
+    await handler(post({ stationId: 's1' }), res);
+    expect(rpc).toHaveBeenCalledWith('claim_push_slot', { p_station_id: 's1', p_state: 'selling' });
+    expect(res.body).toMatchObject({ sent: 2 });
+  });
+
+  it('sends nothing when the claim is refused (another request got there first)', async () => {
+    rpc.mockResolvedValue({ data: null, error: null });
+    const res = makeRes();
+    await handler(post({ stationId: 's1' }), res);
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toMatchObject({ sent: 0, skipped: 'recent' });
+    expect(sendNotification).not.toHaveBeenCalled();
+  });
+
+  it('sends nothing, and says so, when the claim itself fails', async () => {
+    rpc.mockResolvedValue({ data: null, error: { message: 'db down' } });
+    const res = makeRes();
+    await handler(post({ stationId: 's1' }), res);
+    expect(res.statusCode).toBe(500);
+    expect(sendNotification).not.toHaveBeenCalled();
+    expect(JSON.stringify(res.body)).not.toContain('db down');
+  });
+
+  it('many simultaneous requests for one post send only once', async () => {
+    let claimed = false;
+    rpc.mockImplementation(async () => {
+      if (claimed) return { data: null, error: null };
+      claimed = true;
+      return { data: 'log1', error: null };
+    });
+    getUser.mockImplementation(async () => ({ data: { user: { id: 'burst-poster' } }, error: null }));
+    await Promise.all(Array.from({ length: 8 }, () => handler(post({ stationId: 's1' }), makeRes())));
+    expect(sendNotification).toHaveBeenCalledTimes(2); // the two phones in the audience, once
+  });
+
+  it('gives the slot back and sends nothing when the subscriber list cannot be read', async () => {
+    results.push_subscriptions.select = { data: null, error: { message: 'read failed' } };
+    const res = makeRes();
+    await handler(post({ stationId: 's1' }), res);
+    expect(res.statusCode).toBe(500);
+    expect(sendNotification).not.toHaveBeenCalled();
+    expect(calls.some(([t, m]) => t === 'push_notification_log' && m === 'delete')).toBe(true);
+  });
+
+  it('looks up the caller\'s OWN latest post for THIS station, and only gas posts of kind state', async () => {
+    getUser.mockResolvedValue({ data: { user: { id: 'poster-42' } }, error: null });
+    await handler(post({ stationId: 's1' }), makeRes());
+    const onPosts = calls.filter(([t]) => t === 'station_manager_posts');
+    expect(onPosts).toContainEqual(['station_manager_posts', 'eq', ['user_id', 'poster-42']]);
+    expect(onPosts).toContainEqual(['station_manager_posts', 'eq', ['station_id', 's1']]);
+    expect(onPosts).toContainEqual(['station_manager_posts', 'eq', ['kind', 'state']]);
+    expect(calls).toContainEqual(['community_managers', 'eq', ['user_id', 'poster-42']]);
+  });
 });
+

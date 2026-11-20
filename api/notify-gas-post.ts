@@ -222,17 +222,25 @@ export default async function handler(req: any, res: any) {
     });
     if (!decision.send) return send(res, 200, { sent: 0, skipped: decision.reason });
 
-    // Claim the slot before sending, so two quick requests do not both announce.
-    const { data: logRow } = await service
-      .from('push_notification_log')
-      .insert({ station_id: stationId, state: latest.state, recipients: 0 })
-      .select('id')
-      .single();
+    // Claim the slot, atomically in the database, before sending: two simultaneous requests cannot both
+    // get it. (The check above is only a quick way out; this is the one that counts.)
+    const { data: claimedId, error: claimError } = await service.rpc('claim_push_slot', { p_station_id: stationId, p_state: latest.state });
+    if (claimError) {
+      console.error('notify-gas-post: could not claim the station slot');
+      return send(res, 500, { error: 'Could not send alerts.' });
+    }
+    if (!claimedId) return send(res, 200, { sent: 0, skipped: 'recent' });
 
-    const { data: subscribers } = await service
+    const { data: subscribers, error: subscribersError } = await service
       .from('push_subscriptions')
       .select('id, user_id, endpoint, p256dh, auth, state, favorite_station_ids')
       .limit(5000);
+    if (subscribersError) {
+      // Nothing was sent, so give the slot back instead of silencing the station for 15 minutes.
+      console.error('notify-gas-post: could not read subscriptions');
+      await service.from('push_notification_log').delete().eq('id', claimedId);
+      return send(res, 500, { error: 'Could not send alerts.' });
+    }
     const audience = pickAudience((subscribers || []) as Subscriber[], { id: station.id, state: station.state }, posterId);
 
     webpush.setVapidDetails(vapidSubject, vapidPublic, vapidPrivate);
@@ -260,7 +268,7 @@ export default async function handler(req: any, res: any) {
     }
 
     if (gone.length > 0) await service.from('push_subscriptions').delete().in('endpoint', gone);
-    if (logRow?.id) await service.from('push_notification_log').update({ recipients: sent }).eq('id', logRow.id);
+    await service.from('push_notification_log').update({ recipients: sent }).eq('id', claimedId);
 
     return send(res, 200, { sent, removed: gone.length });
   } catch (error) {

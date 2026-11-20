@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   describePushSupport,
   markPushPromptSeen,
+  pushSwitchState,
   shouldAskForAlerts,
   wasPushPromptSeen,
   friendlyPushError,
@@ -162,6 +163,20 @@ describe('the "already asked" memory', () => {
     };
     expect(() => markPushPromptSeen(broken)).not.toThrow();
     expect(wasPushPromptSeen(broken)).toBe(false);
+  });
+});
+
+describe('pushSwitchState', () => {
+  it('with alerts set up, the switch shows whether THIS phone is registered, whatever the browser permission says', () => {
+    expect(pushSwitchState({ keyConfigured: true, subscribed: true, permissionGranted: true })).toBe(true);
+    // switched off earlier: permission stays "granted" in the browser, but the phone is no longer registered
+    expect(pushSwitchState({ keyConfigured: true, subscribed: false, permissionGranted: true })).toBe(false);
+    expect(pushSwitchState({ keyConfigured: true, subscribed: true, permissionGranted: false })).toBe(true);
+  });
+
+  it('before alerts are set up on the server, it keeps the older meaning: the browser permission', () => {
+    expect(pushSwitchState({ keyConfigured: false, subscribed: false, permissionGranted: true })).toBe(true);
+    expect(pushSwitchState({ keyConfigured: false, subscribed: false, permissionGranted: false })).toBe(false);
   });
 });
 

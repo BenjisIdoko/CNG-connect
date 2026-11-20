@@ -98,6 +98,9 @@ export function describePushSupport(facts: PushSupportFacts): PushSupport {
 
 const vapidKey = (): string => (import.meta.env?.VITE_VAPID_PUBLIC_KEY as string | undefined) || '';
 
+/** True once the public VAPID key is configured, i.e. real push alerts are set up for this build. */
+export const isPushKeyConfigured = (): boolean => Boolean(vapidKey());
+
 export function detectPushSupport(): PushSupport {
   if (typeof window === 'undefined') return { supported: false, reason: "This browser can't receive alerts." };
   const ua = navigator.userAgent || '';
@@ -209,4 +212,13 @@ export function markPushPromptSeen(storage: KeyValueStorage | null = defaultStor
   } catch {
     /* storage blocked: the question may be asked again */
   }
+}
+
+/**
+ * What the Profile alerts switch should show. With real alerts set up it is whether THIS phone is registered:
+ * the browser keeps its notification permission after alerts are switched off, so permission alone would show
+ * "on" for a phone that is no longer registered. Before they are set up it keeps its older meaning.
+ */
+export function pushSwitchState(facts: { keyConfigured: boolean; subscribed: boolean; permissionGranted: boolean }): boolean {
+  return facts.keyConfigured ? facts.subscribed : facts.permissionGranted;
 }
