@@ -64,6 +64,20 @@ import { formatRelativeTime, isIsoTimestamp } from './utils/timeUtils';
 import { SuccessBurst } from './components/common/SuccessBurst';
 import { haptic } from './utils/haptics';
 import { track } from './services/analytics';
+import { getSupabase } from './services/supabaseClient';
+import type { RpcClient } from './services/stationManagerService';
+import {
+  PUSH_NOT_SET_UP_REASON,
+  detectPushSupport,
+  getThisDeviceSubscription,
+  markPushPromptSeen,
+  shouldAskForAlerts,
+  subscribeThisDevice,
+  syncThisDevice,
+  unsubscribeThisDevice,
+  wasPushPromptSeen,
+} from './services/pushService';
+import { PushAlertPrompt } from './components/PushAlertPrompt';
 import { takeDueFollowUp } from './utils/followUp';
 import { isAtStation, stationsToPing, PRESENCE_TTL_MINUTES, REPORT_GEOFENCE_METERS, type PingPosition } from './utils/geofencePresence';
 import { reportProofProblem } from './utils/reportProof';
@@ -212,19 +226,37 @@ export const App: React.FC = () => {
     }
   });
 
-  const toggleFavoriteStation = useCallback((stationId: string) => {
-    setFavoriteStationIds((prev) => {
-      const updated = prev.includes(stationId)
-        ? prev.filter((id) => id !== stationId)
-        : [...prev, stationId];
+  // Real push alerts: whether this phone is registered, and the one-time "get an alert?" question.
+  const [isPushSubscribed, setIsPushSubscribed] = useState(false);
+  const [showPushPrompt, setShowPushPrompt] = useState(false);
+  const [isPushBusy, setIsPushBusy] = useState(false);
+
+  const toggleFavoriteStation = useCallback(
+    (stationId: string) => {
+      const adding = !favoriteStationIds.includes(stationId);
+      const updated = adding ? [...favoriteStationIds, stationId] : favoriteStationIds.filter((id) => id !== stationId);
+      setFavoriteStationIds(updated);
       try {
         localStorage.setItem('gasfinder_favorite_stations', JSON.stringify(updated));
       } catch {
         /* storage unavailable or quota exceeded — favourites stay in memory */
       }
-      return updated;
-    });
-  }, []);
+      // Right after a favourite is added is the moment to offer alerts, once.
+      if (
+        shouldAskForAlerts({
+          added: adding,
+          isAuthenticated,
+          supported: detectPushSupport().supported,
+          alreadyOn: isPushSubscribed,
+          alreadyAsked: wasPushPromptSeen(),
+        })
+      ) {
+        markPushPromptSeen();
+        setShowPushPrompt(true);
+      }
+    },
+    [favoriteStationIds, isAuthenticated, isPushSubscribed],
+  );
 
   // Alias so the many existing `userProfile.*` reads below don't all need
   // renaming — writes go through `updateProfile` (from useAuth), not a
@@ -236,7 +268,56 @@ export const App: React.FC = () => {
     return typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted';
   });
 
+  // Registers this phone for real alerts (permission, push service, database). Returns whether it worked.
+  const enablePushAlerts = useCallback(async (): Promise<boolean> => {
+    if (!isAuthenticated) {
+      showToast('Sign in to get gas alerts — it only takes an email and a code.');
+      setAuthMode('signup');
+      return false;
+    }
+    const supabase = await getSupabase();
+    if (!supabase) {
+      showToast('Alerts need an internet connection.', 'warn');
+      return false;
+    }
+    setIsPushBusy(true);
+    const result = await subscribeThisDevice({
+      client: supabase as unknown as RpcClient,
+      state: userProfile.state,
+      favorites: favoriteStationIds,
+    });
+    setIsPushBusy(false);
+    if (result.ok) {
+      setIsPushSubscribed(true);
+      setIsPushGranted(true);
+      showToast('Alerts on: you will hear when a community manager posts for your state or a favourite station.', 'bell');
+      return true;
+    }
+    showToast(result.error, 'warn');
+    return false;
+  }, [isAuthenticated, userProfile.state, favoriteStationIds]);
+
   const handleTogglePushNotifications = useCallback(async () => {
+    // Switching off: remove this phone from the database and the push service.
+    if (isPushSubscribed) {
+      const supabase = await getSupabase();
+      if (supabase) await unsubscribeThisDevice(supabase as unknown as RpcClient);
+      setIsPushSubscribed(false);
+      setIsPushGranted(false);
+      showToast('Alerts off on this phone.');
+      return;
+    }
+    const support = detectPushSupport();
+    if (support.supported) {
+      await enablePushAlerts();
+      return;
+    }
+    // Until alerts are set up on the server, the toggle keeps its older job: browser permission for the
+    // alerts the app shows while it is open. Any other reason (an iPhone tab, an old browser) is told plainly.
+    if (support.reason !== PUSH_NOT_SET_UP_REASON) {
+      showToast(support.reason, 'warn');
+      return;
+    }
     const permission = await requestNotificationPermission();
     if (permission === 'granted') {
       setIsPushGranted(true);
@@ -245,7 +326,32 @@ export const App: React.FC = () => {
       setIsPushGranted(false);
       showToast('Push notification permission blocked in browser settings.', 'warn');
     }
+  }, [isPushSubscribed, enablePushAlerts]);
+
+  // Is this phone already registered (from an earlier visit)?
+  useEffect(() => {
+    let cancelled = false;
+    void getThisDeviceSubscription().then((subscription) => {
+      if (cancelled || !subscription) return;
+      setIsPushSubscribed(true);
+      setIsPushGranted(true);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, []);
+
+  // Keep the saved state and favourites in step with the app, and move a registered phone to whoever is
+  // signed in. Waits a moment so a few quick taps send one update.
+  useEffect(() => {
+    if (!isAuthenticated || !isPushSubscribed) return;
+    const timer = setTimeout(() => {
+      void getSupabase().then((supabase) => {
+        if (supabase) void syncThisDevice({ client: supabase as unknown as RpcClient, state: userProfile.state, favorites: favoriteStationIds });
+      });
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, [isAuthenticated, isPushSubscribed, userProfile.state, favoriteStationIds]);
 
   const [userCoords, setUserCoords] = useState<{ lat: number; lng: number } | null>(() => {
     try {
@@ -1244,6 +1350,15 @@ export const App: React.FC = () => {
             }}
           />
           {!showSplash && <InstallPrompt />}
+          {!showSplash && showPushPrompt && (
+            <PushAlertPrompt
+              busy={isPushBusy}
+              onAccept={() => {
+                void enablePushAlerts().then(() => setShowPushPrompt(false));
+              }}
+              onDismiss={() => setShowPushPrompt(false)}
+            />
+          )}
         </>
       )}
 
