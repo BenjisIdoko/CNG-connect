@@ -6,14 +6,14 @@ import { formatWatTime, type ManagerState, type ManagerStateReason } from '../..
 
 const minsAgo = (m: number) => new Date(Date.now() - m * 60000).toISOString();
 
-const render = (patch: { state?: ManagerState | null; reason?: ManagerStateReason | null; until?: string | null } = {}) =>
+const render = (patch: { state?: ManagerState | null; reason?: ManagerStateReason | null; until?: string | null; minsOld?: number } = {}) =>
   renderToStaticMarkup(
     <StationQuickUpdate
       stationId="s1"
       stationName="NIPCO Kubwa"
       city="Abuja FCT"
       managerState={patch.state ?? null}
-      managerStateAt={patch.state ? minsAgo(10) : null}
+      managerStateAt={patch.state ? minsAgo(patch.minsOld ?? 10) : null}
       managerStateReason={patch.reason ?? null}
       managerStateUntil={patch.until ?? null}
       managerSelling={null}
@@ -77,3 +77,24 @@ describe('StationQuickUpdate WhatsApp share', () => {
     expect(out).not.toMatch(/<button[^>]*disabled=""[^>]*>[^<]*Share update on WhatsApp/);
   });
 });
+
+describe('StationQuickUpdate with an old post', () => {
+  it('says drivers now see it as "last said" and asks the manager to post again', () => {
+    const out = render({ state: 'closed', minsOld: 500 });
+    expect(out).toContain('last said');
+    expect(out).toContain('Tap a status to post again');
+  });
+
+  it('still offers the reason and time controls', () => {
+    expect(render({ state: 'closed', minsOld: 500 })).toContain('Save details');
+  });
+
+  it('does not offer to share a post that is no longer current', () => {
+    expect(render({ state: 'closed', minsOld: 500 })).toMatch(/<button[^>]*disabled=""[^>]*>[^<]*Share update on WhatsApp/);
+  });
+
+  it('a current post says how long drivers see it', () => {
+    expect(render({ state: 'closed' })).toContain('drivers see it');
+  });
+});
+

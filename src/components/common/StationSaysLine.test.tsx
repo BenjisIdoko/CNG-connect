@@ -79,6 +79,24 @@ describe('StationSaysLine', () => {
     expect(html(station(base), true)).toBe('');
   });
 
+  describe('an old closed or waiting post', () => {
+    it('the station page says "Last said" with its age, in grey', () => {
+      const out = html(station({ managerState: 'closed', managerStateAt: minsAgo(400) }));
+      expect(out).toContain('Last said: Closed · 6 hr ago');
+      expect(out).toContain('text-rd-text-tertiary');
+      expect(out).not.toContain('updated');
+    });
+
+    it('the list badge says what the station last said', () => {
+      expect(html(station({ managerState: 'open', managerStateAt: minsAgo(400) }), true)).toContain('Station last said: open, waiting for gas · 6 hr ago');
+    });
+
+    it('is gone after 24 hours, and a gas-available post is gone after 6', () => {
+      expect(html(station({ managerState: 'closed', managerStateAt: minsAgo(1441) }))).toBe('');
+      expect(html(station({ managerState: 'selling', managerStateAt: minsAgo(400) }))).toBe('');
+    });
+  });
+
   describe('with a reason and an expected time', () => {
     const until = new Date(Date.parse('2026-11-19T13:00:00Z')).toISOString(); // 2 pm in Lagos
     const closed = (patch: Partial<GasStation> = {}) =>

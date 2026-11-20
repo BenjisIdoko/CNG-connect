@@ -3,6 +3,7 @@ import {
   MANAGER_REASON_OPTIONS,
   MANAGER_STATE_MINUTES,
   MANAGER_STATE_OPTIONS,
+  describeManagerBadge,
   describeManagerState,
   formatWatTime,
   getManagerStatement,
@@ -24,8 +25,7 @@ describe('getManagerStatement', () => {
     });
   });
 
-  it('is null at 361 minutes, with no timestamp, with an unreadable timestamp, or with no state', () => {
-    expect(getManagerStatement({ managerState: 'open', managerStateAt: minsAgo(361) }, NOW)).toBeNull();
+  it('is null with no timestamp, with an unreadable timestamp, or with no state', () => {
     expect(getManagerStatement({ managerState: 'open' }, NOW)).toBeNull();
     expect(getManagerStatement({ managerState: 'open', managerStateAt: 'garbage' }, NOW)).toBeNull();
     expect(getManagerStatement({ managerStateAt: minsAgo(5) }, NOW)).toBeNull();
@@ -99,7 +99,15 @@ describe('getManagerStatement with a reason and an expected time', () => {
     expect(getManagerStatement(closedUntil, at(UNTIL))?.overdue).toBe(false);
     expect(getManagerStatement(closedUntil, at('2026-11-19T10:59:00Z'))?.overdue).toBe(true);
     expect(getManagerStatement(closedUntil, at('2026-11-19T11:00:00Z'))?.overdue).toBe(true);
-    expect(getManagerStatement(closedUntil, at('2026-11-19T11:01:00Z'))).toBeNull();
+    // past the grace hour it is no longer current; it is shown as "last said" (see below)
+    expect(getManagerStatement(closedUntil, at('2026-11-19T11:01:00Z'))).toEqual({
+      state: 'closed',
+      ageMinutes: 181,
+      reason: 'supply',
+      untilMs: at(UNTIL),
+      overdue: true,
+      lastSaid: true,
+    });
   });
 
   it('an expected time keeps the post past the usual 6 hours', () => {
@@ -116,7 +124,7 @@ describe('getManagerStatement with a reason and an expected time', () => {
   it('an expected time not after the post is ignored and the usual 6 hours apply', () => {
     const post = { managerState: 'closed' as const, managerStateAt: POSTED, managerStateUntil: '2026-11-19T07:00:00Z' };
     expect(getManagerStatement(post, at('2026-11-19T13:59:00Z'))).toEqual({ state: 'closed', ageMinutes: 359 });
-    expect(getManagerStatement(post, at('2026-11-19T14:01:00Z'))).toBeNull();
+    expect(getManagerStatement(post, at('2026-11-19T14:01:00Z'))).toEqual({ state: 'closed', ageMinutes: 361, lastSaid: true });
   });
 
   it('an unreadable expected time is ignored', () => {
@@ -178,5 +186,50 @@ describe('MANAGER_REASON_OPTIONS', () => {
   it('lists the four reasons a manager can choose', () => {
     expect(MANAGER_REASON_OPTIONS.map((o) => o.reason)).toEqual(['supply', 'fault', 'power', 'other']);
     expect(MANAGER_REASON_OPTIONS.map((o) => o.label)).toEqual(['Waiting for supply', 'Technical fault', 'No power', 'Other']);
+  });
+});
+
+describe('a Closed or Open-waiting post after its normal window is "last said", for up to 24 hours', () => {
+  it('after 6 hours a closed or open post stays, marked lastSaid, with its real age', () => {
+    expect(getManagerStatement({ managerState: 'closed', managerStateAt: minsAgo(361) }, NOW)).toEqual({ state: 'closed', ageMinutes: 361, lastSaid: true });
+    expect(getManagerStatement({ managerState: 'open', managerStateAt: minsAgo(600) }, NOW)).toEqual({ state: 'open', ageMinutes: 600, lastSaid: true });
+  });
+
+  it('it is current, not lastSaid, up to and including 360 minutes', () => {
+    expect(getManagerStatement({ managerState: 'closed', managerStateAt: minsAgo(360) }, NOW)).toEqual({ state: 'closed', ageMinutes: 360 });
+  });
+
+  it('it disappears 24 hours after the post', () => {
+    expect(getManagerStatement({ managerState: 'closed', managerStateAt: minsAgo(1440) }, NOW)?.lastSaid).toBe(true);
+    expect(getManagerStatement({ managerState: 'closed', managerStateAt: minsAgo(1441) }, NOW)).toBeNull();
+  });
+
+  it('a gas-available post is never kept as lastSaid: it disappears after 6 hours', () => {
+    expect(getManagerStatement({ managerState: 'selling', managerStateAt: minsAgo(361) }, NOW)).toBeNull();
+    expect(getManagerStatement({ managerState: 'selling', managerStateAt: minsAgo(600) }, NOW)).toBeNull();
+  });
+
+  it('the older closed flag is kept as lastSaid too, the older selling flag is not', () => {
+    expect(getManagerStatement({ managerSelling: false, managerSellingAt: minsAgo(400) }, NOW)).toEqual({ state: 'closed', ageMinutes: 400, lastSaid: true });
+    expect(getManagerStatement({ managerSelling: true, managerSellingAt: minsAgo(400) }, NOW)).toBeNull();
+  });
+
+  it('a post with an expected time keeps its reason and marks the time as missed', () => {
+    const post = { managerState: 'open' as const, managerStateAt: '2026-11-19T08:00:00Z', managerStateReason: 'power' as const, managerStateUntil: '2026-11-19T09:00:00Z' };
+    const result = getManagerStatement(post, Date.parse('2026-11-19T12:00:00Z'));
+    expect(result).toMatchObject({ state: 'open', reason: 'power', overdue: true, lastSaid: true });
+  });
+
+  it('reads as "Last said" with the post age and no "updated"', () => {
+    expect(describeManagerState({ state: 'closed', ageMinutes: 500, lastSaid: true })).toBe('Last said: Closed · 8 hr ago');
+    expect(describeManagerState({ state: 'closed', ageMinutes: 500, reason: 'supply', untilMs: Date.parse('2026-11-19T13:00:00Z'), overdue: true, lastSaid: true })).toBe(
+      'Last said: Closed · Waiting for supply · Was expected back 2 pm · not confirmed · 8 hr ago',
+    );
+  });
+
+  it('has a short badge for lists', () => {
+    expect(describeManagerBadge({ state: 'closed', ageMinutes: 500, lastSaid: true })).toBe('Station last said: closed · 8 hr ago');
+    expect(describeManagerBadge({ state: 'open', ageMinutes: 420, lastSaid: true })).toBe('Station last said: open, waiting for gas · 7 hr ago');
+    expect(describeManagerBadge({ state: 'closed', ageMinutes: 500, untilMs: 1, overdue: true, lastSaid: true })).toBe('Station last said: closed · 8 hr ago');
   });
 });

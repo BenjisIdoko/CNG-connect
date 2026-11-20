@@ -24,8 +24,13 @@ describe('describeStatusOrStation', () => {
     ).toBe('Station: closed · back ~2 pm');
   });
 
-  it('an expired manager post says nothing extra', () => {
-    expect(describeStatusOrStation(station({ managerState: 'closed', managerStateAt: minsAgo(400) }), NOW)).toBe('No report yet');
+  it('an expired gas-available post says nothing extra', () => {
+    expect(describeStatusOrStation(station({ managerState: 'selling', managerStateAt: minsAgo(400) }), NOW)).toBe('No report yet');
+  });
+
+  it('an old closed post is still there, marked as what the station last said', () => {
+    expect(describeStatusOrStation(station({ managerState: 'closed', managerStateAt: minsAgo(400) }), NOW)).toBe('Station last said: closed · 6 hr ago');
+    expect(describeStatusOrStation(station({ managerState: 'closed', managerStateAt: minsAgo(1500) }), NOW)).toBe('No report yet');
   });
 
   it('a recent driver report still wins over the manager post', () => {

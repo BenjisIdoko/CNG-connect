@@ -16,6 +16,9 @@ const BADGE_CLASS: Record<ManagerState, string> = {
   closed: 'bg-rd-surface ring-1 ring-rd-divider text-rd-text-tertiary',
 };
 
+const LAST_SAID_BADGE_CLASS = 'bg-rd-surface ring-1 ring-rd-divider text-rd-text-tertiary';
+const LAST_SAID_LINE_CLASS = 'text-rd-text-tertiary';
+
 const LINE_CLASS: Record<ManagerState, string> = {
   selling: 'text-rd-on-available-container',
   open: 'text-rd-on-queuing-container',
@@ -36,7 +39,7 @@ export const StationSaysLine: React.FC<Props> = ({ station, now, compact = false
   if (compact) {
     if (!statement) return null;
     return (
-      <span className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-micro font-semibold leading-none ${BADGE_CLASS[statement.state]}`}>
+      <span className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-micro font-semibold leading-none ${statement.lastSaid ? LAST_SAID_BADGE_CLASS : BADGE_CLASS[statement.state]}`}>
         <span aria-hidden="true" className="material-symbols-outlined text-[14px]">local_gas_station</span>
         <span className="truncate">{describeManagerBadge(statement)}</span>
       </span>
@@ -51,7 +54,7 @@ export const StationSaysLine: React.FC<Props> = ({ station, now, compact = false
       <div className="flex-1 min-w-0">
         <p className="text-caption text-rd-text-tertiary">Station says</p>
         {statement && (
-          <p className={`font-geist font-bold text-body-lg leading-snug ${LINE_CLASS[statement.state]}`}>{describeManagerState(statement)}</p>
+          <p className={`font-geist font-bold text-body-lg leading-snug ${statement.lastSaid ? LAST_SAID_LINE_CLASS : LINE_CLASS[statement.state]}`}>{describeManagerState(statement)}</p>
         )}
         {livePressure && (
           <p className="text-caption text-rd-text-tertiary mt-0.5">

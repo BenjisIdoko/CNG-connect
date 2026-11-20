@@ -52,6 +52,19 @@ const startingPressure = (live: number | null, pump: number | null): number => {
   return PRESSURE_DEFAULT_BAR;
 };
 
+/** What a manager is told about how long drivers see their post. */
+function visibilityText(statement: ReturnType<typeof getManagerStatement>): string {
+  const hours = MANAGER_STATE_MINUTES / 60;
+  if (!statement) {
+    return `Nothing posted right now. Drivers see a gas-available post for ${hours} hours; a Closed or waiting post stays up to 24 hours, greyed as "last said" after ${hours}.`;
+  }
+  const posted = `Posted ${formatAgeShort(statement.ageMinutes)}`;
+  if (statement.lastSaid) return `${posted} · drivers now see it as "last said", greyed. Tap a status to post again.`;
+  if (statement.untilMs !== undefined) return `${posted} · drivers see it until an hour after the expected time`;
+  if (statement.state === 'selling') return `${posted} · drivers see it for ${hours} hours`;
+  return `${posted} · drivers see it for ${hours} hours, then greyed as "last said" until 24 hours`;
+}
+
 const POSTED_TEXT: Record<ManagerState, string> = {
   closed: 'Posted: Closed',
   open: 'Posted: Open, waiting for gas',
@@ -172,9 +185,7 @@ export const StationQuickUpdate: React.FC<Props> = ({
           })}
         </div>
         <p className="mt-1.5 text-xs text-adm-mute-text">
-          {statement
-            ? `Posted ${formatAgeShort(statement.ageMinutes)} · drivers see it for ${MANAGER_STATE_MINUTES / 60} hours`
-            : `Nothing posted right now. Drivers see a post for ${MANAGER_STATE_MINUTES / 60} hours.`}
+          {visibilityText(statement)}
         </p>
       </div>
 
@@ -243,7 +254,7 @@ export const StationQuickUpdate: React.FC<Props> = ({
       <div>
         <button
           type="button"
-          disabled={!statement}
+          disabled={!statement || statement.lastSaid === true}
           onClick={() =>
             statement && openManagerWhatsAppShare({ stationId, name: stationName, city, statement })
           }

@@ -55,9 +55,15 @@ describe('StationStatusChip with no recent report', () => {
     expect(html(station({ managerState: 'selling', managerStateAt: minsBefore(NOON, 10) }), NOON)).toBe('');
   });
 
-  it('an expired manager post no longer hides the chip', () => {
-    const s = station({ managerState: 'closed', managerStateAt: minsBefore(NOON, 400) });
+  it('an expired gas-available post no longer hides the chip', () => {
+    const s = station({ managerState: 'selling', managerStateAt: minsBefore(NOON, 400) });
     expect(html(s, NOON)).toContain('No report yet');
+  });
+
+  it('an old closed post still replaces the chip, because the badge beside it says what the station last said', () => {
+    const s = station({ managerState: 'closed', managerStateAt: minsBefore(NOON, 400) });
+    expect(html(s, NOON)).toBe('');
+    expect(html(station({ managerState: 'closed', managerStateAt: minsBefore(NOON, 1500) }), NOON)).toContain('No report yet');
   });
 });
 

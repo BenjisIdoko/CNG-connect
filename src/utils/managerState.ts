@@ -16,6 +16,13 @@ export type ManagerState = 'closed' | 'open' | 'selling';
 /** A manager's status shows for this long, then disappears (it always shows its age meanwhile). */
 export const MANAGER_STATE_MINUTES = 360;
 
+/**
+ * A Closed or Open-waiting post that is past its normal window is not thrown away: for up to 24 hours
+ * after it was made it is still shown, marked as what the station "last said". A gas-available post is
+ * never kept like this, so an old "gas available" cannot read as if it were current.
+ */
+const LAST_SAID_MINUTES = 24 * 60;
+
 /** With an expected time, a post stays this long after that time (as "not confirmed"), then disappears. */
 const OVERDUE_GRACE_MINUTES = 60;
 
@@ -46,6 +53,8 @@ export interface ManagerStatement {
   untilMs?: number;
   /** True once the expected time has passed (the post is then shown as "not confirmed"). Set only with `untilMs`. */
   overdue?: boolean;
+  /** True when a Closed / Open-waiting post is past its normal window and is shown as "last said", greyed. */
+  lastSaid?: boolean;
 }
 
 type StatementSource = Pick<
@@ -60,41 +69,41 @@ const within = (age: number | null): age is number => age !== null && age <= MAN
  * station that only has the older "selling" flag (posted from a phone or screen that has not updated),
  * true reads as selling and false as closed.
  *
- * A closed / open post that gave an expected time stays until 60 minutes after that time (capped at 24
- * hours after the post) instead of the usual 6 hours; once the time has passed it reads as overdue.
+ * A closed / open post that gave an expected time stays current until 60 minutes after that time (capped
+ * at 24 hours after the post) instead of the usual 6 hours; once the time has passed it reads as overdue.
+ * After its current window a closed / open post is returned with `lastSaid: true` until 24 hours after it
+ * was made. A gas-available post has no such second life.
  */
 export function getManagerStatement(station: StatementSource, now = Date.now()): ManagerStatement | null {
   if (station.managerState) {
     const age = parseAgeMinutes(station.managerStateAt, now);
     if (age === null) return null;
+    const state = station.managerState;
 
-    if (station.managerState !== 'selling') {
-      const postedMs = Date.parse(station.managerStateAt as string);
-      const untilMs = station.managerStateUntil ? Date.parse(station.managerStateUntil) : NaN;
-      if (Number.isFinite(untilMs) && untilMs > postedMs) {
-        const visibleUntil = Math.min(untilMs + OVERDUE_GRACE_MINUTES * 60000, postedMs + MAX_POST_MINUTES * 60000);
-        if (now > visibleUntil) return null;
-        return {
-          state: station.managerState,
-          ageMinutes: age,
-          ...(station.managerStateReason ? { reason: station.managerStateReason } : {}),
-          untilMs,
-          overdue: now > untilMs,
-        };
-      }
-      if (!within(age)) return null;
-      return {
-        state: station.managerState,
-        ageMinutes: age,
-        ...(station.managerStateReason ? { reason: station.managerStateReason } : {}),
-      };
+    if (state === 'selling') return within(age) ? { state: 'selling', ageMinutes: age } : null;
+
+    const postedMs = Date.parse(station.managerStateAt as string);
+    const untilMs = station.managerStateUntil ? Date.parse(station.managerStateUntil) : NaN;
+    const hasTime = Number.isFinite(untilMs) && untilMs > postedMs;
+    const reason = station.managerStateReason ? { reason: station.managerStateReason } : {};
+
+    const current = hasTime
+      ? now <= Math.min(untilMs + OVERDUE_GRACE_MINUTES * 60000, postedMs + MAX_POST_MINUTES * 60000)
+      : within(age);
+    if (current) {
+      return { state, ageMinutes: age, ...reason, ...(hasTime ? { untilMs, overdue: now > untilMs } : {}) };
     }
-
-    return within(age) ? { state: 'selling', ageMinutes: age } : null;
+    if (age <= LAST_SAID_MINUTES) {
+      return { state, ageMinutes: age, ...reason, ...(hasTime ? { untilMs, overdue: true } : {}), lastSaid: true };
+    }
+    return null;
   }
   if (typeof station.managerSelling === 'boolean') {
     const age = parseAgeMinutes(station.managerSellingAt, now);
-    return within(age) ? { state: station.managerSelling ? 'selling' : 'closed', ageMinutes: age } : null;
+    if (age === null) return null;
+    if (station.managerSelling) return within(age) ? { state: 'selling', ageMinutes: age } : null;
+    if (within(age)) return { state: 'closed', ageMinutes: age };
+    return age <= LAST_SAID_MINUTES ? { state: 'closed', ageMinutes: age, lastSaid: true } : null;
   }
   return null;
 }
@@ -142,8 +151,12 @@ export function describeManagerStatus(statement: ManagerStatement): string {
   return parts.join(' · ');
 }
 
-/** The sentence a driver reads on the station page, with how long ago the manager said it. */
+/**
+ * The sentence a driver reads on the station page, with how long ago the manager said it. An old post
+ * reads "Last said: Closed · 8 hr ago" so it is never taken for a current statement.
+ */
 export function describeManagerState(statement: ManagerStatement): string {
+  if (statement.lastSaid) return `Last said: ${describeManagerStatus(statement)} · ${formatAgeShort(statement.ageMinutes)}`;
   return `${describeManagerStatus(statement)} · updated ${formatAgeShort(statement.ageMinutes)}`;
 }
 
@@ -153,8 +166,15 @@ const BADGE_TEXT: Record<ManagerState, string> = {
   closed: 'Station: closed',
 };
 
+const LAST_SAID_BADGE: Record<ManagerState, string> = {
+  selling: 'Station last said: open, gas available',
+  open: 'Station last said: open, waiting for gas',
+  closed: 'Station last said: closed',
+};
+
 /** The short line for list rows and cards: what the station says, with its expected time when it gave one. */
 export function describeManagerBadge(statement: ManagerStatement): string {
+  if (statement.lastSaid) return `${LAST_SAID_BADGE[statement.state]} · ${formatAgeShort(statement.ageMinutes)}`;
   const base = BADGE_TEXT[statement.state];
   if (statement.state === 'selling' || statement.untilMs === undefined) return base;
   const time = formatWatTime(statement.untilMs);
