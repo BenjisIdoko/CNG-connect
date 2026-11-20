@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Fuel } from 'lucide-react';
+import { Fuel, UserRound } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useSupabaseClient } from '../../hooks/useSupabaseClient';
 import { AdminAuthGate } from './AdminAuthGate';
@@ -8,10 +8,14 @@ import { MyStationsPanel } from './MyStationsPanel';
 import { useAdminToast } from './useAdminToast';
 import { claimManagerInvites } from '../../services/managerAccessService';
 import { SetPasswordCard } from './SetPasswordCard';
+import { ManagerProfilePanel } from './ManagerProfilePanel';
 import { clearSetPasswordPrompt, shouldPromptSetPassword } from '../../utils/passwordPrompt';
 import type { RpcClient } from '../../services/stationManagerService';
 
-const NAV: AdminNavItem[] = [{ key: 'mystations', label: 'My stations', icon: Fuel }];
+const NAV: AdminNavItem[] = [
+  { key: 'mystations', label: 'My stations', icon: Fuel },
+  { key: 'profile', label: 'My profile', icon: UserRound },
+];
 
 /**
  * Shown once a manager is signed in: first it turns any invite for their verified email into station
@@ -74,21 +78,38 @@ const ManagerBody: React.FC<{ flash: (m: string) => void }> = ({ flash }) => {
  * Who may change what is enforced by the database; this page never shows anything beyond "My stations".
  */
 export const StationManagerEntrance: React.FC<{ onExit: () => void }> = ({ onExit }) => {
-  const { driverProfile, signOut } = useAuth();
+  const { driverProfile, isProfileLoaded, signOut, saveContactDetails, updatePassword } = useAuth();
   const { flash, toast } = useAdminToast();
+  const [activeKey, setActiveKey] = useState('mystations');
 
   return (
     <AdminAuthGate title="Station manager" onExit={onExit} mode="manager">
       <AdminSidebarLayout
         brand="CNG-Connect"
         navItems={NAV}
-        activeKey="mystations"
-        onSelect={() => undefined}
+        activeKey={activeKey}
+        onSelect={setActiveKey}
         userEmail={driverProfile.email}
         onSignOut={signOut}
         onExit={onExit}
       >
-        <ManagerBody flash={flash} />
+        {/* Both pages stay mounted and one is hidden, so going to "My profile" and back does not reload the
+            stations or reopen the station editor. */}
+        <div className={activeKey === 'mystations' ? 'h-full' : 'hidden'}>
+          <ManagerBody flash={flash} />
+        </div>
+        <div className={activeKey === 'profile' ? 'h-full' : 'hidden'}>
+          <ManagerProfilePanel
+            // The form copies the profile when it first appears; start it again once the profile has loaded.
+            key={isProfileLoaded ? 'loaded' : 'loading'}
+            name={driverProfile.name}
+            phone={driverProfile.phone}
+            email={driverProfile.email}
+            onSaveDetails={saveContactDetails}
+            onChangePassword={updatePassword}
+            flash={flash}
+          />
+        </div>
       </AdminSidebarLayout>
 
       {toast}

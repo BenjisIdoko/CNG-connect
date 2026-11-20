@@ -33,4 +33,23 @@ describe('SetPasswordCard', () => {
   it('shows the 8 character rule up front', () => {
     expect(html).toContain('At least 8 characters');
   });
+
+  it('can be used as a "Change password" card with no skip button', () => {
+    const out = renderToStaticMarkup(
+      <SetPasswordCard
+        heading="Change password"
+        intro="Choose a new password for this account."
+        saveLabel="Change password"
+        skipLabel={null}
+        onSave={async () => ({ success: true })}
+        onDone={() => undefined}
+      />,
+    );
+    expect(out).toContain('Change password');
+    expect(out).toContain('Choose a new password for this account.');
+    expect(out).not.toContain('Not now');
+    expect(out).not.toContain('Set a password');
+    expect((out.match(/<button/g) || []).length).toBe(1);
+  });
 });
+

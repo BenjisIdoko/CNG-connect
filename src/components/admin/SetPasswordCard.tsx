@@ -8,8 +8,14 @@ import { friendlyPasswordError, validateNewPassword } from '../../utils/password
 interface Props {
   /** Saves the new password for the signed-in person. */
   onSave: (password: string) => Promise<{ success: boolean; error?: string }>;
-  /** Called after a successful save, and when the manager chooses "Not now". */
+  /** Called after a successful save, and when the manager chooses the skip button. */
   onDone: () => void;
+  /** Wording, so the same card serves "Set a password" and "Change password". */
+  heading?: string;
+  intro?: string;
+  saveLabel?: string;
+  /** The skip button's text; null hides it (changing an existing password has nothing to skip). */
+  skipLabel?: string | null;
 }
 
 /**
@@ -17,7 +23,14 @@ interface Props {
  * a password and no code is sent. The manager chooses the password; it is checked before it is sent and
  * any failure is shown in plain words.
  */
-export const SetPasswordCard: React.FC<Props> = ({ onSave, onDone }) => {
+export const SetPasswordCard: React.FC<Props> = ({
+  onSave,
+  onDone,
+  heading = 'Set a password',
+  intro = "So you won't need an emailed code next time.",
+  saveLabel = 'Save password',
+  skipLabel = 'Not now',
+}) => {
   const [password, setPassword] = useState('');
   const [again, setAgain] = useState('');
   const [busy, setBusy] = useState(false);
@@ -48,8 +61,8 @@ export const SetPasswordCard: React.FC<Props> = ({ onSave, onDone }) => {
         }}
       >
         <CardHeader>
-          <CardTitle>Set a password</CardTitle>
-          <CardDescription>So you won't need an emailed code next time.</CardDescription>
+          <CardTitle>{heading}</CardTitle>
+          <CardDescription>{intro}</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
@@ -82,11 +95,13 @@ export const SetPasswordCard: React.FC<Props> = ({ onSave, onDone }) => {
           )}
           <div className="flex flex-wrap gap-2">
             <Button type="submit" disabled={busy || !password || !again} className="min-h-[44px]">
-              {busy ? 'Saving…' : 'Save password'}
+              {busy ? 'Saving…' : saveLabel}
             </Button>
-            <Button type="button" variant="ghost" disabled={busy} onClick={onDone} className="min-h-[44px]">
-              Not now
-            </Button>
+            {skipLabel !== null && (
+              <Button type="button" variant="ghost" disabled={busy} onClick={onDone} className="min-h-[44px]">
+                {skipLabel}
+              </Button>
+            )}
           </div>
         </CardContent>
       </form>
