@@ -27,9 +27,10 @@ describe('reportProofProblem', () => {
     expect(reportProofProblem({ photo: PHOTO, photoLat: Number.NaN, photoLng: 7.4 }, STATION)).toBe(NO_POSITION);
   });
 
-  it('refuses a photo taken more than 150 m from the station and allows 149 m', () => {
-    expect(reportProofProblem({ photo: PHOTO, ...north(151) }, STATION)).toBe(TOO_FAR);
-    expect(reportProofProblem({ photo: PHOTO, ...north(149) }, STATION)).toBeNull();
+  it('refuses a photo taken more than 800 m from the station and allows 799 m', () => {
+    expect(reportProofProblem({ photo: PHOTO, ...north(801) }, STATION)).toBe(TOO_FAR);
+    expect(reportProofProblem({ photo: PHOTO, ...north(799) }, STATION)).toBeNull();
+    expect(reportProofProblem({ photo: PHOTO, ...north(300) }, STATION)).toBeNull(); // the back of a long queue
   });
 
   it('refuses when the station itself has no map position', () => {

@@ -6,7 +6,7 @@
 -- (3) wait, (4) run this file.
 --
 -- The rule: for a signed-in user, a new row in station_reports must carry a photo plus the position the
--- photo was taken at, and that position must be within 150 m of the station. The database cannot see
+-- photo was taken at, and that position must be within 800 m of the station. The database cannot see
 -- the phone's GPS, only the position the app sends, so this stops casual bypasses (an old or modified
 -- app, a direct call), not a determined forger.
 --
@@ -42,7 +42,7 @@ begin
     power(sin(radians(new.photo_lat - v_lat) / 2), 2)
     + cos(radians(v_lat)) * cos(radians(new.photo_lat)) * power(sin(radians(new.photo_lng - v_lng) / 2), 2)
   ));
-  if v_away > 150 then
+  if v_away > 800 then
     raise exception 'a photo taken at the station is required';
   end if;
 

@@ -407,7 +407,7 @@ export const apiService = {
           // Only sent when a driver entered a price, so reports still insert on a database
           // that has not had supabase/add-report-cng-price.sql applied yet.
           ...(enrichedReport.cngPriceNaira != null ? { cng_price_naira: enrichedReport.cngPriceNaira } : {}),
-          // Where the phone was when the photo was taken (a report needs it to be within 150 m of the station).
+          // Where the phone was when the photo was taken (a report needs it to be within the reporting distance of the station).
           ...(enrichedReport.photoLat != null && enrichedReport.photoLng != null
             ? { photo_lat: enrichedReport.photoLat, photo_lng: enrichedReport.photoLng }
             : {}),

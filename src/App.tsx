@@ -82,7 +82,7 @@ import {
 } from './services/pushService';
 import { PushAlertPrompt } from './components/PushAlertPrompt';
 import { takeDueFollowUp } from './utils/followUp';
-import { isAtStation, stationsToPing, PRESENCE_TTL_MINUTES, REPORT_GEOFENCE_METERS, type PingPosition } from './utils/geofencePresence';
+import { isAtStation, stationsToPing, ARRIVAL_PROMPT_METERS, PRESENCE_TTL_MINUTES, type PingPosition } from './utils/geofencePresence';
 import { reportProofProblem } from './utils/reportProof';
 import { useBackLayer } from './utils/backLayer';
 import { Icon } from './components/common/Icon';
@@ -621,8 +621,8 @@ export const App: React.FC = () => {
         if (st.lat == null || st.lng == null) return false;
 
         const distKm = getDistanceInKm(latitude, longitude, st.lat, st.lng);
-        // Same 150 m as the report sheet this prompt leads to, so "arrived" means a report is possible.
-        if (distKm * 1000 > REPORT_GEOFENCE_METERS) return false;
+        // "Arrived" means at the station or in its queue (300 m), not merely within reporting distance (800 m).
+        if (distKm * 1000 > ARRIVAL_PROMPT_METERS) return false;
 
         if (!isStationStale(st.lastUpdated, 30)) return false;
         if (isStationOnCooldown(userKey, st.id, 2)) return false;
@@ -798,7 +798,7 @@ export const App: React.FC = () => {
   };
 
   // A fresh GPS fix for the report sheet, asked for when the photo is taken and when the report is
-  // submitted, so the 150 m rule is checked against where the driver is at that moment.
+  // submitted, so the reporting distance is checked against where the driver is at that moment.
   const getFreshPosition = useCallback(
     (): Promise<PingPosition | null> =>
       new Promise((resolve) => {

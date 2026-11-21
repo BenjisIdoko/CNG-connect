@@ -974,7 +974,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
   };
 
   // The cold-start moment: most stations have no recent report. Just offer the nearest candidate;
-  // only a driver standing at the pump (within 150 m) can file one.
+  // only a driver at the station or in its queue (within the reporting distance) can file one.
   const renderFirstReportCard = (station: GasStation, _count: number, asHero: boolean) => (
     <button
       type="button"

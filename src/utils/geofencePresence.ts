@@ -48,10 +48,18 @@ export function stationsToPing(
 }
 
 /**
- * A report must come from someone actually at the station: within this many metres when the photo
- * is taken (and again when the report is submitted). Tighter than the 250 m "car here" geofence.
+ * A report must come from someone at the station or in its queue: within this many metres when the photo
+ * is taken (and again when the report is submitted). Stations ask drivers to queue back along the road, so
+ * the line can stretch 200 to 300 m; 800 m lets a driver at the back of it report, while still keeping
+ * reports to people who are really there.
  */
-export const REPORT_GEOFENCE_METERS = 150;
+export const REPORT_GEOFENCE_METERS = 800;
+
+/**
+ * How close a driver must be for the "you have arrived, report?" nudge to appear. It is the length of a long
+ * queue, not the whole reporting distance: at 800 m a driver merely passing the station would be nudged.
+ */
+export const ARRIVAL_PROMPT_METERS = 300;
 
 export type ReportPositionCheck = { allowed: true } | { allowed: false; reason: string };
 
@@ -67,7 +75,7 @@ export function checkReportPosition(
   if (!hasCoordinates(station) || haversineMeters(position, station) > REPORT_GEOFENCE_METERS) {
     return {
       allowed: false,
-      reason: 'Reports unlock within 150 m of the station so every status comes from someone actually there.',
+      reason: `Reports unlock within ${REPORT_GEOFENCE_METERS} m of the station so every status comes from someone actually there.`,
     };
   }
   return { allowed: true };

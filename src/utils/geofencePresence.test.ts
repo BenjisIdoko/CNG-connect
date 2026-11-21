@@ -4,6 +4,7 @@ import {
   PRESENCE_GEOFENCE_METERS,
   PRESENCE_PING_INTERVAL_MS,
   PRESENCE_TTL_MINUTES,
+  ARRIVAL_PROMPT_METERS,
   REPORT_GEOFENCE_METERS,
   checkReportPosition,
   isAtStation,
@@ -76,16 +77,20 @@ describe('stationsToPing', () => {
   });
 });
 
-describe('checkReportPosition (the 150 m rule for reporting)', () => {
-  const TOO_FAR = 'Reports unlock within 150 m of the station so every status comes from someone actually there.';
+describe('checkReportPosition (the 800 m rule for reporting: the back of a long queue counts)', () => {
+  const TOO_FAR = 'Reports unlock within 800 m of the station so every status comes from someone actually there.';
 
-  it('uses a 150 m radius', () => {
-    expect(REPORT_GEOFENCE_METERS).toBe(150);
+  it('uses an 800 m radius', () => {
+    expect(REPORT_GEOFENCE_METERS).toBe(800);
   });
 
-  it('allows a fix 149 m away and refuses one 151 m away with the 150 m reason', () => {
-    expect(checkReportPosition(HERE, station('a', 149))).toEqual({ allowed: true });
-    expect(checkReportPosition(HERE, station('a', 151))).toEqual({ allowed: false, reason: TOO_FAR });
+  it('allows a fix 799 m away and refuses one 801 m away with the 800 m reason', () => {
+    expect(checkReportPosition(HERE, station('a', 799))).toEqual({ allowed: true });
+    expect(checkReportPosition(HERE, station('a', 801))).toEqual({ allowed: false, reason: TOO_FAR });
+  });
+
+  it('allows a driver at the back of a 300 m queue, where the old 150 m rule would have refused', () => {
+    expect(checkReportPosition(HERE, station('a', 300))).toEqual({ allowed: true });
   });
 
   it('refuses when there is no usable position', () => {
@@ -107,5 +112,12 @@ describe('checkReportPosition (the 150 m rule for reporting)', () => {
 
   it('refuses a station with no map position instead of guessing', () => {
     expect(checkReportPosition(HERE, { lat: Number.NaN, lng: Number.NaN })).toEqual({ allowed: false, reason: TOO_FAR });
+  });
+});
+
+describe('ARRIVAL_PROMPT_METERS (when the "you have arrived, report?" nudge may appear)', () => {
+  it('is 300 m: the length of a long queue, not the whole 800 m reporting distance, so a driver just passing by is not nudged', () => {
+    expect(ARRIVAL_PROMPT_METERS).toBe(300);
+    expect(ARRIVAL_PROMPT_METERS).toBeLessThan(REPORT_GEOFENCE_METERS);
   });
 });

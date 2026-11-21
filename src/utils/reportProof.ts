@@ -6,7 +6,7 @@ const finite = (n: unknown): n is number => typeof n === 'number' && Number.isFi
 
 /**
  * Why this report cannot be posted, as a sentence for the driver, or null when it carries the proof
- * every report needs: a live photo plus the position it was taken at, within 150 m of the station.
+ * every report needs: a live photo plus the position it was taken at, within the reporting distance of the station (REPORT_GEOFENCE_METERS).
  */
 export function reportProofProblem(
   report: { photo?: string; photoLat?: number; photoLng?: number },

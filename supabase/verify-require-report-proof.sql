@@ -33,7 +33,7 @@ begin
     power(sin(radians(new.photo_lat - v_lat) / 2), 2)
     + cos(radians(v_lat)) * cos(radians(new.photo_lat)) * power(sin(radians(new.photo_lng - v_lng) / 2), 2)
   ));
-  if v_away > 150 then
+  if v_away > 800 then
     raise exception 'a photo taken at the station is required';
   end if;
 
@@ -95,14 +95,14 @@ declare
   v_before integer;
   v_after integer;
   -- one degree of latitude is about 111,195 m
-  lat_149 double precision;
-  lat_151 double precision;
+  lat_799 double precision;
+  lat_801 double precision;
   base_cols text := 'id, station_id, author, author_avatar, verified, is_photo_verified, verification_level, verification_weight, timestamp, status, status_label';
 begin
   select id into v_user from profiles limit 1;
   select id, lat, lng into s1, s_lat, s_lng from stations where lat is not null and lng is not null order by id limit 1;
-  lat_149 := s_lat + 149.0 / 111195.0;
-  lat_151 := s_lat + 151.0 / 111195.0;
+  lat_799 := s_lat + 799.0 / 111195.0;
+  lat_801 := s_lat + 801.0 / 111195.0;
 
   select count(*) into v_before from station_reports;
 
@@ -134,14 +134,14 @@ begin
       base_cols, s1, v_photo, s_lat),
     'photo taken at the station');
 
-  perform pg_temp.expect_error('f: position 151 m away refused',
+  perform pg_temp.expect_error('f: position 801 m away refused',
     format($q$insert into station_reports (%s, photo, photo_lat, photo_lng) values ('verify-f', %L, 'T', '', false, false, 'unverified_text', 0.5, 'now', 'full', 'x', %L, %s, %s)$q$,
-      base_cols, s1, v_photo, lat_151, s_lng),
+      base_cols, s1, v_photo, lat_801, s_lng),
     'photo taken at the station');
 
-  perform pg_temp.expect_ok('g: position 149 m away allowed',
+  perform pg_temp.expect_ok('g: position 799 m away allowed',
     format($q$insert into station_reports (%s, photo, photo_lat, photo_lng) values ('verify-g', %L, 'T', '', false, false, 'unverified_text', 0.5, 'now', 'full', 'x', %L, %s, %s)$q$,
-      base_cols, s1, v_photo, lat_149, s_lng));
+      base_cols, s1, v_photo, lat_799, s_lng));
 
   -- with no login at all (SQL editor, seed scripts) nothing is required
   perform set_config('request.jwt.claims', '', true);

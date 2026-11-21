@@ -141,7 +141,7 @@ export const UserEditorModal: React.FC<Props> = ({ user, onClose, onSaved, flash
             <span>
               <span className="block text-sm font-semibold text-adm-ink">Community manager</span>
               <span className="block text-xs text-adm-mute-text">
-                Can post "Gas available" or "Gas not available" for a station when they are within 150 m of it. They use the normal driver app.
+                Can post "Gas available" or "Gas not available" for any station, from anywhere. They use the normal driver app.
               </span>
             </span>
           </label>
