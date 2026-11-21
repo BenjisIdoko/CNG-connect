@@ -1,7 +1,7 @@
 import { haversineMeters } from './stationDuplicates';
 
 /** A driver whose phone is this close to a station counts as a car there. */
-export const PRESENCE_GEOFENCE_METERS = 250;
+export const PRESENCE_GEOFENCE_METERS = 500;
 /** While inside, the app tells the database again at most this often, per station. */
 export const PRESENCE_PING_INTERVAL_MS = 120_000;
 /** A presence record lapses this long after the last ping, so leaving (or closing the app) drops out fast. */
@@ -50,14 +50,14 @@ export function stationsToPing(
 /**
  * A report must come from someone at the station or in its queue: within this many metres when the photo
  * is taken (and again when the report is submitted). Stations ask drivers to queue back along the road, so
- * the line can stretch 200 to 300 m; 800 m lets a driver at the back of it report, while still keeping
+ * the line can stretch 200 to 300 m; 300 m lets a driver at the back of it report, while still keeping
  * reports to people who are really there.
  */
-export const REPORT_GEOFENCE_METERS = 800;
+export const REPORT_GEOFENCE_METERS = 300;
 
 /**
- * How close a driver must be for the "you have arrived, report?" nudge to appear. It is the length of a long
- * queue, not the whole reporting distance: at 800 m a driver merely passing the station would be nudged.
+ * How close a driver must be for the "you have arrived, report?" nudge to appear. The same as the reporting
+ * distance, so the nudge only shows where a report would be accepted.
  */
 export const ARRIVAL_PROMPT_METERS = 300;
 

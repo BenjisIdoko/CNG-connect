@@ -2,7 +2,7 @@
 -- Run once in the Supabase dashboard: SQL Editor -> paste -> Run. Safe to re-run.
 --
 -- station_presence has one row per driver per station: the app writes it automatically while a
--- signed-in driver's phone is within 250 m of a station (and it lapses a few minutes after the last
+-- signed-in driver's phone is within 500 m of a station (and it lapses a few minutes after the last
 -- update). The table was publicly readable, so anyone could list which account was at which station
 -- and when. Drivers only ever need the NUMBER of cars at each station, so:
 --   1. station_car_counts() returns just (station_id, cars) for live rows, to anyone;

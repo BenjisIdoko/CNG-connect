@@ -1,7 +1,7 @@
 -- Count only real "car at the station" records, not old page-view ones. Safe to re-run.
 --
 -- Older app versions write a presence record every time a driver merely OPENS a station's page,
--- living 20 minutes. The current app writes one only while a driver's phone is within 250 m of the
+-- living 20 minutes. The current app writes one only while a driver's phone is within 500 m of the
 -- station, living 6 minutes and refreshed every 2 minutes. Phones that have not updated yet keep
 -- writing the old kind, so "N cars here" counted people looking at the page and flickered as those
 -- records came and went.

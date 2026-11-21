@@ -17,8 +17,8 @@ const station = (id: string, metersNorth: number) => ({ id, lat: HERE.lat + mete
 const NOW = 1_800_000_000_000;
 
 describe('presence constants', () => {
-  it('uses a 250 m geofence, a ping every 2 minutes, a 6 minute expiry and a 100 m accuracy limit', () => {
-    expect(PRESENCE_GEOFENCE_METERS).toBe(250);
+  it('uses a 500 m geofence, a ping every 2 minutes, a 6 minute expiry and a 100 m accuracy limit', () => {
+    expect(PRESENCE_GEOFENCE_METERS).toBe(500);
     expect(PRESENCE_PING_INTERVAL_MS).toBe(120_000);
     expect(PRESENCE_TTL_MINUTES).toBe(6);
     expect(MAX_GPS_ACCURACY_METERS).toBe(100);
@@ -26,9 +26,9 @@ describe('presence constants', () => {
 });
 
 describe('isAtStation', () => {
-  it('is true at 249 m and false at 251 m', () => {
-    expect(isAtStation(HERE, station('a', 249))).toBe(true);
-    expect(isAtStation(HERE, station('a', 251))).toBe(false);
+  it('is true at 499 m and false at 501 m', () => {
+    expect(isAtStation(HERE, station('a', 499))).toBe(true);
+    expect(isAtStation(HERE, station('a', 501))).toBe(false);
   });
 
   it('is false for a station page opened from 5 km away', () => {
@@ -48,7 +48,7 @@ describe('isAtStation', () => {
 });
 
 describe('stationsToPing', () => {
-  it('returns a station inside 250 m that was never pinged', () => {
+  it('returns a station inside 500 m that was never pinged', () => {
     expect(stationsToPing(HERE, [station('a', 100)], {}, NOW)).toEqual(['a']);
   });
 
@@ -57,8 +57,12 @@ describe('stationsToPing', () => {
     expect(stationsToPing(HERE, [station('a', 100)], { a: NOW - 121_000 }, NOW)).toEqual(['a']);
   });
 
-  it('does not return a station 251 m away', () => {
-    expect(stationsToPing(HERE, [station('a', 251)], {}, NOW)).toEqual([]);
+  it('returns a station 400 m away (beyond the old 250 m radius)', () => {
+    expect(stationsToPing(HERE, [station('a', 400)], {}, NOW)).toEqual(['a']);
+  });
+
+  it('does not return a station 501 m away', () => {
+    expect(stationsToPing(HERE, [station('a', 501)], {}, NOW)).toEqual([]);
   });
 
   it('returns nothing for a fix with accuracy 150 m, but accepts a fix with no accuracy value', () => {
@@ -77,19 +81,19 @@ describe('stationsToPing', () => {
   });
 });
 
-describe('checkReportPosition (the 800 m rule for reporting: the back of a long queue counts)', () => {
-  const TOO_FAR = 'Reports unlock within 800 m of the station so every status comes from someone actually there.';
+describe('checkReportPosition (the 300 m rule for reporting: the back of a long queue counts)', () => {
+  const TOO_FAR = 'Reports unlock within 300 m of the station so every status comes from someone actually there.';
 
-  it('uses an 800 m radius', () => {
-    expect(REPORT_GEOFENCE_METERS).toBe(800);
+  it('uses a 300 m radius', () => {
+    expect(REPORT_GEOFENCE_METERS).toBe(300);
   });
 
-  it('allows a fix 799 m away and refuses one 801 m away with the 800 m reason', () => {
-    expect(checkReportPosition(HERE, station('a', 799))).toEqual({ allowed: true });
-    expect(checkReportPosition(HERE, station('a', 801))).toEqual({ allowed: false, reason: TOO_FAR });
+  it('allows a fix 299 m away and refuses one 301 m away with the 300 m reason', () => {
+    expect(checkReportPosition(HERE, station('a', 299))).toEqual({ allowed: true });
+    expect(checkReportPosition(HERE, station('a', 301))).toEqual({ allowed: false, reason: TOO_FAR });
   });
 
-  it('allows a driver at the back of a 300 m queue, where the old 150 m rule would have refused', () => {
+  it('allows a driver exactly 300 m away (the back of a long queue), where the old 150 m rule would have refused', () => {
     expect(checkReportPosition(HERE, station('a', 300))).toEqual({ allowed: true });
   });
 
@@ -116,8 +120,8 @@ describe('checkReportPosition (the 800 m rule for reporting: the back of a long 
 });
 
 describe('ARRIVAL_PROMPT_METERS (when the "you have arrived, report?" nudge may appear)', () => {
-  it('is 300 m: the length of a long queue, not the whole 800 m reporting distance, so a driver just passing by is not nudged', () => {
+  it('is 300 m, the same as the reporting distance, so the nudge only appears where a report would be accepted', () => {
     expect(ARRIVAL_PROMPT_METERS).toBe(300);
-    expect(ARRIVAL_PROMPT_METERS).toBeLessThan(REPORT_GEOFENCE_METERS);
+    expect(ARRIVAL_PROMPT_METERS).toBeLessThanOrEqual(REPORT_GEOFENCE_METERS);
   });
 });

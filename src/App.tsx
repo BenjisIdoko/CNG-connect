@@ -621,7 +621,7 @@ export const App: React.FC = () => {
         if (st.lat == null || st.lng == null) return false;
 
         const distKm = getDistanceInKm(latitude, longitude, st.lat, st.lng);
-        // "Arrived" means at the station or in its queue (300 m), not merely within reporting distance (800 m).
+        // "Arrived" means at the station or in its queue (300 m, the same as the reporting distance).
         if (distKm * 1000 > ARRIVAL_PROMPT_METERS) return false;
 
         if (!isStationStale(st.lastUpdated, 30)) return false;
