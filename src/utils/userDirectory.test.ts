@@ -59,8 +59,11 @@ describe('filterUsers', () => {
     expect(filterUsers(rows, { ...ALL, search: 'noname' }).map((r) => r.id)).toEqual(['3']);
   });
 
-  it('filters by role', () => {
-    expect(filterUsers(rows, { ...ALL, role: 'admin' }).map((r) => r.id)).toEqual(['1']);
+  it('filters by role, including community managers', () => {
+    const communityManagerIds = new Set(['2']);
+    expect(filterUsers(rows, { ...ALL, role: 'admin', communityManagerIds }).map((r) => r.id)).toEqual(['1']);
+    expect(filterUsers(rows, { ...ALL, role: 'community_manager', communityManagerIds }).map((r) => r.id)).toEqual(['2']);
+    expect(filterUsers(rows, { ...ALL, role: 'driver', communityManagerIds }).map((r) => r.id)).toEqual(['3']);
     expect(filterUsers(rows, { ...ALL, role: 'driver' }).map((r) => r.id)).toEqual(['2', '3']);
   });
 
@@ -94,10 +97,10 @@ describe('sortUsers', () => {
     expect(sortUsers(rows, 'points', 'desc').map((r) => r.id)).toEqual(['a', 'c', 'b', 'n']);
   });
 
-  it('sorts admins before drivers when ascending by role, and does not change its input', () => {
-    const input = [user({ id: 'd', is_admin: false }), user({ id: 'x', is_admin: true })];
+  it('sorts admins before community managers before drivers when ascending by role, and does not change its input', () => {
+    const input = [user({ id: 'd', is_admin: false }), user({ id: 'cm', is_admin: false }), user({ id: 'x', is_admin: true })];
     const copy = [...input];
-    expect(sortUsers(input, 'role', 'asc').map((r) => r.id)).toEqual(['x', 'd']);
+    expect(sortUsers(input, 'role', 'asc', new Set(['cm'])).map((r) => r.id)).toEqual(['x', 'cm', 'd']);
     expect(input).toEqual(copy);
   });
 });

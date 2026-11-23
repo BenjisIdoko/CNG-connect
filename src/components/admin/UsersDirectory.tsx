@@ -95,8 +95,11 @@ export const UsersDirectory: React.FC<DirectoryProps> = ({ rows, loading, onEdit
 
   const kits = useMemo(() => distinctKits(rows), [rows]);
   const states = useMemo(() => distinctStates(rows), [rows]);
-  const filtered = useMemo(() => filterUsers(rows, { search, role, state: stateFilter, kit }), [rows, search, role, stateFilter, kit]);
-  const sorted = useMemo(() => sortUsers(filtered, sortKey, sortDir), [filtered, sortKey, sortDir]);
+  const filtered = useMemo(
+    () => filterUsers(rows, { search, role, state: stateFilter, kit, communityManagerIds }),
+    [rows, search, role, stateFilter, kit, communityManagerIds],
+  );
+  const sorted = useMemo(() => sortUsers(filtered, sortKey, sortDir, communityManagerIds), [filtered, sortKey, sortDir, communityManagerIds]);
   const view = paginate(sorted, page, pageSize);
   const anyFilter = Boolean(search.trim() || role !== 'all' || stateFilter || kit);
 
@@ -214,6 +217,7 @@ export const UsersDirectory: React.FC<DirectoryProps> = ({ rows, loading, onEdit
               >
                 <option value="all">All roles</option>
                 <option value="admin">Admins</option>
+                <option value="community_manager">Community managers</option>
                 <option value="driver">Drivers</option>
               </select>
               <select

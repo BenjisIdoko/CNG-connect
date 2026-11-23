@@ -40,6 +40,7 @@ describe('UsersDirectory', () => {
     const html = render(rows);
     expect(html).toContain('aria-label="Search users"');
     expect(html).toContain('aria-label="Role"');
+    expect(html).toContain('<option value="community_manager">Community managers</option>');
     expect(html).toContain('aria-label="State"');
     expect(html).toContain('>Abuja<');
     expect(html).toContain('>12kg cylinder, installed<');
@@ -96,7 +97,7 @@ describe('UsersDirectory', () => {
       <UsersDirectory rows={rows} loading={false} onEdit={noop} onDelete={noop} flash={noop} communityManagerIds={new Set(['3'])} />,
     );
     expect(html.match(/>Community manager</g)).toHaveLength(1);
-    expect(render(rows)).not.toContain('Community manager');
+    expect(render(rows)).not.toContain('>Community manager<');
   });
 });
 

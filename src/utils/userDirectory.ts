@@ -17,7 +17,7 @@ export interface DirectoryUser {
   is_admin: boolean | null;
 }
 
-export type RoleFilter = 'all' | 'admin' | 'driver';
+export type RoleFilter = 'all' | 'admin' | 'community_manager' | 'driver';
 
 export interface UserFilters {
   search: string;
@@ -26,6 +26,8 @@ export interface UserFilters {
   state: string;
   /** An exact CNG kit value, KIT_NONE for "no kit recorded", or '' for every kit. */
   kit: string;
+  /** Ids of accounts with the community manager role. */
+  communityManagerIds?: ReadonlySet<string>;
 }
 
 export type UserSortKey = 'name' | 'email' | 'state' | 'kit' | 'role' | 'reports' | 'reputation' | 'points';
@@ -46,8 +48,10 @@ export function userInitials(name: string | null | undefined, email: string | nu
 export function filterUsers<T extends DirectoryUser>(rows: T[], filters: UserFilters): T[] {
   const q = filters.search.trim().toLowerCase();
   return rows.filter((r) => {
+    const isCommunityManager = Boolean(filters.communityManagerIds?.has(r.id));
     if (filters.role === 'admin' && !r.is_admin) return false;
-    if (filters.role === 'driver' && r.is_admin) return false;
+    if (filters.role === 'community_manager' && !isCommunityManager) return false;
+    if (filters.role === 'driver' && (r.is_admin || isCommunityManager)) return false;
     if (filters.state && r.state !== filters.state) return false;
     if (filters.kit === KIT_NONE) {
       if ((r.cng_kit || '').trim()) return false;
@@ -59,7 +63,11 @@ export function filterUsers<T extends DirectoryUser>(rows: T[], filters: UserFil
   });
 }
 
-const sortValue = (r: DirectoryUser, key: UserSortKey): string | number | null => {
+const sortValue = (
+  r: DirectoryUser,
+  key: UserSortKey,
+  communityManagerIds?: ReadonlySet<string>,
+): string | number | null => {
   switch (key) {
     case 'name':
       return (r.name || '').trim().toLowerCase() || null;
@@ -70,7 +78,7 @@ const sortValue = (r: DirectoryUser, key: UserSortKey): string | number | null =
     case 'kit':
       return (r.cng_kit || '').trim().toLowerCase() || null;
     case 'role':
-      return r.is_admin ? 0 : 1; // admins first when ascending
+      return r.is_admin ? 0 : communityManagerIds?.has(r.id) ? 1 : 2; // admins, then community managers, then drivers
     case 'reports':
       return r.reports_count;
     case 'reputation':
@@ -81,10 +89,15 @@ const sortValue = (r: DirectoryUser, key: UserSortKey): string | number | null =
 };
 
 /** A sorted copy. Missing values go last in either direction; ties keep their original order. */
-export function sortUsers<T extends DirectoryUser>(rows: T[], key: UserSortKey, dir: SortDir): T[] {
+export function sortUsers<T extends DirectoryUser>(
+  rows: T[],
+  key: UserSortKey,
+  dir: SortDir,
+  communityManagerIds?: ReadonlySet<string>,
+): T[] {
   const sign = dir === 'asc' ? 1 : -1;
   return rows
-    .map((row, index) => ({ row, index, value: sortValue(row, key) }))
+    .map((row, index) => ({ row, index, value: sortValue(row, key, communityManagerIds) }))
     .sort((a, b) => {
       if (a.value === null && b.value !== null) return 1;
       if (a.value !== null && b.value === null) return -1;
