@@ -140,90 +140,94 @@ export const ReportsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash }
 
           {!loading && !err && rows.length > 0 && (
             <div className="overflow-hidden rounded-xl border border-adm-line bg-adm-card shadow-[0_1px_2px_rgba(17,24,20,0.03)]">
-              <Table>
-              <TableHeader>
-                <TableRow className="hover:bg-transparent">
-                  <TableHead className="min-w-[160px]">Station</TableHead>
-                  <TableHead className="min-w-[100px]">Status</TableHead>
-                  <TableHead className="min-w-[110px]">Reporter</TableHead>
-                  <TableHead className="min-w-[90px]">Reported</TableHead>
-                  <TableHead className="min-w-[100px]">Verification</TableHead>
-                  <TableHead className="min-w-[220px]">Flags / comment</TableHead>
-                  <TableHead className="w-20">Photo</TableHead>
-                  <TableHead className="w-44">
-                    <span className="sr-only">Actions</span>
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {rows.map((r) => (
-                  <TableRow key={r.report_id}>
-                    <TableCell className="max-w-[180px] truncate font-semibold" title={r.station_name}>
-                      {r.station_name}
-                    </TableCell>
-                    <TableCell>
-                      <span className="inline-flex items-center gap-1.5 font-semibold">
-                        <span aria-hidden="true" className={`size-2 rounded-sm ${STATUS_DOT[r.status] || 'bg-adm-line'}`} />
-                        {r.status_label}
-                      </span>
-                    </TableCell>
-                    <TableCell className="max-w-[110px] truncate text-adm-mute-text">{r.author}</TableCell>
-                    <TableCell className="whitespace-nowrap text-adm-mute-text">{formatRelativeTime(r.created_at)}</TableCell>
-                    <TableCell className="capitalize text-adm-mute-text">{r.verification_level.replace(/_/g, ' ')}</TableCell>
-                    <TableCell>
-                      <div className="mb-1 flex flex-wrap gap-1">
-                        {r.open_flags > 0 && (
-                          <Badge variant="destructive">
-                            {r.open_flags} flag{r.open_flags > 1 ? 's' : ''}
-                          </Badge>
-                        )}
-                        {(r.reasons || []).map((x) => (
-                          <Badge key={x} variant="secondary">
-                            {REASON_LABEL[x] || x}
-                          </Badge>
-                        ))}
-                        {r.dislikes > 0 && (
-                          <Badge variant="secondary">
-                            {r.dislikes} dislike{r.dislikes > 1 ? 's' : ''}
-                          </Badge>
-                        )}
-                        {r.hidden && r.hidden_reason && <Badge variant="secondary">{r.hidden_reason}</Badge>}
-                      </div>
-                      {r.comment && (
-                        <p className="max-w-[260px] truncate text-adm-mute-text" title={r.comment}>
-                          &ldquo;{r.comment}&rdquo;
-                        </p>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {r.photo && (
-                        <a href={r.photo} target="_blank" rel="noreferrer" aria-label={`Open the photo for ${r.station_name}`}>
-                          <img src={r.photo} alt="" className="size-10 rounded-md border border-adm-line object-cover" loading="lazy" />
-                        </a>
-                      )}
-                    </TableCell>
-                    <TableCell className="whitespace-nowrap">
-                      {view === 'review' ? (
-                        <div className="flex gap-1.5">
-                          <Button variant="destructive" size="sm" disabled={busyId === r.report_id} onClick={() => void act(r, 'hide')}>
-                            Remove
-                          </Button>
-                          <Button variant="default" size="sm" disabled={busyId === r.report_id} onClick={() => void act(r, 'keep')}>
-                            Keep
-                          </Button>
-                        </div>
-                      ) : (
-                        <Button size="sm" disabled={busyId === r.report_id} onClick={() => void act(r, 'restore')}>
-                          Restore
-                        </Button>
-                      )}
-                    </TableCell>
+              <Table className="table-fixed max-md:block">
+                <TableHeader className="max-md:hidden">
+                  <TableRow className="hover:bg-transparent">
+                    <TableHead className="w-[22%]">Station</TableHead>
+                    <TableHead className="w-[14%]">Status</TableHead>
+                    <TableHead className="hidden lg:table-cell lg:w-[13%]">Reporter</TableHead>
+                    <TableHead className="w-[12%]">Reported</TableHead>
+                    <TableHead className="hidden xl:table-cell xl:w-[12%]">Verification</TableHead>
+                    <TableHead className="w-[26%]">Flags / comment</TableHead>
+                    <TableHead className="w-14">Photo</TableHead>
+                    <TableHead className="w-36 text-right">
+                      <span className="sr-only">Actions</span>
+                    </TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        )}
+                </TableHeader>
+                <TableBody className="max-md:block max-md:divide-y max-md:divide-adm-line">
+                  {rows.map((r) => (
+                    <TableRow key={r.report_id} className="max-md:flex max-md:flex-col max-md:gap-2 max-md:p-4">
+                      <TableCell className="truncate font-semibold max-md:p-0" title={r.station_name}>
+                        {r.station_name}
+                      </TableCell>
+                      <TableCell className="max-md:p-0">
+                        <span className="inline-flex items-center gap-1.5 font-semibold">
+                          <span aria-hidden="true" className={`size-2 rounded-sm ${STATUS_DOT[r.status] || 'bg-adm-line'}`} />
+                          {r.status_label}
+                        </span>
+                      </TableCell>
+                      <TableCell className="hidden truncate text-adm-mute-text lg:table-cell">{r.author}</TableCell>
+                      <TableCell className="whitespace-nowrap text-adm-mute-text max-md:p-0 max-md:text-xs">
+                        {formatRelativeTime(r.created_at)}
+                      </TableCell>
+                      <TableCell className="hidden truncate capitalize text-adm-mute-text xl:table-cell">
+                        {r.verification_level.replace(/_/g, ' ')}
+                      </TableCell>
+                      <TableCell className="max-md:p-0">
+                        <div className="mb-1 flex flex-wrap gap-1">
+                          {r.open_flags > 0 && (
+                            <Badge variant="destructive">
+                              {r.open_flags} flag{r.open_flags > 1 ? 's' : ''}
+                            </Badge>
+                          )}
+                          {(r.reasons || []).map((x) => (
+                            <Badge key={x} variant="secondary">
+                              {REASON_LABEL[x] || x}
+                            </Badge>
+                          ))}
+                          {r.dislikes > 0 && (
+                            <Badge variant="secondary">
+                              {r.dislikes} dislike{r.dislikes > 1 ? 's' : ''}
+                            </Badge>
+                          )}
+                          {r.hidden && r.hidden_reason && <Badge variant="secondary">{r.hidden_reason}</Badge>}
+                        </div>
+                        {r.comment && (
+                          <p className="truncate text-adm-mute-text" title={r.comment}>
+                            &ldquo;{r.comment}&rdquo;
+                          </p>
+                        )}
+                      </TableCell>
+                      <TableCell className="max-md:p-0">
+                        {r.photo && (
+                          <a href={r.photo} target="_blank" rel="noreferrer" aria-label={`Open the photo for ${r.station_name}`}>
+                            <img src={r.photo} alt="" className="size-10 rounded-md border border-adm-line object-cover" loading="lazy" />
+                          </a>
+                        )}
+                      </TableCell>
+                      <TableCell className="whitespace-nowrap text-right max-md:p-0 max-md:text-left">
+                        {view === 'review' ? (
+                          <div className="flex justify-end gap-1.5 max-md:justify-start">
+                            <Button variant="destructive" size="sm" disabled={busyId === r.report_id} onClick={() => void act(r, 'hide')}>
+                              Remove
+                            </Button>
+                            <Button variant="default" size="sm" disabled={busyId === r.report_id} onClick={() => void act(r, 'keep')}>
+                              Keep
+                            </Button>
+                          </div>
+                        ) : (
+                          <Button size="sm" disabled={busyId === r.report_id} onClick={() => void act(r, 'restore')}>
+                            Restore
+                          </Button>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
         </div>
       </div>
     </div>
