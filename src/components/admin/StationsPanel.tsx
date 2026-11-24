@@ -147,8 +147,9 @@ const EditableCell: React.FC<{
   value: string;
   placeholder?: string;
   align?: 'left' | 'right';
+  mono?: boolean;
   onCommit: (next: string) => void;
-}> = ({ value, placeholder, align = 'left', onCommit }) => {
+}> = ({ value, placeholder, align = 'left', mono = false, onCommit }) => {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(value);
 
@@ -178,9 +179,9 @@ const EditableCell: React.FC<{
             setEditing(false);
           }
         }}
-        className={`block w-full border border-adm-note rounded-md px-3 py-2.5 text-sm bg-adm-card outline-none ring-2 ring-adm-note ${
+        className={`block h-8 w-full rounded-md border border-adm-note bg-adm-card px-2 text-[13px] text-adm-ink outline-none ring-2 ring-adm-note/30 ${
           align === 'right' ? 'text-right' : ''
-        }`}
+        } ${mono ? 'font-geist-mono tabular-nums' : ''}`}
       />
     );
   }
@@ -189,9 +190,9 @@ const EditableCell: React.FC<{
       type="button"
       onClick={() => setEditing(true)}
       title="Click to edit"
-      className={`block w-full truncate px-3 py-2.5 text-sm outline-none hover:bg-adm-muted focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-adm-note ${
-        align === 'right' ? 'text-right' : 'text-left'
-      } ${value ? 'text-adm-ink' : 'text-adm-mute-text italic'}`}
+      className={`block w-full truncate rounded-md px-2 py-1.5 -mx-2 text-[13px] outline-none transition-colors hover:bg-adm-muted focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-adm-note ${
+        align === 'right' ? 'text-right ml-auto -mr-2' : 'text-left'
+      } ${mono ? 'font-geist-mono tabular-nums' : ''} ${value ? 'text-adm-ink' : 'text-adm-mute-text italic'}`}
     >
       {value || placeholder || '—'}
     </button>
@@ -416,219 +417,240 @@ export const StationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash 
   const fullEditorRow = fullEditorId ? rows.find((r) => r.id === fullEditorId) || null : null;
 
   return (
-    <div className="flex h-full min-h-0 flex-col overflow-x-hidden">
-      <div className="flex min-h-14 shrink-0 flex-wrap items-center justify-between gap-3 border-b border-adm-line bg-adm-card px-4 py-2.5 md:px-6">
-        <div className="flex min-w-0 flex-1 flex-wrap items-center gap-3">
-          <Badge variant={reviewCount > 0 ? 'warning' : 'secondary'}>{reviewCount} need review</Badge>
-          <Input
-            type="search"
-            aria-label="Search stations"
-            placeholder="Search name, address, state or operator"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="min-w-0 flex-1 sm:max-w-xs"
-          />
-          <label className="flex cursor-pointer items-center gap-2 text-xs font-medium whitespace-nowrap text-adm-ink">
+    <div className="h-full overflow-x-hidden overflow-y-auto">
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-5 p-4 pb-16 md:p-6">
+        {/* Top Page Header — aligned to the exact same left & right edges as the cards below */}
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="flex min-w-0 flex-col gap-1">
+            <div className="flex flex-wrap items-center gap-2.5">
+              <h2 className="font-geist text-xl font-bold tracking-tight text-balance text-adm-ink">Stations directory</h2>
+              <Badge variant="secondary" className="text-xs">
+                {rows.length} {rows.length === 1 ? 'station' : 'stations'}
+              </Badge>
+              <Badge variant={reviewCount > 0 ? 'warning' : 'secondary'}>{reviewCount} need review</Badge>
+            </div>
+            <p className="text-xs text-adm-mute-text">
+              Click any cell to edit inline, verify pin coordinates on the map, or open full details for operating hours and photos.
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button onClick={() => setAdding(true)} className="h-9">
+              Add station
+            </Button>
+            <Button variant="outline" onClick={exportCsv} className="h-9">
+              Export CSV
+            </Button>
+            <Button variant="outline" onClick={() => csvInputRef.current?.click()} className="h-9">
+              Upload CSV
+            </Button>
             <input
-              type="checkbox"
-              className="size-4 accent-adm-note"
-              checked={onlyReview}
-              onChange={(e) => setOnlyReview(e.target.checked)}
+              ref={csvInputRef}
+              type="file"
+              accept=".csv,text/csv"
+              className="hidden"
+              aria-label="Upload a CSV file of station changes"
+              onChange={onCsvFileSelected}
             />
-            Only needs review
-          </label>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <Button onClick={() => setAdding(true)}>Add station</Button>
-          <Button variant="outline" onClick={exportCsv}>
-            Export CSV
-          </Button>
-          <Button variant="outline" onClick={() => csvInputRef.current?.click()}>
-            Upload CSV
-          </Button>
-          <input
-            ref={csvInputRef}
-            type="file"
-            accept=".csv,text/csv"
-            className="hidden"
-            aria-label="Upload a CSV file of station changes"
-            onChange={onCsvFileSelected}
-          />
-        </div>
-      </div>
-
-      {selectedForDelete.size > 0 && (
-        <div className="flex shrink-0 items-center justify-between gap-2 border-b border-adm-danger/30 bg-adm-danger-soft px-4 py-2 md:px-6">
-          <span className="text-sm font-semibold text-adm-danger">{selectedForDelete.size} selected</span>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={() => setSelectedForDelete(new Set())}>
-              Clear
-            </Button>
-            <Button variant="destructive" size="sm" onClick={() => setConfirmingDelete(true)}>
-              Delete
-            </Button>
           </div>
         </div>
-      )}
 
-      <div className="flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-6">
-        <div className="mx-auto flex w-full max-w-7xl flex-col gap-4">
-          {!loading && rows.length > 0 && (
-            <div className="flex flex-col justify-between gap-3 rounded-xl border border-adm-line bg-adm-card p-4 shadow-[0_1px_2px_rgba(17,24,20,0.03)]">
-              <div className="grid grid-cols-3 divide-x divide-adm-line">
-                <div className="pr-3 sm:pr-4">
-                  <span className="block truncate text-[10px] font-semibold uppercase tracking-wider text-adm-mute-text">
-                    Total Stations
-                  </span>
-                  <span className="mt-1 block font-geist text-xl font-bold tracking-tight text-adm-ink tabular-nums sm:text-2xl">
-                    {rows.length}
-                  </span>
-                </div>
-                <div className="px-3 sm:px-4">
-                  <span className="block truncate text-[10px] font-semibold uppercase tracking-wider text-adm-mute-text">
-                    Verified Pin Precision
-                  </span>
-                  <span className="mt-1 flex flex-wrap items-baseline gap-1.5 font-geist text-xl font-bold tracking-tight text-adm-ink tabular-nums sm:text-2xl">
-                    {verifiedCount}
-                    <span className="text-xs font-semibold text-[#16a34a]">{verifiedPct}%</span>
-                  </span>
-                </div>
-                <div className="pl-3 sm:pl-4">
-                  <span className="block truncate text-[10px] font-semibold uppercase tracking-wider text-adm-mute-text">
-                    Needs Pin Review
-                  </span>
-                  <span className="mt-1 flex flex-wrap items-baseline gap-1.5 font-geist text-xl font-bold tracking-tight text-adm-ink tabular-nums sm:text-2xl">
-                    {reviewCount}
-                    <span className="text-xs font-semibold text-adm-warn">{reviewPct}%</span>
-                  </span>
-                </div>
+        {/* Sypher KPI & Precision Progress Card */}
+        {!loading && rows.length > 0 && (
+          <div className="flex flex-col justify-between gap-3.5 rounded-xl border border-adm-line bg-adm-card p-4 shadow-[0_1px_2px_rgba(17,24,20,0.03)]">
+            <div className="grid grid-cols-3 divide-x divide-adm-line">
+              <div className="pr-3 sm:pr-4">
+                <span className="block truncate text-[10px] font-semibold uppercase tracking-wider text-adm-mute-text">
+                  Total Stations
+                </span>
+                <span className="mt-1 block font-geist text-xl font-bold tracking-tight text-adm-ink tabular-nums sm:text-2xl">
+                  {rows.length}
+                </span>
               </div>
-              <div aria-hidden="true" className="flex h-2 w-full overflow-hidden rounded-full bg-adm-muted gap-0.5">
-                {verifiedCount > 0 && (
-                  <div className="h-full bg-[#16a34a]" style={{ width: `${Math.max(4, verifiedPct)}%` }} />
-                )}
-                {reviewCount > 0 && (
-                  <div className="h-full bg-[#84cc16]" style={{ width: `${Math.max(4, reviewPct)}%` }} />
-                )}
+              <div className="px-3 sm:px-4">
+                <span className="block truncate text-[10px] font-semibold uppercase tracking-wider text-adm-mute-text">
+                  Verified Pin Precision
+                </span>
+                <span className="mt-1 flex flex-wrap items-baseline gap-1.5 font-geist text-xl font-bold tracking-tight text-adm-ink tabular-nums sm:text-2xl">
+                  {verifiedCount}
+                  <span className="text-xs font-semibold text-[#16a34a]">{verifiedPct}%</span>
+                </span>
+              </div>
+              <div className="pl-3 sm:pl-4">
+                <span className="block truncate text-[10px] font-semibold uppercase tracking-wider text-adm-mute-text">
+                  Needs Pin Review
+                </span>
+                <span className="mt-1 flex flex-wrap items-baseline gap-1.5 font-geist text-xl font-bold tracking-tight text-adm-ink tabular-nums sm:text-2xl">
+                  {reviewCount}
+                  <span className="text-xs font-semibold text-adm-warn">{reviewPct}%</span>
+                </span>
               </div>
             </div>
-          )}
-
-          {loading && (
-            <div className="flex flex-col gap-3" aria-label="Loading stations">
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
+            <div aria-hidden="true" className="flex h-2 w-full overflow-hidden rounded-full bg-adm-muted gap-0.5">
+              {verifiedCount > 0 && (
+                <div className="h-full bg-[#16a34a]" style={{ width: `${Math.max(4, verifiedPct)}%` }} />
+              )}
+              {reviewCount > 0 && (
+                <div className="h-full bg-[#84cc16]" style={{ width: `${Math.max(4, reviewPct)}%` }} />
+              )}
             </div>
-          )}
-          {!loading && filtered.length > 0 && (
-            <div className="overflow-hidden rounded-xl border border-adm-line bg-adm-card shadow-[0_1px_2px_rgba(17,24,20,0.03)]">
-              <Table className="table-fixed max-md:block">
-                <TableHeader className="max-md:hidden">
-                  <TableRow className="hover:bg-transparent">
-                    <TableHead className="w-10">
+          </div>
+        )}
+
+        {/* Filter & Search Bar Card */}
+        <div className="flex flex-col gap-3 rounded-xl border border-adm-line bg-adm-card p-4 shadow-[0_1px_2px_rgba(17,24,20,0.03)] sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex min-w-0 flex-1 flex-wrap items-center gap-3">
+            <Input
+              type="search"
+              aria-label="Search stations"
+              placeholder="Search name, address, state or operator"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="h-10 min-w-0 flex-1 sm:max-w-md"
+            />
+            <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-adm-line bg-adm-muted/40 px-3 py-2 text-xs font-semibold whitespace-nowrap text-adm-ink transition-colors hover:bg-adm-muted">
+              <input
+                type="checkbox"
+                className="size-4 accent-adm-note"
+                checked={onlyReview}
+                onChange={(e) => setOnlyReview(e.target.checked)}
+              />
+              Only needs review ({reviewCount})
+            </label>
+          </div>
+          <span className="text-xs font-medium text-adm-mute-text tabular-nums">
+            Showing {filtered.length} of {rows.length}
+          </span>
+        </div>
+
+        {selectedForDelete.size > 0 && (
+          <div className="flex items-center justify-between gap-2 rounded-xl border border-adm-danger/30 bg-adm-danger-soft px-4 py-2.5">
+            <span className="text-sm font-semibold text-adm-danger">{selectedForDelete.size} selected</span>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" onClick={() => setSelectedForDelete(new Set())}>
+                Clear
+              </Button>
+              <Button variant="destructive" size="sm" onClick={() => setConfirmingDelete(true)}>
+                Delete
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {loading && (
+          <div className="flex flex-col gap-3" aria-label="Loading stations">
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+          </div>
+        )}
+
+        {!loading && filtered.length > 0 && (
+          <div className="overflow-hidden rounded-xl border border-adm-line bg-adm-card shadow-[0_1px_2px_rgba(17,24,20,0.03)]">
+            <Table className="table-fixed max-md:block">
+              <TableHeader className="max-md:hidden">
+                <TableRow className="bg-adm-muted/50 hover:bg-adm-muted/50">
+                  <TableHead className="w-10 pl-4 pr-1">
+                    <input
+                      type="checkbox"
+                      className="size-4 accent-adm-note"
+                      checked={allVisibleSelected}
+                      onChange={toggleSelectAllVisible}
+                      aria-label="Select all"
+                    />
+                  </TableHead>
+                  <TableHead>Name</TableHead>
+                  <TableHead className="w-32 lg:w-36">City</TableHead>
+                  <TableHead className="w-24 lg:w-28">State</TableHead>
+                  <TableHead className="hidden lg:table-cell lg:w-36 xl:w-44">Operator</TableHead>
+                  <TableHead className="w-24 text-right">Price (₦)</TableHead>
+                  <TableHead className="hidden xl:table-cell xl:w-24 text-right">Pressure</TableHead>
+                  <TableHead className="w-28">Pin</TableHead>
+                  <TableHead className="w-28 pr-4 text-right">
+                    <span className="sr-only">Actions</span>
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody className="max-md:block max-md:divide-y max-md:divide-adm-line">
+                {filtered.map((r) => (
+                  <TableRow
+                    key={r.id}
+                    className={`${r.needs_pin_review ? 'bg-adm-warn-soft/40' : ''} max-md:flex max-md:flex-col max-md:gap-2 max-md:p-4`}
+                  >
+                    <TableCell className="pl-4 pr-1 py-2 max-md:p-0">
                       <input
                         type="checkbox"
                         className="size-4 accent-adm-note"
-                        checked={allVisibleSelected}
-                        onChange={toggleSelectAllVisible}
-                        aria-label="Select all"
+                        checked={selectedForDelete.has(r.id)}
+                        onChange={() => toggleDeleteSelect(r.id)}
+                        aria-label={`Select ${r.name}`}
                       />
-                    </TableHead>
-                    <TableHead className="w-[27%] lg:w-[24%]">Name</TableHead>
-                    <TableHead className="w-[24%] lg:w-[20%]">Location</TableHead>
-                    <TableHead className="hidden lg:table-cell lg:w-[15%]">Operator</TableHead>
-                    <TableHead className="w-[12%] lg:w-[10%] text-right">Price (₦)</TableHead>
-                    <TableHead className="hidden xl:table-cell xl:w-[9%] text-right">Pressure</TableHead>
-                    <TableHead className="w-[14%] lg:w-[11%]">Pin</TableHead>
-                    <TableHead className="w-[108px] text-right">
-                      <span className="sr-only">Actions</span>
-                    </TableHead>
+                    </TableCell>
+                    <TableCell className="py-1.5 max-md:p-0">
+                      <div className="flex min-w-0 items-center gap-2">
+                        <span
+                          aria-hidden="true"
+                          className={`inline-block size-2 shrink-0 rounded-full ${r.needs_pin_review ? 'bg-adm-warn' : 'bg-[#16a34a]'}`}
+                        />
+                        <div className="min-w-0 flex-1 font-medium">
+                          <EditableCell value={r.name} onCommit={(v) => void saveField(r, { name: v })} />
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="py-1.5 max-md:p-0">
+                      <EditableCell value={r.city || ''} placeholder="City" onCommit={(v) => void saveField(r, { city: v })} />
+                    </TableCell>
+                    <TableCell className="py-1.5 max-md:p-0">
+                      <EditableCell value={r.state || ''} placeholder="State" onCommit={(v) => void saveField(r, { state: v })} />
+                    </TableCell>
+                    <TableCell className="hidden py-1.5 lg:table-cell">
+                      <EditableCell value={r.operator || ''} placeholder="Operator" onCommit={(v) => void saveField(r, { operator: v })} />
+                    </TableCell>
+                    <TableCell className="py-1.5 max-md:p-0">
+                      <EditableCell
+                        align="right"
+                        mono
+                        value={r.cng_price != null ? String(r.cng_price) : ''}
+                        onCommit={(v) => void saveNumericField(r, 'cng_price', v)}
+                      />
+                    </TableCell>
+                    <TableCell className="hidden py-1.5 xl:table-cell">
+                      <EditableCell
+                        align="right"
+                        mono
+                        value={r.pump_pressure != null ? String(r.pump_pressure) : ''}
+                        onCommit={(v) => void saveNumericField(r, 'pump_pressure', v)}
+                      />
+                    </TableCell>
+                    <TableCell className="py-1.5 max-md:p-0">
+                      <Button
+                        variant={r.needs_pin_review ? 'outline' : 'ghost'}
+                        size="sm"
+                        className={
+                          r.needs_pin_review
+                            ? 'h-7 max-w-full truncate border-adm-warn/40 bg-adm-warn-soft/60 px-2.5 text-xs text-adm-warn hover:bg-adm-warn-soft'
+                            : 'h-7 max-w-full truncate px-2.5 text-xs text-adm-mute-text hover:text-adm-ink'
+                        }
+                        onClick={() => setPinReviewId(r.id)}
+                      >
+                        {TIER_SHORT[(r.location_precision as Tier) || 'city']}
+                      </Button>
+                    </TableCell>
+                    <TableCell className="py-1.5 pr-4 whitespace-nowrap text-right max-md:p-0 max-md:text-left">
+                      <Button variant="secondary" size="sm" className="h-7 px-2.5 text-xs" onClick={() => setFullEditorId(r.id)}>
+                        Full details
+                      </Button>
+                    </TableCell>
                   </TableRow>
-                </TableHeader>
-                <TableBody className="max-md:block max-md:divide-y max-md:divide-adm-line">
-                  {filtered.map((r) => (
-                    <TableRow
-                      key={r.id}
-                      className={`${r.needs_pin_review ? 'bg-adm-warn-soft/50' : ''} max-md:flex max-md:flex-col max-md:gap-2 max-md:p-3.5`}
-                    >
-                      <TableCell className="max-md:p-0">
-                        <input
-                          type="checkbox"
-                          className="size-4 accent-adm-note"
-                          checked={selectedForDelete.has(r.id)}
-                          onChange={() => toggleDeleteSelect(r.id)}
-                          aria-label={`Select ${r.name}`}
-                        />
-                      </TableCell>
-                      <TableCell className="p-0">
-                        <div className="flex min-w-0 items-center gap-2 pl-3 max-md:pl-0">
-                          <span
-                            aria-hidden="true"
-                            className={`inline-block size-2 shrink-0 rounded-sm ${r.needs_pin_review ? 'bg-adm-warn' : 'bg-adm-note'}`}
-                          />
-                          <div className="min-w-0 flex-1">
-                            <EditableCell value={r.name} onCommit={(v) => void saveField(r, { name: v })} />
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell className="p-0">
-                        <div className="flex min-w-0 items-center gap-1 pl-2 max-md:pl-0">
-                          <div className="min-w-0 flex-1">
-                            <EditableCell value={r.city || ''} placeholder="City" onCommit={(v) => void saveField(r, { city: v })} />
-                          </div>
-                          <span aria-hidden="true" className="shrink-0 text-adm-mute-text">
-                            ,
-                          </span>
-                          <div className="w-16 shrink-0">
-                            <EditableCell value={r.state || ''} placeholder="State" onCommit={(v) => void saveField(r, { state: v })} />
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell className="hidden p-0 lg:table-cell">
-                        <EditableCell value={r.operator || ''} onCommit={(v) => void saveField(r, { operator: v })} />
-                      </TableCell>
-                      <TableCell className="p-0">
-                        <EditableCell
-                          align="right"
-                          value={r.cng_price != null ? String(r.cng_price) : ''}
-                          onCommit={(v) => void saveNumericField(r, 'cng_price', v)}
-                        />
-                      </TableCell>
-                      <TableCell className="hidden p-0 xl:table-cell">
-                        <EditableCell
-                          align="right"
-                          value={r.pump_pressure != null ? String(r.pump_pressure) : ''}
-                          onCommit={(v) => void saveNumericField(r, 'pump_pressure', v)}
-                        />
-                      </TableCell>
-                      <TableCell className="max-md:p-0">
-                        <Button
-                          variant={r.needs_pin_review ? 'outline' : 'ghost'}
-                          size="sm"
-                          className={r.needs_pin_review ? 'max-w-full truncate border-adm-warn/40 text-adm-warn' : 'max-w-full truncate'}
-                          onClick={() => setPinReviewId(r.id)}
-                        >
-                          {TIER_SHORT[(r.location_precision as Tier) || 'city']}
-                        </Button>
-                      </TableCell>
-                      <TableCell className="whitespace-nowrap text-right max-md:p-0 max-md:text-left">
-                        <Button variant="secondary" size="sm" onClick={() => setFullEditorId(r.id)}>
-                          Full details
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          )}
-          {!loading && filtered.length === 0 && (
-            <div className="rounded-xl border border-adm-line bg-adm-card p-8 text-center shadow-[0_1px_2px_rgba(17,24,20,0.03)]">
-              <p className="text-sm text-adm-mute-text">Nothing matches that search.</p>
-            </div>
-          )}
-        </div>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        )}
+        {!loading && filtered.length === 0 && (
+          <div className="rounded-xl border border-adm-line bg-adm-card p-8 text-center shadow-[0_1px_2px_rgba(17,24,20,0.03)]">
+            <p className="text-sm text-adm-mute-text">Nothing matches that search.</p>
+          </div>
+        )}
       </div>
 
       {confirmingDelete && (

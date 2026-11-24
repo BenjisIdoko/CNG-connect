@@ -92,28 +92,28 @@ export const ReportsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash }
   };
 
   return (
-    <div className="flex h-full min-h-0 flex-col">
-      <div className="flex shrink-0 items-center justify-between gap-3 border-b border-adm-line bg-adm-card px-4 py-2.5 md:px-6">
-        <div className="flex items-center gap-3">
-          <Tabs value={view} onValueChange={(v) => setView(v as 'review' | 'hidden')}>
-            <TabsList aria-label="Report view">
-              <TabsTrigger value="review">Needs review</TabsTrigger>
-              <TabsTrigger value="hidden">Removed (30 days)</TabsTrigger>
-            </TabsList>
-          </Tabs>
-          {!loading && (
-            <Badge variant="secondary" className="text-xs">
-              {rows.length} {rows.length === 1 ? 'report' : 'reports'}
-            </Badge>
-          )}
+    <div className="h-full overflow-x-hidden overflow-y-auto">
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-5 p-4 pb-16 md:p-6">
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-adm-line bg-adm-card px-4 py-3 shadow-[0_1px_2px_rgba(17,24,20,0.03)]">
+          <div className="flex items-center gap-3">
+            <Tabs value={view} onValueChange={(v) => setView(v as 'review' | 'hidden')}>
+              <TabsList aria-label="Report view">
+                <TabsTrigger value="review">Needs review</TabsTrigger>
+                <TabsTrigger value="hidden">Removed (30 days)</TabsTrigger>
+              </TabsList>
+            </Tabs>
+            {!loading && (
+              <Badge variant="secondary" className="text-xs">
+                {rows.length} {rows.length === 1 ? 'report' : 'reports'}
+              </Badge>
+            )}
+          </div>
+          <Button variant="outline" size="sm" onClick={() => void load()}>
+            Refresh
+          </Button>
         </div>
-        <Button variant="outline" size="sm" onClick={() => void load()}>
-          Refresh
-        </Button>
-      </div>
 
-      <div className="flex-1 overflow-auto p-4 md:p-6">
-        <div className="mx-auto flex w-full max-w-7xl flex-col gap-4">
+        <div className="flex flex-col gap-4">
           {loading && (
             <div className="flex flex-col gap-3" aria-label="Loading reports">
               <Skeleton className="h-10 w-full" />
@@ -142,15 +142,15 @@ export const ReportsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash }
             <div className="overflow-hidden rounded-xl border border-adm-line bg-adm-card shadow-[0_1px_2px_rgba(17,24,20,0.03)]">
               <Table className="table-fixed max-md:block">
                 <TableHeader className="max-md:hidden">
-                  <TableRow className="hover:bg-transparent">
-                    <TableHead className="w-[22%]">Station</TableHead>
-                    <TableHead className="w-[14%]">Status</TableHead>
-                    <TableHead className="hidden lg:table-cell lg:w-[13%]">Reporter</TableHead>
-                    <TableHead className="w-[12%]">Reported</TableHead>
-                    <TableHead className="hidden xl:table-cell xl:w-[12%]">Verification</TableHead>
-                    <TableHead className="w-[26%]">Flags / comment</TableHead>
-                    <TableHead className="w-14">Photo</TableHead>
-                    <TableHead className="w-36 text-right">
+                  <TableRow className="bg-adm-muted/50 hover:bg-adm-muted/50">
+                    <TableHead className="w-[26%] pl-4">Station</TableHead>
+                    <TableHead className="w-28">Status</TableHead>
+                    <TableHead className="hidden lg:table-cell lg:w-32">Reporter</TableHead>
+                    <TableHead className="w-24">Reported</TableHead>
+                    <TableHead className="hidden xl:table-cell xl:w-32">Verification</TableHead>
+                    <TableHead>Flags / comment</TableHead>
+                    <TableHead className="w-16">Photo</TableHead>
+                    <TableHead className="w-36 pr-4 text-right">
                       <span className="sr-only">Actions</span>
                     </TableHead>
                   </TableRow>
@@ -158,7 +158,7 @@ export const ReportsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash }
                 <TableBody className="max-md:block max-md:divide-y max-md:divide-adm-line">
                   {rows.map((r) => (
                     <TableRow key={r.report_id} className="max-md:flex max-md:flex-col max-md:gap-2 max-md:p-4">
-                      <TableCell className="truncate font-semibold max-md:p-0" title={r.station_name}>
+                      <TableCell className="pl-4 truncate font-semibold max-md:p-0" title={r.station_name}>
                         {r.station_name}
                       </TableCell>
                       <TableCell className="max-md:p-0">

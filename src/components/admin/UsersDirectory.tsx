@@ -369,14 +369,14 @@ export const UsersDirectory: React.FC<DirectoryProps> = ({ rows, loading, onEdit
             <Table className="table-fixed max-md:block">
               <TableHeader className="max-md:hidden">
                 <TableRow className="bg-adm-muted/50 hover:bg-adm-muted/50">
-                  <SortHead label="User" sortKey="name" active={sortKey} dir={sortDir} onSort={onSort} className="w-[24%] lg:w-[22%] pl-4" />
-                  <SortHead label="State" sortKey="state" active={sortKey} dir={sortDir} onSort={onSort} className="w-[11%] lg:w-[9%]" />
-                  <TableHead className="hidden xl:table-cell xl:w-[12%]">Vehicle</TableHead>
-                  <SortHead label="CNG kit" sortKey="kit" active={sortKey} dir={sortDir} onSort={onSort} className="hidden lg:table-cell lg:w-[17%] xl:w-[15%]" />
-                  <SortHead label="Role" sortKey="role" active={sortKey} dir={sortDir} onSort={onSort} className="w-[16%] lg:w-[13%] xl:w-[11%]" />
-                  <SortHead label="Activity" sortKey="reports" active={sortKey} dir={sortDir} onSort={onSort} className="w-[18%] lg:w-[13%] xl:w-[12%]" />
-                  <SortHead label="Email" sortKey="email" active={sortKey} dir={sortDir} onSort={onSort} className="w-[21%] lg:w-[18%] xl:w-[14%]" />
-                  <TableHead className="w-[76px] pr-3 text-right">
+                  <SortHead label="User" sortKey="name" active={sortKey} dir={sortDir} onSort={onSort} className="pl-4" />
+                  <SortHead label="State" sortKey="state" active={sortKey} dir={sortDir} onSort={onSort} className="w-24 lg:w-28" />
+                  <TableHead className="hidden xl:table-cell xl:w-36">Vehicle</TableHead>
+                  <SortHead label="CNG kit" sortKey="kit" active={sortKey} dir={sortDir} onSort={onSort} className="hidden lg:table-cell lg:w-44" />
+                  <SortHead label="Role" sortKey="role" active={sortKey} dir={sortDir} onSort={onSort} className="w-32 lg:w-36" />
+                  <SortHead label="Activity" sortKey="reports" active={sortKey} dir={sortDir} onSort={onSort} className="w-32 lg:w-36" />
+                  <SortHead label="Email" sortKey="email" active={sortKey} dir={sortDir} onSort={onSort} className="w-40 lg:w-44" />
+                  <TableHead className="w-20 pr-4 text-right">
                     <span className="sr-only">Actions</span>
                   </TableHead>
                 </TableRow>
