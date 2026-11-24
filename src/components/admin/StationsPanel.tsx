@@ -399,6 +399,9 @@ export const StationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash 
   }, [rows, search, onlyReview]);
 
   const reviewCount = rows.filter((r) => r.needs_pin_review).length;
+  const verifiedCount = Math.max(0, rows.length - reviewCount);
+  const verifiedPct = rows.length > 0 ? Math.round((verifiedCount / rows.length) * 100) : 100;
+  const reviewPct = rows.length > 0 ? Math.max(0, 100 - verifiedPct) : 0;
   const allVisibleSelected = filtered.length > 0 && filtered.every((r) => selectedForDelete.has(r.id));
   const toggleSelectAllVisible = () => {
     setSelectedForDelete((prev) => {
@@ -414,7 +417,7 @@ export const StationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash 
 
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <div className="flex min-h-14 shrink-0 flex-wrap items-center justify-between gap-3 border-b border-adm-line bg-adm-card px-4 py-2 md:px-6">
+      <div className="flex min-h-14 shrink-0 flex-wrap items-center justify-between gap-3 border-b border-adm-line bg-adm-card px-4 py-2.5 md:px-6">
         <div className="flex min-w-0 flex-wrap items-center gap-3">
           <Badge variant={reviewCount > 0 ? 'warning' : 'secondary'}>{reviewCount} need review</Badge>
           <Input
@@ -425,7 +428,7 @@ export const StationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash 
             onChange={(e) => setSearch(e.target.value)}
             className="w-72"
           />
-          <label className="flex items-center gap-2 text-sm whitespace-nowrap text-adm-ink">
+          <label className="flex cursor-pointer items-center gap-2 text-xs font-medium whitespace-nowrap text-adm-ink">
             <input
               type="checkbox"
               className="size-4 accent-adm-note"
@@ -469,16 +472,58 @@ export const StationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash 
       )}
 
       <div className="flex-1 overflow-auto p-4 md:p-6">
-        {loading && (
-          <div className="flex flex-col gap-3" aria-label="Loading stations">
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
-          </div>
-        )}
-        {!loading && filtered.length > 0 && (
-          <div className="overflow-hidden rounded-lg border border-adm-line bg-adm-card">
-            <Table>
+        <div className="mx-auto flex w-full max-w-7xl flex-col gap-4">
+          {!loading && rows.length > 0 && (
+            <div className="flex flex-col justify-between gap-3 rounded-xl border border-adm-line bg-adm-card p-4 shadow-[0_1px_2px_rgba(17,24,20,0.03)]">
+              <div className="grid grid-cols-3 divide-x divide-adm-line">
+                <div className="pr-4">
+                  <span className="block text-[10px] font-semibold uppercase tracking-wider text-adm-mute-text">
+                    Total Stations
+                  </span>
+                  <span className="mt-1 block font-geist text-2xl font-bold tracking-tight text-adm-ink tabular-nums">
+                    {rows.length}
+                  </span>
+                </div>
+                <div className="px-4">
+                  <span className="block text-[10px] font-semibold uppercase tracking-wider text-adm-mute-text">
+                    Verified Pin Precision
+                  </span>
+                  <span className="mt-1 flex items-baseline gap-2 font-geist text-2xl font-bold tracking-tight text-adm-ink tabular-nums">
+                    {verifiedCount}
+                    <span className="text-xs font-semibold text-[#16a34a]">{verifiedPct}%</span>
+                  </span>
+                </div>
+                <div className="pl-4">
+                  <span className="block text-[10px] font-semibold uppercase tracking-wider text-adm-mute-text">
+                    Needs Pin Review
+                  </span>
+                  <span className="mt-1 flex items-baseline gap-2 font-geist text-2xl font-bold tracking-tight text-adm-ink tabular-nums">
+                    {reviewCount}
+                    <span className="text-xs font-semibold text-adm-warn">{reviewPct}%</span>
+                  </span>
+                </div>
+              </div>
+              <div aria-hidden="true" className="flex h-2 w-full overflow-hidden rounded-full bg-adm-muted gap-0.5">
+                {verifiedCount > 0 && (
+                  <div className="h-full bg-[#16a34a]" style={{ width: `${Math.max(4, verifiedPct)}%` }} />
+                )}
+                {reviewCount > 0 && (
+                  <div className="h-full bg-[#84cc16]" style={{ width: `${Math.max(4, reviewPct)}%` }} />
+                )}
+              </div>
+            </div>
+          )}
+
+          {loading && (
+            <div className="flex flex-col gap-3" aria-label="Loading stations">
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+          )}
+          {!loading && filtered.length > 0 && (
+            <div className="overflow-hidden rounded-xl border border-adm-line bg-adm-card shadow-[0_1px_2px_rgba(17,24,20,0.03)]">
+              <Table>
               <TableHeader>
                 <TableRow className="hover:bg-transparent">
                   <TableHead className="w-10">
@@ -573,9 +618,14 @@ export const StationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash 
                 ))}
               </TableBody>
             </Table>
-          </div>
-        )}
-        {!loading && filtered.length === 0 && <p className="p-4 text-sm text-adm-mute-text">Nothing matches that search.</p>}
+            </div>
+          )}
+          {!loading && filtered.length === 0 && (
+            <div className="rounded-xl border border-adm-line bg-adm-card p-8 text-center shadow-[0_1px_2px_rgba(17,24,20,0.03)]">
+              <p className="text-sm text-adm-mute-text">Nothing matches that search.</p>
+            </div>
+          )}
+        </div>
       </div>
 
       {confirmingDelete && (

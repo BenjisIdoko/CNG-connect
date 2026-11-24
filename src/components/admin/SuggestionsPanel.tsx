@@ -99,7 +99,19 @@ export const SuggestionsPanel: React.FC<Props> = ({ flash, onCountChange }) => {
 
   return (
     <div className="h-full overflow-y-auto">
-      <div className="mx-auto flex w-full max-w-3xl flex-col gap-4 p-4 pb-16 md:p-6">
+      <div className="mx-auto flex w-full max-w-4xl flex-col gap-4 p-4 pb-16 md:p-6">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <div className="flex items-center gap-2.5">
+              <h2 className="font-geist text-xl font-bold tracking-tight text-adm-ink">Driver station suggestions</h2>
+              <Badge variant="secondary">{suggestions.length} pending</Badge>
+            </div>
+            <p className="mt-0.5 text-xs text-adm-mute-text">
+              Review driver-submitted stations, verify duplicates against the live directory, and place approved pins on the map.
+            </p>
+          </div>
+        </div>
+
         {loading && (
           <div className="flex flex-col gap-3" aria-label="Loading suggestions">
             <Skeleton className="h-28 w-full" />
@@ -107,19 +119,19 @@ export const SuggestionsPanel: React.FC<Props> = ({ flash, onCountChange }) => {
           </div>
         )}
         {loadErr && (
-          <p role="alert" className="rounded-md border border-adm-danger/30 bg-adm-danger-soft px-4 py-3 text-sm font-semibold text-adm-danger">
+          <p role="alert" className="rounded-xl border border-adm-danger/30 bg-adm-danger-soft px-4 py-3 text-sm font-semibold text-adm-danger">
             {loadErr}
           </p>
         )}
         {actionErr && (
-          <p role="alert" className="rounded-md border border-adm-danger/30 bg-adm-danger-soft px-4 py-3 text-sm font-semibold text-adm-danger">
+          <p role="alert" className="rounded-xl border border-adm-danger/30 bg-adm-danger-soft px-4 py-3 text-sm font-semibold text-adm-danger">
             {actionErr}
           </p>
         )}
         {!loading && !loadErr && suggestions.length === 0 && (
           <Card>
-            <CardContent className="py-8 text-center">
-              <p className="font-geist text-base font-bold">No pending suggestions</p>
+            <CardContent className="py-10 text-center">
+              <p className="font-geist text-base font-bold text-adm-ink">No pending suggestions</p>
               <p className="mt-1 text-sm text-adm-mute-text">When a driver taps "Suggest station" it shows up here.</p>
             </CardContent>
           </Card>
@@ -130,76 +142,92 @@ export const SuggestionsPanel: React.FC<Props> = ({ flash, onCountChange }) => {
           const isEv = s.station_type === 'ev_charging';
           return (
             <Card key={s.id}>
-              <CardContent className="flex flex-col gap-3">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="font-geist text-base font-bold">{s.name}</p>
-                    <p className="mt-0.5 flex flex-wrap items-center gap-2 text-sm text-adm-mute-text">
+              <CardContent className="flex flex-col gap-4 p-5">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="font-geist text-base font-bold text-adm-ink">{s.name}</p>
                       <Badge variant="secondary">{isEv ? 'EV charging' : 'CNG'}</Badge>
-                      {[s.city, s.state].filter(Boolean).join(', ') || 'No city or state'}
-                    </p>
-                    <p className="mt-2 text-sm">{s.address}</p>
-                    {s.operator && <p className="mt-0.5 text-sm text-adm-mute-text">Operator: {s.operator}</p>}
-                    {s.notes && <p className="mt-1 text-sm italic text-adm-mute-text">&ldquo;{s.notes}&rdquo;</p>}
-                    <p className="mt-1 text-xs text-adm-mute-text">Sent {new Date(s.created_at).toLocaleString()}</p>
+                      <span className="text-xs text-adm-mute-text">
+                        {[s.city, s.state].filter(Boolean).join(', ') || 'No city or state'}
+                      </span>
+                    </div>
+                    <p className="mt-2 text-sm text-adm-ink">{s.address}</p>
+                    <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-adm-mute-text">
+                      {s.operator && <span>Operator: <strong className="font-semibold text-adm-ink">{s.operator}</strong></span>}
+                      <span>Sent {new Date(s.created_at).toLocaleString()}</span>
+                    </div>
+                    {s.notes && (
+                      <p className="mt-2 rounded-lg border border-adm-line/80 bg-adm-muted/40 px-3 py-2 text-xs italic text-adm-mute-text">
+                        &ldquo;{s.notes}&rdquo;
+                      </p>
+                    )}
                   </div>
                   {s.photo && (
-                    <img src={s.photo} alt="" loading="lazy" className="size-16 shrink-0 rounded-md border border-adm-line bg-adm-muted object-cover" />
+                    <img src={s.photo} alt="" loading="lazy" className="size-16 shrink-0 rounded-lg border border-adm-line bg-adm-muted object-cover" />
                   )}
                 </div>
 
-                {similar.length > 0 ? (
-                  <div className="rounded-md bg-adm-warn-soft px-3 py-2 text-sm text-adm-warn">
-                    <p className="font-semibold">Possibly already on the map:</p>
-                    <ul className="mt-1 list-disc pl-5">
-                      {similar.map((h) => (
-                        <li key={h.id}>{h.name}</li>
-                      ))}
-                    </ul>
+                <div className="flex flex-wrap items-center justify-between gap-3 border-t border-adm-line/70 pt-3">
+                  <div className="min-w-0 flex-1">
+                    {similar.length > 0 ? (
+                      <div className="rounded-lg border border-adm-warn/30 bg-adm-warn-soft px-3 py-2 text-xs text-adm-warn">
+                        <p className="font-semibold">Possibly already on the map:</p>
+                        <ul className="mt-1 list-disc pl-5">
+                          {similar.map((h) => (
+                            <li key={h.id}>{h.name}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    ) : (
+                      <p className="flex items-center gap-1.5 text-xs text-adm-mute-text">
+                        <span aria-hidden="true" className="size-1.5 rounded-full bg-[#16a34a]" />
+                        No similar station found by name.
+                      </p>
+                    )}
+                    {isEv && (
+                      <p className="mt-1 text-xs text-adm-mute-text">
+                        EV stations aren't shown in the app right now, so this one can only be rejected.
+                      </p>
+                    )}
                   </div>
-                ) : (
-                  <p className="text-sm text-adm-mute-text">No similar station found by name.</p>
-                )}
 
-                {isEv && (
-                  <p className="text-sm text-adm-mute-text">EV stations aren't shown in the app right now, so this one can only be rejected.</p>
-                )}
-
-                <div className="flex items-center justify-end gap-2">
-                  {confirmRejectId === s.id ? (
-                    <>
-                      <span className="text-sm font-semibold text-adm-danger">Reject this suggestion?</span>
-                      <Button variant="outline" size="sm" onClick={() => setConfirmRejectId(null)}>
-                        Keep
-                      </Button>
-                      <Button variant="destructive" size="sm" onClick={() => reject(s.id)} disabled={busyId === s.id}>
-                        {busyId === s.id ? 'Rejecting…' : 'Yes, reject'}
-                      </Button>
-                    </>
-                  ) : (
-                    <>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          setActionErr(null);
-                          setConfirmRejectId(s.id);
-                        }}
-                      >
-                        Reject
-                      </Button>
-                      <Button
-                        size="sm"
-                        onClick={() => {
-                          setActionErr(null);
-                          setApprovingId(s.id);
-                        }}
-                        disabled={isEv}
-                      >
-                        Approve
-                      </Button>
-                    </>
-                  )}
+                  <div className="flex items-center justify-end gap-2">
+                    {confirmRejectId === s.id ? (
+                      <>
+                        <span className="text-xs font-semibold text-adm-danger">Reject this suggestion?</span>
+                        <Button variant="outline" size="sm" onClick={() => setConfirmRejectId(null)}>
+                          Keep
+                        </Button>
+                        <Button variant="destructive" size="sm" onClick={() => reject(s.id)} disabled={busyId === s.id}>
+                          {busyId === s.id ? 'Rejecting…' : 'Yes, reject'}
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setActionErr(null);
+                            setConfirmRejectId(s.id);
+                          }}
+                        >
+                          Reject
+                        </Button>
+                        <Button
+                          size="sm"
+                          onClick={() => {
+                            setActionErr(null);
+                            setApprovingId(s.id);
+                          }}
+                          disabled={isEv}
+                        >
+                          Approve
+                        </Button>
+                      </>
+                    )}
+                  </div>
                 </div>
               </CardContent>
             </Card>

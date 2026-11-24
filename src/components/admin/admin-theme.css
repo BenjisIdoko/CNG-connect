@@ -3,24 +3,25 @@
    browser would otherwise ship with its own defaults: selection, caret, scrollbars, focus. */
 .admin-ui {
   color-scheme: light;
-  font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Geist', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-variant-numeric: tabular-nums;
-  scrollbar-color: #9db8a8 transparent;
+  -webkit-font-smoothing: antialiased;
+  scrollbar-color: #cbd5cf transparent;
   scrollbar-width: thin;
 }
 
 .admin-ui ::selection {
-  background: #c9a227;
-  color: #1a1f1c;
+  background: #dcfce7;
+  color: #111814;
 }
 
 .admin-ui :focus-visible {
-  outline: 2px solid #0d3b2e;
+  outline: 2px solid #15803d;
   outline-offset: 2px;
 }
 
 .admin-ui * {
-  scrollbar-color: #9db8a8 transparent;
+  scrollbar-color: #cbd5cf transparent;
   scrollbar-width: thin;
 }
 

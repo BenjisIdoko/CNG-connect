@@ -103,6 +103,34 @@ export const UsersDirectory: React.FC<DirectoryProps> = ({ rows, loading, onEdit
   const view = paginate(sorted, page, pageSize);
   const anyFilter = Boolean(search.trim() || role !== 'all' || stateFilter || kit);
 
+  const summary = useMemo(() => {
+    const total = rows.length;
+    let admins = 0;
+    let managers = 0;
+    let withKit = 0;
+    for (const r of rows) {
+      if (r.is_admin) admins++;
+      else if (communityManagerIds?.has(r.id)) managers++;
+      if ((r.cng_kit || '').trim()) withKit++;
+    }
+    const drivers = Math.max(0, total - admins - managers);
+    const noKit = Math.max(0, total - withKit);
+    const pct = (n: number) => (total > 0 ? Math.round((n / total) * 100) : 0);
+    return {
+      total,
+      admins,
+      managers,
+      drivers,
+      withKit,
+      noKit,
+      driversPct: pct(drivers),
+      managersPct: pct(managers),
+      adminsPct: pct(admins),
+      kitPct: pct(withKit),
+      noKitPct: pct(noKit),
+    };
+  }, [rows, communityManagerIds]);
+
   const resetPage = () => setPage(1);
   const onSort = (key: UserSortKey) => {
     if (key === sortKey) setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
@@ -170,17 +198,95 @@ export const UsersDirectory: React.FC<DirectoryProps> = ({ rows, loading, onEdit
   return (
     <div className="h-full overflow-y-auto">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-5 p-4 pb-16 md:p-6">
-        <div className="flex flex-col gap-1">
-          <div className="flex flex-wrap items-center gap-3">
-            <h2 className="font-geist text-2xl font-bold text-balance">User directory</h2>
-            <Badge variant="secondary" className="text-sm">
-              {rows.length} {rows.length === 1 ? 'user' : 'users'}
-            </Badge>
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="flex flex-col gap-1">
+            <div className="flex flex-wrap items-center gap-3">
+              <h2 className="font-geist text-xl font-bold tracking-tight text-balance text-adm-ink">User directory</h2>
+              <Badge variant="secondary" className="text-xs">
+                {rows.length} {rows.length === 1 ? 'user' : 'users'}
+              </Badge>
+            </div>
+            <p className="text-xs text-adm-mute-text">
+              Search, filter and manage driver accounts. Admin access can only be changed in the database.
+            </p>
           </div>
-          <p className="text-sm text-adm-mute-text">Search, filter and manage driver accounts. Admin access can only be changed in the database.</p>
+          <Button variant="outline" onClick={exportCsv} disabled={sorted.length === 0} className="h-9">
+            <Download aria-hidden="true" /> Export CSV
+          </Button>
         </div>
 
-        <div className="rounded-lg border border-adm-line bg-adm-card p-4">
+        {/* Sypher Split KPI & Segmented Bar Row */}
+        {!loading && rows.length > 0 && (
+          <div className="grid gap-4 lg:grid-cols-12">
+            {/* Role Breakdown Card (Sypher "Invoices" style) */}
+            <div className="flex flex-col justify-between gap-4 rounded-xl border border-adm-line bg-adm-card p-4 shadow-[0_1px_2px_rgba(17,24,20,0.03)] lg:col-span-7">
+              <div className="grid grid-cols-3 divide-x divide-adm-line">
+                <div className="pr-4">
+                  <span className="block text-[10px] font-semibold uppercase tracking-wider text-adm-mute-text">Drivers</span>
+                  <span className="mt-1 block font-geist text-2xl font-bold tracking-tight text-adm-ink tabular-nums">
+                    {summary.drivers}
+                  </span>
+                  <span className="mt-2 block text-xs text-adm-mute-text tabular-nums">{summary.driversPct}%</span>
+                </div>
+                <div className="px-4">
+                  <span className="block text-[10px] font-semibold uppercase tracking-wider text-adm-mute-text">Managers</span>
+                  <span className="mt-1 block font-geist text-2xl font-bold tracking-tight text-adm-ink tabular-nums">
+                    {summary.managers}
+                  </span>
+                  <span className="mt-2 block text-xs text-adm-mute-text tabular-nums">{summary.managersPct}%</span>
+                </div>
+                <div className="pl-4">
+                  <span className="block text-[10px] font-semibold uppercase tracking-wider text-adm-mute-text">Admins</span>
+                  <span className="mt-1 block font-geist text-2xl font-bold tracking-tight text-adm-ink tabular-nums">
+                    {summary.admins}
+                  </span>
+                  <span className="mt-2 block text-xs text-adm-mute-text tabular-nums">{summary.adminsPct}%</span>
+                </div>
+              </div>
+              <div aria-hidden="true" className="flex h-2 w-full overflow-hidden rounded-full bg-adm-muted gap-0.5">
+                {summary.drivers > 0 && (
+                  <div className="h-full bg-[#16a34a]" style={{ width: `${Math.max(4, summary.driversPct)}%` }} />
+                )}
+                {summary.managers > 0 && (
+                  <div className="h-full bg-[#84cc16]" style={{ width: `${Math.max(4, summary.managersPct)}%` }} />
+                )}
+                {summary.admins > 0 && (
+                  <div className="h-full bg-adm-ink" style={{ width: `${Math.max(4, summary.adminsPct)}%` }} />
+                )}
+              </div>
+            </div>
+
+            {/* CNG Kit Conversion Coverage Card */}
+            <div className="flex flex-col justify-between gap-4 rounded-xl border border-adm-line bg-adm-card p-4 shadow-[0_1px_2px_rgba(17,24,20,0.03)] lg:col-span-5">
+              <div className="grid grid-cols-2 divide-x divide-adm-line">
+                <div className="pr-4">
+                  <span className="block text-[10px] font-semibold uppercase tracking-wider text-adm-mute-text">Kit Recorded</span>
+                  <span className="mt-1 block font-geist text-2xl font-bold tracking-tight text-adm-ink tabular-nums">
+                    {summary.withKit}
+                  </span>
+                  <span className="mt-2 block text-xs text-[#16a34a] font-semibold tabular-nums">{summary.kitPct}%</span>
+                </div>
+                <div className="pl-4">
+                  <span className="block text-[10px] font-semibold uppercase tracking-wider text-adm-mute-text">No Kit Recorded</span>
+                  <span className="mt-1 block font-geist text-2xl font-bold tracking-tight text-adm-ink tabular-nums">
+                    {summary.noKit}
+                  </span>
+                  <span className="mt-2 block text-xs text-adm-mute-text tabular-nums">{summary.noKitPct}%</span>
+                </div>
+              </div>
+              <div aria-hidden="true" className="flex h-2 w-full overflow-hidden rounded-full bg-adm-muted gap-0.5">
+                {summary.withKit > 0 && (
+                  <div className="h-full bg-[#16a34a]" style={{ width: `${Math.max(4, summary.kitPct)}%` }} />
+                )}
+                {summary.noKit > 0 && (
+                  <div className="h-full bg-adm-line" style={{ width: `${Math.max(4, summary.noKitPct)}%` }} />
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className="rounded-xl border border-adm-line bg-adm-card p-4 shadow-[0_1px_2px_rgba(17,24,20,0.03)]">
           <div className="flex flex-wrap items-center gap-3">
             <div className="relative min-w-[16rem] flex-1">
               <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-adm-mute-text" aria-hidden="true" />
@@ -196,15 +302,9 @@ export const UsersDirectory: React.FC<DirectoryProps> = ({ rows, loading, onEdit
                 className="h-10 pl-9"
               />
             </div>
-            <Button variant="outline" onClick={exportCsv} disabled={sorted.length === 0} className="h-10">
-              <Download aria-hidden="true" /> Export CSV
-            </Button>
-          </div>
-
-          <div className="mt-4 flex flex-col gap-3 border-t border-adm-line pt-4">
-            <div className="flex flex-wrap items-center gap-3">
-              <span className="inline-flex items-center gap-2 text-sm text-adm-mute-text">
-                <SlidersHorizontal className="size-4" aria-hidden="true" /> Filters:
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 text-xs font-medium text-adm-mute-text">
+                <SlidersHorizontal className="size-3.5" aria-hidden="true" /> Filters:
               </span>
               <select
                 aria-label="Role"
@@ -242,15 +342,16 @@ export const UsersDirectory: React.FC<DirectoryProps> = ({ rows, loading, onEdit
                 </Button>
               )}
             </div>
-            <div className="flex items-center gap-3">
-              <span className="inline-flex shrink-0 items-center gap-2 text-sm text-adm-mute-text">
-                <SlidersHorizontal className="size-4" aria-hidden="true" /> CNG kit:
-              </span>
-              <div className="flex gap-2 overflow-x-auto py-1">
-                {chip('', 'All')}
-                {kits.map((k) => chip(k, k))}
-                {chip(KIT_NONE, 'Not installed yet')}
-              </div>
+          </div>
+
+          <div className="mt-3 flex items-center gap-3 border-t border-adm-line/80 pt-3">
+            <span className="inline-flex shrink-0 items-center gap-1.5 text-xs font-medium text-adm-mute-text">
+              CNG kit:
+            </span>
+            <div className="flex gap-1.5 overflow-x-auto py-0.5">
+              {chip('', 'All')}
+              {kits.map((k) => chip(k, k))}
+              {chip(KIT_NONE, 'Not installed yet')}
             </div>
           </div>
         </div>
@@ -264,10 +365,10 @@ export const UsersDirectory: React.FC<DirectoryProps> = ({ rows, loading, onEdit
         )}
 
         {!loading && view.total > 0 && (
-          <div className="overflow-hidden rounded-lg border border-adm-line bg-adm-card">
+          <div className="overflow-hidden rounded-xl border border-adm-line bg-adm-card shadow-[0_1px_2px_rgba(17,24,20,0.03)]">
             <Table>
               <TableHeader>
-                <TableRow className="bg-adm-muted/60 hover:bg-adm-muted/60">
+                <TableRow className="bg-adm-muted/50 hover:bg-adm-muted/50">
                   <SortHead label="User" sortKey="name" active={sortKey} dir={sortDir} onSort={onSort} className="min-w-[190px] pl-4" />
                   <SortHead label="State" sortKey="state" active={sortKey} dir={sortDir} onSort={onSort} className="min-w-[80px]" />
                   <TableHead className="min-w-[120px]">Vehicle</TableHead>
@@ -287,12 +388,12 @@ export const UsersDirectory: React.FC<DirectoryProps> = ({ rows, loading, onEdit
                       <div className="flex items-center gap-3">
                         <span
                           aria-hidden="true"
-                          className="flex size-9 shrink-0 items-center justify-center rounded-full bg-adm-muted text-sm font-semibold text-adm-note"
+                          className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-adm-muted text-xs font-bold text-adm-ink border border-adm-line"
                         >
                           {userInitials(r.name, r.email)}
                         </span>
                         <div className="min-w-0">
-                          <p className="max-w-[170px] truncate font-semibold" title={r.name || ''}>
+                          <p className="max-w-[170px] truncate font-semibold text-adm-ink" title={r.name || ''}>
                             {r.name || <span className="font-normal italic text-adm-mute-text">(no name)</span>}
                           </p>
                           <p className="text-xs text-adm-mute-text">{r.phone || 'No phone'}</p>
@@ -305,8 +406,8 @@ export const UsersDirectory: React.FC<DirectoryProps> = ({ rows, loading, onEdit
                     </TableCell>
                     <TableCell>
                       {r.cng_kit ? (
-                        <span className="inline-flex max-w-[190px] items-center gap-2 rounded-full border border-adm-line bg-adm-card px-3 py-1 text-sm">
-                          <span aria-hidden="true" className="size-2 shrink-0 rounded-sm bg-adm-note" />
+                        <span className="inline-flex max-w-[190px] items-center gap-2 rounded-full border border-adm-line bg-adm-muted/40 px-2.5 py-0.5 text-xs font-medium text-adm-ink">
+                          <span aria-hidden="true" className="size-1.5 shrink-0 rounded-full bg-[#16a34a]" />
                           <span className="truncate" title={r.cng_kit}>
                             {r.cng_kit}
                           </span>
@@ -325,7 +426,7 @@ export const UsersDirectory: React.FC<DirectoryProps> = ({ rows, loading, onEdit
                       )}
                     </TableCell>
                     <TableCell>
-                      <p className="font-semibold">{r.reports_count ?? 0} reports</p>
+                      <p className="font-semibold text-adm-ink">{r.reports_count ?? 0} reports</p>
                       <p className="text-xs text-adm-mute-text">
                         {(r.reputation_score ?? 0).toFixed(1)} rating · {r.community_points ?? 0} pts
                       </p>
@@ -357,7 +458,7 @@ export const UsersDirectory: React.FC<DirectoryProps> = ({ rows, loading, onEdit
         )}
 
         {!loading && view.total === 0 && (
-          <div className="rounded-lg border border-adm-line bg-adm-card p-8 text-center">
+          <div className="rounded-xl border border-adm-line bg-adm-card p-8 text-center shadow-[0_1px_2px_rgba(17,24,20,0.03)]">
             <p className="font-geist text-base font-bold">{rows.length === 0 ? 'No accounts yet' : 'No users match'}</p>
             <p className="mt-1 text-sm text-adm-mute-text">
               {rows.length === 0 ? 'Accounts appear here when drivers sign up.' : 'Try a different search, or clear the filters.'}
@@ -371,7 +472,7 @@ export const UsersDirectory: React.FC<DirectoryProps> = ({ rows, loading, onEdit
         )}
 
         {!loading && rows.length > 0 && (
-          <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-adm-mute-text">
+          <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-adm-mute-text">
             <div className="flex items-center gap-3">
               <label htmlFor="users-page-size">Rows per page:</label>
               <select
@@ -410,7 +511,6 @@ export const UsersDirectory: React.FC<DirectoryProps> = ({ rows, loading, onEdit
           </div>
         )}
       </div>
-
     </div>
   );
 };

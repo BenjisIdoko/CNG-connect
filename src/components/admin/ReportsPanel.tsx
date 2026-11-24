@@ -93,46 +93,54 @@ export const ReportsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash }
 
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <div className="flex shrink-0 items-center justify-between gap-3 border-b border-adm-line bg-adm-card px-4 py-2 md:px-6">
-        <Tabs value={view} onValueChange={(v) => setView(v as 'review' | 'hidden')}>
-          <TabsList aria-label="Report view">
-            <TabsTrigger value="review">Needs review</TabsTrigger>
-            <TabsTrigger value="hidden">Removed (30 days)</TabsTrigger>
-          </TabsList>
-        </Tabs>
+      <div className="flex shrink-0 items-center justify-between gap-3 border-b border-adm-line bg-adm-card px-4 py-2.5 md:px-6">
+        <div className="flex items-center gap-3">
+          <Tabs value={view} onValueChange={(v) => setView(v as 'review' | 'hidden')}>
+            <TabsList aria-label="Report view">
+              <TabsTrigger value="review">Needs review</TabsTrigger>
+              <TabsTrigger value="hidden">Removed (30 days)</TabsTrigger>
+            </TabsList>
+          </Tabs>
+          {!loading && (
+            <Badge variant="secondary" className="text-xs">
+              {rows.length} {rows.length === 1 ? 'report' : 'reports'}
+            </Badge>
+          )}
+        </div>
         <Button variant="outline" size="sm" onClick={() => void load()}>
           Refresh
         </Button>
       </div>
 
       <div className="flex-1 overflow-auto p-4 md:p-6">
-        {loading && (
-          <div className="flex flex-col gap-3" aria-label="Loading reports">
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
-          </div>
-        )}
-        {err && (
-          <p role="alert" className="rounded-md border border-adm-danger/30 bg-adm-danger-soft px-4 py-3 text-sm font-semibold text-adm-danger">
-            {err}
-          </p>
-        )}
-
-        {!loading && !err && rows.length === 0 && (
-          <div className="mx-auto max-w-md rounded-lg border border-adm-line bg-adm-card p-8 text-center">
-            <p className="font-geist text-base font-bold">{view === 'review' ? 'Nothing to review' : 'Nothing removed recently'}</p>
-            <p className="mt-1 text-sm text-adm-mute-text">
-              {view === 'review'
-                ? 'Reports appear here when drivers flag them or they get 3+ dislikes.'
-                : 'Removed reports stay here for 30 days so you can restore them.'}
+        <div className="mx-auto flex w-full max-w-7xl flex-col gap-4">
+          {loading && (
+            <div className="flex flex-col gap-3" aria-label="Loading reports">
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+          )}
+          {err && (
+            <p role="alert" className="rounded-xl border border-adm-danger/30 bg-adm-danger-soft px-4 py-3 text-sm font-semibold text-adm-danger">
+              {err}
             </p>
-          </div>
-        )}
+          )}
 
-        {!loading && !err && rows.length > 0 && (
-          <div className="overflow-hidden rounded-lg border border-adm-line bg-adm-card">
-            <Table>
+          {!loading && !err && rows.length === 0 && (
+            <div className="mx-auto w-full max-w-md rounded-xl border border-adm-line bg-adm-card p-8 text-center shadow-[0_1px_2px_rgba(17,24,20,0.03)]">
+              <p className="font-geist text-base font-bold text-adm-ink">{view === 'review' ? 'Nothing to review' : 'Nothing removed recently'}</p>
+              <p className="mt-1 text-sm text-adm-mute-text">
+                {view === 'review'
+                  ? 'Reports appear here when drivers flag them or they get 3+ dislikes.'
+                  : 'Removed reports stay here for 30 days so you can restore them.'}
+              </p>
+            </div>
+          )}
+
+          {!loading && !err && rows.length > 0 && (
+            <div className="overflow-hidden rounded-xl border border-adm-line bg-adm-card shadow-[0_1px_2px_rgba(17,24,20,0.03)]">
+              <Table>
               <TableHeader>
                 <TableRow className="hover:bg-transparent">
                   <TableHead className="min-w-[160px]">Station</TableHead>
@@ -216,6 +224,7 @@ export const ReportsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash }
             </Table>
           </div>
         )}
+        </div>
       </div>
     </div>
   );
