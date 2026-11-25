@@ -16,9 +16,9 @@ colors:
   mint-action: "#86efac"
   mint-action-hover: "#4ade80"
   new-tint: "#fef9c3"
-  danger: "#dc2626"
+  danger: "#b91c1c"
   danger-soft: "#fef2f2"
-  warn: "#d97706"
+  warn: "#b45309"
   warn-soft: "#fffbeb"
 typography:
   page-title:
@@ -159,7 +159,7 @@ Density is operator-grade: plain, fast tables, 14px body with 13px table cells, 
 A cool sage-and-white family with one confident green, one pale mint, and a disciplined status trio.
 
 ### Primary
-- **Leaf Green** (#15803d, `adm-note`): selected tab rule, link text, focus ring and outline, caret, default badge, secondary button fill, toast fill, dialog and drawer scrim (at 55%).
+- **Leaf Green** (#15803d, `adm-note`): selected tab rule, link text, focus ring and outline, caret, default badge, secondary button fill, toast fill, active nav count chip (white text), dialog and drawer scrim (at 55%).
 - **Leaf Green Deep** (#166534, `adm-note-2`): secondary button hover.
 - **Leaf Tint** (#dcfce7, `adm-note-text`): nav count chip and avatar fill, text selection fill; always with Leaf Green text on it.
 
@@ -169,7 +169,7 @@ A cool sage-and-white family with one confident green, one pale mint, and a disc
 - **New Tint** (#fef9c3, `adm-new`): new or changed rows (`TableRow[data-state=new]` at 60%) and the `new` badge, with ink text.
 
 ### Data
-- **Emerald** (#16a34a, `adm-emerald`): driver-suggestion notches, the closed thread, bars, the Stations dot, the active nav count chip.
+- **Emerald** (#16a34a, `adm-emerald`): driver-suggestion notches, the closed thread, bars, the Stations dot.
 - **Lime** (#84cc16, `adm-lime`): pin-review notches, bar gradients, the Users dot. Graphic use only; never text (1.98:1 on white).
 
 ### Neutral
@@ -181,13 +181,13 @@ A cool sage-and-white family with one confident green, one pale mint, and a disc
 - **Mute Text** (#607066, `adm-mute-text`): secondary text, table headers, overlines, placeholders, inactive nav.
 
 ### Status
-- **Danger** (#dc2626) on **Danger Wash** (#fef2f2): flagged reports, errors, destructive button (danger fill, white text).
-- **Warn** (#d97706) on **Warn Wash** (#fffbeb): cautions and the warning badge; also the header status dot when items are pending.
+- **Danger** (#b91c1c, `adm-danger`) on **Danger Wash** (#fef2f2): flagged reports, errors, destructive button (danger fill, white text). 5.91:1 on its wash.
+- **Warn** (#b45309, `adm-warn`) on **Warn Wash** (#fffbeb): cautions and the warning badge; also the header status dot when items are pending. 4.84:1 on its wash.
 
 ### Named Rules
 **The Mint Rule.** Mint (#86efac) is the one pressable primary action in a view, always with ink text, never white. Leaf green carries selection and state; ink carries the active nav item. A mint element that cannot be acted on, or a mint button with white text, is a defect.
 **The Prefix Rule.** Admin colors are `adm-` tokens only. Never reuse the driver app's tokens in admin screens, and never use `adm-` tokens outside admin and the kit.
-**The Data Colors Rule.** Emerald and lime are for marks that show amounts and kinds (thread, bars, dots). Never set text in them, and never let a kind ride on color alone: every notch group has a count and a spoken label.
+**The Data Colors Rule.** Emerald and lime are for marks that show amounts and kinds (thread, bars, dots). Never set text in them (emerald is 3.30:1 on white), never put white text on emerald, and never let a kind ride on color alone: every notch group has a count and a spoken label.
 
 ## Typography
 
@@ -219,9 +219,9 @@ Tone and hairline first. Surfaces separate by color (white over sage) and 1px Ha
 ### Shadow Vocabulary
 - **Card whisper** (`box-shadow: 0 1px 2px rgba(17,24,20,0.03)`): `Card`; nearly a hairline.
 - **Active nav** (`box-shadow: 0 1px 3px rgba(17,24,20,0.12)`): the ink nav item.
-- **Dialog** (`box-shadow: 0 12px 32px rgba(13,59,46,0.22)`): `DialogContent`, over a Leaf Green 55% scrim.
-- **Drawer** (`box-shadow: 0 0 32px rgba(13,59,46,0.3)`): mobile nav Sheet.
-- **Toast** (`box-shadow: 0 6px 20px rgba(13,59,46,0.3)`): `useAdminToast`.
+- **Dialog** (`box-shadow: 0 12px 32px rgba(17,24,20,0.22)`): `DialogContent`, over a Leaf Green 55% scrim.
+- **Drawer** (`box-shadow: 0 0 32px rgba(17,24,20,0.3)`): mobile nav Sheet.
+- **Toast** (`box-shadow: 0 6px 20px rgba(17,24,20,0.3)`): `useAdminToast`.
 
 ### Named Rules
 **The Whisper Rule.** At rest: no shadow on buttons, inputs, rows or tabs, and no more than a 1 to 3px, 12%-opacity shadow on cards and the active nav item. Anything bigger means the layer floats.
@@ -277,7 +277,7 @@ Softly rounded, graded by size: 6px (`rounded-md`) on buttons, inputs, badges, t
 - **Do** use Leaf Green (#15803d) for selection and state: the active tab rule, links, focus, default badge.
 - **Do** draw every divider as 1px Hairline (#e3e9e5).
 - **Do** build new admin screens from the kit in `src/components/ui` and the `adm-` tokens, in `AdminRoot`.
-- **Do** keep text AA on its ground: Ink or Mute Text on white or sage, white on Leaf Green, Ink on Mint.
+- **Do** keep text AA on its ground: Ink or Mute Text on white or sage, white on Leaf Green, Ink on Mint, Danger or Warn on their washes or white. `adminColors.test.ts` measures these pairs from the real tokens and bans raw hex and the retired shadow tint.
 - **Do** keep tabular figures on counts and tables, and Geist Mono on ids and key totals.
 - **Do** reach for `adm-emerald`, `adm-lime` and `adm-foil-hover` rather than raw hex when adding data marks.
 - **Do** respect reduced motion (transitions collapse to 0.01ms under `prefers-reduced-motion`), keep touch targets at 44px under `md`, and keep form inputs at 16px there.
@@ -285,17 +285,9 @@ Softly rounded, graded by size: 6px (`rounded-md`) on buttons, inputs, badges, t
 ### Don't:
 - **Don't** put white text on Mint Action, or use mint on anything that cannot be pressed.
 - **Don't** fill the active tab with mint; the active nav item is Ink, the active tab is a Leaf Green rule.
-- **Don't** set text in Lime, or in Mint on white. Neither passes AA.
+- **Don't** set text in Lime or Emerald, or in Mint on white. None passes AA; use Leaf Green for green text.
 - **Don't** put shadows on buttons, inputs, rows or tabs; real shadows belong to dialog, drawer and toast.
 - **Don't** reintroduce the retired Security Print look: deep note-green sidebar, celadon page, foil gold (#c9a227).
 - **Don't** introduce another type family or dark mode in the admin.
 - **Don't** use driver-app tokens or styles inside admin screens.
 - **Don't** treat the legacy look of `AirtimePayouts.tsx` (behind an off feature flag) as part of this system.
-
-## Known Gaps
-
-Measured against this system on the shipped code; delete each line when it is fixed.
-- **Contrast below AA:** Warn text on Warn Wash is 3.07:1 (warning badge, 12px); Danger text on Danger Wash is 4.41:1 (destructive badge and inline alerts); white on the Emerald active nav count chip is 3.30:1 (11px).
-- **Mobile drawer close button:** `sheet.tsx` still colors the X `adm-note-text` (#dcfce7) on a now-white drawer, 1.10:1, which is effectively invisible. The dialog's close button (Mute Text, Muted Wash hover) is the model to copy.
-- **Retired tint on floating layers:** dialog, drawer and toast shadows still use the old deep green `rgba(13,59,46,…)`; the neutral equivalent is `rgba(17,24,20,…)`.
-- **Raw hex in components:** `OverviewView.tsx` and `AdminSidebarLayout.tsx` hard-code `#16a34a`, `#84cc16` and `#4ade80` where `adm-emerald`, `adm-lime` and `adm-foil-hover` exist.

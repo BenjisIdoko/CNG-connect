@@ -181,7 +181,7 @@ export const SuggestionsPanel: React.FC<Props> = ({ flash, onCountChange }) => {
                       </div>
                     ) : (
                       <p className="flex items-center gap-1.5 text-xs text-adm-mute-text">
-                        <span aria-hidden="true" className="size-1.5 rounded-full bg-[#16a34a]" />
+                        <span aria-hidden="true" className="size-1.5 rounded-full bg-adm-emerald" />
                         No similar station found by name.
                       </p>
                     )}

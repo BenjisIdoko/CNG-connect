@@ -472,7 +472,7 @@ export const StationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash 
                 </span>
                 <span className="mt-1 flex flex-wrap items-baseline gap-1.5 font-geist text-xl font-bold tracking-tight text-adm-ink tabular-nums sm:text-2xl">
                   {verifiedCount}
-                  <span className="text-xs font-semibold text-[#16a34a]">{verifiedPct}%</span>
+                  <span className="text-xs font-semibold text-adm-note">{verifiedPct}%</span>
                 </span>
               </div>
               <div className="pl-3 sm:pl-4">
@@ -487,10 +487,10 @@ export const StationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash 
             </div>
             <div aria-hidden="true" className="flex h-2 w-full overflow-hidden rounded-full bg-adm-muted gap-0.5">
               {verifiedCount > 0 && (
-                <div className="h-full bg-[#16a34a]" style={{ width: `${Math.max(4, verifiedPct)}%` }} />
+                <div className="h-full bg-adm-emerald" style={{ width: `${Math.max(4, verifiedPct)}%` }} />
               )}
               {reviewCount > 0 && (
-                <div className="h-full bg-[#84cc16]" style={{ width: `${Math.max(4, reviewPct)}%` }} />
+                <div className="h-full bg-adm-lime" style={{ width: `${Math.max(4, reviewPct)}%` }} />
               )}
             </div>
           </div>
@@ -589,7 +589,7 @@ export const StationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash 
                       <div className="flex min-w-0 items-center gap-2">
                         <span
                           aria-hidden="true"
-                          className={`inline-block size-2 shrink-0 rounded-full ${r.needs_pin_review ? 'bg-adm-warn' : 'bg-[#16a34a]'}`}
+                          className={`inline-block size-2 shrink-0 rounded-full ${r.needs_pin_review ? 'bg-adm-warn' : 'bg-adm-emerald'}`}
                         />
                         <div className="min-w-0 flex-1 font-medium">
                           <EditableCell value={r.name} onCommit={(v) => void saveField(r, { name: v })} />

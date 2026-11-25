@@ -24,7 +24,7 @@ export function useAdminToast() {
   const toast = (
     <div role="status" aria-live="polite" className="pointer-events-none fixed bottom-6 left-1/2 z-[250] -translate-x-1/2">
       {message && (
-        <div className="rounded-md border border-white/20 bg-adm-note px-4 py-2 text-sm font-semibold text-white shadow-[0_6px_20px_rgba(13,59,46,0.3)]">
+        <div className="rounded-md border border-white/20 bg-adm-note px-4 py-2 text-sm font-semibold text-white shadow-[0_6px_20px_rgba(17,24,20,0.3)]">
           {message}
         </div>
       )}

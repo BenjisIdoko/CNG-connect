@@ -8,14 +8,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import { Separator } from './separator';
 
 describe('admin ui kit', () => {
-  it('Button default carries the gold action background and ink text', () => {
+  it('Button default carries the mint action background and ink text', () => {
     const html = renderToStaticMarkup(<Button>Save</Button>);
     expect(html).toContain('bg-adm-foil');
     expect(html).toContain('text-adm-ink');
     expect(html).toContain('type="button"');
   });
 
-  it('Button destructive is not gold, and secondary is green with white text', () => {
+  it('Button destructive is not mint, and secondary is green with white text', () => {
     const destructive = renderToStaticMarkup(<Button variant="destructive">Delete</Button>);
     expect(destructive).toContain('bg-adm-danger');
     expect(destructive).not.toContain('bg-adm-foil');
@@ -34,7 +34,7 @@ describe('admin ui kit', () => {
     expect(html).toContain('w-full');
   });
 
-  it('Badge new uses the gold tint and the others do not', () => {
+  it('Badge new uses the pale yellow tint and the others do not', () => {
     expect(renderToStaticMarkup(<Badge variant="new">New</Badge>)).toContain('bg-adm-new');
     expect(renderToStaticMarkup(<Badge variant="secondary">Old</Badge>)).not.toContain('bg-adm-new');
   });

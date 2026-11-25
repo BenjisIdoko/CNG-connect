@@ -25,7 +25,7 @@ function DialogContent({
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(
-          'admin-ui fixed top-1/2 left-1/2 z-[240] flex max-h-[88vh] w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 flex-col gap-4 overflow-y-auto rounded-lg border border-adm-line bg-adm-card p-6 text-adm-ink shadow-[0_12px_32px_rgba(13,59,46,0.22)] outline-none',
+          'admin-ui fixed top-1/2 left-1/2 z-[240] flex max-h-[88vh] w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 flex-col gap-4 overflow-y-auto rounded-lg border border-adm-line bg-adm-card p-6 text-adm-ink shadow-[0_12px_32px_rgba(17,24,20,0.22)] outline-none',
           className,
         )}
         {...props}

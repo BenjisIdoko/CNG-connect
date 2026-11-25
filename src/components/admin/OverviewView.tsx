@@ -50,8 +50,8 @@ const KIND_TARGET: Record<ThreadKind, OverviewTarget> = {
 /** Notch colours carry meaning: red needs a decision, green is waiting, amber is a data fix. */
 const NOTCH_CLASS: Record<ThreadKind, string> = {
   flagged: 'bg-adm-danger',
-  suggestion: 'bg-[#16a34a]',
-  pin: 'bg-[#84cc16]',
+  suggestion: 'bg-adm-emerald',
+  pin: 'bg-adm-lime',
 };
 
 const QUEUE_ROWS = 12;
@@ -78,7 +78,7 @@ const Thread: React.FC<{ counts: ThreadCounts }> = ({ counts }) => {
     <div role="img" aria-label={label} className="relative flex h-7 items-center">
       <span aria-hidden="true" className="absolute inset-x-0 top-1/2 h-0.5 -translate-y-1/2 bg-adm-line" />
       {segments.length === 0 ? (
-        <span aria-hidden="true" className="relative h-1.5 w-full rounded-full bg-[#16a34a]" />
+        <span aria-hidden="true" className="relative h-1.5 w-full rounded-full bg-adm-emerald" />
       ) : (
         <span aria-hidden="true" className="relative flex items-center gap-3 bg-adm-card pr-3">
           {segments.map((segment) => (
@@ -198,13 +198,13 @@ export const OverviewView: React.FC<Props> = ({ data, loading, errors, lastVisit
                   )}
                   {counts.suggestion > 0 && (
                     <div
-                      className="h-full bg-[#16a34a] transition-all"
+                      className="h-full bg-adm-emerald transition-all"
                       style={{ width: `${Math.max(6, Math.round((counts.suggestion / totalWait) * 100))}%` }}
                     />
                   )}
                   {counts.pin > 0 && (
                     <div
-                      className="h-full bg-[#84cc16] transition-all"
+                      className="h-full bg-adm-lime transition-all"
                       style={{ width: `${Math.max(6, Math.round((counts.pin / totalWait) * 100))}%` }}
                     />
                   )}
@@ -253,7 +253,7 @@ export const OverviewView: React.FC<Props> = ({ data, loading, errors, lastVisit
                     {[65, 80, 75, 90, 85, 100, 95, 100].map((h, i) => (
                       <span
                         key={i}
-                        className="flex-1 rounded-[1px] bg-[#16a34a]"
+                        className="flex-1 rounded-[1px] bg-adm-emerald"
                         style={{ height: `${h}%` }}
                       />
                     ))}
@@ -271,7 +271,7 @@ export const OverviewView: React.FC<Props> = ({ data, loading, errors, lastVisit
                     {[40, 55, 60, 70, 80, 85, 92, 100].map((h, i) => (
                       <span
                         key={i}
-                        className="flex-1 rounded-[1px] bg-[#16a34a]/80"
+                        className="flex-1 rounded-[1px] bg-adm-emerald/80"
                         style={{ height: `${h}%` }}
                       />
                     ))}
@@ -286,7 +286,7 @@ export const OverviewView: React.FC<Props> = ({ data, loading, errors, lastVisit
                     {countText(totals.communityManagers)}
                   </span>
                   <div aria-hidden="true" className="mt-2.5 flex items-center h-4">
-                    <span className="h-2 w-full rounded-full bg-gradient-to-r from-[#84cc16] to-[#16a34a]" />
+                    <span className="h-2 w-full rounded-full bg-gradient-to-r from-adm-lime to-adm-emerald" />
                   </div>
                 </div>
               </div>
@@ -295,8 +295,8 @@ export const OverviewView: React.FC<Props> = ({ data, loading, errors, lastVisit
               <dl className="flex flex-col divide-y divide-adm-line/70 text-[13px]">
                 {(
                   [
-                    ['Stations', totals.stations, 'bg-[#16a34a]'],
-                    ['Users', totals.users, 'bg-[#84cc16]'],
+                    ['Stations', totals.stations, 'bg-adm-emerald'],
+                    ['Users', totals.users, 'bg-adm-lime'],
                     ['Community managers', totals.communityManagers, 'bg-adm-ink'],
                   ] as [string, number | null, string][]
                 ).map(([label, value, dotCls]) => (

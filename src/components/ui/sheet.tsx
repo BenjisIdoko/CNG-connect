@@ -21,7 +21,7 @@ function SheetContent({
       <SheetPrimitive.Content
         data-slot="sheet-content"
         className={cn(
-          'admin-ui fixed inset-y-0 z-[240] flex h-full w-[min(20rem,85vw)] flex-col outline-none shadow-[0_0_32px_rgba(13,59,46,0.3)]',
+          'admin-ui fixed inset-y-0 z-[240] flex h-full w-[min(20rem,85vw)] flex-col outline-none shadow-[0_0_32px_rgba(17,24,20,0.3)]',
           side === 'left' ? 'left-0' : 'right-0',
           className,
         )}
@@ -29,7 +29,7 @@ function SheetContent({
       >
         {children}
         {showCloseButton && (
-          <SheetPrimitive.Close className="absolute top-3 right-3 rounded-md p-1 text-adm-note-text hover:bg-adm-note-2 focus-visible:ring-2 focus-visible:ring-adm-foil outline-none">
+          <SheetPrimitive.Close className="absolute top-3 right-3 rounded-md p-1 text-adm-mute-text transition-colors hover:bg-adm-muted hover:text-adm-ink focus-visible:ring-2 focus-visible:ring-adm-note outline-none">
             <X className="size-4" aria-hidden="true" />
             <span className="sr-only">Close menu</span>
           </SheetPrimitive.Close>

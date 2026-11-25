@@ -75,7 +75,7 @@ export const AdminSidebarLayout: React.FC<AdminSidebarLayoutProps> = ({
             <Icon
               className={cn(
                 'size-4 shrink-0 transition-colors',
-                active ? 'text-[#4ade80]' : 'text-adm-mute-text group-hover:text-adm-ink',
+                active ? 'text-adm-foil-hover' : 'text-adm-mute-text group-hover:text-adm-ink',
               )}
               aria-hidden="true"
             />
@@ -85,7 +85,7 @@ export const AdminSidebarLayout: React.FC<AdminSidebarLayoutProps> = ({
                 className={cn(
                   'shrink-0 rounded-full px-2 py-0.5 text-[11px] font-bold tabular-nums',
                   active
-                    ? 'bg-[#16a34a] text-white'
+                    ? 'bg-adm-note text-white'
                     : 'bg-adm-note-text text-adm-note',
                 )}
               >
@@ -110,7 +110,7 @@ export const AdminSidebarLayout: React.FC<AdminSidebarLayoutProps> = ({
         <div className="min-w-0 flex-1">
           <span className="block truncate font-geist text-sm font-bold tracking-tight text-adm-ink">{brand}</span>
           <span className="flex items-center gap-1.5 text-[11px] font-medium text-adm-mute-text">
-            <span aria-hidden="true" className="size-1.5 rounded-full bg-[#16a34a]" />
+            <span aria-hidden="true" className="size-1.5 rounded-full bg-adm-emerald" />
             Admin Operations
           </span>
         </div>
@@ -185,7 +185,7 @@ export const AdminSidebarLayout: React.FC<AdminSidebarLayoutProps> = ({
             <span className="inline-flex items-center gap-1.5 rounded-full border border-adm-line bg-adm-muted/60 px-2.5 py-1 font-medium text-adm-ink">
               <span
                 aria-hidden="true"
-                className={cn('size-2 rounded-full', totalBadges > 0 ? 'bg-adm-warn' : 'bg-[#16a34a]')}
+                className={cn('size-2 rounded-full', totalBadges > 0 ? 'bg-adm-warn' : 'bg-adm-emerald')}
               />
               {totalBadges > 0 ? `${totalBadges} pending review` : 'Queue clear'}
             </span>

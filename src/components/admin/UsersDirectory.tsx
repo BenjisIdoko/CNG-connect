@@ -245,10 +245,10 @@ export const UsersDirectory: React.FC<DirectoryProps> = ({ rows, loading, onEdit
               </div>
               <div aria-hidden="true" className="flex h-2 w-full overflow-hidden rounded-full bg-adm-muted gap-0.5">
                 {summary.drivers > 0 && (
-                  <div className="h-full bg-[#16a34a]" style={{ width: `${Math.max(4, summary.driversPct)}%` }} />
+                  <div className="h-full bg-adm-emerald" style={{ width: `${Math.max(4, summary.driversPct)}%` }} />
                 )}
                 {summary.managers > 0 && (
-                  <div className="h-full bg-[#84cc16]" style={{ width: `${Math.max(4, summary.managersPct)}%` }} />
+                  <div className="h-full bg-adm-lime" style={{ width: `${Math.max(4, summary.managersPct)}%` }} />
                 )}
                 {summary.admins > 0 && (
                   <div className="h-full bg-adm-ink" style={{ width: `${Math.max(4, summary.adminsPct)}%` }} />
@@ -264,7 +264,7 @@ export const UsersDirectory: React.FC<DirectoryProps> = ({ rows, loading, onEdit
                   <span className="mt-1 block font-geist text-xl font-bold tracking-tight text-adm-ink tabular-nums sm:text-2xl">
                     {summary.withKit}
                   </span>
-                  <span className="mt-1.5 block text-xs font-semibold text-[#16a34a] tabular-nums">{summary.kitPct}%</span>
+                  <span className="mt-1.5 block text-xs font-semibold text-adm-note tabular-nums">{summary.kitPct}%</span>
                 </div>
                 <div className="pl-3 sm:pl-4">
                   <span className="block truncate text-[11px] font-semibold uppercase tracking-wider text-adm-mute-text">No Kit Recorded</span>
@@ -276,7 +276,7 @@ export const UsersDirectory: React.FC<DirectoryProps> = ({ rows, loading, onEdit
               </div>
               <div aria-hidden="true" className="flex h-2 w-full overflow-hidden rounded-full bg-adm-muted gap-0.5">
                 {summary.withKit > 0 && (
-                  <div className="h-full bg-[#16a34a]" style={{ width: `${Math.max(4, summary.kitPct)}%` }} />
+                  <div className="h-full bg-adm-emerald" style={{ width: `${Math.max(4, summary.kitPct)}%` }} />
                 )}
                 {summary.noKit > 0 && (
                   <div className="h-full bg-adm-line" style={{ width: `${Math.max(4, summary.noKitPct)}%` }} />
@@ -412,7 +412,7 @@ export const UsersDirectory: React.FC<DirectoryProps> = ({ rows, loading, onEdit
                     <TableCell className="hidden lg:table-cell max-md:col-span-2 max-md:block max-md:p-0">
                       {r.cng_kit ? (
                         <span className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-adm-line bg-adm-muted/40 px-2.5 py-0.5 text-xs font-medium text-adm-ink">
-                          <span aria-hidden="true" className="size-1.5 shrink-0 rounded-full bg-[#16a34a]" />
+                          <span aria-hidden="true" className="size-1.5 shrink-0 rounded-full bg-adm-emerald" />
                           <span className="truncate" title={r.cng_kit}>
                             {r.cng_kit}
                           </span>
