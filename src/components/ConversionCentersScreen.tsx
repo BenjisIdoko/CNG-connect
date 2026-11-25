@@ -101,6 +101,7 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search workshops"
+                aria-label="Search workshops"
                 className="flex-1 min-w-0 bg-transparent border-none outline-none text-caption font-medium text-rd-fg placeholder:text-rd-text-tertiary"
               />
               {searchQuery && (

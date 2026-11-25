@@ -156,8 +156,9 @@ export const PinReviewModal: React.FC<Props> = ({ station, onClose, onSaved, fla
 
         <div className="p-4 flex flex-col gap-2.5 overflow-y-auto">
           <div className="flex items-center gap-2">
-            <label className="text-xs font-semibold text-adm-mute-text w-14 shrink-0">Coords</label>
+            <label htmlFor="pin-review-coords" className="text-xs font-semibold text-adm-mute-text w-14 shrink-0">Coords</label>
             <input
+              id="pin-review-coords"
               value={pasteVal}
               onChange={(e) => {
                 setPasteVal(e.target.value);

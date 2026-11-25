@@ -271,9 +271,10 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              aria-label={activeMainTab === 'station_groups' ? 'Search station groups or city' : 'Search tips and deals'}
               placeholder={
                 activeMainTab === 'station_groups'
-                  ? 'Search groups or city'
+                  ? 'Group or city'
                   : 'Search tips and deals'
               }
               className="w-full bg-surface-container rounded-full py-2.5 pl-10 pr-9 text-body font-normal text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary/30 focus:bg-surface-container-high transition-all"

@@ -466,8 +466,8 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
       <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} title="Edit Driver Profile">
         <form onSubmit={handleSaveProfile} className="flex flex-col gap-4 text-on-surface">
           <div>
-            <label className="block text-caption font-bold text-slate-700 mb-1">Full Name</label>
-            <input
+            <label htmlFor="profile-edit-full-name" className="block text-caption font-bold text-slate-700 mb-1">Full Name</label>
+            <input id="profile-edit-full-name"
               type="text"
               required
               value={editName}
@@ -477,8 +477,8 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
           </div>
 
           <div>
-            <label className="block text-caption font-bold text-slate-700 mb-1">Phone Number</label>
-            <input
+            <label htmlFor="profile-edit-phone-number" className="block text-caption font-bold text-slate-700 mb-1">Phone Number</label>
+            <input id="profile-edit-phone-number"
               type="tel"
               required
               value={editPhone}
@@ -488,8 +488,8 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
           </div>
 
           <div>
-            <label className="block text-caption font-bold text-slate-700 mb-1">Email Address</label>
-            <input
+            <label htmlFor="profile-edit-email-address" className="block text-caption font-bold text-slate-700 mb-1">Email Address</label>
+            <input id="profile-edit-email-address"
               type="email"
               value={editEmail}
               onChange={(e) => setEditEmail(e.target.value)}
@@ -498,8 +498,8 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
           </div>
 
           <div>
-            <label className="block text-caption font-bold text-slate-700 mb-1">Vehicle Details</label>
-            <input
+            <label htmlFor="profile-edit-vehicle-details" className="block text-caption font-bold text-slate-700 mb-1">Vehicle Details</label>
+            <input id="profile-edit-vehicle-details"
               type="text"
               placeholder="e.g. Toyota Corolla 1.8L"
               value={editVehicle}
@@ -509,8 +509,8 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
           </div>
 
           <div>
-            <label className="block text-caption font-bold text-slate-700 mb-1">CNG Kit</label>
-            <select
+            <label htmlFor="profile-edit-cng-kit" className="block text-caption font-bold text-slate-700 mb-1">CNG Kit</label>
+            <select id="profile-edit-cng-kit"
               aria-label="CNG Kit"
               value={editCngKit}
               onChange={(e) => setEditCngKit(e.target.value)}
@@ -538,8 +538,8 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
           </div>
 
           <div>
-            <label className="block text-caption font-bold text-slate-700 mb-1">Registered State</label>
-            <select aria-label="Registered State"
+            <label htmlFor="profile-edit-registered-state" className="block text-caption font-bold text-slate-700 mb-1">Registered State</label>
+            <select id="profile-edit-registered-state" aria-label="Registered State"
               value={editState}
               onChange={(e) => setEditState(e.target.value)}
               className="w-full bg-surface border border-surface-container-highest rounded-xl px-3 py-2 text-body font-semibold text-slate-900 outline-none focus:border-primary"

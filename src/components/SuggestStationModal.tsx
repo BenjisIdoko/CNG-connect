@@ -127,10 +127,10 @@ export const SuggestStationModal: React.FC<SuggestStationModalProps> = ({
 
             {/* Station Name */}
             <div>
-              <label className="block text-caption font-bold text-on-surface mb-1">
+              <label htmlFor="suggest-station-name" className="block text-caption font-bold text-on-surface mb-1">
                 Station Name *
               </label>
-              <input
+              <input id="suggest-station-name"
                 type="text"
                 required
                 value={name}
@@ -142,10 +142,10 @@ export const SuggestStationModal: React.FC<SuggestStationModalProps> = ({
 
             {/* Address */}
             <div>
-              <label className="block text-caption font-bold text-on-surface mb-1">
+              <label htmlFor="suggest-street-address-landmark" className="block text-caption font-bold text-on-surface mb-1">
                 Street Address / Landmark *
               </label>
-              <input
+              <input id="suggest-street-address-landmark"
                 type="text"
                 required
                 value={address}
@@ -158,10 +158,10 @@ export const SuggestStationModal: React.FC<SuggestStationModalProps> = ({
             {/* City & State Grid */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-caption font-bold text-on-surface mb-1">
+                <label htmlFor="suggest-city-area" className="block text-caption font-bold text-on-surface mb-1">
                   City / Area *
                 </label>
-                <input
+                <input id="suggest-city-area"
                   type="text"
                   required
                   value={city}
@@ -172,10 +172,10 @@ export const SuggestStationModal: React.FC<SuggestStationModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-caption font-bold text-on-surface mb-1">
+                <label htmlFor="suggest-state" className="block text-caption font-bold text-on-surface mb-1">
                   State *
                 </label>
-                <select aria-label="State"
+                <select id="suggest-state" aria-label="State"
                   value={state}
                   onChange={(e) => setState(e.target.value)}
                   className="w-full px-4 py-3 rounded-2xl bg-surface-container text-body font-medium text-on-surface outline-none focus:border-primary"
@@ -196,10 +196,10 @@ export const SuggestStationModal: React.FC<SuggestStationModalProps> = ({
 
             {/* Operator / Network Name */}
             <div>
-              <label className="block text-caption font-bold text-on-surface mb-1">
+              <label htmlFor="suggest-operator-network-name-option" className="block text-caption font-bold text-on-surface mb-1">
                 Operator / Network Name (Optional)
               </label>
-              <input
+              <input id="suggest-operator-network-name-option"
                 type="text"
                 value={operator}
                 onChange={(e) => setOperator(e.target.value)}
@@ -235,10 +235,10 @@ export const SuggestStationModal: React.FC<SuggestStationModalProps> = ({
 
             {/* Additional Notes */}
             <div>
-              <label className="block text-caption font-bold text-on-surface mb-1">
+              <label htmlFor="suggest-additional-notes-charger-spe" className="block text-caption font-bold text-on-surface mb-1">
                 Additional Notes / Charger Specs (Optional)
               </label>
-              <textarea
+              <textarea id="suggest-additional-notes-charger-spe"
                 rows={2}
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}

@@ -144,12 +144,14 @@ function buildCsvDiff(parsed: string[][], rows: Row[]): { diffs: CsvDiffRow[]; h
 
 /** A table cell that's plain text until clicked, then becomes an input; commits on blur/Enter. */
 const EditableCell: React.FC<{
+  /** What this cell edits; read out as the field's name once it turns into an input. */
+  label: string;
   value: string;
   placeholder?: string;
   align?: 'left' | 'right';
   mono?: boolean;
   onCommit: (next: string) => void;
-}> = ({ value, placeholder, align = 'left', mono = false, onCommit }) => {
+}> = ({ label, value, placeholder, align = 'left', mono = false, onCommit }) => {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(value);
 
@@ -168,6 +170,7 @@ const EditableCell: React.FC<{
     return (
       <input
         autoFocus
+        aria-label={label}
         value={draft}
         onChange={(e) => setDraft(e.target.value)}
         onFocus={(e) => e.currentTarget.select()}
@@ -592,21 +595,22 @@ export const StationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash 
                           className={`inline-block size-2 shrink-0 rounded-full ${r.needs_pin_review ? 'bg-adm-warn' : 'bg-adm-emerald'}`}
                         />
                         <div className="min-w-0 flex-1 font-medium">
-                          <EditableCell value={r.name} onCommit={(v) => void saveField(r, { name: v })} />
+                          <EditableCell label="Station name" value={r.name} onCommit={(v) => void saveField(r, { name: v })} />
                         </div>
                       </div>
                     </TableCell>
                     <TableCell className="py-1.5 max-md:p-0">
-                      <EditableCell value={r.city || ''} placeholder="City" onCommit={(v) => void saveField(r, { city: v })} />
+                      <EditableCell label="City" value={r.city || ''} placeholder="City" onCommit={(v) => void saveField(r, { city: v })} />
                     </TableCell>
                     <TableCell className="py-1.5 max-md:p-0">
-                      <EditableCell value={r.state || ''} placeholder="State" onCommit={(v) => void saveField(r, { state: v })} />
+                      <EditableCell label="State" value={r.state || ''} placeholder="State" onCommit={(v) => void saveField(r, { state: v })} />
                     </TableCell>
                     <TableCell className="hidden py-1.5 lg:table-cell">
-                      <EditableCell value={r.operator || ''} placeholder="Operator" onCommit={(v) => void saveField(r, { operator: v })} />
+                      <EditableCell label="Operator" value={r.operator || ''} placeholder="Operator" onCommit={(v) => void saveField(r, { operator: v })} />
                     </TableCell>
                     <TableCell className="py-1.5 max-md:p-0">
                       <EditableCell
+                        label="CNG price"
                         align="right"
                         mono
                         value={r.cng_price != null ? String(r.cng_price) : ''}
@@ -615,6 +619,7 @@ export const StationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash 
                     </TableCell>
                     <TableCell className="hidden py-1.5 xl:table-cell">
                       <EditableCell
+                        label="Pump pressure"
                         align="right"
                         mono
                         value={r.pump_pressure != null ? String(r.pump_pressure) : ''}

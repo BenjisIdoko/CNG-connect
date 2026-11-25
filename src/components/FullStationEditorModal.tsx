@@ -34,7 +34,7 @@ interface Props {
   onSaved: (id: string, patch: Partial<FullStationRow>) => void;
 }
 
-// HH:MM:SS (from the DB) -> HH:MM (what <input type="time"> wants).
+// HH:MM:SS (from the DB) -> HH:MM (the format a time field wants).
 const toTimeInput = (v: string | null) => (v ? v.slice(0, 5) : '');
 
 const inputCls =
@@ -229,23 +229,23 @@ export const FullStationEditorModal: React.FC<Props> = ({ station, onClose, onSa
           <section className="flex flex-col gap-3">
             <h3 className="text-sm font-semibold text-adm-ink">Core info</h3>
             <div>
-              <label className={labelCls}>Name</label>
-              <input className={inputCls} value={name} onChange={(e) => setName(e.target.value)} />
+              <label htmlFor="station-edit-name" className={labelCls}>Name</label>
+              <input id="station-edit-name" className={inputCls} value={name} onChange={(e) => setName(e.target.value)} />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className={labelCls}>Operator</label>
-                <input className={inputCls} value={operator} onChange={(e) => setOperator(e.target.value)} />
+                <label htmlFor="station-edit-operator" className={labelCls}>Operator</label>
+                <input id="station-edit-operator" className={inputCls} value={operator} onChange={(e) => setOperator(e.target.value)} />
               </div>
               <div>
-                <label className={labelCls}>Phone</label>
-                <input className={inputCls} value={phone} onChange={(e) => setPhone(e.target.value)} />
+                <label htmlFor="station-edit-phone" className={labelCls}>Phone</label>
+                <input id="station-edit-phone" className={inputCls} value={phone} onChange={(e) => setPhone(e.target.value)} />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3 items-end">
               <div>
-                <label className={labelCls}>Station type</label>
-                <select aria-label="Station type" className={inputCls} value={stationType} onChange={(e) => setStationType(e.target.value)}>
+                <label htmlFor="station-edit-station-type" className={labelCls}>Station type</label>
+                <select id="station-edit-station-type" aria-label="Station type" className={inputCls} value={stationType} onChange={(e) => setStationType(e.target.value)}>
                   <option value="cng">CNG</option>
                   <option value="ev_charging">EV charging</option>
                 </select>
@@ -256,21 +256,21 @@ export const FullStationEditorModal: React.FC<Props> = ({ station, onClose, onSa
               </label>
             </div>
             <div>
-              <label className={labelCls}>Address</label>
-              <input className={inputCls} value={address} onChange={(e) => setAddress(e.target.value)} />
+              <label htmlFor="station-edit-address" className={labelCls}>Address</label>
+              <input id="station-edit-address" className={inputCls} value={address} onChange={(e) => setAddress(e.target.value)} />
             </div>
             <div className="grid grid-cols-3 gap-3">
               <div>
-                <label className={labelCls}>City</label>
-                <input className={inputCls} value={city} onChange={(e) => setCity(e.target.value)} />
+                <label htmlFor="station-edit-city" className={labelCls}>City</label>
+                <input id="station-edit-city" className={inputCls} value={city} onChange={(e) => setCity(e.target.value)} />
               </div>
               <div>
-                <label className={labelCls}>State</label>
-                <input className={inputCls} value={state} onChange={(e) => setState(e.target.value)} />
+                <label htmlFor="station-edit-state" className={labelCls}>State</label>
+                <input id="station-edit-state" className={inputCls} value={state} onChange={(e) => setState(e.target.value)} />
               </div>
               <div>
-                <label className={labelCls}>Area</label>
-                <input className={inputCls} value={area} onChange={(e) => setArea(e.target.value)} />
+                <label htmlFor="station-edit-area" className={labelCls}>Area</label>
+                <input id="station-edit-area" className={inputCls} value={area} onChange={(e) => setArea(e.target.value)} />
               </div>
             </div>
           </section>
@@ -281,8 +281,8 @@ export const FullStationEditorModal: React.FC<Props> = ({ station, onClose, onSa
             {isEv ? (
               <>
                 <div>
-                  <label className={labelCls}>Connector types (comma-separated)</label>
-                  <input
+                  <label htmlFor="station-edit-connector-types-comma-separa" className={labelCls}>Connector types (comma-separated)</label>
+                  <input id="station-edit-connector-types-comma-separa"
                     className={inputCls}
                     placeholder="CCS2 Combo, Type 2 AC"
                     value={connectorTypes}
@@ -291,32 +291,32 @@ export const FullStationEditorModal: React.FC<Props> = ({ station, onClose, onSa
                 </div>
                 <div className="grid grid-cols-3 gap-3">
                   <div>
-                    <label className={labelCls}>Charging speed (kW)</label>
-                    <input className={inputCls} inputMode="decimal" value={chargingSpeed} onChange={(e) => setChargingSpeed(e.target.value)} />
+                    <label htmlFor="station-edit-charging-speed-kw" className={labelCls}>Charging speed (kW)</label>
+                    <input id="station-edit-charging-speed-kw" className={inputCls} inputMode="decimal" value={chargingSpeed} onChange={(e) => setChargingSpeed(e.target.value)} />
                   </div>
                   <div>
-                    <label className={labelCls}>Price (₦/kWh)</label>
-                    <input className={inputCls} inputMode="decimal" value={pricePerKwh} onChange={(e) => setPricePerKwh(e.target.value)} />
+                    <label htmlFor="station-edit-price-kwh" className={labelCls}>Price (₦/kWh)</label>
+                    <input id="station-edit-price-kwh" className={inputCls} inputMode="decimal" value={pricePerKwh} onChange={(e) => setPricePerKwh(e.target.value)} />
                   </div>
                   <div>
-                    <label className={labelCls}>Total ports</label>
-                    <input className={inputCls} inputMode="numeric" value={totalPorts} onChange={(e) => setTotalPorts(e.target.value)} />
+                    <label htmlFor="station-edit-total-ports" className={labelCls}>Total ports</label>
+                    <input id="station-edit-total-ports" className={inputCls} inputMode="numeric" value={totalPorts} onChange={(e) => setTotalPorts(e.target.value)} />
                   </div>
                 </div>
                 <div>
-                  <label className={labelCls}>Network</label>
-                  <input className={inputCls} value={network} onChange={(e) => setNetwork(e.target.value)} />
+                  <label htmlFor="station-edit-network" className={labelCls}>Network</label>
+                  <input id="station-edit-network" className={inputCls} value={network} onChange={(e) => setNetwork(e.target.value)} />
                 </div>
               </>
             ) : (
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className={labelCls}>CNG price (₦/kg)</label>
-                  <input className={inputCls} inputMode="decimal" value={cngPrice} onChange={(e) => setCngPrice(e.target.value)} />
+                  <label htmlFor="station-edit-cng-price-kg" className={labelCls}>CNG price (₦/kg)</label>
+                  <input id="station-edit-cng-price-kg" className={inputCls} inputMode="decimal" value={cngPrice} onChange={(e) => setCngPrice(e.target.value)} />
                 </div>
                 <div>
-                  <label className={labelCls}>Pump pressure (bar)</label>
-                  <input className={inputCls} inputMode="numeric" value={pumpPressure} onChange={(e) => setPumpPressure(e.target.value)} />
+                  <label htmlFor="station-edit-pump-pressure-bar" className={labelCls}>Pump pressure (bar)</label>
+                  <input id="station-edit-pump-pressure-bar" className={inputCls} inputMode="numeric" value={pumpPressure} onChange={(e) => setPumpPressure(e.target.value)} />
                 </div>
               </div>
             )}
@@ -332,18 +332,18 @@ export const FullStationEditorModal: React.FC<Props> = ({ station, onClose, onSa
             {!is24Hours && (
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className={labelCls}>Opens at</label>
-                  <input type="time" className={inputCls} value={opensAt} onChange={(e) => setOpensAt(e.target.value)} />
+                  <label htmlFor="station-edit-opens-at" className={labelCls}>Opens at</label>
+                  <input id="station-edit-opens-at" type="time" className={inputCls} value={opensAt} onChange={(e) => setOpensAt(e.target.value)} />
                 </div>
                 <div>
-                  <label className={labelCls}>Closes at</label>
-                  <input type="time" className={inputCls} value={closesAt} onChange={(e) => setClosesAt(e.target.value)} />
+                  <label htmlFor="station-edit-closes-at" className={labelCls}>Closes at</label>
+                  <input id="station-edit-closes-at" type="time" className={inputCls} value={closesAt} onChange={(e) => setClosesAt(e.target.value)} />
                 </div>
               </div>
             )}
             <div>
-              <label className={labelCls}>Hours note (optional)</label>
-              <input className={inputCls} placeholder="e.g. Closed Sundays" value={hoursNote} onChange={(e) => setHoursNote(e.target.value)} />
+              <label htmlFor="station-edit-hours-note-optional" className={labelCls}>Hours note (optional)</label>
+              <input id="station-edit-hours-note-optional" className={inputCls} placeholder="e.g. Closed Sundays" value={hoursNote} onChange={(e) => setHoursNote(e.target.value)} />
             </div>
           </section>
 

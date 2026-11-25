@@ -156,10 +156,10 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
 
           {/* Title */}
           <div>
-            <label className="block text-[0.875rem] font-semibold text-on-surface-variant mb-1">
+            <label htmlFor="post-title" className="block text-[0.875rem] font-semibold text-on-surface-variant mb-1">
               Title
             </label>
-            <input
+            <input id="post-title"
               type="text"
               required
               value={title}
@@ -199,10 +199,10 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
 
           {/* Content Body */}
           <div>
-            <label className="block text-[0.875rem] font-semibold text-on-surface-variant mb-1">
+            <label htmlFor="post-details-description" className="block text-[0.875rem] font-semibold text-on-surface-variant mb-1">
               Details &amp; Description
             </label>
-            <textarea
+            <textarea id="post-details-description"
               required
               rows={3}
               value={content}

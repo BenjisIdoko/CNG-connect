@@ -255,6 +255,7 @@ export const DiscussionScreen: React.FC<DiscussionScreenProps> = ({
                 type="text"
                 value={newCommentText}
                 onChange={(e) => setNewCommentText(e.target.value)}
+                aria-label={replyingTo ? `Reply to ${replyingTo}` : 'Add a comment'}
                 placeholder={
                   replyingTo ? `Reply to ${replyingTo}...` : 'Add a comment...'
                 }

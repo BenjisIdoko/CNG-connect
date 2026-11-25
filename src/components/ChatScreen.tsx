@@ -272,6 +272,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ post, onBack }) => {
                   handleSendMessage();
                 }
               }}
+              aria-label="Message"
               placeholder="Type a message..."
               className="w-full bg-transparent border-none outline-none resize-none max-h-28 text-body-lg text-on-surface placeholder:text-outline m-0 p-0 block"
             />

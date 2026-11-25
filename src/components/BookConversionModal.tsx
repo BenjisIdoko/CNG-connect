@@ -112,10 +112,10 @@ export const BookConversionModal: React.FC<BookConversionModalProps> = ({
 
             <form onSubmit={handleSubmit} className="space-y-3.5 text-[0.875rem]">
               <div>
-                <label className="block font-semibold text-on-surface-variant mb-1">
+                <label htmlFor="book-vehicle-make-year" className="block font-semibold text-on-surface-variant mb-1">
                   Vehicle Make &amp; Year
                 </label>
-                <input
+                <input id="book-vehicle-make-year"
                   type="text"
                   required
                   value={carModel}
@@ -126,10 +126,10 @@ export const BookConversionModal: React.FC<BookConversionModalProps> = ({
               </div>
 
               <div>
-                <label className="block font-semibold text-on-surface-variant mb-1">
+                <label htmlFor="book-cng-kit-tank-capacity" className="block font-semibold text-on-surface-variant mb-1">
                   CNG Kit Tank Capacity
                 </label>
-                <select aria-label="CNG Kit Tank Capacity"
+                <select id="book-cng-kit-tank-capacity" aria-label="CNG Kit Tank Capacity"
                   value={tankSize}
                   onChange={(e) => setTankSize(e.target.value)}
                   className="w-full bg-surface-container/90 rounded-2xl px-4 py-2.5 outline-none font-medium text-on-surface focus:ring-2 focus:ring-primary/30"
@@ -151,10 +151,10 @@ export const BookConversionModal: React.FC<BookConversionModalProps> = ({
 
               <div className="grid grid-cols-2 gap-2.5">
                 <div>
-                  <label className="block font-semibold text-on-surface-variant mb-1">
+                  <label htmlFor="book-preferred-date" className="block font-semibold text-on-surface-variant mb-1">
                     Preferred Date
                   </label>
-                  <input
+                  <input id="book-preferred-date"
                     type="date"
                     required
                     value={selectedDate}
@@ -164,10 +164,10 @@ export const BookConversionModal: React.FC<BookConversionModalProps> = ({
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-on-surface-variant mb-1">
+                  <label htmlFor="book-phone-number" className="block font-semibold text-on-surface-variant mb-1">
                     Phone Number
                   </label>
-                  <input
+                  <input id="book-phone-number"
                     type="tel"
                     required
                     value={phone}
@@ -178,10 +178,10 @@ export const BookConversionModal: React.FC<BookConversionModalProps> = ({
               </div>
 
               <div>
-                <label className="block font-semibold text-on-surface-variant mb-1">
+                <label htmlFor="book-additional-notes-optional" className="block font-semibold text-on-surface-variant mb-1">
                   Additional Notes (Optional)
                 </label>
-                <textarea
+                <textarea id="book-additional-notes-optional"
                   rows={2}
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}

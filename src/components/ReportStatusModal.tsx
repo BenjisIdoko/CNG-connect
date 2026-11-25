@@ -384,6 +384,7 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
                 <input
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
+                  aria-label="Note (optional)"
                   placeholder="Add a note (optional)"
                   className="w-full bg-surface-container-high rounded-xl px-3 py-2.5 text-caption text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary/30"
                 />

@@ -252,6 +252,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
                 <span aria-hidden="true" className="material-symbols-outlined text-rd-text-tertiary text-[20px] mr-2.5">mail</span>
                 <input
                   type="email"
+                  aria-label="Email address"
                   required
                   autoComplete="email"
                   autoFocus
@@ -277,6 +278,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
                 <span aria-hidden="true" className="material-symbols-outlined text-rd-text-tertiary text-[20px] mr-2.5">call</span>
                 <input
                   id="signup-phone-step1"
+                  aria-label="Phone number"
                   type="tel"
                   inputMode="tel"
                   required
@@ -368,10 +370,11 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
             <>
               {!phoneOnly && (
               <div>
-                <label className="block text-[0.7812rem] font-semibold text-rd-text-tertiary mb-1">Full Name</label>
+                <label htmlFor="signup-full-name" className="block text-[0.7812rem] font-semibold text-rd-text-tertiary mb-1">Full Name</label>
                 <div className="flex items-center bg-white border border-[#E3E6E4] rounded-2xl px-3.5 h-12 focus-within:ring-2 focus-within:ring-primary/30 focus-within:border-primary transition-all">
                   <span aria-hidden="true" className="material-symbols-outlined text-outline text-[20px] mr-2">person</span>
                   <input
+                    id="signup-full-name"
                     type="text"
                     required
                     autoFocus
@@ -467,10 +470,10 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
 
 
               <div>
-                <label className="block text-[0.7812rem] font-semibold text-rd-text-tertiary mb-1">
+                <label htmlFor="signup-primary-location-state" className="block text-[0.7812rem] font-semibold text-rd-text-tertiary mb-1">
                   Primary Location / State
                 </label>
-                <select aria-label="Primary Location / State"
+                <select id="signup-primary-location-state" aria-label="Primary Location / State"
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
                   className="w-full bg-white border border-[#E3E6E4] rounded-2xl px-3.5 h-12 text-[0.9375rem] font-medium text-rd-ink outline-none focus:ring-2 focus:ring-primary/30"
@@ -512,8 +515,8 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[0.7812rem] font-bold text-rd-text-tertiary mb-1">Car Model</label>
-                  <input
+                  <label htmlFor="signup-car-model" className="block text-[0.7812rem] font-bold text-rd-text-tertiary mb-1">Car Model</label>
+                  <input id="signup-car-model"
                     type="text"
                     required
                     value={vehicleMake}
@@ -523,8 +526,8 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
                   />
                 </div>
                 <div>
-                  <label className="block text-[0.7812rem] font-bold text-rd-text-tertiary mb-1">Year</label>
-                  <input
+                  <label htmlFor="signup-year" className="block text-[0.7812rem] font-bold text-rd-text-tertiary mb-1">Year</label>
+                  <input id="signup-year"
                     type="text"
                     required
                     value={vehicleYear}
@@ -562,8 +565,8 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
 
               {cngStatus === 'installed' && (
                 <div>
-                  <label className="block text-[0.7812rem] font-bold text-rd-text-tertiary mb-1">CNG Cylinder Tank Size</label>
-                  <select aria-label="CNG Cylinder Tank Size"
+                  <label htmlFor="signup-cng-cylinder-tank-size" className="block text-[0.7812rem] font-bold text-rd-text-tertiary mb-1">CNG Cylinder Tank Size</label>
+                  <select id="signup-cng-cylinder-tank-size" aria-label="CNG Cylinder Tank Size"
                     value={tankSize}
                     onChange={(e) => setTankSize(e.target.value)}
                     className="w-full bg-white border border-[#E3E6E4] rounded-2xl px-3.5 h-12 text-[0.9375rem] font-bold text-rd-ink outline-none"
