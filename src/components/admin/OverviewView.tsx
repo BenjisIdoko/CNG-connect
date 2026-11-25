@@ -243,7 +243,7 @@ export const OverviewView: React.FC<Props> = ({ data, loading, errors, lastVisit
               {/* Top Mini KPI Row with Micro Bar Visuals */}
               <div className="grid grid-cols-3 gap-3">
                 <div className="rounded-lg border border-adm-line/80 bg-adm-muted/30 p-3">
-                  <span className="block text-[10px] font-semibold uppercase tracking-wider text-adm-mute-text">
+                  <span className="block text-[11px] font-semibold uppercase tracking-wider text-adm-mute-text">
                     Stations
                   </span>
                   <span className="mt-1 block font-geist text-xl font-bold text-adm-ink tabular-nums">
@@ -261,7 +261,7 @@ export const OverviewView: React.FC<Props> = ({ data, loading, errors, lastVisit
                 </div>
 
                 <div className="rounded-lg border border-adm-line/80 bg-adm-muted/30 p-3">
-                  <span className="block text-[10px] font-semibold uppercase tracking-wider text-adm-mute-text">
+                  <span className="block text-[11px] font-semibold uppercase tracking-wider text-adm-mute-text">
                     Accounts
                   </span>
                   <span className="mt-1 block font-geist text-xl font-bold text-adm-ink tabular-nums">
@@ -279,7 +279,7 @@ export const OverviewView: React.FC<Props> = ({ data, loading, errors, lastVisit
                 </div>
 
                 <div className="rounded-lg border border-adm-line/80 bg-adm-muted/30 p-3">
-                  <span className="block text-[10px] font-semibold uppercase tracking-wider text-adm-mute-text">
+                  <span className="block text-[11px] font-semibold uppercase tracking-wider text-adm-mute-text">
                     Managers
                   </span>
                   <span className="mt-1 block font-geist text-xl font-bold text-adm-ink tabular-nums">

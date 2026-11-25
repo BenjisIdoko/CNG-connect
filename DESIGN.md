@@ -21,19 +21,21 @@ colors:
 typography:
   page-title:
     fontFamily: "Geist, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif"
-    fontSize: "1.25rem"
+    fontSize: "1.125rem"
     fontWeight: 700
     lineHeight: 1.4
+    letterSpacing: "-0.025em"
   brand:
     fontFamily: "Geist, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif"
-    fontSize: "1.125rem"
+    fontSize: "0.875rem"
     fontWeight: 700
     letterSpacing: "-0.025em"
   card-title:
     fontFamily: "Geist, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif"
-    fontSize: "1rem"
-    fontWeight: 700
+    fontSize: "0.9375rem"
+    fontWeight: 600
     lineHeight: 1.25
+    letterSpacing: "-0.025em"
   body:
     fontFamily: "Geist, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif"
     fontSize: "0.875rem"
@@ -45,6 +47,12 @@ typography:
     fontSize: "0.75rem"
     fontWeight: 600
     lineHeight: 1.33
+  overline:
+    fontFamily: "Geist, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif"
+    fontSize: "0.6875rem"
+    fontWeight: 600
+    letterSpacing: "0.05em"
+    textTransform: "uppercase"
   mono:
     fontFamily: "Geist Mono, ui-monospace, SFMono-Regular, Menlo, monospace"
     fontSize: "0.92em"
@@ -166,17 +174,18 @@ A cool, desaturated green family with one warm metal accent and a disciplined st
 
 ## Typography
 
-**Display / Body Font:** Geist (with -apple-system, Segoe UI, Roboto fallbacks), self-hosted and shared with the driver app.
+**Display / Body Font:** Geist (with -apple-system, Segoe UI, Roboto fallbacks), self-hosted and shared with the driver app's phone screens. The driver app's own base styles put Inter on the body and Urbanist on every heading; `admin-theme.css` opts the admin out of both (`.admin-ui` sets Geist, and `h1`-`h6` inside it inherit), and `adminFonts.test.ts` keeps it that way.
 **Label/Mono Font:** Geist Mono (with ui-monospace, Menlo), for ids and code (`.font-adm-mono`, `code`, at 0.92em).
 
 **Character:** one neutral grotesque family, differentiated by weight (700 titles, 600 labels and buttons, 400 body); the mono face signals machine identifiers.
 
 ### Hierarchy
-- **Page title** (700, 1.25rem, balanced wrap): the `h1` in the header bar.
-- **Brand** (700, 1.125rem, -0.025em): sidebar wordmark.
-- **Card title** (700, 1rem, 1.25): `CardTitle`.
-- **Body** (400, 0.875rem): everything else, tables included, tabular figures on (`font-variant-numeric: tabular-nums` on `.admin-ui`).
-- **Label** (600, 0.75rem): table headers (Mute Text), badges, sidebar buttons, nav counts.
+- **Page title** (700, 1.125rem, -0.025em, balanced wrap): the `h1` in the header bar.
+- **Brand** (700, 0.875rem, -0.025em): sidebar wordmark.
+- **Card title** (600, 0.9375rem, 1.25, -0.025em): `CardTitle`.
+- **Body** (400, 0.875rem): prose and controls; table cells and sidebar items run at 0.8125rem. Tabular figures on (`font-variant-numeric: tabular-nums` on `.admin-ui`).
+- **Label** (600, 0.75rem): badges, sidebar buttons, nav counts.
+- **Overline** (600, 0.6875rem, uppercase, +0.05em): table headers (Mute Text), small field captions and group headings. Nothing in the admin is set below 0.6875rem.
 - **Mono** (400, 0.92em): ids.
 
 ### Named Rules

@@ -459,7 +459,7 @@ export const StationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash 
           <div className="flex flex-col justify-between gap-3.5 rounded-xl border border-adm-line bg-adm-card p-4 shadow-[0_1px_2px_rgba(17,24,20,0.03)]">
             <div className="grid grid-cols-3 divide-x divide-adm-line">
               <div className="pr-3 sm:pr-4">
-                <span className="block truncate text-[10px] font-semibold uppercase tracking-wider text-adm-mute-text">
+                <span className="block truncate text-[11px] font-semibold uppercase tracking-wider text-adm-mute-text">
                   Total Stations
                 </span>
                 <span className="mt-1 block font-geist text-xl font-bold tracking-tight text-adm-ink tabular-nums sm:text-2xl">
@@ -467,7 +467,7 @@ export const StationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash 
                 </span>
               </div>
               <div className="px-3 sm:px-4">
-                <span className="block truncate text-[10px] font-semibold uppercase tracking-wider text-adm-mute-text">
+                <span className="block truncate text-[11px] font-semibold uppercase tracking-wider text-adm-mute-text">
                   Verified Pin Precision
                 </span>
                 <span className="mt-1 flex flex-wrap items-baseline gap-1.5 font-geist text-xl font-bold tracking-tight text-adm-ink tabular-nums sm:text-2xl">
@@ -476,7 +476,7 @@ export const StationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash 
                 </span>
               </div>
               <div className="pl-3 sm:pl-4">
-                <span className="block truncate text-[10px] font-semibold uppercase tracking-wider text-adm-mute-text">
+                <span className="block truncate text-[11px] font-semibold uppercase tracking-wider text-adm-mute-text">
                   Needs Pin Review
                 </span>
                 <span className="mt-1 flex flex-wrap items-baseline gap-1.5 font-geist text-xl font-bold tracking-tight text-adm-ink tabular-nums sm:text-2xl">

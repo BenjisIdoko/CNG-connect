@@ -222,21 +222,21 @@ export const UsersDirectory: React.FC<DirectoryProps> = ({ rows, loading, onEdit
             <div className="flex flex-col justify-between gap-3.5 rounded-xl border border-adm-line bg-adm-card p-4 shadow-[0_1px_2px_rgba(17,24,20,0.03)] lg:col-span-7">
               <div className="grid grid-cols-3 divide-x divide-adm-line">
                 <div className="pr-3 sm:pr-4">
-                  <span className="block truncate text-[10px] font-semibold uppercase tracking-wider text-adm-mute-text">Drivers</span>
+                  <span className="block truncate text-[11px] font-semibold uppercase tracking-wider text-adm-mute-text">Drivers</span>
                   <span className="mt-1 block font-geist text-xl font-bold tracking-tight text-adm-ink tabular-nums sm:text-2xl">
                     {summary.drivers}
                   </span>
                   <span className="mt-1.5 block text-xs text-adm-mute-text tabular-nums">{summary.driversPct}%</span>
                 </div>
                 <div className="px-3 sm:px-4">
-                  <span className="block truncate text-[10px] font-semibold uppercase tracking-wider text-adm-mute-text">Managers</span>
+                  <span className="block truncate text-[11px] font-semibold uppercase tracking-wider text-adm-mute-text">Managers</span>
                   <span className="mt-1 block font-geist text-xl font-bold tracking-tight text-adm-ink tabular-nums sm:text-2xl">
                     {summary.managers}
                   </span>
                   <span className="mt-1.5 block text-xs text-adm-mute-text tabular-nums">{summary.managersPct}%</span>
                 </div>
                 <div className="pl-3 sm:pl-4">
-                  <span className="block truncate text-[10px] font-semibold uppercase tracking-wider text-adm-mute-text">Admins</span>
+                  <span className="block truncate text-[11px] font-semibold uppercase tracking-wider text-adm-mute-text">Admins</span>
                   <span className="mt-1 block font-geist text-xl font-bold tracking-tight text-adm-ink tabular-nums sm:text-2xl">
                     {summary.admins}
                   </span>
@@ -260,14 +260,14 @@ export const UsersDirectory: React.FC<DirectoryProps> = ({ rows, loading, onEdit
             <div className="flex flex-col justify-between gap-3.5 rounded-xl border border-adm-line bg-adm-card p-4 shadow-[0_1px_2px_rgba(17,24,20,0.03)] lg:col-span-5">
               <div className="grid grid-cols-2 divide-x divide-adm-line">
                 <div className="pr-3 sm:pr-4">
-                  <span className="block truncate text-[10px] font-semibold uppercase tracking-wider text-adm-mute-text">Kit Recorded</span>
+                  <span className="block truncate text-[11px] font-semibold uppercase tracking-wider text-adm-mute-text">Kit Recorded</span>
                   <span className="mt-1 block font-geist text-xl font-bold tracking-tight text-adm-ink tabular-nums sm:text-2xl">
                     {summary.withKit}
                   </span>
                   <span className="mt-1.5 block text-xs font-semibold text-[#16a34a] tabular-nums">{summary.kitPct}%</span>
                 </div>
                 <div className="pl-3 sm:pl-4">
-                  <span className="block truncate text-[10px] font-semibold uppercase tracking-wider text-adm-mute-text">No Kit Recorded</span>
+                  <span className="block truncate text-[11px] font-semibold uppercase tracking-wider text-adm-mute-text">No Kit Recorded</span>
                   <span className="mt-1 block font-geist text-xl font-bold tracking-tight text-adm-ink tabular-nums sm:text-2xl">
                     {summary.noKit}
                   </span>
