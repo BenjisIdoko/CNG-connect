@@ -2,7 +2,7 @@ import * as React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../lib/utils';
 
-/** Small status chip. `new` is the gold tint for anything new or changed since the last visit. */
+/** Small status chip. `new` is the pale yellow tint for anything new or changed since the last visit. */
 const badgeVariants = cva(
   'inline-flex w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded-md border border-transparent px-2 py-0.5 text-xs font-semibold whitespace-nowrap [&>svg]:size-3',
   {

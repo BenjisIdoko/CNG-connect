@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as TabsPrimitive from '@radix-ui/react-tabs';
 import { cn } from '../../lib/utils';
 
-/** Underlined tabs: the active tab gets an ink rule, not a filled pill, so gold stays for actions. */
+/** Underlined tabs: the active tab gets a leaf-green rule, not a filled pill, so mint stays for actions. */
 function Tabs({ className, ...props }: React.ComponentProps<typeof TabsPrimitive.Root>) {
   return <TabsPrimitive.Root data-slot="tabs" className={cn('flex flex-col gap-3', className)} {...props} />;
 }

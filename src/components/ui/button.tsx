@@ -3,9 +3,9 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../lib/utils';
 
 /**
- * shadcn Button, themed for the admin dashboard ("Security Print"). The default variant is foil
- * gold with ink text: gold is reserved for things that can be pressed. The other variants stay
- * green, outlined or red so gold keeps meaning "you can act here".
+ * shadcn Button, themed for the admin dashboard ("Sypher Clean"). The default variant is mint
+ * with ink text: mint is reserved for the primary thing to press. The other variants stay
+ * green, outlined or red so mint keeps meaning "you can act here".
  */
 const buttonVariants = cva(
   'inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-semibold whitespace-nowrap transition-colors outline-none focus-visible:ring-2 focus-visible:ring-adm-note focus-visible:ring-offset-2 focus-visible:ring-offset-adm-paper disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*=size-])]:size-4',

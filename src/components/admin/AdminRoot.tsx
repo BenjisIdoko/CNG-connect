@@ -3,7 +3,7 @@ import { cn } from '../../lib/utils';
 import './admin-theme.css';
 
 /**
- * The root of the admin dashboard. It carries the scoped "Security Print"
+ * The root of the admin dashboard. It carries the scoped "Sypher Clean"
  * theme (.admin-ui), forces the light scheme, and sets the ground and ink colours, so nothing in
  * the driver app can pick them up.
  */
