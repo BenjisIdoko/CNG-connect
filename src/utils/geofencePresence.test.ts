@@ -17,8 +17,8 @@ const station = (id: string, metersNorth: number) => ({ id, lat: HERE.lat + mete
 const NOW = 1_800_000_000_000;
 
 describe('presence constants', () => {
-  it('uses a 500 m geofence, a ping every 2 minutes, a 6 minute expiry and a 100 m accuracy limit', () => {
-    expect(PRESENCE_GEOFENCE_METERS).toBe(500);
+  it('uses a 1 km geofence, a ping every 2 minutes, a 6 minute expiry and a 100 m accuracy limit', () => {
+    expect(PRESENCE_GEOFENCE_METERS).toBe(1000);
     expect(PRESENCE_PING_INTERVAL_MS).toBe(120_000);
     expect(PRESENCE_TTL_MINUTES).toBe(6);
     expect(MAX_GPS_ACCURACY_METERS).toBe(100);
@@ -26,9 +26,9 @@ describe('presence constants', () => {
 });
 
 describe('isAtStation', () => {
-  it('is true at 499 m and false at 501 m', () => {
-    expect(isAtStation(HERE, station('a', 499))).toBe(true);
-    expect(isAtStation(HERE, station('a', 501))).toBe(false);
+  it('is true at 999 m and false at 1001 m', () => {
+    expect(isAtStation(HERE, station('a', 999))).toBe(true);
+    expect(isAtStation(HERE, station('a', 1001))).toBe(false);
   });
 
   it('is false for a station page opened from 5 km away', () => {
@@ -48,7 +48,7 @@ describe('isAtStation', () => {
 });
 
 describe('stationsToPing', () => {
-  it('returns a station inside 500 m that was never pinged', () => {
+  it('returns a station inside 1 km that was never pinged', () => {
     expect(stationsToPing(HERE, [station('a', 100)], {}, NOW)).toEqual(['a']);
   });
 
@@ -57,12 +57,12 @@ describe('stationsToPing', () => {
     expect(stationsToPing(HERE, [station('a', 100)], { a: NOW - 121_000 }, NOW)).toEqual(['a']);
   });
 
-  it('returns a station 400 m away (beyond the old 250 m radius)', () => {
-    expect(stationsToPing(HERE, [station('a', 400)], {}, NOW)).toEqual(['a']);
+  it('returns a station 900 m away (beyond the old 500 m radius)', () => {
+    expect(stationsToPing(HERE, [station('a', 900)], {}, NOW)).toEqual(['a']);
   });
 
-  it('does not return a station 501 m away', () => {
-    expect(stationsToPing(HERE, [station('a', 501)], {}, NOW)).toEqual([]);
+  it('does not return a station 1001 m away', () => {
+    expect(stationsToPing(HERE, [station('a', 1001)], {}, NOW)).toEqual([]);
   });
 
   it('returns nothing for a fix with accuracy 150 m, but accepts a fix with no accuracy value', () => {

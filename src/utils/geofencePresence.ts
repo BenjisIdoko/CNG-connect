@@ -1,7 +1,7 @@
 import { haversineMeters } from './stationDuplicates';
 
 /** A driver whose phone is this close to a station counts as a car there. */
-export const PRESENCE_GEOFENCE_METERS = 500;
+export const PRESENCE_GEOFENCE_METERS = 1000;
 /** While inside, the app tells the database again at most this often, per station. */
 export const PRESENCE_PING_INTERVAL_MS = 120_000;
 /** A presence record lapses this long after the last ping, so leaving (or closing the app) drops out fast. */

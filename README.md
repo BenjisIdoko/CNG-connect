@@ -23,7 +23,7 @@
 - Filter by pump pressure, distance radius, and live availability (*Available*, *Queuing*, *Out of Gas*).
 - One-tap turn-by-turn navigation via Google Maps, Apple Maps, or Waze.
 - Every station shows a plain-language report age (`"Updated 5 min ago"`, `"No recent report"`) so drivers know how fresh a status actually is.
-- A *Queuing* status only stays current while a car is actually at the station (a signed-in driver's phone within 500 m), or for 30 minutes after it is reported, up to the 45 minutes a report lasts. Otherwise it reads `"Last: Queuing · 6 hr ago"` in grey. Only counts of cars per station are public; who is where stays private.
+- A *Queuing* status only stays current while a car is actually at the station (a signed-in driver's phone within 1 km), or for 30 minutes after it is reported, up to the 45 minutes a report lasts. Otherwise it reads `"Last: Queuing · 6 hr ago"` in grey. Only counts of cars per station are public; who is where stays private.
 
 ### 📍 Proximity Alerts
 - Background location watch detects when a driver is near a station they'd want to know about, and surfaces a push notification/in-app banner — the point being drivers find out about a nearby restock without needing to have the app open.
