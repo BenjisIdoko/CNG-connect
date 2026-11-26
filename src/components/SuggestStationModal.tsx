@@ -74,17 +74,10 @@ export const SuggestStationModal: React.FC<SuggestStationModalProps> = ({
             <div className="w-14 h-14 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center">
               <span aria-hidden="true" className="material-symbols-outlined text-[36px]">verified</span>
             </div>
-            <h3 className="text-[1.25rem] font-extrabold text-on-surface">Submission Received!</h3>
-            <p className="text-body font-medium text-outline max-w-sm">
-              Thank you for contributing! Your suggested {stationType === 'ev_charging' ? 'EV charging point' : 'CNG station'} has been submitted for admin verification.
-            </p>
+            <h3 className="text-[1.25rem] font-extrabold text-on-surface">Sent for review</h3>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <p className="text-caption font-medium text-outline">
-              Help build Nigeria's clean energy mobility directory. Submit a new station or charger for community review.
-            </p>
-
             {formError && (
               <div className="p-3 bg-rose-50 border border-rose-200 rounded-2xl text-rose-700 text-caption font-semibold flex items-center gap-2">
                 <span aria-hidden="true" className="material-symbols-outlined text-[18px]">error</span>
@@ -227,7 +220,7 @@ export const SuggestStationModal: React.FC<SuggestStationModalProps> = ({
               ) : (
                 <label className="w-full p-4 border-2 border-dashed border-outline-variant hover:border-primary rounded-2xl flex items-center justify-center gap-2 cursor-pointer text-caption font-bold text-primary bg-surface-container-lowest transition-colors">
                   <span aria-hidden="true" className="material-symbols-outlined text-[20px]">add_a_photo</span>
-                  <span>Upload Station / Charger Photo</span>
+                  <span>Add photo</span>
                   <input type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" />
                 </label>
               )}
@@ -236,7 +229,7 @@ export const SuggestStationModal: React.FC<SuggestStationModalProps> = ({
             {/* Additional Notes */}
             <div>
               <label htmlFor="suggest-additional-notes-charger-spe" className="block text-caption font-bold text-on-surface mb-1">
-                Additional Notes / Charger Specs (Optional)
+                Notes (optional)
               </label>
               <textarea id="suggest-additional-notes-charger-spe"
                 rows={2}

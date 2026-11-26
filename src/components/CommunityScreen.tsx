@@ -116,7 +116,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
     } else {
       navigator.clipboard
         .writeText(`"${post.title}" - ${post.content.slice(0, 100)}... on CNG-Connect`)
-        .then(() => showToast('Discussion link copied!'))
+        .then(() => showToast('Link copied'))
         .catch(() => showToast('Could not copy link on this device.'));
     }
   };
@@ -187,7 +187,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                 } else {
                   navigator.clipboard
                     .writeText(window.location.href)
-                    .then(() => showToast('Link copied!'))
+                    .then(() => showToast('Link copied'))
                     .catch(() => {});
                 }
               }}
@@ -373,15 +373,10 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
               </div>
             </div>
 
-            <p className="text-[0.8125rem] text-rd-text-tertiary leading-relaxed -mt-1">
-              Each station has one group for pump status and queues. Everything else goes in the General hub.
-            </p>
-
             {/* Station Groups — flat divider rows on mobile, cards from md up */}
             {filteredStations.length === 0 ? (
               <EmptyState
                 title="No Station Groups Found"
-                message="No station groups match your current search query or status filter."
                 actionLabel="Reset Filters"
                 onAction={() => {
                   setSearchQuery('');
@@ -505,13 +500,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
               {filteredPosts.length === 0 ? (
                 <EmptyState
                   title={searchQuery ? `No results for "${searchQuery}"` : 'No posts found'}
-                  message={
-                    searchQuery
-                      ? `Try searching for other keywords like "pressure", "kit", "NIPCO", or "maintenance".`
-                      : activeCategory !== 'all'
-                      ? `There are no posts in the ${activeCategory} category yet.`
-                      : 'Be the first to share an update or question in the Community hub!'
-                  }
+                  message={searchQuery || activeCategory !== 'all' ? undefined : 'Be the first to post.'}
                   actionLabel={searchQuery || activeCategory !== 'all' ? 'Clear Search & Filters' : undefined}
                   onAction={
                     searchQuery || activeCategory !== 'all'
@@ -644,15 +633,9 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
             {/* Header Banner */}
             <div className="bg-deep-teal rounded-3xl p-6 text-white shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/30 text-white text-xs font-extrabold mb-2">
-                  <span className="inline-flex items-center gap-1.5"><Icon name="emoji_events" size={14} fill /> Nationwide Driver Leaderboard</span>
-                </div>
                 <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight">
                   Gas Finder Legends of Nigeria
                 </h2>
-                <p className="text-xs text-emerald-100/90 mt-1 max-w-xl leading-relaxed">
-                  Top drivers earning reputation points & badges by reporting real-time queue wait times and station stock status.
-                </p>
               </div>
             </div>
 
@@ -662,7 +645,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                 <EmptyState
                   icon="leaderboard"
                   title="No ranked drivers yet"
-                  message="Be the first — submit verified station reports to earn reputation points and claim the top spot."
+                  message="Report a station to claim the top spot."
                 />
               )}
               {leaderboard.map((driver) => (

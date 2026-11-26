@@ -27,10 +27,7 @@ export const InstallPrompt: React.FC = () => {
             <span aria-hidden="true" className="material-symbols-outlined text-[22px]">install_mobile</span>
           </div>
           <div className="min-w-0 flex-1">
-            <p className="font-geist text-body font-semibold text-white leading-tight">Install CNG-Connect</p>
-            <p className="text-caption text-white/70 truncate">
-              Full-screen, works offline.
-            </p>
+            <p className="font-geist text-body font-semibold text-white leading-tight">Install the app</p>
           </div>
 
           {canInstall ? (
@@ -78,7 +75,7 @@ export const InstallPrompt: React.FC = () => {
             <li className="flex items-center gap-2">
               <span aria-hidden="true" className="material-symbols-outlined text-[18px] text-emerald-400">check_circle</span>
               <span>
-                Tap <strong>Add</strong> — the CNG-Connect icon appears on your home screen.
+                Tap <strong>Add</strong>.
               </span>
             </li>
           </ol>

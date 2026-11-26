@@ -237,7 +237,6 @@ export const OverviewView: React.FC<Props> = ({ data, loading, errors, lastVisit
           <Card className="lg:col-span-5">
             <CardHeader>
               <CardTitle className="text-base">In the app</CardTitle>
-              <CardDescription>Live footprint across stations, registered drivers, and ambassadors.</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-5">
               {/* Top Mini KPI Row with Micro Bar Visuals */}
@@ -327,7 +326,7 @@ export const OverviewView: React.FC<Props> = ({ data, loading, errors, lastVisit
             <div className="flex flex-col gap-1">
               <CardTitle className="text-base">Work queue</CardTitle>
               <CardDescription>
-                Oldest first. Highlighted rows mark flags and suggestions new since you last opened this page.
+                Oldest first. New items are highlighted.
               </CardDescription>
             </div>
             {ranked.length > 0 && (

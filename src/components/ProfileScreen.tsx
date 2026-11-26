@@ -130,7 +130,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
     }
 
     setIsEditModalOpen(false);
-    showToast('Profile updated successfully!');
+    showToast('Profile updated');
   };
 
   const [analyticsOn, setAnalyticsOn] = useState(() => !isAnalyticsOptedOut());
@@ -313,7 +313,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
           <div className="rounded-2xl bg-rd-available-container px-4 py-3 flex items-center gap-3">
             <span aria-hidden="true" className="material-symbols-outlined text-rd-on-available-container text-[20px] shrink-0">bolt</span>
             <p className="flex-1 text-caption font-semibold text-rd-on-available-container">
-              Your first station report is worth +100 pts. It's the fastest way to Verified Reporter.
+              Your first station report earns +100 pts.
             </p>
           </div>
         )}
@@ -370,9 +370,6 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                 </div>
               }
             />
-            <p className="px-4 pb-3.5 -mt-1.5 text-micro text-outline">
-              Auto follows your phone's setting. Choose Light or Dark to override it.
-            </p>
           </div>
           <Row
             icon="location_on"

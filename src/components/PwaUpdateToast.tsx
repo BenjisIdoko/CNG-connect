@@ -83,8 +83,7 @@ export const PwaUpdateToast: React.FC = () => {
               <RefreshCw className="w-5 h-5 animate-spin" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-white">App Update Available</p>
-              <p className="text-xs text-white/70">Reload to get the latest station reports & features.</p>
+              <p className="text-sm font-semibold text-white">Update available</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -110,7 +109,7 @@ export const PwaUpdateToast: React.FC = () => {
         <div className="pointer-events-auto flex items-center justify-between gap-3 p-3.5 rounded-2xl bg-surface-container-high text-slate-900 shadow-[0_8px_24px_rgba(31,41,35,0.15)] animate-in slide-in-from-bottom-4 duration-300">
           <div className="flex items-center gap-2.5">
             <CheckCircle2 className="w-5 h-5 text-primary shrink-0" />
-            <p className="text-xs font-medium">Map & station data cached for offline driving!</p>
+            <p className="text-xs font-medium">Ready for offline use</p>
           </div>
           <button
             onClick={closeOfflineReadyModal}
@@ -128,8 +127,7 @@ export const PwaUpdateToast: React.FC = () => {
           <div className="flex items-center gap-2.5">
             <WifiOff className="w-5 h-5 text-status-amber shrink-0" />
             <div>
-              <p className="text-xs font-semibold text-slate-900">You are offline</p>
-              <p className="text-[0.75rem] text-outline">Showing cached station map and data.</p>
+              <p className="text-xs font-semibold text-slate-900">You're offline · showing saved data</p>
             </div>
           </div>
           <button

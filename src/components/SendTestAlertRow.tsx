@@ -15,7 +15,6 @@ export const SendTestAlertRow: React.FC<Props> = ({ busy, onSend }) => (
       <span aria-hidden="true" className="material-symbols-outlined text-[20px] text-outline">notifications_active</span>
       <div className="min-w-0">
         <span className="text-body font-semibold block leading-tight text-on-surface">Send a test alert</span>
-        <span className="text-micro text-outline">Checks that alerts reach this phone</span>
       </div>
     </div>
     <button

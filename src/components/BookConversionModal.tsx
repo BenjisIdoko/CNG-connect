@@ -16,7 +16,7 @@ export const BookConversionModal: React.FC<BookConversionModalProps> = ({
   onSuccess,
 }) => {
   const [carModel, setCarModel] = useState('2018 Toyota Camry');
-  const [tankSize, setTankSize] = useState('15kg / 75L Steel Cylinder (Recommended)');
+  const [tankSize, setTankSize] = useState('15kg / 75L steel · sedans');
   const [selectedDate, setSelectedDate] = useState('2026-08-25');
   const [phone, setPhone] = useState('+234 803 456 7890');
   const [notes, setNotes] = useState('');
@@ -42,39 +42,32 @@ export const BookConversionModal: React.FC<BookConversionModalProps> = ({
             </div>
 
             <div>
-              <span className="bg-surface-container text-primary text-[0.75rem] font-semibold px-3 py-1 rounded-full uppercase tracking-wider">
-                Pi-CNG Booking Confirmed
-              </span>
-              <h3 className="text-[1.25rem] font-bold text-on-surface mt-2">
-                Conversion Appointment Booked!
-              </h3>
-              <p className="text-[0.875rem] text-on-surface-variant font-normal mt-1">
-                Your kit inspection slot at <strong className="text-on-surface font-semibold">{center.name}</strong> is reserved.
-              </p>
+              <h3 className="text-[1.25rem] font-bold text-on-surface">Booked</h3>
+              <p className="text-[0.875rem] text-on-surface-variant font-normal mt-1">{center.name}</p>
             </div>
 
             <div className="bg-surface-container rounded-2xl p-4 text-left space-y-2 text-[0.875rem]">
               <div className="flex justify-between">
-                <span className="text-on-surface-variant font-medium">Booking Reference:</span>
+                <span className="text-on-surface-variant font-medium">Reference</span>
                 <span className="font-bold text-primary">{bookingSuccessRef}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-on-surface-variant font-medium">Center Code:</span>
+                <span className="text-on-surface-variant font-medium">Code</span>
                 <span className="font-bold text-on-surface">{center.code}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-on-surface-variant font-medium">Date:</span>
+                <span className="text-on-surface-variant font-medium">Date</span>
                 <span className="font-bold text-on-surface">{selectedDate}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-on-surface-variant font-medium">Kit Spec:</span>
+                <span className="text-on-surface-variant font-medium">Kit</span>
                 <span className="font-bold text-on-surface truncate max-w-[200px]">{tankSize}</span>
               </div>
             </div>
 
             <div className="bg-surface rounded-2xl p-3 text-primary text-[0.8125rem] font-semibold flex items-center gap-2">
               <span aria-hidden="true" className="material-symbols-outlined text-[18px]">stars</span>
-              <span>+100 Driver Reward Points added to your profile!</span>
+              <span>+100 pts</span>
             </div>
 
             <button
@@ -88,25 +81,18 @@ export const BookConversionModal: React.FC<BookConversionModalProps> = ({
               }}
               className="w-full py-3.5 bg-primary text-on-primary font-bold text-[0.9375rem] rounded-full shadow-md hover:opacity-95 transition-all"
             >
-              Done & Return
+              Done
             </button>
           </div>
         ) : (
           <div>
-            <span className="inline-block text-[0.75rem] font-semibold text-primary bg-primary-container px-2.5 py-0.5 rounded-full uppercase mb-3">
-              Accredited Workshop
-            </span>
-
             {/* Selected Center Summary Card */}
             <div className="bg-surface-container rounded-2xl p-3.5 mb-4 space-y-1">
-              <span className="text-[0.75rem] font-semibold text-primary uppercase tracking-wider block">
-                Selected Workshop ({center.code})
-              </span>
               <p className="font-bold text-[0.9375rem] text-on-surface leading-snug">
                 {center.name}
               </p>
               <p className="text-[0.8125rem] font-normal text-on-surface-variant truncate">
-                {center.address}
+                {center.address} · {center.code}
               </p>
             </div>
 
@@ -134,18 +120,10 @@ export const BookConversionModal: React.FC<BookConversionModalProps> = ({
                   onChange={(e) => setTankSize(e.target.value)}
                   className="w-full bg-surface-container/90 rounded-2xl px-4 py-2.5 outline-none font-medium text-on-surface focus:ring-2 focus:ring-primary/30"
                 >
-                  <option value="15kg / 75L Steel Cylinder (Recommended)">
-                    15kg / 75L Steel Cylinder (Recommended for Sedans)
-                  </option>
-                  <option value="12kg / 60L Compact Cylinder">
-                    12kg / 60L Compact Cylinder (Hatchbacks)
-                  </option>
-                  <option value="Composite Type-3 Ultra Light Cylinder">
-                    Composite Type-3 Ultra Light Cylinder (Premium)
-                  </option>
-                  <option value="Dual 15kg Tanks (Commercial Buses/Vans)">
-                    Dual 15kg Tanks (Commercial Buses / Vans)
-                  </option>
+                  <option value="15kg / 75L steel · sedans">15kg / 75L steel · sedans</option>
+                  <option value="12kg / 60L compact · hatchbacks">12kg / 60L compact · hatchbacks</option>
+                  <option value="Composite Type-3 · lightweight">Composite Type-3 · lightweight</option>
+                  <option value="Dual 15kg · buses and vans">Dual 15kg · buses and vans</option>
                 </select>
               </div>
 
@@ -179,13 +157,13 @@ export const BookConversionModal: React.FC<BookConversionModalProps> = ({
 
               <div>
                 <label htmlFor="book-additional-notes-optional" className="block font-semibold text-on-surface-variant mb-1">
-                  Additional Notes (Optional)
+                  Notes (optional)
                 </label>
                 <textarea id="book-additional-notes-optional"
                   rows={2}
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  placeholder="Mention any existing vehicle issues or special instructions..."
+                  placeholder="Anything we should know"
                   className="w-full bg-surface-container/90 rounded-2xl px-4 py-2 outline-none font-normal text-on-surface focus:ring-2 focus:ring-primary/30"
                 />
               </div>
@@ -199,12 +177,12 @@ export const BookConversionModal: React.FC<BookConversionModalProps> = ({
                   {isSubmitting ? (
                     <>
                       <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      <span>Confirming Slot...</span>
+                      <span>Booking…</span>
                     </>
                   ) : (
                     <>
                       <span aria-hidden="true" className="material-symbols-outlined text-[18px]">verified</span>
-                      Confirm Conversion Appointment (+100 PTS)
+                      Confirm booking
                     </>
                   )}
                 </button>

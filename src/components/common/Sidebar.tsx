@@ -1,7 +1,6 @@
 import React from 'react';
 import { UserProfile } from '../../types';
 import { ASSETS } from '../../data/mockData';
-import { Icon } from './Icon';
 import { Avatar } from './Avatar';
 
 interface SidebarProps {
@@ -44,19 +43,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <h1 className="font-extrabold text-[1.0625rem] text-slate-900 leading-tight">
             CNG-Connect
           </h1>
-          <span className="text-[0.75rem] font-bold text-rd-on-available-container bg-rd-available-container px-2 py-0.5 rounded-full">
-            <span className="inline-flex items-center gap-1"><Icon name="eco" size={12} fill /> Clean Mobility</span>
-          </span>
         </div>
       </div>
 
       {/* Main Navigation Links */}
       <div className="flex-1 py-4 px-3 flex flex-col gap-1 overflow-y-auto">
         <nav aria-label="Main" className="flex flex-col gap-1">
-        <span className="px-3 text-micro font-bold text-rd-text-tertiary uppercase tracking-wider mb-1">
-          Navigation
-        </span>
-
         {navItems.map((item) => {
           const isActive = activeTab === item.id;
           return (
@@ -84,15 +76,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
         })}
         </nav>
 
-        {/* Quick Tools Section */}
-        <span className="px-3 text-micro font-bold text-rd-text-tertiary uppercase tracking-wider mt-6 mb-1">
-          Smart Tools
-        </span>
-
+        {/* Quick tools */}
         {onOpenRoiCalculator && (
           <button
             onClick={onOpenRoiCalculator}
-            className="w-full py-2.5 px-3.5 rounded-2xl font-extrabold text-[0.875rem] bg-slate-50 hover:bg-slate-100 text-slate-800 border border-slate-200 flex items-center gap-3 transition-all"
+            className="mt-6 w-full py-2.5 px-3.5 rounded-2xl font-extrabold text-[0.875rem] bg-slate-50 hover:bg-slate-100 text-slate-800 border border-slate-200 flex items-center gap-3 transition-all"
           >
             <span aria-hidden="true" className="material-symbols-outlined text-[20px] text-emerald-600">calculate</span>
             <span>CNG & EV Savings</span>
@@ -118,9 +106,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <p className="font-extrabold text-[0.875rem] text-slate-900 truncate leading-tight">
               {userProfile.name || 'Guest driver'}
             </p>
-            <p className="text-[0.75rem] font-semibold text-slate-500 truncate">
-              {userProfile.vehicle || 'Driver'}
-            </p>
+            {userProfile.vehicle && (
+              <p className="text-[0.75rem] font-semibold text-slate-500 truncate">{userProfile.vehicle}</p>
+            )}
           </div>
         </div>
       )}

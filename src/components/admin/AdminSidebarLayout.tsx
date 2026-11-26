@@ -111,7 +111,7 @@ export const AdminSidebarLayout: React.FC<AdminSidebarLayoutProps> = ({
           <span className="block truncate font-geist text-sm font-bold tracking-tight text-adm-ink">{brand}</span>
           <span className="flex items-center gap-1.5 text-[11px] font-medium text-adm-mute-text">
             <span aria-hidden="true" className="size-1.5 rounded-full bg-adm-emerald" />
-            Admin Operations
+            Admin
           </span>
         </div>
       </div>
@@ -131,7 +131,6 @@ export const AdminSidebarLayout: React.FC<AdminSidebarLayoutProps> = ({
           <p className="truncate text-xs font-semibold text-adm-ink" title={userEmail}>
             {userEmail}
           </p>
-          <p className="text-[11px] text-adm-mute-text">Administrator</p>
         </div>
       </div>
       <div className="mt-3 flex gap-2">
@@ -158,7 +157,7 @@ export const AdminSidebarLayout: React.FC<AdminSidebarLayoutProps> = ({
       <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
         <SheetContent side="left" className="border-r border-adm-line bg-adm-card text-adm-ink">
           <SheetTitle className="sr-only">{brand} menu</SheetTitle>
-          <SheetDescription>Choose a dashboard section.</SheetDescription>
+          <SheetDescription className="sr-only">Choose a dashboard section.</SheetDescription>
           {brandBlock}
           {navList(() => setDrawerOpen(false))}
           {footer}

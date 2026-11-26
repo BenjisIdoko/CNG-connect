@@ -29,11 +29,10 @@ describe('UsersDirectory', () => {
     row({ id: '3', name: null, email: 'noname@example.com', cng_kit: '', state: null }),
   ];
 
-  it('shows the title, the user count and the description', () => {
+  it('shows the title and the user count', () => {
     const html = render(rows);
     expect(html).toContain('User directory');
     expect(html).toContain('3 users');
-    expect(html).toContain('Search, filter and manage driver accounts');
   });
 
   it('shows search, role and state filters, a kit chip row and an export button', () => {

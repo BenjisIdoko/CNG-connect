@@ -218,10 +218,6 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
               <label className="block text-[0.875rem] font-semibold text-on-surface-variant">
                 Attach Photo (Live Camera Only)
               </label>
-              <span className="text-[0.75rem] font-semibold text-primary bg-surface-container px-2 py-0.5 rounded-full flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-status-green animate-pulse" />
-                Anti-Misinformation Verified
-              </span>
             </div>
 
             {imageError && (

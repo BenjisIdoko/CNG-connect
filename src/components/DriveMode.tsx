@@ -121,7 +121,7 @@ export const DriveMode: React.FC<DriveModeProps> = ({ best, alternatives, fallba
       ) : (
         <div className="py-2">
           <h2 className="font-geist font-bold text-display leading-tight">No stations to show</h2>
-          <p className="text-body-lg text-white/80 mt-1">Clear your filters or choose a different area, then try again.</p>
+          <p className="text-body-lg text-white/80 mt-1">Clear filters or pick another area.</p>
         </div>
       )}
 

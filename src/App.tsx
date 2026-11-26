@@ -194,7 +194,7 @@ export const App: React.FC = () => {
   useEffect(() => {
     const handleOnline = () => {
       setIsOnline(true);
-      showToast('Back online. Syncing stations...');
+      showToast('Back online');
       apiService.fetchStations().then((data) => {
         if (data.length > 0) setStations(data);
       });
@@ -272,7 +272,7 @@ export const App: React.FC = () => {
   // Registers this phone for real alerts (permission, push service, database). Returns whether it worked.
   const enablePushAlerts = useCallback(async (): Promise<boolean> => {
     if (!isAuthenticated) {
-      showToast('Sign in to get gas alerts — it only takes an email and a code.');
+      showToast('Sign in to get gas alerts.');
       setAuthMode('signup');
       return false;
     }
@@ -291,7 +291,7 @@ export const App: React.FC = () => {
     if (result.ok) {
       setIsPushSubscribed(true);
       setIsPushGranted(true);
-      showToast('Alerts on: you will hear when a community manager posts for your state or a favourite station.', 'bell');
+      showToast('Alerts on for your state and favourites.', 'bell');
       return true;
     }
     showToast(result.error, 'warn');
@@ -322,10 +322,10 @@ export const App: React.FC = () => {
     const permission = await requestNotificationPermission();
     if (permission === 'granted') {
       setIsPushGranted(true);
-      showToast('Push alerts active for favorite & nearby stations!', 'bell');
+      showToast('Alerts on.', 'bell');
     } else if (permission === 'denied') {
       setIsPushGranted(false);
-      showToast('Push notification permission blocked in browser settings.', 'warn');
+      showToast('Alerts are blocked in your browser settings.', 'warn');
     }
   }, [isPushSubscribed, enablePushAlerts]);
 
@@ -411,9 +411,9 @@ export const App: React.FC = () => {
           if (evalResult.notify) {
             sendStationPushAlert(st, transition, evalResult.distanceKm);
             if (transition === 'recovered') {
-              showToast(`Pump Online: ${st.name} is back at Full Stock!`, 'ok');
+              showToast(`${st.name} is back at full stock`, 'ok');
             } else {
-              showToast(`Alert: ${st.name} reported Out of Gas!`, 'alert');
+              showToast(`${st.name} is out of gas`, 'alert');
             }
           }
         }
@@ -635,7 +635,7 @@ export const App: React.FC = () => {
         track('arrival_prompt_shown', { station_id: nearbyStaleStation.id, source: 'geofence' });
         setProximityAlertStation(nearbyStaleStation);
         setStationCooldown(userKey, nearbyStaleStation.id);
-        showToast(`Geofence Nudge: You arrived near ${nearbyStaleStation.name}`, 'pin');
+        showToast(`You're near ${nearbyStaleStation.name}`, 'pin');
       }
     };
 
@@ -741,7 +741,7 @@ export const App: React.FC = () => {
   // about giving a clear prompt instead of a request silently failing.
   const requireAuth = (): boolean => {
     if (isAuthenticated) return true;
-    showToast('Sign in to continue — it only takes an email and a code.');
+    showToast('Sign in to continue.');
     setAuthMode('signup');
     return false;
   };
@@ -759,12 +759,12 @@ export const App: React.FC = () => {
     const onCooldown = isStationOnCooldown(userKey, candidate.id, 2);
 
     if (!stale) {
-      showToast(`Nudge skipped for ${candidate.name}: Status is fresh (${isIsoTimestamp(candidate.lastUpdated) ? formatRelativeTime(candidate.lastUpdated) : candidate.lastUpdated}). Nudges require >30m staleness.`, 'warn');
+      showToast(`${candidate.name} was updated recently (${isIsoTimestamp(candidate.lastUpdated) ? formatRelativeTime(candidate.lastUpdated) : candidate.lastUpdated})`, 'warn');
       return;
     }
 
     if (onCooldown) {
-      showToast(`Nudge skipped for ${candidate.name}: 2-hour user cooldown active.`, 'wait');
+      showToast(`Already asked about ${candidate.name} in the last 2 hours`, 'wait');
       return;
     }
 
@@ -772,7 +772,7 @@ export const App: React.FC = () => {
     track('arrival_prompt_shown', { station_id: candidate.id, source: 'manual' });
     setProximityAlertStation(candidate);
     setStationCooldown(userKey, candidate.id);
-    showToast(`Geofence Alert: Arrived near ${candidate.name}`, 'pin');
+    showToast(`You're near ${candidate.name}`, 'pin');
   };
 
   // Handlers
@@ -875,7 +875,7 @@ export const App: React.FC = () => {
       };
     });
 
-    showToast(`Thanks! +${award.pointsAwarded} reputation points earned.`);
+    showToast(`Thanks! +${award.pointsAwarded} pts earned.`);
   };
 
   const handleSubmitReport = (newReport: DriverReport, newStatus: StationStatus) => {
@@ -922,7 +922,7 @@ export const App: React.FC = () => {
         return st;
       })
     );
-    showToast('Comment posted to Station Group!');
+    showToast('Comment posted');
 
     // Sync to backend (Supabase station_comments table) when configured;
     // reconcile local state with the authoritative merged result.
@@ -951,14 +951,13 @@ export const App: React.FC = () => {
 
   const handleNavigate = (station: GasStation) => {
     setNavigatingStation(station);
-    showToast(`Navigation summary for ${station.name} (${station.distance})`);
   };
 
   const handleCreatePost = async (newPost: CommunityPost) => {
     if (!requireAuth()) return;
     const updatedPosts = await apiService.createPost(newPost);
     setPosts(updatedPosts);
-    showToast('Post published to CNG-Connect Community!');
+    showToast('Post published');
   };
 
   const handleToggleLikePost = async (postId: string) => {
@@ -1045,7 +1044,7 @@ export const App: React.FC = () => {
     }
     await signOut();
     setAuthMode('onboarding');
-    showToast('Signed out successfully.');
+    showToast('Signed out');
   };
 
   if (isPasswordRecovery) {

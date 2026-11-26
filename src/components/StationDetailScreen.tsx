@@ -272,7 +272,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
       {/* Toast Notification */}
       {copiedNotification && (
         <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-on-surface text-white text-[0.875rem] font-bold px-4 py-2 rounded-full shadow-lg">
-          Station Group link copied!
+          Link copied
         </div>
       )}
 
@@ -383,15 +383,13 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                         ? getFormattedStatusPillText(station)
                         : isStale
                         ? `Last reported: ${STATUS_SHORT_LABEL[freshness.lastKnownStatus!]}`
-                        : 'No report in the last 45 min'}
+                        : 'No recent report'}
                     </p>
-                    <p className="text-caption text-rd-text-tertiary mt-0.5">
-                      {isLive
-                        ? `Updated ${freshness.ageText}`
-                        : isStale
-                        ? `${freshness.ageText} · it may have changed since. Tell drivers what it's like now.`
-                        : 'Be the first to tell drivers if this station has gas.'}
-                    </p>
+                    {(isLive || isStale) && (
+                      <p className="text-caption text-rd-text-tertiary mt-0.5">
+                        {isLive ? `Updated ${freshness.ageText}` : `${freshness.ageText} · may have changed`}
+                      </p>
+                    )}
                   </div>
                 </div>
                 {(() => {
@@ -405,7 +403,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                           {' · reported '}{formatAgeShort(price.ageMinutes)}
                         </p>
                       ) : (
-                        <p className="flex-1 min-w-0 text-caption text-rd-text-tertiary">No price reported yet. Add what you paid when you report.</p>
+                        <p className="flex-1 min-w-0 text-caption text-rd-text-tertiary">No price reported yet.</p>
                       )}
                     </div>
                   );
@@ -421,7 +419,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                   <div className="rounded-2xl bg-rd-available-container px-4 py-3 flex items-center gap-3">
                     <span aria-hidden="true" className="material-symbols-outlined text-rd-on-available-container text-[20px] shrink-0">bolt</span>
                     <p className="flex-1 text-caption font-semibold text-rd-on-available-container">
-                      {isStale ? 'At the station? Tell drivers how it is now.' : 'At the station? Be the first to report today.'}
+                      {isStale ? 'At the station? Update it.' : 'At the station? Report it.'}
                     </p>
                     <span className="shrink-0 text-[0.75rem] font-bold text-rd-on-available-container">+100 pts</span>
                   </div>
@@ -483,7 +481,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
               tab, since merging would be a bigger behavior change than a visual rebuild. */}
           <TabsPrimitive.Content value="feed" className="mt-4 outline-none">
             {comments.length === 0 ? (
-              <p className="text-caption text-outline py-6 text-center">No messages yet. Say hi to drivers here.</p>
+              <p className="text-caption text-outline py-6 text-center">No messages yet.</p>
             ) : (
               <div className="flex flex-col gap-3">
                 {comments.map((comment) => {
@@ -535,9 +533,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
           {/* TAB CONTENT 2: Driver Status Reports */}
           <TabsPrimitive.Content value="reports" className="mt-4 outline-none">
             {listedReports.length === 0 ? (
-              <p className="text-caption text-outline py-6 text-center">
-                No report in the last 45 minutes. Be the first to report stock &amp; queue.
-              </p>
+              <p className="text-caption text-outline py-6 text-center">No reports yet.</p>
             ) : (
               <div className="flex flex-col gap-4">
                 {listedReports.map((report) => {
@@ -717,11 +713,6 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                   );
                 })()}
 
-                <p className="text-[0.75rem] text-rd-text-tertiary leading-relaxed mt-3.5">
-                  Live photos carry a burned-in timestamp. The listing photo was added when the
-                  station was suggested and isn&apos;t a status claim.
-                </p>
-
                 {onAddPhoto && (
                   <div className="mt-3.5 flex flex-col items-center gap-1.5">
                     <button
@@ -733,16 +724,14 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                       Add live photo
                       <span className="text-[0.75rem] font-bold bg-white/20 rounded-full px-2 py-0.5">+15 pts</span>
                     </button>
-                    <span className="text-[0.75rem] text-rd-text-tertiary">Camera only · gallery uploads blocked</span>
+                    <span className="text-[0.75rem] text-rd-text-tertiary">Camera only</span>
                   </div>
                 )}
               </>
             ) : (
               <div className="py-6 text-center flex flex-col items-center gap-2">
                 <span aria-hidden="true" className="material-symbols-outlined text-[32px] text-slate-300">photo_camera</span>
-                <p className="text-caption text-outline max-w-xs">
-                  No photos yet. Only live camera photos taken at the station appear here.
-                </p>
+                <p className="text-caption text-outline max-w-xs">No photos yet.</p>
               </div>
             )}
           </TabsPrimitive.Content>
@@ -758,7 +747,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
               <div className="rounded-2xl bg-rd-available-container px-3.5 py-2.5 flex items-center gap-2.5">
                 <span aria-hidden="true" className="material-symbols-outlined text-rd-on-available-container text-[18px] shrink-0">campaign</span>
                 <p className="flex-1 text-[0.8125rem] font-semibold text-rd-on-available-container leading-snug">
-                  At the pump? A status report reaches more drivers than a message.
+                  At the pump? Report its status.
                 </p>
                 <button
                   type="button"

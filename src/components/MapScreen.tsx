@@ -1180,8 +1180,8 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                 </p>
                 <p className="text-micro mt-0.5">
                   {gpsStatus === 'denied'
-                    ? 'Location is blocked for this site — enable it in your browser or device settings, then reload.'
-                    : "We couldn't get your location. If this isn't where you are:"}
+                    ? 'Location is blocked. Allow it in your settings, then reload.'
+                    : "We couldn't get your location."}
                 </p>
                 <button
                   type="button"
@@ -1235,11 +1235,9 @@ export const MapScreen: React.FC<MapScreenProps> = ({
           {sheetMode === 'collapsed' ? null : filteredStations.length === 0 ? (
             <div className="px-5 pt-4 pb-28 text-center flex flex-col items-center gap-2">
               <h3 className="font-extrabold text-on-surface text-body-lg">No stations found</h3>
-              <p className="text-caption text-on-surface-variant max-w-xs">
-                {searchQuery.trim()
-                  ? `Nothing matches "${searchQuery.trim()}". Try just the station name or the city.`
-                  : 'Nothing matches your filters right now.'}
-              </p>
+              {searchQuery.trim() && (
+                <p className="text-caption text-on-surface-variant max-w-xs">{`Nothing matches "${searchQuery.trim()}".`}</p>
+              )}
               <button
                 onClick={resetAllFilters}
                 className="mt-1 min-h-11 px-6 bg-primary text-white text-caption font-bold rounded-full active:scale-95 transition-all"
@@ -1452,7 +1450,6 @@ export const MapScreen: React.FC<MapScreenProps> = ({
               <span className="material-symbols-outlined text-[28px]">search_off</span>
             </span>
             <p className="font-geist font-bold text-[1.0625rem]">No stations match</p>
-            <p className="text-caption text-rd-text-tertiary">Try a different search or clear the filters to see every station again.</p>
             <button
               type="button"
               onClick={resetAllFilters}

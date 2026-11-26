@@ -224,7 +224,7 @@ export const StationSearchOverlay: React.FC<Props> = ({
               <span aria-hidden="true" className="material-symbols-outlined text-[40px] text-outline">search_off</span>
               <h3 className="mt-2 font-extrabold text-body-lg text-on-surface">No station found</h3>
               <p className="mt-1 text-caption text-on-surface-variant">
-                Nothing matches &ldquo;{query.trim()}&rdquo;. Try just the station name or the city.
+                Nothing matches &ldquo;{query.trim()}&rdquo;.
               </p>
             </div>
           )

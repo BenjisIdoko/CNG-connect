@@ -21,7 +21,7 @@ export const PushAlertPrompt: React.FC<Props> = ({ busy, onAccept, onDismiss }) 
         <div className="min-w-0 flex-1">
           <p className="font-geist text-body font-semibold text-white leading-tight">Get an alert when gas arrives here?</p>
           <p className="text-caption text-white/70 mt-0.5">
-            A community manager at the station tells you the moment gas is available or runs out.
+            Posted by the station's community manager.
           </p>
         </div>
       </div>

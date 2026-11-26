@@ -43,9 +43,6 @@ export const PasswordResetScreen: React.FC = () => {
         {done ? (
           <>
             <h1 className="text-lg font-extrabold text-slate-900">Password set</h1>
-            <p className="text-sm text-slate-500">
-              Your password has been updated. You can now sign in with it.
-            </p>
             <button
               onClick={() => void signOut()}
               className="rounded-lg bg-emerald-600 py-2 text-sm font-bold text-white"
@@ -62,7 +59,6 @@ export const PasswordResetScreen: React.FC = () => {
             className="flex flex-col gap-3"
           >
             <h1 className="text-lg font-extrabold text-slate-900">Set a new password</h1>
-            <p className="text-sm text-slate-500">Choose a password for your account.</p>
             <input
               type="password"
               autoComplete="new-password"

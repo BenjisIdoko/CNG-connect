@@ -8,7 +8,6 @@ const html = (busy = false) => renderToStaticMarkup(<SendTestAlertRow busy={busy
 describe('SendTestAlertRow', () => {
   it('says what it does and offers one button', () => {
     expect(html()).toContain('Send a test alert');
-    expect(html()).toContain('Checks that alerts reach this phone');
     expect((html().match(/<button/g) || []).length).toBe(1);
   });
 

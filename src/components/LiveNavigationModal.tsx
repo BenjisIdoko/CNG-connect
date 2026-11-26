@@ -69,7 +69,7 @@ export const LiveNavigationModal: React.FC<LiveNavigationModalProps> = ({
         <div className="grid grid-cols-2 gap-3">
           <div className="bg-surface-container rounded-2xl p-3.5 text-center">
             <span className="text-[0.75rem] font-semibold uppercase text-outline block mb-0.5">
-              Estimated Distance
+              Distance
             </span>
             <span className="text-[1.25rem] font-bold text-on-surface">
               {station.distance}
@@ -78,7 +78,7 @@ export const LiveNavigationModal: React.FC<LiveNavigationModalProps> = ({
 
           <div className="bg-surface-container rounded-2xl p-3.5 text-center">
             <span className="text-[0.75rem] font-semibold uppercase text-outline block mb-0.5">
-              Drive Time ETA
+              Drive time
             </span>
             <span className="text-[1.25rem] font-bold text-primary">
               {station.driveTime}
@@ -93,7 +93,7 @@ export const LiveNavigationModal: React.FC<LiveNavigationModalProps> = ({
             className="w-full py-3.5 bg-surface-container hover:bg-surface-container-high text-on-surface font-bold text-[0.9062rem] rounded-full flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
           >
             <span aria-hidden="true" className="material-symbols-outlined text-[20px] shrink-0">pin_drop</span>
-            <span>Open Location Pin on Google Maps</span>
+            <span>Open pin in Google Maps</span>
           </button>
 
           <button
@@ -101,14 +101,14 @@ export const LiveNavigationModal: React.FC<LiveNavigationModalProps> = ({
             className="w-full py-3.5 bg-primary hover:opacity-95 text-white font-bold text-[0.9062rem] rounded-full flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
           >
             <span aria-hidden="true" className="material-symbols-outlined text-[20px] shrink-0">turn_right</span>
-            <span>Turn-by-Turn Navigation</span>
+            <span>Start navigation</span>
           </button>
 
           <button
             onClick={onClose}
             className="w-full py-2.5 text-outline hover:text-slate-900 font-bold text-[0.875rem] rounded-full active:scale-[0.98] transition-all"
           >
-            Close Summary
+            Close
           </button>
         </div>
       </div>

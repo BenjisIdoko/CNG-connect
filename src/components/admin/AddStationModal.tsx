@@ -83,9 +83,6 @@ export const AddStationModal: React.FC<Props> = ({ stations, prefill, onClose, o
     <ModalFrame onClose={onClose} title="Add station" className="max-w-xl">
         <div className="p-4 border-b border-adm-line shrink-0">
           <h2 className="font-bold text-adm-ink text-sm">Add station</h2>
-          <p className="text-xs text-adm-mute-text">
-            Basics and a map position. Price, hours and photos can be added right after in the full editor.
-          </p>
         </div>
 
         <div className="p-4 overflow-y-auto flex flex-col gap-3">
@@ -138,13 +135,13 @@ export const AddStationModal: React.FC<Props> = ({ stations, prefill, onClose, o
 
           {exactDuplicate && (
             <p role="alert" className="text-xs text-adm-danger bg-adm-danger-soft border border-adm-danger/30 rounded-lg px-3 py-2">
-              A station with this name already exists, so it can't be added. The app hides stations whose names match once case and punctuation are ignored. Use a more specific name.
+              A station with this name already exists. Use a more specific name.
             </p>
           )}
 
           {warnings.length > 0 && (
             <div role="status" className="text-xs text-adm-warn bg-adm-warn-soft border border-adm-warn/30 rounded-lg px-3 py-2">
-              <p className="font-semibold">Check before adding. Similar stations:</p>
+              <p className="font-semibold">Similar stations:</p>
               <ul className="mt-1 list-disc pl-4">
                 {warnings.map((h) => (
                   <li key={h.id}>

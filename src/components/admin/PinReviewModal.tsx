@@ -149,8 +149,7 @@ export const PinReviewModal: React.FC<Props> = ({ station, onClose, onSaved, fla
           </div>
         ) : (
           <div className="h-40 shrink-0 grid place-items-center p-4 text-center bg-adm-paper text-xs text-adm-ink">
-            Map disabled — set <code className="mx-1">VITE_GOOGLE_MAPS_API_KEY</code> to see it here. You can still fix
-            the pin below by pasting coordinates.
+            Map unavailable. Paste coordinates below to fix the pin.
           </div>
         )}
 

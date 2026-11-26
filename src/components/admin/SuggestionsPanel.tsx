@@ -106,9 +106,6 @@ export const SuggestionsPanel: React.FC<Props> = ({ flash, onCountChange }) => {
               <h2 className="font-geist text-xl font-bold tracking-tight text-adm-ink">Driver station suggestions</h2>
               <Badge variant="secondary">{suggestions.length} pending</Badge>
             </div>
-            <p className="mt-0.5 text-xs text-adm-mute-text">
-              Review driver-submitted stations, verify duplicates against the live directory, and place approved pins on the map.
-            </p>
           </div>
         </div>
 
@@ -132,7 +129,6 @@ export const SuggestionsPanel: React.FC<Props> = ({ flash, onCountChange }) => {
           <Card>
             <CardContent className="py-10 text-center">
               <p className="font-geist text-base font-bold text-adm-ink">No pending suggestions</p>
-              <p className="mt-1 text-sm text-adm-mute-text">When a driver taps "Suggest station" it shows up here.</p>
             </CardContent>
           </Card>
         )}

@@ -432,9 +432,6 @@ export const StationsPanel: React.FC<{ flash: (m: string) => void }> = ({ flash 
               </Badge>
               <Badge variant={reviewCount > 0 ? 'warning' : 'secondary'}>{reviewCount} need review</Badge>
             </div>
-            <p className="text-xs text-adm-mute-text">
-              Click any cell to edit inline, verify pin coordinates on the map, or open full details for operating hours and photos.
-            </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <Button onClick={() => setAdding(true)} className="h-9">

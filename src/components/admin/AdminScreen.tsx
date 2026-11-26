@@ -100,8 +100,8 @@ export const AdminScreen: React.FC<{ onExit: () => void }> = ({ onExit }) => {
         <AdminRoot className="fixed inset-0 z-[200] grid place-items-center text-sm text-adm-mute-text">Loading…</AdminRoot>
       ) : !isAdmin ? (
         <NotForYou
-          title="This page is for the app admin"
-          message="You're signed in, but this dashboard is only for the app admin."
+          title="Admin only"
+          message="This account is not an admin."
           linkLabel="Back to CNG-Connect"
           linkHref="/"
           onSignOut={signOut}

@@ -113,7 +113,7 @@ export const PositionPicker: React.FC<Props> = ({ value, onChange, tier, onTierC
         </div>
       ) : (
         <p className="text-xs text-adm-mute-text">
-          No Google Maps key is set here, so paste the coordinates or a Google Maps link instead.
+          Paste coordinates or a Google Maps link.
         </p>
       )}
 
@@ -162,7 +162,7 @@ export const PositionPicker: React.FC<Props> = ({ value, onChange, tier, onTierC
             find on Google Maps <ArrowUpRight className="inline size-3" aria-hidden="true" />
           </a>
         )}
-        {hasGoogleMapsKey && <span className="text-adm-mute-text">click or drag the pin on the map</span>}
+        {hasGoogleMapsKey && <span className="text-adm-mute-text">click or drag the pin</span>}
       </div>
 
       <select

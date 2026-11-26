@@ -206,9 +206,6 @@ export const UsersDirectory: React.FC<DirectoryProps> = ({ rows, loading, onEdit
                 {rows.length} {rows.length === 1 ? 'user' : 'users'}
               </Badge>
             </div>
-            <p className="text-xs text-adm-mute-text">
-              Search, filter and manage driver accounts. Admin access can only be changed in the database.
-            </p>
           </div>
           <Button variant="outline" onClick={exportCsv} disabled={sorted.length === 0} className="h-9 shrink-0">
             <Download aria-hidden="true" /> Export CSV

@@ -3,7 +3,7 @@ import React from 'react';
 export interface EmptyStateProps {
   icon?: string;
   title: string;
-  message: string;
+  message?: string;
   actionLabel?: string;
   onAction?: () => void;
   className?: string;
@@ -23,7 +23,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
         <span aria-hidden="true" className="material-symbols-outlined text-[28px]">{icon}</span>
       </div>
       <h4 className="font-extrabold text-slate-900 text-body-lg">{title}</h4>
-      <p className="text-caption text-slate-500 font-normal max-w-xs">{message}</p>
+      {message && <p className="text-caption text-slate-500 font-normal max-w-xs">{message}</p>}
       {actionLabel && onAction && (
         <button
           onClick={onAction}

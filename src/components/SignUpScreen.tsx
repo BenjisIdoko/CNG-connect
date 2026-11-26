@@ -226,7 +226,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
       </h1>
       {step === 1 && (
         <p className="text-[0.9375rem] text-rd-text-tertiary leading-relaxed mt-2">
-          No password needed — we&apos;ll email you a code. New here? The same code creates your account.
+          We&apos;ll email you a code. No password needed.
         </p>
       )}
       {step === 2 && (
@@ -298,7 +298,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
                   <span>{phoneError}</span>
                 </p>
               ) : (
-                <p className="text-[0.8125rem] text-rd-text-tertiary mt-2">Nigerian number, e.g. 0803 123 4567 or +234 803 123 4567</p>
+                <p className="text-[0.8125rem] text-rd-text-tertiary mt-2">e.g. 0803 123 4567</p>
               )}
             </div>
           )}
@@ -417,7 +417,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
                     <span>{phoneError}</span>
                   </p>
                 ) : (
-                  <p className="text-[0.7812rem] text-outline mt-1">Nigerian number, e.g. 0803 123 4567 or +234 803 123 4567</p>
+                  <p className="text-[0.7812rem] text-outline mt-1">e.g. 0803 123 4567</p>
                 )}
               </div>
 
@@ -458,10 +458,8 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
                               className="flex-1 bg-transparent text-[0.9062rem] font-semibold tracking-widest text-rd-ink outline-none placeholder:font-medium placeholder:tracking-normal"
                             />
                           </div>
-                          {inviteError ? (
+                          {inviteError && (
                             <p className="text-[0.7812rem] font-medium text-status-red mt-1">{inviteError}</p>
-                          ) : (
-                            <p className="text-[0.7812rem] text-outline mt-1">From a friend who shared the app with you.</p>
                           )}
                         </>
                       )}

@@ -156,7 +156,6 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
           {filteredCenters.length === 0 ? (
             <div className="bg-rd-surface rounded-2xl p-8 text-center col-span-full">
               <p className="font-bold text-body-lg">No centres found</p>
-              <p className="text-caption text-outline mt-1">Try another state or clear your search.</p>
               <button
                 onClick={() => {
                   setSearchQuery('');
