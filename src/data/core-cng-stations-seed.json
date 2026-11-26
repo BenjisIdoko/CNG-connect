@@ -28,34 +28,6 @@
     "stationComments": []
   },
   {
-    "id": "bovas-cng-aust",
-    "stationType": "cng",
-    "name": "BOVAS AutoGas - Industrial Area II",
-    "address": "Plot 21, Cadastral Zone C, Industrial Area II, Airport Road (AUST), Abuja",
-    "city": "Airport Road",
-    "state": "Abuja FCT",
-    "distance": "6.5 km",
-    "driveTime": "17 min drive",
-    "status": "unknown",
-    "statusLabel": "No recent reports",
-    "verifiedByCommunity": false,
-    "isPiCngAccredited": true,
-    "operator": "BOVAS Group",
-    "phone": "+234 9 290 8821",
-    "lat": 8.981,
-    "lng": 7.421,
-    "images": [
-      "/images/img-10.webp",
-      "/images/img-09.webp"
-    ],
-    "stationNotice": "",
-    "locationPrecision": "city",
-    "needsPinReview": false,
-    "lastUpdated": "",
-    "reports": [],
-    "stationComments": []
-  },
-  {
     "id": "bovas-cng-idimu",
     "stationType": "cng",
     "name": "BOVAS CNG Station - Idimu",

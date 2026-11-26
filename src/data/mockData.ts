@@ -68,6 +68,14 @@ export function deduplicateStations(stationsList: GasStation[]): GasStation[] {
   });
 }
 
+// Listings that must never show, even from a station list an older build saved on a phone.
+// bovas-cng-aust was the Bovas forecourt at AUST on Airport Road listed a second time with a rough pin about
+// 2.5 km from the real one (pci-station-81, "Bovas Filling Station - Chika"), so drivers at the station could not report on it.
+export const RETIRED_STATION_IDS: ReadonlySet<string> = new Set(['bovas-cng-aust']);
+
+export const dropRetiredStations = (stations: GasStation[]): GasStation[] =>
+  stations.filter((s) => !RETIRED_STATION_IDS.has(s.id));
+
 // Temporary switch to pull EV charging stations out of the app entirely
 // (map, lists, search, counts) without deleting their data — flip back to
 // true to bring them back. Also honored in apiService.fetchStations() for

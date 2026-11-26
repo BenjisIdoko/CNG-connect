@@ -1,5 +1,5 @@
 import { GasStation, DriverReport, CommunityPost, StationStatus, VerificationLevel, StationMedia, StationSuggestion, CommentItem } from '../types';
-import { INITIAL_STATIONS, INITIAL_POSTS, deduplicateStations, SHOW_EV_STATIONS } from '../data/mockData';
+import { INITIAL_STATIONS, INITIAL_POSTS, deduplicateStations, dropRetiredStations, SHOW_EV_STATIONS } from '../data/mockData';
 import { getSupabase, isSupabaseConfigured, restSelect, restRpc } from './supabaseClient';
 import { checkNotificationPermission } from '../utils/permissionManager';
 import { formatRelativeTime } from '../utils/timeUtils';
@@ -105,7 +105,7 @@ function purgeStaleLocalStorage() {
 // (not just at INITIAL_STATIONS) in case a stale localStorage cache from
 // before this flag existed still has them.
 function applyStationTypeVisibility(stations: GasStation[]): GasStation[] {
-  return SHOW_EV_STATIONS ? stations : stations.filter((s) => s.stationType !== 'ev_charging');
+  return dropRetiredStations(SHOW_EV_STATIONS ? stations : stations.filter((s) => s.stationType !== 'ev_charging'));
 }
 
 // Older builds cached the literal text 'Just now' as a station/report time. It can
