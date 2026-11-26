@@ -14,18 +14,21 @@
     "isPiCngAccredited": true,
     "operator": "BOVAS Group",
     "phone": "+234 2 810 5500",
-    "lat": 7.448,
-    "lng": 3.901,
+    "lat": 7.457357,
+    "lng": 3.907383,
     "images": [
       "/images/img-17.webp",
       "/images/img-13.webp"
     ],
     "stationNotice": "",
-    "locationPrecision": "city",
+    "locationPrecision": "rooftop",
     "needsPinReview": false,
     "lastUpdated": "",
     "reports": [],
-    "stationComments": []
+    "stationComments": [],
+    "accuracyRadiusM": 30,
+    "dataSource": "Google Places",
+    "dataSourceDate": "2026-09-07"
   },
   {
     "id": "bovas-cng-idimu",
@@ -42,18 +45,21 @@
     "isPiCngAccredited": true,
     "operator": "BOVAS Group",
     "phone": "+234 1 892 1100",
-    "lat": 6.551,
-    "lng": 3.268,
+    "lat": 6.59713,
+    "lng": 3.28939,
     "images": [
       "/images/img-17.webp",
       "/images/img-13.webp"
     ],
     "stationNotice": "",
-    "locationPrecision": "city",
+    "locationPrecision": "rooftop",
     "needsPinReview": false,
     "lastUpdated": "",
     "reports": [],
-    "stationComments": []
+    "stationComments": [],
+    "accuracyRadiusM": 30,
+    "dataSource": "Google Places",
+    "dataSourceDate": "2026-09-07"
   },
   {
     "id": "bovas-cng-upper-sakponba",
@@ -78,10 +84,13 @@
     ],
     "stationNotice": "",
     "locationPrecision": "city",
-    "needsPinReview": false,
+    "needsPinReview": true,
     "lastUpdated": "",
     "reports": [],
-    "stationComments": []
+    "stationComments": [],
+    "accuracyRadiusM": 4000,
+    "dataSource": "PCI centroid (Places match not trusted)",
+    "dataSourceDate": "2026-09-07"
   },
   {
     "id": "bovas-cng-wuse5",
@@ -126,18 +135,21 @@
     "isPiCngAccredited": true,
     "operator": "NIPCO Gas",
     "phone": "+234 52 250 880",
-    "lat": 6.3012,
-    "lng": 5.6201,
+    "lat": 6.319165,
+    "lng": 5.637861,
     "images": [
       "/images/img-16.webp",
       "/images/img-09.webp"
     ],
     "stationNotice": "",
-    "locationPrecision": "city",
+    "locationPrecision": "rooftop",
     "needsPinReview": false,
     "lastUpdated": "",
     "reports": [],
-    "stationComments": []
+    "stationComments": [],
+    "accuracyRadiusM": 30,
+    "dataSource": "Google Places",
+    "dataSourceDate": "2026-09-07"
   },
   {
     "id": "nipco-lekki-epe",
@@ -154,18 +166,21 @@
     "isPiCngAccredited": true,
     "operator": "NIPCO Gas",
     "phone": "+234 1 270 2400",
-    "lat": 6.4689,
-    "lng": 3.621,
+    "lat": 6.470791,
+    "lng": 3.565216,
     "images": [
       "/images/img-10.webp",
       "/images/img-17.webp"
     ],
     "stationNotice": "",
-    "locationPrecision": "city",
+    "locationPrecision": "rooftop",
     "needsPinReview": false,
     "lastUpdated": "",
     "reports": [],
-    "stationComments": []
+    "stationComments": [],
+    "accuracyRadiusM": 30,
+    "dataSource": "Google Places",
+    "dataSourceDate": "2026-09-07"
   },
   {
     "id": "nipco-nnpc-ibadan-tollgate",
@@ -182,19 +197,22 @@
     "isPiCngAccredited": true,
     "operator": "NIPCO Gas / NNPC Ltd",
     "phone": "+234 2 241 3300",
-    "lat": 7.3512,
-    "lng": 3.8901,
+    "lat": 7.383402,
+    "lng": 3.991486,
     "images": [
       "/images/img-16.webp",
       "/images/img-09.webp",
       "/images/img-10.webp"
     ],
     "stationNotice": "",
-    "locationPrecision": "city",
+    "locationPrecision": "rooftop",
     "needsPinReview": false,
     "lastUpdated": "",
     "reports": [],
-    "stationComments": []
+    "stationComments": [],
+    "accuracyRadiusM": 30,
+    "dataSource": "Google Places",
+    "dataSourceDate": "2026-09-07"
   },
   {
     "id": "nipco-nnpc-ikeja",
@@ -211,19 +229,22 @@
     "isPiCngAccredited": true,
     "operator": "NIPCO Gas / NNPC Ltd",
     "phone": "+234 1 774 2190",
-    "lat": 6.612,
-    "lng": 3.356,
+    "lat": 6.607676,
+    "lng": 3.36919,
     "images": [
       "/images/img-16.webp",
       "/images/img-09.webp",
       "/images/img-13.webp"
     ],
     "stationNotice": "",
-    "locationPrecision": "city",
+    "locationPrecision": "rooftop",
     "needsPinReview": false,
     "lastUpdated": "",
     "reports": [],
-    "stationComments": []
+    "stationComments": [],
+    "accuracyRadiusM": 30,
+    "dataSource": "Google Places",
+    "dataSourceDate": "2026-09-07"
   },
   {
     "id": "nnpc-cng-deidei",
@@ -240,18 +261,21 @@
     "isPiCngAccredited": true,
     "operator": "NNPC / NIPCO Gas",
     "phone": "+234 9 881 4400",
-    "lat": 9.12,
-    "lng": 7.29,
+    "lat": 8.986545,
+    "lng": 7.392687,
     "images": [
       "/images/img-16.webp",
       "/images/img-17.webp"
     ],
     "stationNotice": "",
-    "locationPrecision": "city",
+    "locationPrecision": "rooftop",
     "needsPinReview": false,
     "lastUpdated": "",
     "reports": [],
-    "stationComments": []
+    "stationComments": [],
+    "accuracyRadiusM": 30,
+    "dataSource": "Admin verified",
+    "dataSourceDate": "2026-09-18"
   },
   {
     "id": "nnpc-cng-gaduwa",
@@ -268,19 +292,22 @@
     "isPiCngAccredited": true,
     "operator": "NNPC Retail",
     "phone": "+234 9 270 3000",
-    "lat": 9.0145,
-    "lng": 7.4912,
+    "lat": 9.044372,
+    "lng": 7.452962,
     "images": [
       "/images/img-16.webp",
       "/images/img-09.webp",
       "/images/img-10.webp"
     ],
     "stationNotice": "",
-    "locationPrecision": "city",
+    "locationPrecision": "rooftop",
     "needsPinReview": false,
     "lastUpdated": "",
     "reports": [],
-    "stationComments": []
+    "stationComments": [],
+    "accuracyRadiusM": 30,
+    "dataSource": "Admin verified",
+    "dataSourceDate": "2026-09-14"
   },
   {
     "id": "nnpc-cng-kubwa",
@@ -325,19 +352,22 @@
     "isPiCngAccredited": true,
     "operator": "NNPC / NIPCO Gas",
     "phone": "+234 9 774 2190",
-    "lat": 8.9772,
-    "lng": 7.3756,
+    "lat": 8.939191,
+    "lng": 7.308817,
     "images": [
       "/images/img-09.webp",
       "/images/img-13.webp",
       "/images/img-16.webp"
     ],
     "stationNotice": "Airport Road Station Group. Please post all live gas availability, queue updates, and pump reports in this group!",
-    "locationPrecision": "city",
+    "locationPrecision": "rooftop",
     "needsPinReview": false,
     "lastUpdated": "",
     "reports": [],
-    "stationComments": []
+    "stationComments": [],
+    "accuracyRadiusM": 30,
+    "dataSource": "Admin verified",
+    "dataSourceDate": "2026-09-18"
   },
   {
     "id": "portland-cng-utako",
@@ -390,10 +420,13 @@
     ],
     "stationNotice": "",
     "locationPrecision": "city",
-    "needsPinReview": false,
+    "needsPinReview": true,
     "lastUpdated": "",
     "reports": [],
-    "stationComments": []
+    "stationComments": [],
+    "accuracyRadiusM": 4000,
+    "dataSource": "PCI centroid (Places match not trusted)",
+    "dataSourceDate": "2026-09-07"
   },
   {
     "id": "total-cng-wuse2",
