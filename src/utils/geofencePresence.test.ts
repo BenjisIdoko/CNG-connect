@@ -81,20 +81,21 @@ describe('stationsToPing', () => {
   });
 });
 
-describe('checkReportPosition (the 300 m rule for reporting: the back of a long queue counts)', () => {
-  const TOO_FAR = 'Reports unlock within 300 m of the station so every status comes from someone actually there.';
+describe('checkReportPosition (the 1 km rule for reporting: a driver in the approach queue or nearby counts)', () => {
+  const TOO_FAR = 'Reports unlock within 1 km of the station so every status comes from someone actually there.';
 
-  it('uses a 300 m radius', () => {
-    expect(REPORT_GEOFENCE_METERS).toBe(300);
+  it('uses a 1 km radius, the same as the presence geofence', () => {
+    expect(REPORT_GEOFENCE_METERS).toBe(1000);
+    expect(REPORT_GEOFENCE_METERS).toBe(PRESENCE_GEOFENCE_METERS);
   });
 
-  it('allows a fix 299 m away and refuses one 301 m away with the 300 m reason', () => {
-    expect(checkReportPosition(HERE, station('a', 299))).toEqual({ allowed: true });
-    expect(checkReportPosition(HERE, station('a', 301))).toEqual({ allowed: false, reason: TOO_FAR });
+  it('allows a fix 999 m away and refuses one 1001 m away with the 1 km reason', () => {
+    expect(checkReportPosition(HERE, station('a', 999))).toEqual({ allowed: true });
+    expect(checkReportPosition(HERE, station('a', 1001))).toEqual({ allowed: false, reason: TOO_FAR });
   });
 
-  it('allows a driver exactly 300 m away (the back of a long queue), where the old 150 m rule would have refused', () => {
-    expect(checkReportPosition(HERE, station('a', 300))).toEqual({ allowed: true });
+  it('allows a driver exactly 1 km away, where the old 300 m rule would have refused', () => {
+    expect(checkReportPosition(HERE, station('a', 1000))).toEqual({ allowed: true });
   });
 
   it('refuses when there is no usable position', () => {
@@ -120,7 +121,7 @@ describe('checkReportPosition (the 300 m rule for reporting: the back of a long 
 });
 
 describe('ARRIVAL_PROMPT_METERS (when the "you have arrived, report?" nudge may appear)', () => {
-  it('is 300 m, the same as the reporting distance, so the nudge only appears where a report would be accepted', () => {
+  it('stays 300 m ("arrived" means at the station or its queue, not a kilometre away) and never fires where a report would be refused', () => {
     expect(ARRIVAL_PROMPT_METERS).toBe(300);
     expect(ARRIVAL_PROMPT_METERS).toBeLessThanOrEqual(REPORT_GEOFENCE_METERS);
   });

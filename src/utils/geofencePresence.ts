@@ -48,16 +48,17 @@ export function stationsToPing(
 }
 
 /**
- * A report must come from someone at the station or in its queue: within this many metres when the photo
- * is taken (and again when the report is submitted). Stations ask drivers to queue back along the road, so
- * the line can stretch 200 to 300 m; 300 m lets a driver at the back of it report, while still keeping
- * reports to people who are really there.
+ * A report must come from someone near the station: within this many metres when the photo is taken (and
+ * again when the report is submitted). 1 km is the same radius that counts a driver as present at a station,
+ * and covers a queue along the road and drivers whose phone places them a few hundred metres off (300 m
+ * turned drivers away at Bovas Chika while they were logged as present).
  */
-export const REPORT_GEOFENCE_METERS = 300;
+export const REPORT_GEOFENCE_METERS = PRESENCE_GEOFENCE_METERS;
 
 /**
- * How close a driver must be for the "you have arrived, report?" nudge to appear. The same as the reporting
- * distance, so the nudge only shows where a report would be accepted.
+ * How close a driver must be for the "you have arrived, report?" nudge to appear. "Arrived" means at the
+ * station or in its queue, so this stays tighter than the reporting distance; it never shows where a report
+ * would be refused.
  */
 export const ARRIVAL_PROMPT_METERS = 300;
 
@@ -75,7 +76,7 @@ export function checkReportPosition(
   if (!hasCoordinates(station) || haversineMeters(position, station) > REPORT_GEOFENCE_METERS) {
     return {
       allowed: false,
-      reason: `Reports unlock within ${REPORT_GEOFENCE_METERS} m of the station so every status comes from someone actually there.`,
+      reason: `Reports unlock within ${REPORT_GEOFENCE_METERS / 1000} km of the station so every status comes from someone actually there.`,
     };
   }
   return { allowed: true };
