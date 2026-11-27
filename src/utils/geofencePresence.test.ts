@@ -91,7 +91,7 @@ describe('checkReportPosition (the 1 km rule for reporting: a driver in the appr
 
   it('allows a fix 999 m away and refuses one 1001 m away with the 1 km reason', () => {
     expect(checkReportPosition(HERE, station('a', 999))).toEqual({ allowed: true });
-    expect(checkReportPosition(HERE, station('a', 1001))).toEqual({ allowed: false, reason: TOO_FAR });
+    expect(checkReportPosition(HERE, station('a', 1001))).toEqual({ allowed: false, reason: TOO_FAR, code: 'too_far' });
   });
 
   it('allows a driver exactly 1 km away, where the old 300 m rule would have refused', () => {
@@ -99,7 +99,7 @@ describe('checkReportPosition (the 1 km rule for reporting: a driver in the appr
   });
 
   it('refuses when there is no usable position', () => {
-    const noFix = { allowed: false, reason: 'Turn on location to report.' };
+    const noFix = { allowed: false, reason: 'Turn on location to report.', code: 'no_location' };
     expect(checkReportPosition(null, station('a', 10))).toEqual(noFix);
     expect(checkReportPosition(undefined, station('a', 10))).toEqual(noFix);
     expect(checkReportPosition({ lat: Number.NaN, lng: 7.4 }, station('a', 10))).toEqual(noFix);
@@ -110,13 +110,18 @@ describe('checkReportPosition (the 1 km rule for reporting: a driver in the appr
     expect(checkReportPosition({ ...HERE, accuracy: 101 }, station('a', 10))).toEqual({
       allowed: false,
       reason: "Your location isn't precise enough yet. Step into the open and try again.",
+      code: 'low_accuracy',
     });
     expect(checkReportPosition({ ...HERE, accuracy: 100 }, station('a', 10))).toEqual({ allowed: true });
     expect(checkReportPosition(HERE, station('a', 10))).toEqual({ allowed: true });
   });
 
   it('refuses a station with no map position instead of guessing', () => {
-    expect(checkReportPosition(HERE, { lat: Number.NaN, lng: Number.NaN })).toEqual({ allowed: false, reason: TOO_FAR });
+    expect(checkReportPosition(HERE, { lat: Number.NaN, lng: Number.NaN })).toEqual({
+      allowed: false,
+      reason: TOO_FAR,
+      code: 'station_has_no_position',
+    });
   });
 });
 

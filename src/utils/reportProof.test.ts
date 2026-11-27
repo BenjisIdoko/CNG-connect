@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { reportPhotoHint, reportProofProblem } from './reportProof';
+import { reportPhotoHint, reportProofCode, reportProofProblem } from './reportProof';
 
 // One degree of latitude is about 111,195 m.
 const STATION = { lat: 9.0, lng: 7.4 };
@@ -39,6 +39,22 @@ describe('reportProofProblem', () => {
 
   it('refuses a report built by a one-tap prompt (no photo, no position)', () => {
     expect(reportProofProblem({}, STATION)).toBe(NO_PHOTO);
+  });
+});
+
+describe('reportProofCode (the stable name of the same refusal, for logs)', () => {
+  it('names each way a photo can fail to prove the driver was there, and is null when it does', () => {
+    expect(reportProofCode({ photo: PHOTO, ...north(100) }, STATION)).toBeNull();
+    expect(reportProofCode({}, STATION)).toBe('no_photo');
+    expect(reportProofCode({ photo: PHOTO }, STATION)).toBe('photo_no_position');
+    expect(reportProofCode({ photo: PHOTO, ...north(1001) }, STATION)).toBe('photo_too_far');
+    expect(reportProofCode({ photo: PHOTO, ...north(10) }, { lat: Number.NaN, lng: Number.NaN })).toBe('photo_too_far');
+  });
+
+  it('always agrees with reportProofProblem about whether the report is refused', () => {
+    for (const report of [{}, { photo: PHOTO }, { photo: PHOTO, ...north(500) }, { photo: PHOTO, ...north(5000) }]) {
+      expect(reportProofCode(report, STATION) === null).toBe(reportProofProblem(report, STATION) === null);
+    }
   });
 });
 

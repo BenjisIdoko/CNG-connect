@@ -2,8 +2,10 @@ import React, { useEffect, useRef, useState } from 'react';
 import { GasStation, StationStatus, DriverReport, UserProfile } from '../types';
 import { verifyImageMetadata, registerSharedImageHash } from '../utils/imageMetadataVerifier';
 import { LiveCameraCaptureModal } from './LiveCameraCaptureModal';
-import { checkReportPosition, type PingPosition } from '../utils/geofencePresence';
-import { reportPhotoHint, reportProofProblem } from '../utils/reportProof';
+import { checkReportPosition, type PingPosition, type ReportPositionCheck } from '../utils/geofencePresence';
+import { reportPhotoHint, reportProofCode, reportProofProblem } from '../utils/reportProof';
+import { reportBlockedProps, type ReportBlockStage } from '../utils/reportBlocked';
+import { track } from '../services/analytics';
 import { StationGroupInfoSheet } from './StationGroupInfoSheet';
 import { Modal } from './common/Modal';
 import { isPlausiblePrice, PRICE_MIN_NAIRA, PRICE_MAX_NAIRA } from '../utils/stationPrice';
@@ -56,6 +58,27 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
   const positionCheck = checkReportPosition(position, station);
   const canReport = positionCheck.allowed;
 
+  // Every refusal is recorded (which step, why, roughly how far), so a driver's complaint can be answered from the data.
+  const logBlocked = (
+    stage: ReportBlockStage,
+    check: Extract<ReportPositionCheck, { allowed: false }>,
+    fix: PingPosition | null,
+  ) => track('report_blocked', reportBlockedProps(stage, check, fix, station));
+
+  // The banner counts as a refusal once a driver has been looking at it for a few seconds: the first moments
+  // after opening are only the GPS warming up.
+  const bannerCode = positionCheck.allowed ? null : positionCheck.code;
+  useEffect(() => {
+    if (!bannerCode) return;
+    const timer = setTimeout(() => {
+      const fix = getPositionRef.current();
+      const check = checkReportPosition(fix, station);
+      if (!check.allowed) logBlocked('banner', check, fix);
+    }, 3500);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bannerCode, station.id]);
+
   // Clear pending submit timer if the modal unmounts mid-submit
   useEffect(() => {
     return () => {
@@ -77,8 +100,10 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
   // Ask for a fresh fix before opening the camera, so a driver who has already left is told so.
   const openCamera = async () => {
     setPhotoError(null);
-    const check = checkReportPosition(await getFreshPosition(), station);
+    const fix = await getFreshPosition();
+    const check = checkReportPosition(fix, station);
     if (!check.allowed) {
+      logBlocked('camera', check, fix);
       setPhotoError(check.reason);
       return;
     }
@@ -91,12 +116,14 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
     const fix = await getFreshPosition();
     const check = checkReportPosition(fix, station);
     if (!check.allowed || !fix) {
+      if (!check.allowed) logBlocked('photo', check, fix);
       setPhotoError(check.allowed ? 'Turn on location to report.' : check.reason);
       return;
     }
     // Freshness/duplicate CHECK at capture time (registration happens only when the report is submitted).
     const verification = verifyImageMetadata(undefined, dataUrl);
     if (!verification.isValid) {
+      logBlocked('photo', { allowed: false, reason: verification.reason || '', code: 'photo_rejected' }, fix);
       setPhotoError(verification.reason || 'Photo rejected by anti-misinformation check.');
       return;
     }
@@ -115,14 +142,19 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
     };
 
     // The driver must still be at the station when they press Submit, not only when the photo was taken.
-    const check = checkReportPosition(await getFreshPosition(), station);
-    if (!check.allowed) return fail(check.reason);
+    const fix = await getFreshPosition();
+    const check = checkReportPosition(fix, station);
+    if (!check.allowed) {
+      logBlocked('submit', check, fix);
+      return fail(check.reason);
+    }
 
-    const proofProblem = reportProofProblem(
-      { photo: attachedPhoto ?? undefined, photoLat: photoPosition?.lat, photoLng: photoPosition?.lng },
-      station,
-    );
+    const proof = { photo: attachedPhoto ?? undefined, photoLat: photoPosition?.lat, photoLng: photoPosition?.lng };
+    const proofCode = reportProofCode(proof, station);
+    const proofProblem = reportProofProblem(proof, station);
     if (proofProblem || !attachedPhoto || !photoPosition) {
+      const code = proofCode ?? (attachedPhoto ? 'photo_no_position' : 'no_photo');
+      logBlocked('submit', { allowed: false, reason: proofProblem || '', code }, photoPosition ?? fix);
       return fail(proofProblem || 'Take a live photo at the station to post this report.');
     }
 

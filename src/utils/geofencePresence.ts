@@ -62,22 +62,39 @@ export const REPORT_GEOFENCE_METERS = PRESENCE_GEOFENCE_METERS;
  */
 export const ARRIVAL_PROMPT_METERS = 300;
 
-export type ReportPositionCheck = { allowed: true } | { allowed: false; reason: string };
+/** Why a report was refused, as a stable name for logs; `reason` is the sentence shown to the driver. */
+export type ReportBlockCode =
+  | 'no_location'
+  | 'low_accuracy'
+  | 'too_far'
+  | 'station_has_no_position'
+  | 'photo_too_far'
+  | 'photo_no_position'
+  | 'no_photo'
+  | 'photo_rejected';
+
+export type ReportPositionCheck = { allowed: true } | { allowed: false; reason: string; code: ReportBlockCode };
+
+const TOO_FAR_REASON = `Reports unlock within ${REPORT_GEOFENCE_METERS / 1000} km of the station so every status comes from someone actually there.`;
 
 /** Whether a GPS fix is good enough, and close enough, to let a driver report this station. */
 export function checkReportPosition(
   position: PingPosition | null | undefined,
   station: { lat: number; lng: number },
 ): ReportPositionCheck {
-  if (!position || !hasCoordinates(position)) return { allowed: false, reason: 'Turn on location to report.' };
-  if (!isAccurateEnough(position)) {
-    return { allowed: false, reason: "Your location isn't precise enough yet. Step into the open and try again." };
+  if (!position || !hasCoordinates(position)) {
+    return { allowed: false, reason: 'Turn on location to report.', code: 'no_location' };
   }
-  if (!hasCoordinates(station) || haversineMeters(position, station) > REPORT_GEOFENCE_METERS) {
+  if (!isAccurateEnough(position)) {
     return {
       allowed: false,
-      reason: `Reports unlock within ${REPORT_GEOFENCE_METERS / 1000} km of the station so every status comes from someone actually there.`,
+      reason: "Your location isn't precise enough yet. Step into the open and try again.",
+      code: 'low_accuracy',
     };
+  }
+  if (!hasCoordinates(station)) return { allowed: false, reason: TOO_FAR_REASON, code: 'station_has_no_position' };
+  if (haversineMeters(position, station) > REPORT_GEOFENCE_METERS) {
+    return { allowed: false, reason: TOO_FAR_REASON, code: 'too_far' };
   }
   return { allowed: true };
 }

@@ -23,6 +23,7 @@ export type EventName =
   | 'admin_login_verified'
   | 'report_started'
   | 'report_submitted'
+  | 'report_blocked'
   | 'report_flagged'
   | 'referral_claimed'
   | 'arrival_prompt_shown'
