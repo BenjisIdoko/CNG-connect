@@ -1711,7 +1711,7 @@
   },
   {
     "id": "pci-station-60",
-    "name": "NIPCO Gas Limited - FCT",
+    "name": "NIPCO Gas Station - Kubwa",
     "address": "Plot P58, Cadastral Zone 07-05, Along Kubwa Expressway, Kubwa, FCT, Abuja",
     "city": "Abuja",
     "state": "FCT Abuja",
@@ -1797,7 +1797,7 @@
   },
   {
     "id": "pci-station-63",
-    "name": "NNPC Retail - Wuye",
+    "name": "NNPC Retail - Zone 1",
     "address": "Olusegun Obasanjo Way, Zone 1, Abuja",
     "city": "Abuja",
     "state": "FCT Abuja",
@@ -1854,7 +1854,7 @@
   },
   {
     "id": "pci-station-65",
-    "name": "NNPC Retail - Obasanjo Road",
+    "name": "NNPC filling station ushafa",
     "address": "Dutse-Bwari Road, Abuja",
     "city": "Dam Camp",
     "state": "FCT Abuja",
@@ -2057,7 +2057,7 @@
   },
   {
     "id": "pci-station-72",
-    "name": "11 PLC (NIPCO) - Abuja",
+    "name": "Mobil - Madalla, Abuja",
     "address": "Mobil Station, Madalla Junction, Madalla, Abuja, FCT",
     "city": "Abuja",
     "state": "FCT Abuja",
@@ -2086,7 +2086,7 @@
   },
   {
     "id": "pci-station-73",
-    "name": "AYM Shafa Ltd - Along Lugbe Airport Road",
+    "name": "Shafa Sabo Lugbe, Airport Road",
     "address": "Plot 2874, Along Lugbe Airport Road, Abuja",
     "city": "Abuja",
     "state": "FCT Abuja",
@@ -2115,7 +2115,7 @@
   },
   {
     "id": "pci-station-74",
-    "name": "NNPC Retail - Abuja 900103",
+    "name": "NNPC Retail - CBD",
     "address": "Constitution Ave, 1008 Ali Muhammad Zarah St, CBD, Abuja 900103, FCT",
     "city": "Abuja",
     "state": "FCT Abuja",
@@ -2144,7 +2144,7 @@
   },
   {
     "id": "pci-station-75",
-    "name": "11 PLC (NIPCO) - FM Opurum Street",
+    "name": "Mobil Gas Station - Glory Dome",
     "address": "Mobil Station, Plot No. MF 2854, Cadastral Zone 07-07, Lugbe-1 Extension, Airport Road, Abuja",
     "city": "Abuja",
     "state": "FCT Abuja",
@@ -2173,7 +2173,7 @@
   },
   {
     "id": "pci-station-76",
-    "name": "NIPCO Gas Limited - Mabushi",
+    "name": "NIPCO Gas Station - Mabushi",
     "address": "Plot No. 274, Cadastral Zone B06, Mabushi District, Abuja",
     "city": "Abuja",
     "state": "FCT Abuja",
@@ -2202,7 +2202,7 @@
   },
   {
     "id": "pci-station-77",
-    "name": "NNPC Retail - CBN Quaters Lugbe Phase 2",
+    "name": "NNPC Retail - Shoprite Lugbe Road",
     "address": "Plot 504, Cadastral Zone, Opposite Shoprite, Umaru Musa Yaradua Expressway, Lugbe, FCT Abuja",
     "city": "Abuja",
     "state": "FCT Abuja",
@@ -2289,7 +2289,7 @@
   },
   {
     "id": "pci-station-80",
-    "name": "Femadec Energy Limited - FM Opurum Street",
+    "name": "Femadec Uni Abuja",
     "address": "University of Abuja, Km 23, Airport Road, Abuja",
     "city": "Abuja",
     "state": "FCT Abuja",
@@ -2318,7 +2318,7 @@
   },
   {
     "id": "pci-station-81",
-    "name": "Bovas and Company Ltd - AUST Retail Outlet",
+    "name": "Bovas Filling Station - Chika",
     "address": "AUST Retail Outlet, Along Airport Road",
     "city": "Along Airport Road",
     "state": "FCT Abuja",
@@ -2376,7 +2376,7 @@
   },
   {
     "id": "pci-station-83",
-    "name": "Portland Gas Ltd - Kubwa-Gwarimpa Expressway",
+    "name": "Portland Gas - Kubwa",
     "address": "Kubwa-Gwarimpa Expressway, Abuja",
     "city": "Abuja",
     "state": "FCT Abuja",
