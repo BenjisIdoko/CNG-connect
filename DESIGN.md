@@ -191,7 +191,7 @@ A cool sage-and-white family with one confident green, one pale mint, and a disc
 
 ## Typography
 
-**Display / Body Font:** Geist (with -apple-system, Segoe UI, Roboto fallbacks), self-hosted and shared with the driver app's phone screens. The driver app's own base styles put Inter on the body and Urbanist on every heading; `admin-theme.css` opts the admin out of both (`.admin-ui` sets Geist, and `h1`-`h6` inside it inherit), and `adminFonts.test.ts` keeps it that way.
+**Display / Body Font:** Geist (with -apple-system, Segoe UI, Roboto fallbacks), self-hosted and shared with the driver app's phone screens. The driver app uses the same single family: Geist on the body and on every heading (Inter and Urbanist are gone). Geist has no naira sign or Yoruba dotted letters, so a small subset face under the same name supplies exactly those characters. The driver app's size ramp (13/14/15/17/19/21/26/30px, nothing a driver must read below 14px, no all-caps labels, no weight above 700) is in `src/index.css` and kept by `src/driverTypography.test.ts`; the admin keeps its own smaller scale (`.admin-ui` sets Geist, and `h1`-`h6` inside it inherit), and `adminFonts.test.ts` keeps it that way.
 **Label/Mono Font:** Geist Mono (with ui-monospace, Menlo), for ids, code and key totals (`.font-adm-mono`, `font-geist-mono`, `code`, at 0.92em).
 
 **Character:** one neutral grotesque family, differentiated by weight (700 titles, 600 labels and buttons, 400 body); the mono face signals machine identifiers and counted figures.

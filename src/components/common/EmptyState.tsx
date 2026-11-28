@@ -22,7 +22,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
       <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-primary flex items-center justify-center font-bold">
         <span aria-hidden="true" className="material-symbols-outlined text-[28px]">{icon}</span>
       </div>
-      <h4 className="font-extrabold text-slate-900 text-body-lg">{title}</h4>
+      <h4 className="font-bold text-slate-900 text-body-lg">{title}</h4>
       {message && <p className="text-caption text-slate-500 font-normal max-w-xs">{message}</p>}
       {actionLabel && onAction && (
         <button

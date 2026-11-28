@@ -144,13 +144,13 @@ export const LiveCameraCaptureModal: React.FC<LiveCameraCaptureModalProps> = ({
                 <span aria-hidden="true" className="material-symbols-outlined text-[36px]">videocam_off</span>
               </div>
               <h3 className="font-geist font-bold text-[1.125rem] text-white">Enable Camera Access</h3>
-              <p className="text-[0.875rem] mt-1 text-white/70 font-normal leading-relaxed mb-5">
+              <p className="text-micro mt-1 text-white/70 font-normal leading-relaxed mb-5">
                 {cameraError}
               </p>
 
               <button
                 onClick={() => startCamera(facingMode)}
-                className="px-6 py-3.5 bg-rd-available text-white font-geist font-bold text-[0.9062rem] rounded-full shadow-lg flex items-center gap-2 active:scale-95 transition-all"
+                className="px-6 py-3.5 bg-rd-available text-white font-geist font-bold text-micro rounded-full shadow-lg flex items-center gap-2 active:scale-95 transition-all"
               >
                 <span aria-hidden="true" className="material-symbols-outlined text-[20px]">photo_camera</span>
                 <span>Allow &amp; Enable Camera</span>
@@ -190,7 +190,7 @@ export const LiveCameraCaptureModal: React.FC<LiveCameraCaptureModalProps> = ({
           >
             <span aria-hidden="true" className="material-symbols-outlined text-[18px]">close</span>
           </button>
-          <span className="font-geist-mono text-[10px] font-semibold tracking-wide text-white/70 uppercase truncate max-w-[50%] text-center">
+          <span className="font-geist-mono text-micro font-semibold text-white/70 truncate max-w-[50%] text-center">
             {title}
           </span>
           {stream ? (
@@ -209,10 +209,10 @@ export const LiveCameraCaptureModal: React.FC<LiveCameraCaptureModalProps> = ({
         {/* Floating bottom stack — watermark preview, gallery-blocked notice, shutter */}
         {!cameraError && stream && (
           <div className="absolute bottom-[max(env(safe-area-inset-bottom,0px),1.75rem)] inset-x-0 flex flex-col items-center gap-3 z-10">
-            <div className="bg-black/55 backdrop-blur-sm text-rd-available font-geist-mono text-[10px] font-medium px-3 py-1.5 rounded-md">
+            <div className="bg-black/55 backdrop-blur-sm text-rd-available font-geist-mono text-overline font-medium px-3 py-1.5 rounded-md">
               Verified live snapshot &middot; {previewTime.toLocaleDateString()}, {previewTime.toLocaleTimeString()}
             </div>
-            <div className="flex items-center gap-1.5 text-white/85 text-[11px] font-geist font-medium">
+            <div className="flex items-center gap-1.5 text-white/85 text-overline font-geist font-medium">
               <span aria-hidden="true" className="material-symbols-outlined text-[14px]">lock</span>
               Gallery access disabled
             </div>

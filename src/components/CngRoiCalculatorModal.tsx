@@ -53,16 +53,16 @@ export const CngRoiCalculatorModal: React.FC<CngRoiCalculatorModalProps> = ({
       <div className="flex flex-col bg-rd-surface text-on-surface">
         <div className="bg-rd-ink text-white px-5 pt-5 pb-6">
           <div className="flex items-center justify-between">
-            <span className="font-geist font-bold text-[0.9375rem]">Fuel Savings Calculator</span>
+            <span className="font-geist font-bold text-body">Fuel Savings Calculator</span>
             <button onClick={onClose} aria-label="Close" className="text-[#A9AFBA] p-1 -mr-1">
               <span aria-hidden="true" className="material-symbols-outlined text-[20px]">close</span>
             </button>
           </div>
           <div className="text-center mt-5">
-            <div className="text-[0.75rem] font-bold uppercase tracking-[0.06em] text-[#A9AFBA]">You&apos;d save</div>
-            <div className="font-geist font-extrabold text-[3.125rem] leading-none tracking-[-0.03em] mt-1.5">
+            <div className="text-micro font-semibold text-[#A9AFBA]">You&apos;d save</div>
+            <div className="font-geist font-bold text-[3.125rem] leading-none tracking-[-0.03em] mt-1.5">
               ₦{monthlySavings.toLocaleString()}
-              <span className="text-[0.875rem] font-semibold text-[#A9AFBA]">/mo</span>
+              <span className="text-micro font-semibold text-[#A9AFBA]">/mo</span>
             </div>
             <div className="text-caption text-[#A9AFBA] mt-2">{savingsPercent}% less than petrol</div>
           </div>

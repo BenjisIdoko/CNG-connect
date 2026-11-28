@@ -42,10 +42,10 @@ export const PasswordResetScreen: React.FC = () => {
       <div className="w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-6 shadow-sm flex flex-col gap-3">
         {done ? (
           <>
-            <h1 className="text-lg font-extrabold text-slate-900">Password set</h1>
+            <h1 className="text-lg font-bold text-slate-900">Password set</h1>
             <button
               onClick={() => void signOut()}
-              className="rounded-lg bg-emerald-600 py-2 text-sm font-bold text-white"
+              className="rounded-lg bg-emerald-600 py-2 text-micro font-bold text-white"
             >
               Continue
             </button>
@@ -58,7 +58,7 @@ export const PasswordResetScreen: React.FC = () => {
             }}
             className="flex flex-col gap-3"
           >
-            <h1 className="text-lg font-extrabold text-slate-900">Set a new password</h1>
+            <h1 className="text-lg font-bold text-slate-900">Set a new password</h1>
             <input
               type="password"
               autoComplete="new-password"
@@ -67,7 +67,7 @@ export const PasswordResetScreen: React.FC = () => {
               aria-label="New password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
+              className="rounded-lg border border-slate-300 px-3 py-2 text-micro"
             />
             <input
               type="password"
@@ -76,16 +76,16 @@ export const PasswordResetScreen: React.FC = () => {
               aria-label="Confirm new password"
               value={confirm}
               onChange={(e) => setConfirm(e.target.value)}
-              className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
+              className="rounded-lg border border-slate-300 px-3 py-2 text-micro"
             />
             <button
               type="submit"
               disabled={busy || !password || !confirm}
-              className="rounded-lg bg-emerald-600 py-2 text-sm font-bold text-white disabled:opacity-50"
+              className="rounded-lg bg-emerald-600 py-2 text-micro font-bold text-white disabled:opacity-50"
             >
               {busy ? 'Saving…' : 'Save password'}
             </button>
-            {err && <p className="text-xs font-semibold text-rose-600">{err}</p>}
+            {err && <p className="text-overline font-semibold text-rose-600">{err}</p>}
           </form>
         )}
       </div>

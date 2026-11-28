@@ -106,11 +106,11 @@ export const AirtimePayouts: React.FC<{ supabase: SupabaseClient | null; flash: 
             <div className="min-w-0">
               <p className="text-micro font-semibold text-outline">Send airtime to</p>
               <h2 className="font-bold text-body text-slate-900 truncate">{r.referrer_name || 'Driver'}</h2>
-              <a href={`tel:${r.referrer_phone}`} className="text-body font-extrabold text-primary">
+              <a href={`tel:${r.referrer_phone}`} className="text-body font-bold text-primary">
                 {r.referrer_phone || 'No phone saved'}
               </a>
             </div>
-            <span className="shrink-0 rounded-full bg-primary-container text-on-surface font-extrabold px-3 py-1 text-caption">
+            <span className="shrink-0 rounded-full bg-primary-container text-on-surface font-bold px-3 py-1 text-caption">
               ₦{r.reward_naira.toLocaleString()}
             </span>
           </div>

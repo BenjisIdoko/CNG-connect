@@ -88,7 +88,7 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
             ].map((t, i) => (
               <div key={t.l} className={`py-3.5 text-center ${i > 0 ? 'border-l border-[#2A3830]' : ''}`}>
                 <div className="font-geist font-bold text-[1.625rem] text-white">{t.v}</div>
-                <div className="text-[11px] font-semibold uppercase tracking-wide text-[#A9AFBA] mt-0.5">{t.l}</div>
+                <div className="text-micro font-semibold text-[#A9AFBA] mt-0.5">{t.l}</div>
               </div>
             ))}
           </div>
@@ -177,7 +177,7 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-1.5 min-w-0">
                     {center.isPiCngAccredited && (
-                      <span className="shrink-0 inline-flex items-center gap-1 rounded-md bg-[#E6F3EC] text-[#006B40] px-1.5 py-1 text-[0.75rem] font-bold">
+                      <span className="shrink-0 inline-flex items-center gap-1 rounded-md bg-[#E6F3EC] text-[#006B40] px-1.5 py-1 text-overline font-bold">
                         <span aria-hidden="true" className="inline-flex w-[14px] h-[10px] overflow-hidden rounded-[1px]">
                           <span className="flex-1 bg-[#288435]" />
                           <span className="flex-1 bg-white" />
@@ -187,7 +187,7 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
                       </span>
                     )}
                     {center.code && (
-                      <span className="font-geist-mono text-[0.75rem] text-rd-text-tertiary truncate">{center.code}</span>
+                      <span className="font-geist-mono text-overline text-rd-text-tertiary truncate">{center.code}</span>
                     )}
                   </div>
                   <span className="shrink-0 text-caption font-semibold text-rd-text-tertiary">{center.computedDistance}</span>
@@ -207,7 +207,7 @@ export const ConversionCentersScreen: React.FC<ConversionCentersScreenProps> = (
                 {center.services.length > 0 && (
                   <div className="flex flex-wrap gap-1.5 mt-2.5">
                     {center.services.slice(0, 3).map((srv, idx) => (
-                      <span key={idx} className="bg-rd-chip-grey rounded-md px-2 py-0.5 text-[0.75rem] text-rd-fg">
+                      <span key={idx} className="bg-rd-chip-grey rounded-md px-2 py-0.5 text-overline text-rd-fg">
                         {srv}
                       </span>
                     ))}

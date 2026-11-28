@@ -88,7 +88,7 @@ export const Modal: React.FC<ModalProps> = ({
               <div className="sm:hidden h-4" />
               <div className="flex items-center justify-between pb-3">
                 {title ? (
-                  <DialogPrimitive.Title className="font-extrabold text-body-lg text-slate-900 pr-6 truncate">
+                  <DialogPrimitive.Title className="font-bold text-body-lg text-slate-900 pr-6 truncate">
                     {title}
                   </DialogPrimitive.Title>
                 ) : (

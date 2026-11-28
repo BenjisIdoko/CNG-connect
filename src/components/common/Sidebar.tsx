@@ -36,11 +36,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
     >
       {/* Brand Header */}
       <div className="p-5 border-b border-slate-100 flex items-center gap-3">
-        <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-700 via-primary to-emerald-500 text-white flex items-center justify-center font-black shadow-md shadow-emerald-700/20">
+        <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-700 via-primary to-emerald-500 text-white flex items-center justify-center shadow-md shadow-emerald-700/20">
           <span aria-hidden="true" className="material-symbols-outlined text-[24px]">local_gas_station</span>
         </div>
         <div>
-          <h1 className="font-extrabold text-[1.0625rem] text-slate-900 leading-tight">
+          <h1 className="font-bold text-body text-slate-900 leading-tight">
             CNG-Connect
           </h1>
         </div>
@@ -56,7 +56,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               key={item.id}
               onClick={() => setActiveTab(item.id)}
               aria-current={isActive ? 'page' : undefined}
-              className={`w-full py-3 px-3.5 rounded-2xl font-extrabold text-[0.9375rem] flex items-center justify-between transition-all active:scale-98 ${
+              className={`w-full py-3 px-3.5 rounded-2xl font-bold text-body flex items-center justify-between transition-all active:scale-98 ${
                 isActive
                   ? 'bg-primary text-white shadow-md shadow-primary/20'
                   : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
@@ -80,7 +80,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {onOpenRoiCalculator && (
           <button
             onClick={onOpenRoiCalculator}
-            className="mt-6 w-full py-2.5 px-3.5 rounded-2xl font-extrabold text-[0.875rem] bg-slate-50 hover:bg-slate-100 text-slate-800 border border-slate-200 flex items-center gap-3 transition-all"
+            className="mt-6 w-full py-2.5 px-3.5 rounded-2xl font-bold text-micro bg-slate-50 hover:bg-slate-100 text-slate-800 border border-slate-200 flex items-center gap-3 transition-all"
           >
             <span aria-hidden="true" className="material-symbols-outlined text-[20px] text-emerald-600">calculate</span>
             <span>CNG & EV Savings</span>
@@ -90,7 +90,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {onShareApp && (
           <button
             onClick={onShareApp}
-            className="w-full py-2.5 px-3.5 rounded-2xl font-extrabold text-[0.875rem] bg-gradient-to-r from-emerald-50 to-sky-50 hover:from-emerald-100 hover:to-sky-100 text-primary border border-emerald-200 flex items-center gap-3 transition-all mt-1"
+            className="w-full py-2.5 px-3.5 rounded-2xl font-bold text-micro bg-gradient-to-r from-emerald-50 to-sky-50 hover:from-emerald-100 hover:to-sky-100 text-primary border border-emerald-200 flex items-center gap-3 transition-all mt-1"
           >
             <span aria-hidden="true" className="material-symbols-outlined text-[20px] text-primary">share</span>
             <span>Share app with drivers</span>
@@ -103,11 +103,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div className="p-3 m-3 bg-slate-50 rounded-2xl border border-slate-200 flex items-center gap-3">
           <Avatar src={userProfile.avatar} name={userProfile.name} className="w-10 h-10" />
           <div className="flex-1 min-w-0">
-            <p className="font-extrabold text-[0.875rem] text-slate-900 truncate leading-tight">
+            <p className="font-bold text-micro text-slate-900 truncate leading-tight">
               {userProfile.name || 'Guest driver'}
             </p>
             {userProfile.vehicle && (
-              <p className="text-[0.75rem] font-semibold text-slate-500 truncate">{userProfile.vehicle}</p>
+              <p className="text-overline font-semibold text-slate-500 truncate">{userProfile.vehicle}</p>
             )}
           </div>
         </div>

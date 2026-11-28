@@ -271,7 +271,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
     <div className="screen-fade min-h-screen bg-surface text-on-surface pb-36">
       {/* Toast Notification */}
       {copiedNotification && (
-        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-on-surface text-white text-[0.875rem] font-bold px-4 py-2 rounded-full shadow-lg">
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-on-surface text-white text-micro font-bold px-4 py-2 rounded-full shadow-lg">
           Link copied
         </div>
       )}
@@ -311,7 +311,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
           </button>
         </div>
         {images.length > 0 && (
-          <span className="absolute bottom-3 left-4 inline-flex items-center gap-1 rounded-lg bg-rd-ink/80 text-white text-[0.75rem] font-semibold px-2 py-1">
+          <span className="absolute bottom-3 left-4 inline-flex items-center gap-1 rounded-lg bg-rd-ink/80 text-white text-overline font-semibold px-2 py-1">
             <span aria-hidden="true" className="material-symbols-outlined text-[14px]">photo_camera</span>
             Photos · {images.length}
           </span>
@@ -322,7 +322,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
       <div className="max-w-4xl mx-auto px-5 pt-4 flex flex-col gap-5">
         {/* Identity + live status */}
         <div>
-          <p className="font-geist-mono text-[11px] font-medium tracking-[0.08em] uppercase text-rd-text-tertiary">
+          <p className="text-caption font-medium text-rd-text-tertiary">
             {[
               station.stationType === 'ev_charging' ? 'EV charging' : 'CNG station',
               station.distance,
@@ -421,7 +421,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                     <p className="flex-1 text-caption font-semibold text-rd-on-available-container">
                       {isStale ? 'At the station? Update it.' : 'At the station? Report it.'}
                     </p>
-                    <span className="shrink-0 text-[0.75rem] font-bold text-rd-on-available-container">+100 pts</span>
+                    <span className="shrink-0 text-overline font-bold text-rd-on-available-container">+100 pts</span>
                   </div>
                 )}
               </div>
@@ -432,14 +432,14 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
         {station.stationType === 'ev_charging' && (
           <div className="flex gap-6">
             <div className="flex-1">
-              <div className="text-[0.75rem] font-bold text-outline uppercase tracking-wider">Rate</div>
-              <div className={`font-extrabold mt-1 ${station.pricePerKwh ? 'text-heading text-slate-900' : 'text-body-lg text-slate-400'}`}>
+              <div className="text-micro font-bold text-outline">Rate</div>
+              <div className={`font-bold mt-1 ${station.pricePerKwh ? 'text-heading text-slate-900' : 'text-body-lg text-slate-400'}`}>
                 {station.pricePerKwh ? `₦${station.pricePerKwh}/kWh` : 'Unreported'}
               </div>
             </div>
             <div className="flex-1">
-              <div className="text-[0.75rem] font-bold text-outline uppercase tracking-wider">Power</div>
-              <div className="font-extrabold mt-1 text-heading text-slate-900">
+              <div className="text-micro font-bold text-outline">Power</div>
+              <div className="font-bold mt-1 text-heading text-slate-900">
                 {station.chargingSpeedKw ? `${station.chargingSpeedKw} kW` : '—'}
               </div>
               {station.connectorTypes && station.connectorTypes.length > 0 && (
@@ -454,19 +454,19 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
           <TabsPrimitive.List ref={tabListRef} className="relative flex gap-6 border-b border-surface-container-highest">
             <TabsPrimitive.Trigger
               value="reports"
-              className="min-h-11 flex items-end pb-2.5 -mb-px font-geist text-[0.9375rem] font-semibold text-rd-text-tertiary border-b-2 border-transparent transition-colors data-[state=active]:text-rd-fg data-[state=active]:font-bold focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              className="min-h-11 flex items-end pb-2.5 -mb-px font-geist text-body font-semibold text-rd-text-tertiary border-b-2 border-transparent transition-colors data-[state=active]:text-rd-fg data-[state=active]:font-bold focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
             >
               Reports{listedReports.length > 0 ? ` · ${listedReports.length}` : ''}
             </TabsPrimitive.Trigger>
             <TabsPrimitive.Trigger
               value="feed"
-              className="min-h-11 flex items-end pb-2.5 -mb-px font-geist text-[0.9375rem] font-semibold text-rd-text-tertiary border-b-2 border-transparent transition-colors data-[state=active]:text-rd-fg data-[state=active]:font-bold focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              className="min-h-11 flex items-end pb-2.5 -mb-px font-geist text-body font-semibold text-rd-text-tertiary border-b-2 border-transparent transition-colors data-[state=active]:text-rd-fg data-[state=active]:font-bold focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
             >
               Chat{comments.length > 0 ? ` · ${comments.length}` : ''}
             </TabsPrimitive.Trigger>
             <TabsPrimitive.Trigger
               value="photos"
-              className="min-h-11 flex items-end pb-2.5 -mb-px font-geist text-[0.9375rem] font-semibold text-rd-text-tertiary border-b-2 border-transparent transition-colors data-[state=active]:text-rd-fg data-[state=active]:font-bold focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              className="min-h-11 flex items-end pb-2.5 -mb-px font-geist text-body font-semibold text-rd-text-tertiary border-b-2 border-transparent transition-colors data-[state=active]:text-rd-fg data-[state=active]:font-bold focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
             >
               Photos{images.length > 0 ? ` · ${images.length}` : ''}
             </TabsPrimitive.Trigger>
@@ -497,9 +497,9 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                           </div>
                         ))}
                       <div className={`max-w-[78%] flex flex-col ${mine ? 'items-end' : 'items-start'}`}>
-                        {!mine && <span className="text-[0.75rem] font-semibold text-rd-text-tertiary mb-0.5 px-1">{comment.author}</span>}
+                        {!mine && <span className="text-overline font-semibold text-rd-text-tertiary mb-0.5 px-1">{comment.author}</span>}
                         <div
-                          className={`px-3.5 py-2.5 text-[0.9375rem] leading-relaxed ${
+                          className={`px-3.5 py-2.5 text-caption leading-relaxed ${
                             mine
                               ? 'bg-primary text-white rounded-[18px] rounded-br-[6px]'
                               : 'bg-rd-surface text-rd-fg shadow-[0_1px_2px_rgba(20,32,26,0.05),0_2px_8px_rgba(20,32,26,0.06)] rounded-[18px] rounded-bl-[6px]'
@@ -507,7 +507,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                         >
                           {comment.content}
                         </div>
-                        <span className="text-[0.75rem] text-rd-text-tertiary mt-0.5 px-1 flex items-center gap-1">
+                        <span className="text-overline text-rd-text-tertiary mt-0.5 px-1 flex items-center gap-1">
                           {comment.timeAgo}
                           {mine && <span aria-hidden="true" className="material-symbols-outlined text-[14px] text-primary">done_all</span>}
                         </span>
@@ -566,8 +566,8 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-2">
-                          <span className="font-geist text-[0.9375rem] font-semibold text-rd-fg truncate">{report.author}</span>
-                          <span className="shrink-0 inline-flex items-center rounded-md bg-surface-container-high px-1.5 py-0.5 text-[0.6875rem] font-bold uppercase tracking-wide text-rd-text-tertiary">
+                          <span className="font-geist text-body font-semibold text-rd-fg truncate">{report.author}</span>
+                          <span className="shrink-0 inline-flex items-center rounded-md bg-surface-container-high px-1.5 py-0.5 text-micro font-bold text-rd-text-tertiary">
                             {freshness.label}
                           </span>
                         </div>
@@ -637,7 +637,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                     role="tab"
                     aria-selected={photoFilter === 'all'}
                     onClick={() => setPhotoFilter('all')}
-                    className={`rounded-full px-3 py-1.5 text-[0.8125rem] font-semibold transition-colors ${
+                    className={`rounded-full px-3 py-1.5 text-micro font-semibold transition-colors ${
                       photoFilter === 'all' ? 'bg-rd-selected text-rd-on-selected' : 'bg-rd-chip-grey text-rd-fg'
                     }`}
                   >
@@ -649,7 +649,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                       role="tab"
                       aria-selected={photoFilter === 'live'}
                       onClick={() => setPhotoFilter('live')}
-                      className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-[0.8125rem] font-semibold transition-colors ${
+                      className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-micro font-semibold transition-colors ${
                         photoFilter === 'live' ? 'bg-rd-selected text-rd-on-selected' : 'bg-rd-chip-grey text-rd-available'
                       }`}
                     >
@@ -674,17 +674,17 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                       >
                         <img src={featured.url} alt="Latest station photo" className="w-full h-full object-cover" />
                         {featured.isLive && (
-                          <span className="absolute top-3 left-3 inline-flex items-center gap-1 rounded-md bg-rd-available text-white text-[0.75rem] font-bold px-2 py-1">
+                          <span className="absolute top-3 left-3 inline-flex items-center gap-1 rounded-md bg-rd-available text-white text-overline font-bold px-2 py-1">
                             <span aria-hidden="true" className="material-symbols-outlined text-[13px] material-symbols-fill">verified</span>
                             Live verified
                           </span>
                         )}
                         <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/70 to-transparent flex flex-col justify-end p-3">
-                          <span className="text-white font-geist font-bold text-[0.9375rem] truncate">{station.name}</span>
+                          <span className="text-white font-geist font-bold text-body truncate">{station.name}</span>
                           {featuredTime ? (
-                            <span className="font-geist-mono text-[11px] text-white/80 mt-0.5">{featuredTime}</span>
+                            <span className="font-geist-mono text-overline text-white/80 mt-0.5">{featuredTime}</span>
                           ) : (
-                            <span className="text-[0.75rem] text-white/80 mt-0.5">Station listing photo</span>
+                            <span className="text-overline text-white/80 mt-0.5">Station listing photo</span>
                           )}
                         </div>
                       </div>
@@ -699,7 +699,7 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                             >
                               <img src={item.url} alt="Station photo" className="w-full h-full object-cover" />
                               <span
-                                className={`absolute top-2 left-2 inline-flex items-center gap-1 rounded-md text-[0.6875rem] font-bold px-1.5 py-0.5 ${
+                                className={`absolute top-2 left-2 inline-flex items-center gap-1 rounded-md text-overline font-bold px-1.5 py-0.5 ${
                                   item.isLive ? 'bg-rd-available text-white' : 'bg-rd-surface text-rd-fg'
                                 }`}
                               >
@@ -718,13 +718,13 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
                     <button
                       type="button"
                       onClick={onAddPhoto}
-                      className="inline-flex items-center gap-2 rounded-full bg-primary text-white font-geist font-bold text-[0.9375rem] px-5 py-3 active:scale-95 transition-transform"
+                      className="inline-flex items-center gap-2 rounded-full bg-primary text-white font-geist font-bold text-body px-5 py-3 active:scale-95 transition-transform"
                     >
                       <span aria-hidden="true" className="material-symbols-outlined text-[18px]">add_a_photo</span>
                       Add live photo
-                      <span className="text-[0.75rem] font-bold bg-white/20 rounded-full px-2 py-0.5">+15 pts</span>
+                      <span className="text-overline font-bold bg-white/20 rounded-full px-2 py-0.5">+15 pts</span>
                     </button>
-                    <span className="text-[0.75rem] text-rd-text-tertiary">Camera only</span>
+                    <span className="text-overline text-rd-text-tertiary">Camera only</span>
                   </div>
                 )}
               </>
@@ -746,13 +746,13 @@ export const StationDetailScreen: React.FC<StationDetailScreenProps> = ({
               {/* Nudge banner: pushes reporting over chatting, per design_handoff_cng_connect_mobile 4a */}
               <div className="rounded-2xl bg-rd-available-container px-3.5 py-2.5 flex items-center gap-2.5">
                 <span aria-hidden="true" className="material-symbols-outlined text-rd-on-available-container text-[18px] shrink-0">campaign</span>
-                <p className="flex-1 text-[0.8125rem] font-semibold text-rd-on-available-container leading-snug">
+                <p className="flex-1 text-micro font-semibold text-rd-on-available-container leading-snug">
                   At the pump? Report its status.
                 </p>
                 <button
                   type="button"
                   onClick={() => onOpenReportModal(station)}
-                  className="shrink-0 rounded-full bg-primary text-white text-[0.75rem] font-bold px-3 py-1.5 active:scale-95 transition-transform"
+                  className="shrink-0 rounded-full bg-primary text-white text-overline font-bold px-3 py-1.5 active:scale-95 transition-transform"
                 >
                   Report
                 </button>

@@ -43,10 +43,10 @@ export const BookConversionModal: React.FC<BookConversionModalProps> = ({
 
             <div>
               <h3 className="text-[1.25rem] font-bold text-on-surface">Booked</h3>
-              <p className="text-[0.875rem] text-on-surface-variant font-normal mt-1">{center.name}</p>
+              <p className="text-micro text-on-surface-variant font-normal mt-1">{center.name}</p>
             </div>
 
-            <div className="bg-surface-container rounded-2xl p-4 text-left space-y-2 text-[0.875rem]">
+            <div className="bg-surface-container rounded-2xl p-4 text-left space-y-2 text-micro">
               <div className="flex justify-between">
                 <span className="text-on-surface-variant font-medium">Reference</span>
                 <span className="font-bold text-primary">{bookingSuccessRef}</span>
@@ -65,7 +65,7 @@ export const BookConversionModal: React.FC<BookConversionModalProps> = ({
               </div>
             </div>
 
-            <div className="bg-surface rounded-2xl p-3 text-primary text-[0.8125rem] font-semibold flex items-center gap-2">
+            <div className="bg-surface rounded-2xl p-3 text-primary text-micro font-semibold flex items-center gap-2">
               <span aria-hidden="true" className="material-symbols-outlined text-[18px]">stars</span>
               <span>+100 pts</span>
             </div>
@@ -79,7 +79,7 @@ export const BookConversionModal: React.FC<BookConversionModalProps> = ({
                 });
                 onClose();
               }}
-              className="w-full py-3.5 bg-primary text-on-primary font-bold text-[0.9375rem] rounded-full shadow-md hover:opacity-95 transition-all"
+              className="w-full py-3.5 bg-primary text-on-primary font-bold text-body rounded-full shadow-md hover:opacity-95 transition-all"
             >
               Done
             </button>
@@ -88,15 +88,15 @@ export const BookConversionModal: React.FC<BookConversionModalProps> = ({
           <div>
             {/* Selected Center Summary Card */}
             <div className="bg-surface-container rounded-2xl p-3.5 mb-4 space-y-1">
-              <p className="font-bold text-[0.9375rem] text-on-surface leading-snug">
+              <p className="font-bold text-body text-on-surface leading-snug">
                 {center.name}
               </p>
-              <p className="text-[0.8125rem] font-normal text-on-surface-variant truncate">
+              <p className="text-micro font-normal text-on-surface-variant truncate">
                 {center.address} · {center.code}
               </p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-3.5 text-[0.875rem]">
+            <form onSubmit={handleSubmit} className="space-y-3.5 text-micro">
               <div>
                 <label htmlFor="book-vehicle-make-year" className="block font-semibold text-on-surface-variant mb-1">
                   Vehicle Make &amp; Year
@@ -172,7 +172,7 @@ export const BookConversionModal: React.FC<BookConversionModalProps> = ({
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full py-3.5 bg-primary text-on-primary font-bold text-[0.9375rem] rounded-full shadow-lg hover:opacity-95 active:scale-98 transition-all flex items-center justify-center gap-2"
+                  className="w-full py-3.5 bg-primary text-on-primary font-bold text-body rounded-full shadow-lg hover:opacity-95 active:scale-98 transition-all flex items-center justify-center gap-2"
                 >
                   {isSubmitting ? (
                     <>

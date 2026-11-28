@@ -33,7 +33,7 @@ export const LiveNavigationModal: React.FC<LiveNavigationModalProps> = ({
             <h2 className="font-bold text-[1.1875rem] text-on-surface leading-snug truncate">
               {station.name}
             </h2>
-            <p className="text-[0.875rem] text-slate-500 font-normal mt-0.5 flex items-center gap-1">
+            <p className="text-micro text-slate-500 font-normal mt-0.5 flex items-center gap-1">
               <span aria-hidden="true" className="material-symbols-outlined text-[16px] text-outline">
                 location_on
               </span>
@@ -41,7 +41,7 @@ export const LiveNavigationModal: React.FC<LiveNavigationModalProps> = ({
             </p>
 
             {station.lat && station.lng && (
-              <p className="text-[0.7812rem] text-primary font-medium mt-1 flex items-center gap-1">
+              <p className="text-overline text-primary font-medium mt-1 flex items-center gap-1">
                 <span aria-hidden="true" className="material-symbols-outlined text-[15px]">
                   {station.locationPrecision === 'gps_confirmed' ? 'my_location' : 'pin_drop'}
                 </span>
@@ -54,11 +54,11 @@ export const LiveNavigationModal: React.FC<LiveNavigationModalProps> = ({
           </div>
 
           <div className="flex flex-wrap items-center gap-2 pt-2">
-            <span className="bg-primary-container text-on-primary-container text-[0.7812rem] font-semibold px-3 py-1 rounded-full">
+            <span className="bg-primary-container text-on-primary-container text-overline font-semibold px-3 py-1 rounded-full">
               {describeStatus(station)}{describePressure(station) ? ` • ${describePressure(station)}` : ''}
             </span>
             {station.cngPrice && (
-              <span className="bg-surface-container-high text-slate-700 text-[0.7812rem] font-medium px-3 py-1 rounded-full">
+              <span className="bg-surface-container-high text-slate-700 text-overline font-medium px-3 py-1 rounded-full">
                 ₦{station.cngPrice}/kg
               </span>
             )}
@@ -68,7 +68,7 @@ export const LiveNavigationModal: React.FC<LiveNavigationModalProps> = ({
         {/* Real Distance & Drive Time Summary Grid */}
         <div className="grid grid-cols-2 gap-3">
           <div className="bg-surface-container rounded-2xl p-3.5 text-center">
-            <span className="text-[0.75rem] font-semibold uppercase text-outline block mb-0.5">
+            <span className="text-micro font-semibold text-outline block mb-0.5">
               Distance
             </span>
             <span className="text-[1.25rem] font-bold text-on-surface">
@@ -77,7 +77,7 @@ export const LiveNavigationModal: React.FC<LiveNavigationModalProps> = ({
           </div>
 
           <div className="bg-surface-container rounded-2xl p-3.5 text-center">
-            <span className="text-[0.75rem] font-semibold uppercase text-outline block mb-0.5">
+            <span className="text-micro font-semibold text-outline block mb-0.5">
               Drive time
             </span>
             <span className="text-[1.25rem] font-bold text-primary">
@@ -90,7 +90,7 @@ export const LiveNavigationModal: React.FC<LiveNavigationModalProps> = ({
         <div className="flex flex-col gap-2.5 pt-1">
           <button
             onClick={handleLaunchPin}
-            className="w-full py-3.5 bg-surface-container hover:bg-surface-container-high text-on-surface font-bold text-[0.9062rem] rounded-full flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
+            className="w-full py-3.5 bg-surface-container hover:bg-surface-container-high text-on-surface font-bold text-micro rounded-full flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
           >
             <span aria-hidden="true" className="material-symbols-outlined text-[20px] shrink-0">pin_drop</span>
             <span>Open pin in Google Maps</span>
@@ -98,7 +98,7 @@ export const LiveNavigationModal: React.FC<LiveNavigationModalProps> = ({
 
           <button
             onClick={handleLaunchMaps}
-            className="w-full py-3.5 bg-primary hover:opacity-95 text-white font-bold text-[0.9062rem] rounded-full flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
+            className="w-full py-3.5 bg-primary hover:opacity-95 text-white font-bold text-micro rounded-full flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
           >
             <span aria-hidden="true" className="material-symbols-outlined text-[20px] shrink-0">turn_right</span>
             <span>Start navigation</span>
@@ -106,7 +106,7 @@ export const LiveNavigationModal: React.FC<LiveNavigationModalProps> = ({
 
           <button
             onClick={onClose}
-            className="w-full py-2.5 text-outline hover:text-slate-900 font-bold text-[0.875rem] rounded-full active:scale-[0.98] transition-all"
+            className="w-full py-2.5 text-outline hover:text-slate-900 font-bold text-micro rounded-full active:scale-[0.98] transition-all"
           >
             Close
           </button>

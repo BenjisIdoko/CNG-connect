@@ -161,7 +161,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ post, onBack }) => {
       <div className="flex-1 max-w-xl w-full mx-auto px-4 py-4 flex flex-col gap-3">
         {/* Date Divider */}
         <div className="flex items-center justify-center my-1">
-          <span className="text-micro font-semibold bg-surface-container text-outline px-3 py-1 rounded-full uppercase tracking-wider">
+          <span className="text-micro font-semibold bg-surface-container text-outline px-3 py-1 rounded-full">
             Today
           </span>
         </div>

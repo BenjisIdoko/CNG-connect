@@ -46,7 +46,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
       }`}
     >
       <img src="/pwa-icon.svg" alt="" className="burst-pop w-28 h-28 rounded-[28px] shadow-[0_18px_50px_rgba(0,0,0,0.45)]" />
-      <span className="font-headline font-extrabold text-[1.5rem] tracking-tight">
+      <span className="font-headline font-bold text-[1.5rem] tracking-tight">
         CNG-<span className="text-[#57C06A]">Connect</span>
       </span>
     </div>

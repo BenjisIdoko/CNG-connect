@@ -220,7 +220,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                     sideOffset={5}
                     className="z-[150] w-64 bg-surface-container-high rounded-2xl p-3 shadow-xl flex flex-col gap-1.5"
                   >
-                    <span className="text-micro font-bold text-outline uppercase tracking-wider px-2">Switch active vehicle</span>
+                    <span className="text-micro font-bold text-outline px-2">Switch active vehicle</span>
                     {['Toyota Corolla 1.8L', 'Hyundai Accent 1.6L', 'Qoray E-Trike (EV)'].map((v) => (
                       <button
                         key={v}
@@ -259,7 +259,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
             ].map((t) => (
               <div key={t.l} className="flex-1 text-center">
                 <div className="font-geist font-bold text-[1.5rem] tracking-tight">{t.v}</div>
-                <div className="text-[0.75rem] font-semibold uppercase tracking-wide text-[#A9AFBA] mt-0.5">{t.l}</div>
+                <div className="text-micro font-semibold text-[#A9AFBA] mt-0.5">{t.l}</div>
               </div>
             ))}
           </div>
@@ -328,7 +328,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
           className={`bg-surface-container-high rounded-2xl p-4 shadow-[0_4px_14px_rgba(14,20,32,0.05)] ${onOpenRoiCalculator ? 'cursor-pointer active:scale-[0.99] transition-transform' : ''}`}
         >
           <div className="text-micro font-semibold text-outline">Estimated savings</div>
-          <div className="font-extrabold text-[1.375rem] text-primary mt-0.5 tracking-tight">
+          <div className="font-bold text-[1.375rem] text-primary mt-0.5 tracking-tight">
             ₦{monthlySavings.toLocaleString()}
             <span className="text-caption font-semibold text-outline">/mo</span>
           </div>
@@ -360,7 +360,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                         setThemePref(pref);
                         setThemePrefState(pref);
                       }}
-                      className={`min-h-11 px-3.5 rounded-full text-[0.75rem] font-bold transition-colors ${
+                      className={`min-h-11 px-3.5 rounded-full text-overline font-bold transition-colors ${
                         themePref === pref ? 'bg-rd-selected text-rd-on-selected' : 'text-outline'
                       }`}
                     >
@@ -563,7 +563,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
             </button>
             <button
               type="submit"
-              className="px-5 py-2 rounded-full text-body font-extrabold text-white bg-primary hover:bg-deep-teal shadow-sm"
+              className="px-5 py-2 rounded-full text-body font-bold text-white bg-primary hover:bg-deep-teal shadow-sm"
             >
               Save Changes
             </button>

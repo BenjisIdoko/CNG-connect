@@ -414,7 +414,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                         <div className="flex items-center gap-1.5">
                           <h3 className="text-body font-semibold text-rd-fg leading-tight truncate">{st.name}</h3>
                           {st.verifiedByCommunity && (
-                            <span className="shrink-0 inline-flex items-center gap-0.5 rounded-md bg-rd-available-container text-rd-on-available-container px-1.5 py-0.5 text-[0.6875rem] font-bold">
+                            <span className="shrink-0 inline-flex items-center gap-0.5 rounded-md bg-rd-available-container text-rd-on-available-container px-1.5 py-0.5 text-overline font-bold">
                               <span aria-hidden="true" className="material-symbols-outlined text-[11px] material-symbols-fill">verified</span>
                               Official
                             </span>
@@ -488,7 +488,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
               </p>
               <button
                 onClick={() => setActiveMainTab('station_groups')}
-                className="shrink-0 rounded-full bg-white text-primary text-[0.75rem] font-bold px-3 py-1.5 active:scale-95 transition-transform"
+                className="shrink-0 rounded-full bg-white text-primary text-overline font-bold px-3 py-1.5 active:scale-95 transition-transform"
               >
                 Find group
               </button>
@@ -542,7 +542,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                               {post.author}
                             </h3>
                             {post.verified && (
-                              <span className="shrink-0 inline-flex items-center gap-0.5 rounded-md bg-rd-available-container text-rd-on-available-container px-1.5 py-0.5 text-[0.6875rem] font-bold whitespace-nowrap">
+                              <span className="shrink-0 inline-flex items-center gap-0.5 rounded-md bg-rd-available-container text-rd-on-available-container px-1.5 py-0.5 text-overline font-bold whitespace-nowrap">
                                 <span aria-hidden="true" className="material-symbols-outlined text-[11px] material-symbols-fill">workspace_premium</span>
                                 Verified Reporter
                               </span>
@@ -552,7 +552,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                             {post.timeAgo}
                           </span>
                         </div>
-                        <span className="text-micro font-semibold text-outline uppercase tracking-wide">
+                        <span className="text-micro font-semibold text-outline">
                           {post.categoryLabel || post.category}
                         </span>
                       </div>
@@ -581,7 +581,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
                       <button
                         onClick={(e) => handleToggleLike(post.id, e)}
                         aria-pressed={likeOverrides[post.id]?.isLiked ?? Boolean(post.isLiked)}
-                        className={`flex items-center gap-2 text-caption font-extrabold transition-all active:scale-95 ${
+                        className={`flex items-center gap-2 text-caption font-bold transition-all active:scale-95 ${
                           (likeOverrides[post.id]?.isLiked ?? Boolean(post.isLiked))
                             ? 'text-primary'
                             : 'text-slate-500 hover:text-slate-800'
@@ -602,7 +602,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
 
                       <button
                         onClick={() => onOpenDiscussion(post)}
-                        className="flex items-center gap-2 text-caption font-extrabold text-slate-500 hover:text-slate-800 transition-colors"
+                        className="flex items-center gap-2 text-caption font-bold text-slate-500 hover:text-slate-800 transition-colors"
                       >
                         <span aria-hidden="true" className="material-symbols-outlined text-[19px]">
                           chat_bubble
@@ -633,7 +633,7 @@ export const CommunityScreen: React.FC<CommunityScreenProps> = ({
             {/* Header Banner */}
             <div className="bg-deep-teal rounded-3xl p-6 text-white shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
-                <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight">
+                <h2 className="text-xl sm:text-2xl font-bold tracking-tight">
                   Gas Finder Legends of Nigeria
                 </h2>
               </div>

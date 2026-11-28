@@ -82,12 +82,12 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
         <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/20 to-transparent" />
         {!isLast && (
           <div className="absolute top-0 inset-x-0 pt-[max(env(safe-area-inset-top,0px),1.25rem)] px-6 flex items-center justify-between max-w-xl mx-auto">
-            <span className="font-geist text-[1.0625rem] font-extrabold text-white tracking-tight [text-shadow:0_1px_4px_rgba(0,0,0,0.4)]">
+            <span className="font-geist text-body font-bold text-white tracking-tight [text-shadow:0_1px_4px_rgba(0,0,0,0.4)]">
               CNG&#8209;Connect
             </span>
             <button
               onClick={onStartLogin}
-              className="min-h-11 pl-4 -mr-2 pr-2 flex items-center text-[0.875rem] font-semibold text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.5)] active:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white rounded-md"
+              className="min-h-11 pl-4 -mr-2 pr-2 flex items-center text-micro font-semibold text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.5)] active:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white rounded-md"
             >
               Log in
             </button>
@@ -120,7 +120,7 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
         <h1 key={`t-${activeSlide.id}`} className="font-geist text-[2rem] leading-[1.15] font-bold tracking-tight animate-fade-in">
           {activeSlide.title}
         </h1>
-        <p className="mt-2.5 text-[0.9375rem] text-rd-text-tertiary leading-relaxed">{activeSlide.description}</p>
+        <p className="mt-2.5 text-caption text-rd-text-tertiary leading-relaxed">{activeSlide.description}</p>
 
         <div className="flex-1" />
 
@@ -128,25 +128,25 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
           <div className="flex flex-col gap-2.5">
             <button
               onClick={onStartSignUp}
-              className="w-full h-14 bg-rd-ink text-white font-geist font-bold text-[0.9375rem] rounded-full flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
+              className="w-full h-14 bg-rd-ink text-white font-geist font-bold text-body rounded-full flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
             >
               Create account
             </button>
             <button
               onClick={onStartLogin}
-              className="w-full h-14 bg-white text-rd-ink font-geist font-bold text-[0.9375rem] rounded-full ring-1 ring-[#D5D8D6] active:scale-[0.98] transition-transform"
+              className="w-full h-14 bg-white text-rd-ink font-geist font-bold text-body rounded-full ring-1 ring-[#D5D8D6] active:scale-[0.98] transition-transform"
             >
               Log in
             </button>
             {onExploreAsGuest && (
-              <button onClick={onExploreAsGuest} className="h-11 text-[0.9375rem] font-bold text-primary">
+              <button onClick={onExploreAsGuest} className="h-11 text-body font-bold text-primary">
                 Explore as guest
               </button>
             )}
           </div>
         ) : (
           <div className="flex items-center justify-between">
-            <button onClick={handleSkip} className="min-h-11 pr-4 text-[0.9375rem] font-semibold text-rd-text-tertiary">
+            <button onClick={handleSkip} className="min-h-11 pr-4 text-body font-semibold text-rd-text-tertiary">
               Skip
             </button>
             <div className="flex items-center gap-3">

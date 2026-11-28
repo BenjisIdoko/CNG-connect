@@ -473,7 +473,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       iconCreateFunction: (cluster: any) => {
         const childCount = cluster.getChildCount();
         return L.divIcon({
-          html: `<div class="w-9 h-9 rounded-full bg-[#14201A] text-white font-extrabold text-[14px] flex items-center justify-center border-[3px] border-white shadow-[0_2px_8px_rgba(20,32,26,0.35)] transition-transform hover:scale-110"><span>${childCount}</span></div>`,
+          html: `<div class="w-9 h-9 rounded-full bg-[#14201A] text-white font-bold text-micro flex items-center justify-center border-[3px] border-white shadow-[0_2px_8px_rgba(20,32,26,0.35)] transition-transform hover:scale-110"><span>${childCount}</span></div>`,
           className: 'custom-cluster-icon',
           iconSize: [36, 36],
         });
@@ -824,7 +824,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       >
         {renderStatusTile(station)}
         <div className="min-w-0 flex-1">
-          <h3 className="font-geist font-semibold text-[0.9375rem] text-rd-fg truncate leading-snug">{station.name}</h3>
+          <h3 className="font-geist font-semibold text-body text-rd-fg truncate leading-snug">{station.name}</h3>
           <p className="text-caption text-outline truncate flex items-center gap-1.5 mt-0.5">
             <span aria-hidden="true" className={`w-2 h-2 rounded-full shrink-0 ${dotColor}`} />
             <span className="truncate">
@@ -892,7 +892,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
               {kind === 'best' ? 'Best option now' : kind === 'selected' ? 'Selected' : 'Nearest'}
               {userGps && station.distance ? ` · ${station.distance}` : ''}{userGps && station.driveTime ? ` · ${station.driveTime}` : ''}
             </p>
-            <h3 className="font-geist font-bold text-[1.0625rem] leading-snug text-white line-clamp-2">
+            <h3 className="font-geist font-bold text-body leading-snug text-white line-clamp-2">
               <button
                 type="button"
                 onClick={openDetails}
@@ -959,7 +959,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       >
         {renderStatusTile(station)}
         <div className="min-w-0 flex-1">
-          <h3 className="font-geist font-semibold text-[0.9375rem] text-rd-fg truncate">{station.name}</h3>
+          <h3 className="font-geist font-semibold text-body text-rd-fg truncate">{station.name}</h3>
           <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
             <StationStatusChip station={station} now={now} />
             <StationSaysLine station={station} now={now} compact />
@@ -1058,7 +1058,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
             className="pointer-events-auto flex-1 min-w-0 h-[52px] pl-4 pr-4 rounded-full bg-rd-surface flex items-center gap-2.5 text-left shadow-[0_6px_20px_rgba(20,32,26,0.12)] font-geist"
           >
             <span aria-hidden="true" className="material-symbols-outlined text-rd-fg text-[22px] shrink-0">search</span>
-            <span className={`flex-1 min-w-0 truncate text-[0.9375rem] ${searchQuery ? 'font-semibold text-rd-fg' : 'font-normal text-rd-text-tertiary'}`}>
+            <span className={`flex-1 min-w-0 truncate text-caption ${searchQuery ? 'font-semibold text-rd-fg' : 'font-normal text-rd-text-tertiary'}`}>
               {searchQuery || 'Where do you want to fill up?'}
             </span>
           </button>
@@ -1234,7 +1234,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
 
           {sheetMode === 'collapsed' ? null : filteredStations.length === 0 ? (
             <div className="px-5 pt-4 pb-28 text-center flex flex-col items-center gap-2">
-              <h3 className="font-extrabold text-on-surface text-body-lg">No stations found</h3>
+              <h3 className="font-bold text-on-surface text-body-lg">No stations found</h3>
               {searchQuery.trim() && (
                 <p className="text-caption text-on-surface-variant max-w-xs">{`Nothing matches "${searchQuery.trim()}".`}</p>
               )}
@@ -1449,7 +1449,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
             <span aria-hidden="true" className="w-14 h-14 rounded-full bg-rd-segmented-track text-rd-text-tertiary flex items-center justify-center">
               <span className="material-symbols-outlined text-[28px]">search_off</span>
             </span>
-            <p className="font-geist font-bold text-[1.0625rem]">No stations match</p>
+            <p className="font-geist font-bold text-body">No stations match</p>
             <button
               type="button"
               onClick={resetAllFilters}
@@ -1504,7 +1504,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                         </span>
                         <span className="min-w-0 flex-1 flex flex-col">
                           <span className="flex items-start justify-between gap-2">
-                            <span className="font-geist font-bold text-[0.9375rem] leading-snug text-rd-fg line-clamp-2">{station.name}</span>
+                            <span className="font-geist font-bold text-body leading-snug text-rd-fg line-clamp-2">{station.name}</span>
                             {userGps && station.distance && (
                               <span className="font-geist-mono text-micro font-medium text-rd-text-tertiary shrink-0">{station.distance}</span>
                             )}

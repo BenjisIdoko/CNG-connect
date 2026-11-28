@@ -1093,7 +1093,7 @@ export const App: React.FC = () => {
       {burst && <SuccessBurst key={burst.key} status={burst.status} onDone={() => setBurst(null)} />}
 
       {globalToast && (
-        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-[#141d19]/95 text-white text-[0.8438rem] font-bold px-5 py-2.5 rounded-full shadow-2xl backdrop-blur-md animate-fade-in border border-white/10 text-center max-w-sm pointer-events-none">
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-[#141d19]/95 text-white text-micro font-bold px-5 py-2.5 rounded-full shadow-2xl backdrop-blur-md animate-fade-in border border-white/10 text-center max-w-sm pointer-events-none">
           <span className="inline-flex items-center gap-2 justify-center">
             {globalToast.tone && <Icon name={TOAST_ICONS[globalToast.tone]} size={18} fill className={TOAST_COLORS[globalToast.tone]} />}
             <span>{globalToast.msg}</span>
@@ -1160,7 +1160,7 @@ export const App: React.FC = () => {
       >
         <h1 className="sr-only lg:hidden">{headerTitle || (activeTab === 'map' ? 'CNG-Connect map' : activeTab === 'conversions' ? 'CNG kit centres' : activeTab === 'community' ? 'Community' : 'Profile')}</h1>
         {!isOnline && (
-          <div className="fixed top-3 left-1/2 -translate-x-1/2 z-50 bg-deep-teal text-white text-[0.7812rem] font-extrabold px-4 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 animate-pulse pointer-events-none">
+          <div className="fixed top-3 left-1/2 -translate-x-1/2 z-50 bg-deep-teal text-white text-overline font-bold px-4 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 animate-pulse pointer-events-none">
             <span aria-hidden="true" className="material-symbols-outlined text-[16px] text-amber-400">wifi_off</span>
             <span>No network. Showing last known stations.</span>
           </div>

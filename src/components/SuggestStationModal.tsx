@@ -74,7 +74,7 @@ export const SuggestStationModal: React.FC<SuggestStationModalProps> = ({
             <div className="w-14 h-14 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center">
               <span aria-hidden="true" className="material-symbols-outlined text-[36px]">verified</span>
             </div>
-            <h3 className="text-[1.25rem] font-extrabold text-on-surface">Sent for review</h3>
+            <h3 className="text-[1.25rem] font-bold text-on-surface">Sent for review</h3>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -94,7 +94,7 @@ export const SuggestStationModal: React.FC<SuggestStationModalProps> = ({
                 <button
                   type="button"
                   onClick={() => setStationType('cng')}
-                  className={`py-2.5 px-3 rounded-xl font-extrabold text-caption flex items-center justify-center gap-2 transition-all ${
+                  className={`py-2.5 px-3 rounded-xl font-bold text-caption flex items-center justify-center gap-2 transition-all ${
                     stationType === 'cng'
                       ? 'bg-emerald-600 text-white shadow-md'
                       : 'text-on-surface-variant hover:bg-surface-container'
@@ -106,7 +106,7 @@ export const SuggestStationModal: React.FC<SuggestStationModalProps> = ({
                 <button
                   type="button"
                   onClick={() => setStationType('ev_charging')}
-                  className={`py-2.5 px-3 rounded-xl font-extrabold text-caption flex items-center justify-center gap-2 transition-all ${
+                  className={`py-2.5 px-3 rounded-xl font-bold text-caption flex items-center justify-center gap-2 transition-all ${
                     stationType === 'ev_charging'
                       ? 'bg-sky-600 text-white shadow-md'
                       : 'text-on-surface-variant hover:bg-surface-container'
@@ -245,13 +245,13 @@ export const SuggestStationModal: React.FC<SuggestStationModalProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="px-5 py-3 rounded-full text-caption font-extrabold text-outline hover:bg-surface-container"
+                className="px-5 py-3 rounded-full text-caption font-bold text-outline hover:bg-surface-container"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="px-6 py-3 rounded-full bg-primary text-on-primary font-extrabold text-caption shadow-md active:scale-95 transition-all flex items-center gap-2"
+                className="px-6 py-3 rounded-full bg-primary text-on-primary font-bold text-caption shadow-md active:scale-95 transition-all flex items-center gap-2"
               >
                 <span aria-hidden="true" className="material-symbols-outlined text-[18px]">send</span>
                 <span>Submit for Verification</span>

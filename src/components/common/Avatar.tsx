@@ -13,7 +13,7 @@ export const Avatar: React.FC<{
   return (
     <span
       aria-hidden
-      className={`rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-extrabold select-none ${className}`}
+      className={`rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold select-none ${className}`}
     >
       {initial ? (
         <span className="text-[1.1em] leading-none">{initial}</span>

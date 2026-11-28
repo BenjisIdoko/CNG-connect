@@ -135,7 +135,7 @@ export const InviteCard: React.FC<{
               ].map((s) => (
                 <div key={s.label} className="bg-surface-container rounded-xl py-2 px-1">
                   <dt className="text-micro font-semibold text-outline">{s.label}</dt>
-                  <dd className="font-extrabold text-body text-on-surface">{s.value}</dd>
+                  <dd className="font-bold text-body text-on-surface">{s.value}</dd>
                 </div>
               ))}
             </dl>

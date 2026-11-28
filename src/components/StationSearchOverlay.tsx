@@ -72,7 +72,7 @@ function Highlight({ text, tokens }: { text: string; tokens: string[] }) {
   merged.forEach(([a, b], i) => {
     if (a > pos) out.push(text.slice(pos, a));
     out.push(
-      <strong key={i} className="font-extrabold text-on-surface">
+      <strong key={i} className="font-bold text-on-surface">
         {text.slice(a, b)}
       </strong>,
     );
@@ -214,7 +214,7 @@ export const StationSearchOverlay: React.FC<Props> = ({
         {searching ? (
           shown.length > 0 ? (
             <>
-              <p className="px-5 pt-4 pb-1 text-micro font-bold text-outline uppercase tracking-wide">
+              <p className="px-5 pt-4 pb-1 text-micro font-bold text-outline">
                 {results.length} {results.length === 1 ? 'station' : 'stations'}
               </p>
               <ul>{shown.map(row)}</ul>
@@ -222,7 +222,7 @@ export const StationSearchOverlay: React.FC<Props> = ({
           ) : (
             <div className="px-8 pt-16 text-center">
               <span aria-hidden="true" className="material-symbols-outlined text-[40px] text-outline">search_off</span>
-              <h3 className="mt-2 font-extrabold text-body-lg text-on-surface">No station found</h3>
+              <h3 className="mt-2 font-bold text-body-lg text-on-surface">No station found</h3>
               <p className="mt-1 text-caption text-on-surface-variant">
                 Nothing matches &ldquo;{query.trim()}&rdquo;.
               </p>
@@ -230,13 +230,13 @@ export const StationSearchOverlay: React.FC<Props> = ({
           )
         ) : (
           <>
-            <p className="px-5 pt-4 pb-1 text-micro font-bold text-outline uppercase tracking-wide">
+            <p className="px-5 pt-4 pb-1 text-micro font-bold text-outline">
               {suggestionsTitle}
             </p>
             <ul>{suggestions.map(row)}</ul>
             {recent.length > 0 && (
               <>
-                <p className="px-5 pt-4 pb-1 text-micro font-bold text-outline uppercase tracking-wide">Recent</p>
+                <p className="px-5 pt-4 pb-1 text-micro font-bold text-outline">Recent</p>
                 <ul>{recent.map(row)}</ul>
               </>
             )}

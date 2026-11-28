@@ -36,7 +36,7 @@ export const ProximityAlertBanner: React.FC<ProximityAlertBannerProps> = ({
 
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <h2 className="font-geist text-[1.0625rem] font-extrabold text-rd-fg leading-snug">
+            <h2 className="font-geist text-body font-bold text-rd-fg leading-snug">
               {variant === 'followup' ? `Did you fill up at ${station.name}?` : `Arrived near ${station.name}`}
             </h2>
             <div className="flex items-center gap-1.5 mt-1.5">

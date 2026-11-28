@@ -27,7 +27,7 @@ export const ReputationLevelModal: React.FC<ReputationLevelModalProps> = ({
         <div className="w-[76px] h-[76px] rounded-full bg-rd-queuing-container flex items-center justify-center text-[2.125rem]">
           <TierBadge tierId={tier.id} size={40} />
         </div>
-        <h3 className="font-geist font-extrabold text-heading text-rd-fg leading-tight mt-4">
+        <h3 className="font-geist font-bold text-heading text-rd-fg leading-tight mt-4">
           You&apos;ve reached
           <br />
           {tier.title}

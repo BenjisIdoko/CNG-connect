@@ -72,7 +72,7 @@ export const DiscussionScreen: React.FC<DiscussionScreenProps> = ({
             </div>
 
             {/* Category Tag */}
-            <div className="bg-primary-container/20 text-on-primary-container px-3 py-1 rounded-xl text-micro font-semibold uppercase tracking-wide">
+            <div className="bg-primary-container/20 text-on-primary-container px-3 py-1 rounded-xl text-micro font-semibold">
               {post.categoryLabel}
             </div>
           </div>

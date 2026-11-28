@@ -37,7 +37,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
         const active = activeTab === tab.id;
         const badge =
           tab.id === 'community' && unreadNotifications > 0 ? (
-            <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-[#D92D20] text-white text-[11px] font-bold flex items-center justify-center">
+            <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-[#D92D20] text-white text-overline font-bold flex items-center justify-center">
               {unreadNotifications}
             </span>
           ) : null;
@@ -77,7 +77,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
               </span>
             )}
             <span
-              className={`font-geist text-[12px] leading-none ${
+              className={`font-geist text-overline leading-none ${
                 active ? 'font-bold text-rd-fg' : 'font-medium text-rd-text-tertiary'
               }`}
             >

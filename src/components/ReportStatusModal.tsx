@@ -231,7 +231,7 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
         <div className="px-5 pb-6 pt-7">
           <div className="flex items-start justify-between gap-3 mb-4">
             <div className="min-w-0 flex-1">
-              <p className="font-geist-mono text-[11px] font-medium tracking-[0.08em] uppercase text-rd-text-tertiary truncate flex items-center gap-1.5">
+              <p className="text-caption font-medium text-rd-text-tertiary truncate flex items-center gap-1.5">
                 {station.name}
                 <button
                   type="button"
@@ -294,7 +294,7 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
                     </span>
                     <span className="flex-1 text-left min-w-0">
                       <span className="block font-geist text-[1.125rem] font-bold text-rd-fg truncate">{opt.title}</span>
-                      <span className="block text-[0.8125rem] text-rd-text-tertiary truncate">{opt.meaning}</span>
+                      <span className="block text-micro text-rd-text-tertiary truncate">{opt.meaning}</span>
                     </span>
                     <span aria-hidden="true" className="material-symbols-outlined text-[22px] text-rd-fg shrink-0" style={{ fontVariationSettings: on ? "'FILL' 1" : "'FILL' 0" }}>
                       {on ? 'radio_button_checked' : 'radio_button_unchecked'}
@@ -307,7 +307,7 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
             {/* Photo proof — required for every status */}
             <div className="bg-surface-container rounded-2xl p-3.5 flex flex-col gap-2.5">
               <div>
-                <p className="text-[0.75rem] font-bold text-outline uppercase tracking-wider">Photo required</p>
+                <p className="text-micro font-bold text-outline">Photo required</p>
                 <p className="text-caption font-semibold text-rd-fg mt-0.5">{reportPhotoHint(selectedStatus, isEv)}</p>
               </div>
               {photoError && (
@@ -319,7 +319,7 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
               {attachedPhoto ? (
                 <div className="relative rounded-xl overflow-hidden bg-black/10">
                   <img src={attachedPhoto} alt="Live photo taken at the station" className="w-full h-32 object-cover" />
-                  <div className="absolute bottom-2 left-2 bg-slate-900/85 text-white text-[0.75rem] font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
+                  <div className="absolute bottom-2 left-2 bg-slate-900/85 text-white text-overline font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
                     <span aria-hidden="true" className="material-symbols-outlined text-[14px] text-status-green">verified</span>
                     Live photo at the station
                   </div>
@@ -345,7 +345,7 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
                 >
                   <span aria-hidden="true" className="material-symbols-outlined text-[20px] text-slate-700">photo_camera</span>
                   <span className="text-caption font-semibold flex-1">Take photo</span>
-                  <span className="text-[0.75rem] text-outline">Live camera only</span>
+                  <span className="text-overline text-outline">Live camera only</span>
                 </button>
               )}
             </div>
@@ -359,17 +359,17 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
               >
                 <span aria-hidden="true" className="material-symbols-outlined text-[20px] text-primary shrink-0">add_a_photo</span>
                 <span className="flex-1 min-w-0">
-                  <span className="block font-geist text-[0.9375rem] font-semibold text-rd-fg">
+                  <span className="block font-geist text-body font-semibold text-rd-fg">
                     {isEv ? 'Add wait time or a note' : 'Add price, wait time or a note'}
                   </span>
-                  <span className="block text-[0.75rem] text-rd-text-tertiary">Optional</span>
+                  <span className="block text-overline text-rd-text-tertiary">Optional</span>
                 </span>
                 <span aria-hidden="true" className="material-symbols-outlined text-[20px] text-rd-text-tertiary shrink-0">expand_more</span>
               </button>
             ) : (
               <div className="bg-surface-container rounded-2xl p-3.5 flex flex-col gap-3.5">
                 <div>
-                  <p className="text-[0.75rem] font-bold text-outline uppercase tracking-wider">Wait time (optional)</p>
+                  <p className="text-micro font-bold text-outline">Wait time (optional)</p>
                   <div className="flex gap-1.5 mt-2">
                     {[
                       { label: '0–5m', v: 5 },
@@ -393,7 +393,7 @@ export const ReportStatusModal: React.FC<ReportStatusModalProps> = ({
 
                 {!isEv && (
                   <div>
-                    <label htmlFor="report-cng-price" className="text-[0.75rem] font-bold text-outline uppercase tracking-wider">
+                    <label htmlFor="report-cng-price" className="text-micro font-bold text-outline">
                       CNG price per kg (optional)
                     </label>
                     <div className="mt-2 flex items-center gap-2 bg-surface-container-high rounded-xl px-3 min-h-11">

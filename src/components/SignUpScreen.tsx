@@ -216,7 +216,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
             <span aria-hidden="true" className="material-symbols-outlined text-[20px]">close</span>
           </button>
         ) : null}
-        <span className="text-[0.8125rem] font-semibold text-rd-text-tertiary">
+        <span className="text-micro font-semibold text-rd-text-tertiary">
           {step === 3 ? (phoneOnly ? 'One last step' : 'Almost there') : `Step ${step} of 2`}
         </span>
       </div>
@@ -225,17 +225,17 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
         {step === 1 ? 'Sign in or sign up' : step === 2 ? 'Enter your code' : phoneOnly ? 'Add your phone number' : 'Complete your profile'}
       </h1>
       {step === 1 && (
-        <p className="text-[0.9375rem] text-rd-text-tertiary leading-relaxed mt-2">
+        <p className="text-caption text-rd-text-tertiary leading-relaxed mt-2">
           We&apos;ll email you a code. No password needed.
         </p>
       )}
       {step === 2 && (
-        <p className="text-[0.9375rem] text-rd-text-tertiary leading-relaxed mt-2">
+        <p className="text-caption text-rd-text-tertiary leading-relaxed mt-2">
           Sent to <strong className="text-rd-ink">{email}</strong>. Works for new and returning drivers.
         </p>
       )}
       {step === 3 && (
-        <p className="text-[0.9375rem] text-rd-text-tertiary leading-relaxed mt-2">
+        <p className="text-caption text-rd-text-tertiary leading-relaxed mt-2">
           {phoneOnly
             ? 'A phone number is required on every CNG-Connect account. It only takes a few seconds.'
             : "Just a few details so other drivers know who’s reporting. Your phone number is required."}
@@ -262,11 +262,11 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
                     if (emailError) setEmailError(null);
                   }}
                   placeholder="Email address"
-                  className="flex-1 bg-transparent text-[0.9375rem] font-medium text-rd-ink outline-none placeholder:text-rd-text-tertiary"
+                  className="flex-1 bg-transparent text-caption font-medium text-rd-ink outline-none placeholder:text-rd-text-tertiary"
                 />
               </div>
               {emailError && (
-                <p className="text-[0.8125rem] font-medium text-status-red mt-2 flex items-center gap-1">
+                <p className="text-micro font-medium text-status-red mt-2 flex items-center gap-1">
                   <span aria-hidden="true" className="material-symbols-outlined text-[15px]">error</span>
                   <span>{emailError}</span>
                 </p>
@@ -289,16 +289,16 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
                     if (phoneError) setPhoneError(null);
                   }}
                   placeholder="Phone number (required)"
-                  className="flex-1 bg-transparent text-[0.9375rem] font-medium text-rd-ink outline-none placeholder:text-rd-text-tertiary"
+                  className="flex-1 bg-transparent text-caption font-medium text-rd-ink outline-none placeholder:text-rd-text-tertiary"
                 />
               </div>
               {phoneError ? (
-                <p className="text-[0.8125rem] font-medium text-status-red mt-2 flex items-center gap-1">
+                <p className="text-micro font-medium text-status-red mt-2 flex items-center gap-1">
                   <span aria-hidden="true" className="material-symbols-outlined text-[15px]">error</span>
                   <span>{phoneError}</span>
                 </p>
               ) : (
-                <p className="text-[0.8125rem] text-rd-text-tertiary mt-2">e.g. 0803 123 4567</p>
+                <p className="text-micro text-rd-text-tertiary mt-2">e.g. 0803 123 4567</p>
               )}
             </div>
           )}
@@ -339,18 +339,18 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
                 </div>
               </label>
               {codeError && (
-                <p className="text-[0.8125rem] font-bold text-status-red mt-3 flex items-center gap-1">
+                <p className="text-micro font-bold text-status-red mt-3 flex items-center gap-1">
                   <span aria-hidden="true" className="material-symbols-outlined text-[16px]">gpp_bad</span>
                   <span>{codeError}</span>
                 </p>
               )}
               <div className="mt-5 flex items-center justify-between">
-                <span className="text-[0.875rem] text-rd-text-tertiary">Didn&apos;t get it?</span>
+                <span className="text-micro text-rd-text-tertiary">Didn&apos;t get it?</span>
                 <button
                   type="button"
                   onClick={handleResendCode}
                   disabled={resendCooldown > 0 || isSendingCode}
-                  className={`font-geist-mono text-[0.8125rem] font-semibold px-3 py-1.5 rounded-full transition-colors ${
+                  className={`font-geist-mono text-micro font-semibold px-3 py-1.5 rounded-full transition-colors ${
                     resendCooldown > 0 ? 'bg-rd-chip-grey text-rd-text-tertiary' : 'bg-rd-chip-grey text-primary'
                   }`}
                 >
@@ -359,7 +359,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
               </div>
               <div className="mt-4 flex items-start gap-2.5 bg-white rounded-2xl p-3.5">
                 <span aria-hidden="true" className="material-symbols-outlined text-primary text-[18px] shrink-0 mt-0.5">mail</span>
-                <p className="text-[0.8125rem] text-rd-text-tertiary leading-relaxed">
+                <p className="text-micro text-rd-text-tertiary leading-relaxed">
                   Got a link instead of a code? Tap it on this phone and you&apos;ll be signed in.
                 </p>
               </div>
@@ -370,7 +370,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
             <>
               {!phoneOnly && (
               <div>
-                <label htmlFor="signup-full-name" className="block text-[0.7812rem] font-semibold text-rd-text-tertiary mb-1">Full Name</label>
+                <label htmlFor="signup-full-name" className="block text-overline font-semibold text-rd-text-tertiary mb-1">Full Name</label>
                 <div className="flex items-center bg-white border border-[#E3E6E4] rounded-2xl px-3.5 h-12 focus-within:ring-2 focus-within:ring-primary/30 focus-within:border-primary transition-all">
                   <span aria-hidden="true" className="material-symbols-outlined text-outline text-[20px] mr-2">person</span>
                   <input
@@ -381,14 +381,14 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     placeholder="e.g. Tunde Adebayo"
-                    className="flex-1 bg-transparent text-[0.9062rem] font-medium text-rd-ink outline-none"
+                    className="flex-1 bg-transparent text-micro font-medium text-rd-ink outline-none"
                   />
                 </div>
               </div>
               )}
 
               <div>
-                <label htmlFor="signup-phone" className="block text-[0.7812rem] font-semibold text-rd-text-tertiary mb-1">
+                <label htmlFor="signup-phone" className="block text-overline font-semibold text-rd-text-tertiary mb-1">
                   Phone number <span className="text-status-red">(required)</span>
                 </label>
                 <div className={`flex items-center bg-white border rounded-2xl px-3.5 h-12 transition-all ${
@@ -408,16 +408,16 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
                       if (phoneError) setPhoneError(null);
                     }}
                     placeholder="0803 123 4567"
-                    className="flex-1 bg-transparent text-[0.9062rem] font-medium text-rd-ink outline-none"
+                    className="flex-1 bg-transparent text-micro font-medium text-rd-ink outline-none"
                   />
                 </div>
                 {phoneError ? (
-                  <p className="text-[0.7812rem] font-medium text-status-red mt-1 flex items-center gap-1">
+                  <p className="text-overline font-medium text-status-red mt-1 flex items-center gap-1">
                     <span aria-hidden="true" className="material-symbols-outlined text-[15px]">error</span>
                     <span>{phoneError}</span>
                   </p>
                 ) : (
-                  <p className="text-[0.7812rem] text-outline mt-1">e.g. 0803 123 4567</p>
+                  <p className="text-overline text-outline mt-1">e.g. 0803 123 4567</p>
                 )}
               </div>
 
@@ -429,13 +429,13 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
                         <button
                           type="button"
                           onClick={() => setShowInvite(true)}
-                          className="text-[0.8125rem] font-bold text-primary"
+                          className="text-micro font-bold text-primary"
                         >
                           Have an invite code?
                         </button>
                       ) : (
                         <>
-                          <label htmlFor="signup-invite" className="block text-[0.7812rem] font-semibold text-rd-text-tertiary mb-1">
+                          <label htmlFor="signup-invite" className="block text-overline font-semibold text-rd-text-tertiary mb-1">
                             Invite code <span className="text-outline font-medium">(optional)</span>
                           </label>
                           <div className={`flex items-center bg-white border rounded-2xl px-3.5 h-12 transition-all ${
@@ -455,11 +455,11 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
                                 if (inviteError) setInviteError(null);
                               }}
                               placeholder="e.g. K7M2QX"
-                              className="flex-1 bg-transparent text-[0.9062rem] font-semibold tracking-widest text-rd-ink outline-none placeholder:font-medium placeholder:tracking-normal"
+                              className="flex-1 bg-transparent text-micro font-semibold tracking-widest text-rd-ink outline-none placeholder:font-medium placeholder:tracking-normal"
                             />
                           </div>
                           {inviteError && (
-                            <p className="text-[0.7812rem] font-medium text-status-red mt-1">{inviteError}</p>
+                            <p className="text-overline font-medium text-status-red mt-1">{inviteError}</p>
                           )}
                         </>
                       )}
@@ -468,13 +468,13 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
 
 
               <div>
-                <label htmlFor="signup-primary-location-state" className="block text-[0.7812rem] font-semibold text-rd-text-tertiary mb-1">
+                <label htmlFor="signup-primary-location-state" className="block text-overline font-semibold text-rd-text-tertiary mb-1">
                   Primary Location / State
                 </label>
                 <select id="signup-primary-location-state" aria-label="Primary Location / State"
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
-                  className="w-full bg-white border border-[#E3E6E4] rounded-2xl px-3.5 h-12 text-[0.9375rem] font-medium text-rd-ink outline-none focus:ring-2 focus:ring-primary/30"
+                  className="w-full bg-white border border-[#E3E6E4] rounded-2xl px-3.5 h-12 text-caption font-medium text-rd-ink outline-none focus:ring-2 focus:ring-primary/30"
                 >
                   <option value="Abuja FCT">Abuja FCT</option>
                   <option value="Lagos State">Lagos State</option>
@@ -486,7 +486,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
               </div>
 
               <div>
-                <label className="block text-[0.7812rem] font-bold text-rd-text-tertiary mb-2">Vehicle Category</label>
+                <label className="block text-overline font-bold text-rd-text-tertiary mb-2">Vehicle Category</label>
                 <div className="grid grid-cols-2 gap-2">
                   {[
                     { id: 'private', icon: 'directions_car', label: 'Private Car', sub: 'Personal drive' },
@@ -504,8 +504,8 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
                           : 'bg-white text-rd-ink ring-1 ring-[#E3E6E4] hover:ring-rd-ink/30'
                       }`}
                     >
-                      <p className="font-geist font-bold text-[0.8438rem] flex items-center gap-1.5"><Icon name={v.icon} size={18} className="shrink-0" />{v.label}</p>
-                      <p className={`text-[0.75rem] mt-0.5 ${vehicleType === v.id ? 'text-white/70' : 'text-rd-text-tertiary'}`}>{v.sub}</p>
+                      <p className="font-geist font-bold text-micro flex items-center gap-1.5"><Icon name={v.icon} size={18} className="shrink-0" />{v.label}</p>
+                      <p className={`text-overline mt-0.5 ${vehicleType === v.id ? 'text-white/70' : 'text-rd-text-tertiary'}`}>{v.sub}</p>
                     </button>
                   ))}
                 </div>
@@ -513,31 +513,31 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label htmlFor="signup-car-model" className="block text-[0.7812rem] font-bold text-rd-text-tertiary mb-1">Car Model</label>
+                  <label htmlFor="signup-car-model" className="block text-overline font-bold text-rd-text-tertiary mb-1">Car Model</label>
                   <input id="signup-car-model"
                     type="text"
                     required
                     value={vehicleMake}
                     onChange={(e) => setVehicleMake(e.target.value)}
                     placeholder="e.g. Toyota Camry"
-                    className="w-full bg-white border border-[#E3E6E4] rounded-2xl px-3.5 h-12 text-[0.9375rem] font-bold text-rd-ink outline-none"
+                    className="w-full bg-white border border-[#E3E6E4] rounded-2xl px-3.5 h-12 text-body font-bold text-rd-ink outline-none"
                   />
                 </div>
                 <div>
-                  <label htmlFor="signup-year" className="block text-[0.7812rem] font-bold text-rd-text-tertiary mb-1">Year</label>
+                  <label htmlFor="signup-year" className="block text-overline font-bold text-rd-text-tertiary mb-1">Year</label>
                   <input id="signup-year"
                     type="text"
                     required
                     value={vehicleYear}
                     onChange={(e) => setVehicleYear(e.target.value)}
                     placeholder="2018"
-                    className="w-full bg-white border border-[#E3E6E4] rounded-2xl px-3.5 h-12 text-[0.9375rem] font-bold text-rd-ink outline-none"
+                    className="w-full bg-white border border-[#E3E6E4] rounded-2xl px-3.5 h-12 text-body font-bold text-rd-ink outline-none"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-[0.7812rem] font-bold text-rd-text-tertiary mb-1.5">CNG Conversion Status</label>
+                <label className="block text-overline font-bold text-rd-text-tertiary mb-1.5">CNG Conversion Status</label>
                 <div className="flex flex-col gap-2">
                   {[
                     { id: 'installed', icon: 'check_circle', label: 'CNG Kit Already Installed', desc: 'Active AutoCNG driver' },
@@ -554,8 +554,8 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
                           : 'bg-white ring-1 ring-[#E3E6E4] hover:ring-rd-ink/30'
                       }`}
                     >
-                      <p className="font-geist font-bold text-[0.875rem] text-rd-ink flex items-center gap-1.5"><Icon name={st.icon} size={18} fill className="shrink-0" />{st.label}</p>
-                      <p className="text-[0.75rem] text-rd-text-tertiary">{st.desc}</p>
+                      <p className="font-geist font-bold text-micro text-rd-ink flex items-center gap-1.5"><Icon name={st.icon} size={18} fill className="shrink-0" />{st.label}</p>
+                      <p className="text-overline text-rd-text-tertiary">{st.desc}</p>
                     </button>
                   ))}
                 </div>
@@ -563,11 +563,11 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
 
               {cngStatus === 'installed' && (
                 <div>
-                  <label htmlFor="signup-cng-cylinder-tank-size" className="block text-[0.7812rem] font-bold text-rd-text-tertiary mb-1">CNG Cylinder Tank Size</label>
+                  <label htmlFor="signup-cng-cylinder-tank-size" className="block text-overline font-bold text-rd-text-tertiary mb-1">CNG Cylinder Tank Size</label>
                   <select id="signup-cng-cylinder-tank-size" aria-label="CNG Cylinder Tank Size"
                     value={tankSize}
                     onChange={(e) => setTankSize(e.target.value)}
-                    className="w-full bg-white border border-[#E3E6E4] rounded-2xl px-3.5 h-12 text-[0.9375rem] font-bold text-rd-ink outline-none"
+                    className="w-full bg-white border border-[#E3E6E4] rounded-2xl px-3.5 h-12 text-body font-bold text-rd-ink outline-none"
                   >
                     <option value="12kg">12kg Cylinder</option>
                     <option value="15kg">15kg Cylinder (Standard Sedan)</option>
@@ -585,7 +585,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({ onComplete, onCancel
             <button
               type="submit"
               disabled={isBusy || (step === 2 && userCodeInput.trim().length < 6)}
-              className="w-full h-14 bg-rd-ink text-white font-geist font-bold text-[0.9375rem] rounded-full active:scale-[0.98] transition-transform flex items-center justify-center gap-2 disabled:opacity-35"
+              className="w-full h-14 bg-rd-ink text-white font-geist font-bold text-body rounded-full active:scale-[0.98] transition-transform flex items-center justify-center gap-2 disabled:opacity-35"
             >
               {isBusy ? (
                 <div className="flex items-center gap-2">
