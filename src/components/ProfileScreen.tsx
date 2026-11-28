@@ -1,7 +1,10 @@
 import { InviteCard } from './InviteCard';
 import { FEATURES } from '../config/features';
 import { validatePhoneNumber } from '../utils/phoneValidator';
-import { SendTestAlertRow } from './SendTestAlertRow';
+import { AlertsCard } from './AlertsCard';
+import { describeAlertsCard, type AlertsCardAction } from '../utils/alertsCard';
+import { detectAlertsDevice, readNotificationPermission } from '../utils/alertsDevice';
+import { isPushKeyConfigured } from '../services/pushService';
 import { BUILD_ID, checkForAppUpdate } from '../utils/appUpdate';
 import React, { useState } from 'react';
 import * as PopoverPrimitive from '@radix-ui/react-popover';
@@ -26,9 +29,16 @@ interface ProfileScreenProps {
   onUpdateProfile?: (updatedUser: Partial<UserProfile>) => void;
   onUploadAvatar?: (file: File) => Promise<{ url?: string; error?: string }>;
   onOpenRoiCalculator?: () => void;
-  onTogglePushNotifications?: () => void;
-  isPushGranted?: boolean;
-  /** Sends a test alert to this phone; the row is shown only while alerts are on. */
+  isSignedIn?: boolean;
+  /** How many stations the driver has favourited; alerts cover them. */
+  favoriteCount?: number;
+  /** This phone is registered for alerts. */
+  isPushSubscribed?: boolean;
+  /** Turning alerts on or off is in progress. */
+  isPushBusy?: boolean;
+  onEnableAlerts?: () => void;
+  onDisableAlerts?: () => void;
+  /** Sends a test alert to this phone. */
   onSendTestAlert?: () => void;
   isSendingTestAlert?: boolean;
 }
@@ -42,18 +52,38 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   onUpdateProfile,
   onUploadAvatar,
   onOpenRoiCalculator,
-  onTogglePushNotifications,
-  isPushGranted,
+  isSignedIn = false,
+  favoriteCount = 0,
+  isPushSubscribed = false,
+  isPushBusy = false,
+  onEnableAlerts,
+  onDisableAlerts,
   onSendTestAlert,
   isSendingTestAlert = false,
 }) => {
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const avatarInputRef = React.useRef<HTMLInputElement>(null);
-  const [notificationsEnabledLocal, setNotificationsEnabledLocal] = useState(true);
-  // Prefer the real browser push-permission state when the parent wires it in;
-  // fall back to a local toggle otherwise.
-  const notificationsEnabled = onTogglePushNotifications ? Boolean(isPushGranted) : notificationsEnabledLocal;
-  const handleToggleNotifications = onTogglePushNotifications ?? (() => setNotificationsEnabledLocal((v) => !v));
+  // The Alerts card reads the phone at render time; the app re-renders it when alerts are switched on or off.
+  const alertsModel = describeAlertsCard({
+    isSignedIn,
+    keyConfigured: isPushKeyConfigured(),
+    device: detectAlertsDevice(),
+    permission: readNotificationPermission(),
+    subscribed: isPushSubscribed,
+    homeState: user.state || '',
+    favoriteCount,
+  });
+  const handleAlertsAction = (action: AlertsCardAction) => {
+    if (action === 'sign_in') onOpenSignUp?.();
+    else if (action === 'enable') onEnableAlerts?.();
+    else if (action === 'disable') onDisableAlerts?.();
+    else if (action === 'test') onSendTestAlert?.();
+    else {
+      const select = document.getElementById('profile-home-state');
+      select?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      select?.focus();
+    }
+  };
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
@@ -337,6 +367,8 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
           )}
         </div>
 
+        <AlertsCard model={alertsModel} onAction={handleAlertsAction} busy={isPushBusy} testBusy={isSendingTestAlert} />
+
         {/* Settings */}
         <div className="bg-surface-container-high rounded-2xl shadow-[0_4px_14px_rgba(14,20,32,0.05)] divide-y divide-surface-container overflow-hidden">
           <div>
@@ -360,7 +392,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                         setThemePref(pref);
                         setThemePrefState(pref);
                       }}
-                      className={`min-h-11 px-3.5 rounded-full text-overline font-bold transition-colors ${
+                      className={`min-h-11 px-3 rounded-full text-overline font-bold transition-colors ${
                         themePref === pref ? 'bg-rd-selected text-rd-on-selected' : 'text-outline'
                       }`}
                     >
@@ -376,7 +408,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
             label="Home state"
             hint="Alerts follow this state"
             right={
-              <select aria-label="Home state"
+              <select id="profile-home-state" aria-label="Home state"
                 value={user.state || 'Abuja FCT'}
                 onChange={(e) => {
                   const newState = e.target.value;
@@ -394,27 +426,6 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
               </select>
             }
           />
-          <Row
-            icon="notifications"
-            label="Proximity alerts"
-            right={
-              <button
-                onClick={handleToggleNotifications}
-                aria-pressed={notificationsEnabled}
-                aria-label="Toggle proximity alerts"
-                className={`w-[34px] h-5 rounded-full transition-colors relative shrink-0 before:content-[''] before:absolute before:-inset-x-[5px] before:-inset-y-3 ${
-                  notificationsEnabled ? 'bg-primary' : 'bg-surface-container-highest'
-                }`}
-              >
-                <span
-                  className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-all ${
-                    notificationsEnabled ? 'right-0.5' : 'left-0.5'
-                  }`}
-                />
-              </button>
-            }
-          />
-          {notificationsEnabled && onSendTestAlert && <SendTestAlertRow busy={isSendingTestAlert} onSend={onSendTestAlert} />}
           <Row
             icon="tune"
             label="Anonymous usage data"

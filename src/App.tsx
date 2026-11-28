@@ -53,7 +53,6 @@ import {
   detectStatusTransition,
   checkShouldNotifyDriver,
   sendStationPushAlert,
-  requestNotificationPermission,
 } from './utils/pushNotificationEngine';
 import { getDriverTier, DriverTier } from './utils/reputationEngine';
 import { ReputationLevelModal } from './components/ReputationLevelModal';
@@ -67,12 +66,9 @@ import { track } from './services/analytics';
 import { getSupabase } from './services/supabaseClient';
 import type { RpcClient } from './services/rpcClient';
 import {
-  PUSH_NOT_SET_UP_REASON,
   detectPushSupport,
   getThisDeviceSubscription,
-  isPushKeyConfigured,
   markPushPromptSeen,
-  pushSwitchState,
   sendTestAlert,
   shouldAskForAlerts,
   subscribeThisDevice,
@@ -298,36 +294,16 @@ export const App: React.FC = () => {
     return false;
   }, [isAuthenticated, userProfile.state, favoriteStationIds]);
 
-  const handleTogglePushNotifications = useCallback(async () => {
-    // Switching off: remove this phone from the database and the push service.
-    if (isPushSubscribed) {
-      const supabase = await getSupabase();
-      if (supabase) await unsubscribeThisDevice(supabase as unknown as RpcClient);
-      setIsPushSubscribed(false);
-      setIsPushGranted(false);
-      showToast('Alerts off on this phone.');
-      return;
-    }
-    const support = detectPushSupport();
-    if (support.supported) {
-      await enablePushAlerts();
-      return;
-    }
-    // Until alerts are set up on the server, the toggle keeps its older job: browser permission for the
-    // alerts the app shows while it is open. Any other reason (an iPhone tab, an old browser) is told plainly.
-    if (support.reason !== PUSH_NOT_SET_UP_REASON) {
-      showToast(support.reason, 'warn');
-      return;
-    }
-    const permission = await requestNotificationPermission();
-    if (permission === 'granted') {
-      setIsPushGranted(true);
-      showToast('Alerts on.', 'bell');
-    } else if (permission === 'denied') {
-      setIsPushGranted(false);
-      showToast('Alerts are blocked in your browser settings.', 'warn');
-    }
-  }, [isPushSubscribed, enablePushAlerts]);
+  // Switching off: remove this phone from the database and the push service.
+  const disablePushAlerts = useCallback(async () => {
+    setIsPushBusy(true);
+    const supabase = await getSupabase();
+    if (supabase) await unsubscribeThisDevice(supabase as unknown as RpcClient);
+    setIsPushBusy(false);
+    setIsPushSubscribed(false);
+    setIsPushGranted(false);
+    showToast('Alerts off on this phone.');
+  }, []);
 
   // "Send a test alert": asks the server to push one to this phone, and says what happened.
   const [isSendingTestAlert, setIsSendingTestAlert] = useState(false);
@@ -1255,10 +1231,14 @@ export const App: React.FC = () => {
               }}
               onUploadAvatar={isAuthenticated ? uploadAvatar : undefined}
               onOpenRoiCalculator={() => setIsRoiModalOpen(true)}
-              onTogglePushNotifications={handleTogglePushNotifications}
+              isSignedIn={isAuthenticated}
+              favoriteCount={favoriteStationIds.length}
+              isPushSubscribed={isPushSubscribed}
+              isPushBusy={isPushBusy}
+              onEnableAlerts={() => void enablePushAlerts()}
+              onDisableAlerts={() => void disablePushAlerts()}
               onSendTestAlert={() => void handleSendTestAlert()}
               isSendingTestAlert={isSendingTestAlert}
-              isPushGranted={pushSwitchState({ keyConfigured: isPushKeyConfigured(), subscribed: isPushSubscribed, permissionGranted: isPushGranted })}
               onTriggerProximityAlert={() => {
                 handleSimulateProximityNudge();
                 setActiveTab('map');
