@@ -825,12 +825,14 @@ export const MapScreen: React.FC<MapScreenProps> = ({
         {renderStatusTile(station)}
         <div className="min-w-0 flex-1">
           <h3 className="font-geist font-semibold text-body text-rd-fg truncate leading-snug">{station.name}</h3>
-          <p className="text-caption text-outline truncate flex items-center gap-1.5 mt-0.5">
-            <span aria-hidden="true" className={`w-2 h-2 rounded-full shrink-0 ${dotColor}`} />
-            <span className="truncate">
+          {/* Wraps to a second line instead of cutting off the price age, distance or place with an ellipsis. */}
+          <p className="text-caption text-outline flex items-start gap-1.5 mt-0.5">
+            <span aria-hidden="true" className={`w-2 h-2 rounded-full shrink-0 mt-[7px] ${dotColor}`} />
+            <span className="line-clamp-2">
               {[describeStatusOrStation(station, now), latestReportedPrice(station, now)?.compact, userGps && station.distance ? station.distance : null, station.city]
                 .filter(Boolean)
-                .join(' · ')}
+                // A non-breaking space keeps each separator on the line of the item before it, so a wrapped line never starts with "·".
+                .join('\u00A0· ')}
             </span>
           </p>
         </div>
